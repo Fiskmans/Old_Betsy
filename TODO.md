@@ -20,5 +20,6 @@
 - Editor tools
   - Play/Pause
   - Freecam
-
+- Add VR Support
+  - using [OpenVR](https://github.com/ValveSoftware/openvr)
 
