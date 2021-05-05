@@ -63,9 +63,6 @@
     <ClInclude Include="BaseState.h">
       <Filter>StateStack</Filter>
     </ClInclude>
-    <ClInclude Include="BootLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SvnIntegration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -193,9 +190,6 @@
     </ClCompile>
     <ClCompile Include="BaseState.cpp">
       <Filter>StateStack</Filter>
-    </ClCompile>
-    <ClCompile Include="BootLogger.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SvnIntegration.cpp">
       <Filter>Source Files</Filter>

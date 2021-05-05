@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "FontFactory.h"
 #include "DirectX11Framework.h"
-#include <SpriteFont.h>
+#include "DirectXTK\Inc\SpriteFont.h"
 
 std::unordered_map<std::string, DirectX::SpriteFont*>  FontFactory::ourFonts;
 ID3D11Device* FontFactory::ourDevicePtr = nullptr;

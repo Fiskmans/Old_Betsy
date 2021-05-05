@@ -4,7 +4,7 @@
 
 #pragma warning(push)
 #pragma warning(disable: 26812)
-#include <DDSTextureLoader.h>
+#include "DirectXTK\Inc\DDSTextureLoader.h"
 
 #include <stdexcept>
 #include <d3d11.h>

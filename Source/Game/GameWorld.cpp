@@ -92,7 +92,7 @@
 #include "TraderAI.h"
 #include "WildPlant.h"
 
-#include "../packages/directxtk_desktop_2015.2019.10.17.1/include/SpriteBatch.h"
+#include "DirectXTK\Inc\SpriteBatch.h"
 #include "DirectX11Framework.h"
 #include "NodeChangeInteractableMesh.h"
 

@@ -3,7 +3,7 @@
 #include "Sprite.h"
 #include "SpriteInstance.h"
 #include <fstream>
-#include <DDSTextureLoader.h>
+#include "DirectXTK\Inc\DDSTextureLoader.h"
 #include "ShaderCompiler.h"
 #include "DirectX11Framework.h"
 #include "TextureLoader.h"

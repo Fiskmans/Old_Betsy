@@ -1,5 +1,5 @@
 #pragma once
-#include "../packages/directxtk_desktop_2015.2019.10.17.1/include/SpriteFont.h"
+#include "DirectXTK\Inc\SpriteFont.h"
 #include "Vector2.hpp"
 #include "Vector4.hpp"
 

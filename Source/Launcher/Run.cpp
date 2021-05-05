@@ -1,6 +1,5 @@
 #include <pch.h>
 #include <Game.h>
-#include <BootLogger.h>
 #include "WindowHandler.h"
 #include <DirectX11Framework.h>
 #include "Button.h"
@@ -71,9 +70,6 @@ int Run()
 #endif
 
 #if USEIMGUI
-		char bootTimes[1024];
-		*bootTimes = '\0';
-		CheckLaunchTimes(bootTimes, 1024);
 
 		char pendingFiles[2048];
 		*pendingFiles = '\0';
@@ -223,9 +219,6 @@ int Run()
 							{
 								SvnIntegration::Update();
 								pendingSvn = false;
-
-								*bootTimes = '\0';
-								CheckLaunchTimes(bootTimes, 1024);
 							}
 							ImGui::Text(pendingFiles);
 						}
@@ -316,12 +309,6 @@ int Run()
 							}
 							MemAvailability = newAvailability;
 #endif
-							if (ImGui::TreeNode("Times since last known boot & commit"))
-							{
-								ImGui::Text(bootTimes);
-								ImGui::Separator();
-								ImGui::TreePop();
-							}
 							if (ImGui::TreeNode("Svn"))
 							{
 								if (ImGui::Button("Check for updates"))

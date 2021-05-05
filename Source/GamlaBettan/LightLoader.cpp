@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "LightLoader.h"
 #include "Environmentlight.h"
-#include <DDSTextureLoader.h>
+#include "DirectXTK\Inc\DDSTextureLoader.h"
 #include "CameraFactory.h"
 #include "PointLight.h"
 

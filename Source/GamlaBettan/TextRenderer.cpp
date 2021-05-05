@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "TextRenderer.h"
-#include "SpriteBatch.h"
+#include "DirectXTK\Inc\SpriteBatch.h"
 #include "DirectX11Framework.h"
 #include "TextInstance.h"
 

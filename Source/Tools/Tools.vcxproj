@@ -63,6 +63,7 @@
     <Import Project="..\OpenSSLInclude.props" />
     <Import Project="..\SharedPCH.props" />
     <Import Project="..\ZmSwitch.props" />
+    <Import Project="..\Includes.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -71,6 +72,7 @@
     <Import Project="..\OpenSSLInclude.props" />
     <Import Project="..\SharedPCH.props" />
     <Import Project="..\ZmSwitch.props" />
+    <Import Project="..\Includes.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -79,6 +81,7 @@
     <Import Project="..\OpenSSLInclude.props" />
     <Import Project="..\SharedPCH.props" />
     <Import Project="..\ZmSwitch.props" />
+    <Import Project="..\Includes.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -87,6 +90,7 @@
     <Import Project="..\OpenSSLInclude.props" />
     <Import Project="..\SharedPCH.props" />
     <Import Project="..\ZmSwitch.props" />
+    <Import Project="..\Includes.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -181,7 +185,6 @@
     <ClInclude Include="BaseState.h" />
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="BezierCurve.h" />
-    <ClInclude Include="BootLogger.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="CatmullRom.h" />
     <ClInclude Include="ClipBoardHelper.h" />
@@ -225,7 +228,6 @@
     <ClCompile Include="Base64.cpp" />
     <ClCompile Include="BaseState.cpp" />
     <ClCompile Include="Bezier.cpp" />
-    <ClCompile Include="BootLogger.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="CatmullRom.cpp" />
     <ClCompile Include="ClipBoardHelper.cpp" />

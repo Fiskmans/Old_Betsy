@@ -294,7 +294,7 @@ namespace Logger
 	void Map(LOGGERTYPE aMessageType, std::string aOutputFile)
 	{
 #if USELOGGER
-		aOutputFile += ".log";
+		aOutputFile = "logs/" + aOutputFile + ".log";
 		for (LOGGERTYPE i = 0; i < sizeof(LOGGERTYPE) * CHAR_BIT; i++)
 		{
 			LOGGERTYPE bit = aMessageType & (1ULL << i);
@@ -311,6 +311,11 @@ namespace Logger
 				FileMapping[messageType] = aOutputFile;
 				if (OpenFiles.count(aOutputFile) == 0)
 				{
+					if (!std::filesystem::exists("logs/"))
+					{
+						std::filesystem::create_directories("logs/");
+					}
+
 					OpenFiles[aOutputFile].open(aOutputFile); // default construct and open
 					if (!OpenFiles[aOutputFile].good())
 					{
