@@ -1,0 +1,34 @@
+{
+
+  "Daily" : true,
+	"Dialogues": [
+		[
+			"Ruth#Oh, good morning. Getting curious I see.",
+			
+			"Ruth#That's good.",
+			
+			"Ruth#Grandma always said that cuirosity is the apple of the pie.",
+			
+			"Ruth#So don't shy away from it!",
+
+			"#*Ruth can feel something stir in her mind. Words form inside her head,*",
+
+			"#*but they are strange...*",
+
+			"#*not her own.*",
+			
+			"Gnome inside of Ruth's head#My study is now complete.\nWe have chosen you.\nBe prepared.",
+			
+			"Ruth#Uhm. Okay?",
+			
+			"Ruth#What is it you have chosen me for?",
+			
+			"#*The gnome's nose looks very serious, but it's silent inside Ruth's head.*"
+
+
+		],
+		[
+		"Ruth# "
+		]
+	]
+}

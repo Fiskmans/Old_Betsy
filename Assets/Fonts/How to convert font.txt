@@ -1,0 +1,17 @@
+- Tryck windows + r och skriv in "cmd" och tryck enter (ett konsollfönster kommer att öppnas)
+
+- Skriv "cd " och sedan filsökvägen till den här mappen innanför "" i konsollfönstret, copy-paste går bra. Tryck enter.
+
+- Skriv sedan "MakeSpriteFont "namn på font" filnamn.spritefont /Fontsize:x" i konsollfönstert och tada! Fonten är klar och du kan 
+  stänga fönstret. Dock måste fonten som ska konverteras vara installerad. 
+
+  Om du vill att fonten ska vara t.ex. kursiv skriv något av följade efter "/Fontsize:x": /FontStyle:Bold /FontStyle:Italic 
+  /FontStyle:Strikeout /FontStyle:Underline. Om texten ska vara "vanlig" behövs ingen FontStyle
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+  Exempel på fontkonvertering: 
+
+  C:\Users\Jim.Skipper> cd "C:\Users\Jim.Skipper\Desktop\Project\Game\Data\Fonts"
+
+  C:\Users\Jim.Skipper\Desktop\Project\Game\Data\Fonts> MakeSpriteFont "Comic sans" bestFont.spritefont /Fontsize:32 /FontStyle:Bold

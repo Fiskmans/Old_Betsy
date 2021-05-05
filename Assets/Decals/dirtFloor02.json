@@ -1,0 +1,7 @@
+{
+	"ShaderPath":"Data/Shaders/Deferred/DefaultDecal.hlsl",
+	"Texture": ["Data/Textures/Decals/DirtFloor02/dirtFloor02_decal_mat_D.DDS", "Data/Textures/Decals/DirtFloor02/dirtFloor02_decal_mat_M.DDS", "Data/Textures/Decals/DirtFloor02/dirtFloor02_decal_mat_N.DDS"],
+	"FOV":60,
+	"Range":400,
+	"CustomData":[1.0,2.0,3.0,4.0]
+}

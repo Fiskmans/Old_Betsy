@@ -1,0 +1,32 @@
+{
+	"Stages":[
+	{
+		"Model":"Data/Models/PL_Radish_01/PL_RadishStage1_01.fbx",
+		"Yield": [{
+			"Item":"Radish",
+			"Amount":0.5
+		}]
+	},
+	{
+		"Model":"Data/Models/PL_Radish_01/PL_RadishStage2_01.fbx",
+		"Yield": [{
+			"Item":"Radish",
+			"Amount":1
+		}]
+	},
+	{
+		"Model":"Data/Models/PL_Radish_01/PL_RadishStage3_01.fbx",
+		"Yield": [{
+			"Item":"Radish",
+			"Amount":2.5
+		}]
+	},
+	{
+		"Model":"Data/Models/PL_Radish_01/PL_RadishStage4_01.fbx",
+		"Yield": [{
+			"Item":"Radish",
+			"Amount":4
+		}]
+	}
+	]
+}

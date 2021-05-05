@@ -1,0 +1,7 @@
+{
+	"ShaderPath":"Data/Shaders/Deferred/BulletDecal.hlsl",
+	"Texture": [ "Data/Textures/Decals/BulletHole01/BulletHole01_d.dds", "Data/Textures/Decals/BulletHole01/BulletHole01_m.dds", "Data/Textures/Decals/BulletHole01/BulletHole01_n.dds" ],
+	"FOV":30,
+	"Range":200,
+	"CustomData":[1.0,2.0,3.0,4.0]
+}

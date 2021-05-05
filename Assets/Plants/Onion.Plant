@@ -1,0 +1,25 @@
+{
+	"Stages":[
+	{
+		"Model":"Data/Models/PL_Onion_01/PL_onionStage1_01.fbx",
+		"Yield": [{
+			"Item":"Onion",
+			"Amount":0.3
+		}]
+	},
+	{
+		"Model":"Data/Models/PL_Onion_01/PL_onionStage2_01.fbx",
+		"Yield": [{
+			"Item":"Onion",
+			"Amount":1.3
+		}]
+	},
+	{
+		"Model":"Data/Models/PL_Onion_01/PL_onionStage3_01.fbx",
+		"Yield": [{
+			"Item":"Onion",
+			"Amount":2
+		}]
+	}
+	]
+}

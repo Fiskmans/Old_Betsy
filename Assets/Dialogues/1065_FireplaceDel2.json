@@ -1,0 +1,22 @@
+{
+  "Daily" : true,
+  
+  "Dialogues": [
+	[
+	  "Ruth#Someone has lit the fire, but... I don't see anyone here.",
+	  
+	  "Ruth#Could it really?...",
+	  
+	  "Ruth#Are these my old toys?",
+	  
+	  "Ruth#But how did they get here?\nI sure could not have missed them last time I was here."
+	  
+	  "#*The fire intensifies, and Ruth stare towards the flames*",
+	  
+	  "#*In the fire Ruth can see her grandparents wave at her.\nThey look happy and Ruth is filled with warmth.*"
+	],
+	[
+	  "Ruth#DONT SHOW THIS"
+	]
+  ]
+}

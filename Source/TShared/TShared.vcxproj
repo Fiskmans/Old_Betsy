@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{ADBD4EB5-E36B-4338-90DD-53C299C9F77C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>TShared</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPCH.props" />
+    <Import Project="..\Cxx17.props" />
+    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
+    <Import Project="..\ZmSwitch.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPCH.props" />
+    <Import Project="..\Cxx17.props" />
+    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
+    <Import Project="..\ZmSwitch.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>$(ProjectName)_$(Configuration)</TargetName>
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(solutiondir)libs\</OutDir>
+    <IntDir>$(solutiondir)Workbed\shared\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>$(ProjectName)_$(Configuration)</TargetName>
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(solutiondir)libs\</OutDir>
+    <IntDir>$(solutiondir)Workbed\shared\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(solutiondir)../../ClientMigration/precompiled/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(solutiondir)../../ClientMigration/precompiled/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Precompiled\Macros.h" />
+    <ClInclude Include="..\Precompiled\pch.h" />
+    <ClInclude Include="BigFileMessage.h" />
+    <ClInclude Include="DeathSpotMessage.h" />
+    <ClInclude Include="DoWorkMessage.h" />
+    <ClInclude Include="EasyAssignString.h" />
+    <ClInclude Include="NetIdentify.h" />
+    <ClInclude Include="NetRapport.h" />
+    <ClInclude Include="NetworkHelpers.h" />
+    <ClInclude Include="PingMessage.h" />
+    <ClInclude Include="CommonNetworkIncludes.h" />
+    <ClInclude Include="AllNetMesseges.h" />
+    <ClInclude Include="NetMessage.h" />
+    <ClInclude Include="NetPackResponse.h" />
+    <ClInclude Include="NetworkInterface.h" />
+    <ClInclude Include="SetupMessage.h" />
+    <ClInclude Include="StatusMessage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Precompiled\pch.cpp" />
+    <ClCompile Include="BigFileMessage.cpp" />
+    <ClCompile Include="DeathSpotMessage.cpp" />
+    <ClCompile Include="DoWorkMessage.cpp" />
+    <ClCompile Include="EasyAssignString.cpp" />
+    <ClCompile Include="NetIdentify.cpp" />
+    <ClCompile Include="NetRapport.cpp" />
+    <ClCompile Include="NetworkHelpers.cpp" />
+    <ClCompile Include="PingMessage.cpp" />
+    <ClCompile Include="NetMessage.cpp" />
+    <ClCompile Include="NetPackResponse.cpp" />
+    <ClCompile Include="NetworkInterface.cpp" />
+    <ClCompile Include="SetupMessage.cpp" />
+    <ClCompile Include="StatusMessage.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

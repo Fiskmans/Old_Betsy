@@ -1,0 +1,28 @@
+{
+ "Daily" : true,
+
+  "Dialogues": [
+    [
+      "Ruth#I felt so brave when I sneaked out here\nwhen I was little,",
+	  
+	  "Ruth#telling dad that I would ABSOLUTELY NOT\ngo to the forbidden hut.",
+	  
+	  "Ruth#It was scary going this close though, I guess\ndad's ghost stories got to me after all,",
+	  
+	  "Ruth#the air always seemed to get colder the closer I got.",
+	  
+	  "Ruth#Wait...",
+	  
+	  "Ruth#This chopped wood wasn't here when we moved away!",
+	  
+	  "Ruth#Could it be that it's not abandoned any more?",
+	  
+	  "Ruth#I might have a neighbor, how delightful!",
+	  
+	  "Ruth#I wonder what their name is."
+    ],
+	[
+	"Ruth#The wood is defenitely freshly chopped."
+	]
+  ]
+}

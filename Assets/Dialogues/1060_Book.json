@@ -1,0 +1,27 @@
+{
+  
+  "Dialogues": [
+    [
+      "Ruth#Huh, I don't think I've seen this one before.",
+	  
+	  "Book#My dearest Ruth.",
+	  
+	  "Book#I am happy to see that you are back.\nI always thought you were one of the\nfew that could truly understand this place.",
+	  
+	  "Book#There is so much more going on here than most\nunderstand, but YOU, you have the potential.",
+	  
+	  "Book#You can see the underground tunnels, the\n world that lies hidden here.",
+	  
+	  "Book#Keep following your feet, my dearest Ruth,\nand you might uncover the truth of this\nunusual mountain.",
+	  
+	  "#*The rest of the book is filled with illegible text.\nIt feels like it's written for someone else.\nOr maybe for someone that Ruth has yet to become.*"
+	  
+	 
+    ],
+	[
+      "#*The air around the book is glistening,\nas if the book is radiating some kind of power.*"
+	  
+	 
+    ]
+  ]
+}

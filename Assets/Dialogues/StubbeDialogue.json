@@ -1,0 +1,15 @@
+{
+"Daily" : true,
+
+  "Dialogues": [
+    [
+      "Tjolle#Tjenare!\nhur ar laget?",
+
+      "Bolle#Bara bra tack",
+
+      "Tjolle#Schysst",
+
+      "Bolle#yep"
+    ]
+  ]
+}

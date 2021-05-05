@@ -1,0 +1,16 @@
+{
+  "Daily" : true,
+
+  "Dialogues": [
+    [
+      "Ruth#Oh, what a beautiful name.",
+	  
+	  "Ruth#Pleased to meet you Alf,\nI hope we can become friends.",
+	  
+	  "Ruth#I live just down the stream,\nfeel free to come visit any time."
+    ],
+	[
+      "Ruth#Such a friendly neighbor."
+    ]
+  ]
+}

@@ -1,0 +1,512 @@
+{
+  "Days": [
+    {
+      "dayindex": 1,
+	  "events":
+	  [
+		{
+			"time": 7,
+			"typeofevent": 0,
+			"specificID": 10
+		},
+		{
+			"time": 8,
+			"typeofevent": 1,
+			"specificID": 0
+		},
+			{
+			"time": 9,
+			"typeofevent": 0,
+			"specificID": 2
+		},
+			{
+			"time": 10,
+			"typeofevent": 0,
+			"specificID": 4
+		},
+		{
+			"time": 11,
+			"typeofevent": 0,
+			"specificID": 9
+		},
+		{
+			"time": 13,
+			"typeofevent": 0,
+			"specificID": 14
+		},
+		{
+			"time": 14,
+			"typeofevent": 0,
+			"specificID": 16
+		},
+		{
+			"time": 15,
+			"typeofevent": 0,
+			"specificID": 3
+		},
+		{
+			"time": 16,
+			"typeofevent": 0,
+			"specificID": 11
+		},
+		{
+			"time": 17,
+			"typeofevent": 0,
+			"specificID": 15
+		},
+		{
+			"time": 18,
+			"typeofevent": 0,
+			"specificID": 5
+		},
+		{
+			"time": 19,
+			"typeofevent": 0,
+			"specificID": 18
+		},
+		{
+			"time": 20,
+			"typeofevent": 0,
+			"specificID": 6
+		}
+	  ]
+    },
+	{
+      "dayindex": 2,
+	  "events":
+	  [
+		{
+			"time": 7,
+			"typeofevent": 0,
+			"specificID": 20
+		},
+		{
+			"time": 8,
+			"typeofevent": 0,
+			"specificID": 7
+		},
+		
+		{
+			"time": 9,
+			"typeofevent": 0,
+			"specificID": 13
+		},
+		{
+			"time": 10,
+			"typeofevent": 0,
+			"specificID": 9
+		},
+		{
+			"time": 11,
+			"typeofevent": 0,
+			"specificID": 16
+		},
+		{
+			"time": 12,
+			"typeofevent": 0,
+			"specificID": 23
+		},
+		{
+			"time": 13,
+			"typeofevent": 1,
+			"specificID": 0
+		},
+		{
+			"time": 14,
+			"typeofevent": 0,
+			"specificID": 1
+		},
+		{
+			"time": 15,
+			"typeofevent": 0,
+			"specificID": 14
+		},
+		{
+			"time": 16,
+			"typeofevent": 0,
+			"specificID": 9
+		},
+		{
+			"time": 17,
+			"typeofevent": 0,
+			"specificID": 12
+		},
+		{
+			"time": 18,
+			"typeofevent": 0,
+			"specificID": 15
+		},
+		{
+			"time": 19,
+			"typeofevent": 0,
+			"specificID": 19
+		},
+		{
+			"time": 20,
+			"typeofevent": 0,
+			"specificID": 24
+		}
+	  ]
+    },
+	 {
+      "dayindex": 4,
+	  "events":
+	  [
+		{
+			"time": 7,
+			"typeofevent": 0,
+			"specificID": 15
+		},
+		{
+			"time": 8,
+			"typeofevent": 0,
+			"specificID": 20
+		},
+		{
+			"time": 9,
+			"typeofevent": 0,
+			"specificID": 16
+		},
+		{
+			"time": 10,
+			"typeofevent": 0,
+			"specificID": 18
+		},
+		{
+			"time": 11,
+			"typeofevent": 0,
+			"specificID": 24
+		},
+		{
+			"time": 12,
+			"typeofevent": 1,
+			"specificID": 0
+		},
+		{
+			"time": 13,
+			"typeofevent": 0,
+			"specificID": 22
+		},
+		{
+			"time": 14,
+			"typeofevent": 0,
+			"specificID": 6
+		},
+		{
+			"time": 15,
+			"typeofevent": 0,
+			"specificID": 10
+		},
+		{
+			"time": 16,
+			"typeofevent": 0,
+			"specificID": 2
+		},
+		{
+			"time": 17,
+			"typeofevent": 0,
+			"specificID": 14
+		},
+		{
+			"time": 18,
+			"typeofevent": 0,
+			"specificID": 4
+		},
+		{
+			"time": 23,
+			"typeofevent": 2,
+			"specificID": 0
+		}
+	  ]
+    },
+	{
+      "dayindex": 6,
+	  "events":
+	  [
+		{
+			"time": 7,
+			"typeofevent": 0,
+			"specificID": 15
+		},
+		{
+			"time": 8,
+			"typeofevent": 0,
+			"specificID": 21
+		},
+		{
+			"time": 9,
+			"typeofevent": 0,
+			"specificID": 16
+		},
+		{
+			"time": 10,
+			"typeofevent": 0,
+			"specificID": 18
+		},
+		{
+			"time": 11,
+			"typeofevent": 0,
+			"specificID": 24
+		},
+		{
+			"time": 12,
+			"typeofevent": 0,
+			"specificID": 22
+		},
+		{
+			"time": 13,
+			"typeofevent": 1,
+			"specificID": 0
+		},
+		{
+			"time": 14,
+			"typeofevent": 0,
+			"specificID": 9
+		},
+		{
+			"time": 15,
+			"typeofevent": 0,
+			"specificID": 11
+		},
+		{
+			"time": 16,
+			"typeofevent": 0,
+			"specificID": 10
+		},
+		{
+			"time": 17,
+			"typeofevent": 0,
+			"specificID": 7
+		},
+		{
+			"time": 18,
+			"typeofevent": 0,
+			"specificID": 6
+		},
+		{
+			"time": 19,
+			"typeofevent": 0,
+			"specificID": 5
+		},
+		{
+			"time": 20,
+			"typeofevent": 0,
+			"specificID": 1
+		}
+	  ]
+    },
+	{
+      "dayindex": 9,
+	  "events":
+	  [
+		
+		{
+			"time": 7,
+			"typeofevent": 0,
+			"specificID": 19
+		},
+		{
+			"time": 8,
+			"typeofevent": 0,
+			"specificID": 15
+		},
+		{
+			"time": 9,
+			"typeofevent": 0,
+			"specificID": 16
+		},
+		{
+			"time": 10,
+			"typeofevent": 0,
+			"specificID": 18
+		},
+		{
+			"time": 11,
+			"typeofevent": 0,
+			"specificID": 24
+		},
+		{
+			"time": 12,
+			"typeofevent": 0,
+			"specificID": 23
+		},
+		{
+			"time": 13,
+			"typeofevent": 1,
+			"specificID": 0
+		},
+		{
+			"time": 14,
+			"typeofevent": 0,
+			"specificID": 20
+		},
+		{
+			"time": 15,
+			"typeofevent": 0,
+			"specificID": 6
+		},
+		{
+			"time": 16,
+			"typeofevent": 0,
+			"specificID": 14
+		},
+		{
+			"time": 17,
+			"typeofevent": 0,
+			"specificID": 3
+		},
+		{
+			"time": 19,
+			"typeofevent": 0,
+			"specificID": 1
+		},
+		{
+			"time": 21,
+			"typeofevent": 0,
+			"specificID": 5
+		}
+	  ]
+    },
+	{
+      "dayindex": 12,
+	  "events":
+	  [
+		
+		{
+			"time": 7,
+			"typeofevent": 0,
+			"specificID": 10
+		},
+		{
+			"time": 8,
+			"typeofevent": 0,
+			"specificID": 0
+		},
+			{
+			"time": 9,
+			"typeofevent": 0,
+			"specificID": 2
+		},
+			{
+			"time": 10,
+			"typeofevent": 0,
+			"specificID": 4
+		},
+		{
+			"time": 11,
+			"typeofevent": 0,
+			"specificID": 9
+		},
+		{
+			"time": 13,
+			"typeofevent": 1,
+			"specificID": 0
+		},
+		{
+			"time": 14,
+			"typeofevent": 0,
+			"specificID": 7
+		},
+		{
+			"time": 15,
+			"typeofevent": 0,
+			"specificID": 3
+		},
+		{
+			"time": 16,
+			"typeofevent": 0,
+			"specificID": 11
+		},
+		{
+			"time": 18,
+			"typeofevent": 0,
+			"specificID": 5
+		},
+		{
+			"time": 20,
+			"typeofevent": 0,
+			"specificID": 6
+		}
+	  ]
+    },
+	{
+      "dayindex": 14,
+	  "events":
+	  [
+		
+		{
+			"time": 7,
+			"typeofevent": 0,
+			"specificID": 12
+		},
+		{
+			"time": 8,
+			"typeofevent": 0,
+			"specificID": 7
+		},
+		
+		{
+			"time": 9,
+			"typeofevent": 0,
+			"specificID": 13
+		},
+		{
+			"time": 10,
+			"typeofevent": 0,
+			"specificID": 9
+		},
+		{
+			"time": 11,
+			"typeofevent": 0,
+			"specificID": 19
+		},
+		{
+			"time": 12,
+			"typeofevent": 0,
+			"specificID": 14
+		},
+		{
+			"time": 13,
+			"typeofevent": 1,
+			"specificID": 0
+		},
+		{
+			"time": 14,
+			"typeofevent": 0,
+			"specificID": 1
+		},
+		{
+			"time": 15,
+			"typeofevent": 0,
+			"specificID": 11
+		},
+		{
+			"time": 16,
+			"typeofevent": 0,
+			"specificID": 9
+		},
+		{
+			"time": 17,
+			"typeofevent": 0,
+			"specificID": 2
+		},
+		{
+			"time": 18,
+			"typeofevent": 0,
+			"specificID": 6
+		},
+		{
+			"time": 19,
+			"typeofevent": 0,
+			"specificID": 10
+		},
+		{
+			"time": 20,
+			"typeofevent": 0,
+			"specificID": 11
+		}
+	  ]
+    }
+	
+  ]
+}

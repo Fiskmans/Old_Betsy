@@ -1,0 +1,31 @@
+{
+
+"Daily" : true,
+	"Dialogues": [
+		[
+			"Ruth#Befriending the sheep I see. Aren't they lovely?",
+			
+			"Gnome in Ruth's head#They do not understand.",
+			
+			"Ruth#Oh?",
+			
+			"Gnome in Ruth's head#Not like you do. They can not be chosen.",
+			
+			"Ruth#Oh. That's too bad.",
+			
+			"Ruth#So...",
+			
+			"Ruth#Can I help you somehow?",
+			
+			"Gnome in Ruth's head#Be vigilant. Keep your eyes open as you patrol the mountain.\nWe will not let anything bad happen here.",
+			
+			"Ruth#Okay? I guess I can do that.",
+			
+			"#*The gnome's nose looks satisfied, even though it is hard to tell.*"
+
+		],
+		[
+		"Ruth# "
+		]
+	]
+}

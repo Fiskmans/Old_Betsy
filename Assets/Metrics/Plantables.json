@@ -1,0 +1,20 @@
+{
+	"StackSize": 50,
+
+	"Seeds": "Data/Plants/potato.plant",
+	"CabbageSeed": "Data/Plants/CabbageSeed.plant",
+	"CarrotSeed": "Data/Plants/CarrotSeed.plant",
+	"OnionSeed": "Data/Plants/OnionSeed.plant",
+	"PeaSeed": "Data/Plants/PeaSeed.plant",
+	"RadishSeed": "Data/Plants/RadishSeed.plant",
+	"RhubarbSeed": "Data/Plants/RhubarbSeed.plant",
+	"MagicFlowerSeed": "Data/Plants/MagicFlowerSeed.plant",
+	"Potato": "Data/Plants/potato.plant",
+	"Carrot": "Data/Plants/carrot.plant",
+	"Cabbage": "Data/Plants/cabbage.plant",
+	"Onion": "Data/Plants/onion.plant",
+	"Pea": "Data/Plants/Pea.plant",
+	"Radish": "Data/Plants/Radish.plant",
+	"Rhubarb": "Data/Plants/Rhubarb.plant",
+	"MagicFlower": "Data/Plants/MagicFlower.plant"
+}

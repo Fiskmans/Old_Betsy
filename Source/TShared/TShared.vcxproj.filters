@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="MessageTypes">
+      <UniqueIdentifier>{19412f2d-9075-4a04-87c9-bdba43598d14}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CommonNetworkIncludes.h" />
+    <ClInclude Include="NetworkInterface.h" />
+    <ClInclude Include="BigFileMessage.h">
+      <Filter>MessageTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="AllNetMesseges.h">
+      <Filter>MessageTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="NetMessage.h">
+      <Filter>MessageTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="NetPackResponse.h">
+      <Filter>MessageTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="SetupMessage.h">
+      <Filter>MessageTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusMessage.h">
+      <Filter>MessageTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Precompiled\pch.h" />
+    <ClInclude Include="..\Precompiled\Macros.h" />
+    <ClInclude Include="NetworkHelpers.h" />
+    <ClInclude Include="EasyAssignString.h" />
+    <ClInclude Include="NetIdentify.h">
+      <Filter>MessageTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="PingMessage.h">
+      <Filter>MessageTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="NetRapport.h" />
+    <ClInclude Include="DoWorkMessage.h">
+      <Filter>MessageTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="DeathSpotMessage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="NetworkInterface.cpp" />
+    <ClCompile Include="BigFileMessage.cpp">
+      <Filter>MessageTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="NetMessage.cpp">
+      <Filter>MessageTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="NetPackResponse.cpp">
+      <Filter>MessageTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="SetupMessage.cpp">
+      <Filter>MessageTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusMessage.cpp">
+      <Filter>MessageTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Precompiled\pch.cpp" />
+    <ClCompile Include="NetworkHelpers.cpp" />
+    <ClCompile Include="EasyAssignString.cpp" />
+    <ClCompile Include="NetIdentify.cpp">
+      <Filter>MessageTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="PingMessage.cpp">
+      <Filter>MessageTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="NetRapport.cpp" />
+    <ClCompile Include="DoWorkMessage.cpp">
+      <Filter>MessageTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="DeathSpotMessage.cpp" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,25 @@
+{
+	"Stages":[
+	{
+		"Model":"Data/Models/PL_Cabbage_01/PL_cabbageStage1_01.fbx",
+		"Yield": [{
+			"Item":"Cabbage",
+			"Amount":0.3
+		}]
+	},
+	{
+		"Model":"Data/Models/PL_Cabbage_01/PL_cabbageStage2_01.fbx",
+		"Yield": [{
+			"Item":"Cabbage",
+			"Amount":0.75
+		}]
+	},
+	{
+		"Model":"Data/Models/PL_Cabbage_01/PL_cabbageStage3_01.fbx",
+		"Yield": [{
+			"Item":"Cabbage",
+			"Amount":1.5
+		}]
+	}
+	]
+}

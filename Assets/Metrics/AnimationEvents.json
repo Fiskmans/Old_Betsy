@@ -1,0 +1,268 @@
+{
+  "AnimationEvents": [
+    {
+		"name": "SquirrelInChick",
+		"specialID" : 1,
+		"fbxPath": "Data/Models/CH_squirrel_01/CH_squirrel_01.fbx",
+		"spawnDuration": 4.83,
+		"loopDuration": 13.958,
+		"endDuration": 3.66,
+		"xPos": -978.62,
+		"yPos": -100.0,
+		"zPos": -421.7
+    },
+	{
+		"name": "SparrowLandOnHouse",
+		"specialID" : 2,
+		"fbxPath": "Data/Models/CH_sparrow_01/CH_sparrow_01.fbx",
+		"spawnDuration": 16.41,
+		"loopDuration": 6.7,
+		"endDuration": 11.33,
+		"xPos": -377.0,
+		"yPos": -200.0,
+		"zPos": -723.0
+    },
+	{
+		"name": "SparrowsOnRune",
+		"specialID" : 3,
+		"fbxPath": "Data/Models/CH_sparrow_02/CH_sparrow_02.fbx",
+		"spawnDuration": 11.75,
+		"loopDuration": 11.0,
+		"endDuration": 14.58,
+		"xPos": 3817.0,
+		"yPos": -500.0,
+		"zPos": -1614.1
+    },
+	{
+		"name": "SquirrelRunningAcross",
+		"specialID" : 4,
+		"fbxPath": "Data/Models/CH_squirrel_02/CH_squirrel_02.fbx",
+		"spawnDuration": 7.8,
+		"loopDuration": 9.41,
+		"endDuration": 6.0,
+		"xPos": 172.233,
+		"yPos": -100.0,
+		"zPos": -407.781
+    },
+	{
+		"name": "WolfInTrees",
+		"specialID" : 5,
+		"fbxPath": "Data/Models/CH_wolf_01/CH_wolf_01.fbx",
+		"spawnDuration": 5.0,
+		"loopDuration": 21.33,
+		"endDuration": 3.08,
+		"xPos": -180.5,
+		"yPos": -100.0,
+		"zPos": -1592.23
+    },
+	{
+		"name": "SquirrelOnLog",
+		"specialID" : 6,
+		"fbxPath": "Data/Models/CH_squirrel_03/CH_squirrel_03.fbx",
+		"spawnDuration": 7.95,
+		"loopDuration": 27.91,
+		"endDuration": 5.83,
+		"xPos": 93.09,
+		"yPos": -143.35,
+		"zPos": 402.67
+    },
+	{
+		"name": "SparrowCircles",
+		"specialID" : 7,
+		"fbxPath": "Data/Models/CH_sparrow_03/CH_sparrow_03.fbx",
+		"spawnDuration": 8.83,
+		"loopDuration": 8.1,
+		"endDuration": 5.83,
+		"xPos": -547.73,
+		"yPos": -500.0,
+		"zPos": -654.567
+    },
+	{
+		"name": "ChickOnBench",
+		"specialID" : 8,
+		"fbxPath": "Data/Models/CH_chick_01/CH_chick_01.fbx",
+		"spawnDuration": 13.20,
+		"loopDuration": 11.83,
+		"endDuration": 10.83,
+		"xPos": 0.0,
+		"yPos": -800.0,
+		"zPos": 0.0
+    },
+	{
+		"name": "FishInTheWater",
+		"specialID" : 9,
+		"fbxPath": "Data/Models/CH_Fish_01/CH_Fish_01.fbx",
+		"spawnDuration": 10.45,
+		"loopDuration": 16.20,
+		"endDuration": 9.20,
+		"xPos": 2552.91,
+		"yPos": -225.0,
+		"zPos": 278.79
+    },	
+	{
+		"name": "RatRunByHouse",
+		"specialID" : 10,
+		"fbxPath": "Data/Models/CH_Rodent_01/CH_rodent_01.fbx",
+		"spawnDuration": 9.08,
+		"loopDuration": 12.0,
+		"endDuration": 5.12,
+		"xPos": -665.65,
+		"yPos": -200.0,
+		"zPos": -1349.52
+    },
+	{
+		"name": "RatRunToSheep",
+		"specialID" : 11,
+		"fbxPath": "Data/Models/CH_Rodent_02/CH_rodent_02.fbx",
+		"spawnDuration": 8.08,
+		"loopDuration": 12.0,
+		"endDuration": 8.08,
+		"xPos": -82.72,
+		"yPos": -200.0,
+		"zPos": -980.27
+    },
+	{
+		"name": "FishInTheWaterBig",
+		"specialID" : 12,
+		"fbxPath": "Data/Models/CH_Fish_02/CH_Fish_02.fbx",
+		"spawnDuration": 10.45,
+		"loopDuration": 16.20,
+		"endDuration": 9.20,
+		"xPos": 2552.91,
+		"yPos": -225.0,
+		"zPos": 278.79
+	},
+	{
+		"name": "FishWaterSplash",
+		"specialID" : 13,
+		"fbxPath": "Data/Models/CH_Fish_03/CH_Fish_03.fbx",
+		"spawnDuration": 10.45,
+		"loopDuration": 16.20,
+		"endDuration": 9.20,
+		"xPos": 2282.66,
+		"yPos": -225.0,
+		"zPos": 743.45
+	},
+	{
+		"name": "CatWalkAround",
+		"specialID" : 14,
+		"fbxPath": "Data/Models/CH_cat_02/CH_cat_02.fbx",
+		"spawnDuration": 19.29,
+		"loopDuration": 290.00,
+		"endDuration": 1.00,
+		"xPos": 0.00,
+		"yPos": -200.0,
+		"zPos": 0.00
+	},
+	{
+		"name": "RatByGiant",
+		"specialID" : 15,
+		"fbxPath": "Data/Models/CH_Rodent_04/CH_rodent_04.fbx",
+		"spawnDuration": 51.4583,
+		"loopDuration": 51.4583,
+		"endDuration": 1.0,
+		"xPos": 6172.172,
+		"yPos": -200.0,
+		"zPos": 1279.114
+	},
+	{
+		"name": "SquirrelByWell",
+		"specialID" : 16,
+		"fbxPath": "Data/Models/CH_squirrel_04/CH_squirrel_04.fbx",
+		"spawnDuration": 31.25,
+		"loopDuration": 31.25,
+		"endDuration": 0.1,
+		"xPos": -3643.858,
+		"yPos": -200.0,
+		"zPos": 4456.804
+	},
+	{
+		"name": "Catandmouse",
+		"specialID" : 17,
+		"fbxPath": "Data/Models/CH_catandMouse_01/CH_catandMouse_01.fbx",
+		"spawnDuration": 25.83,
+		"loopDuration": 0.1,
+		"endDuration": 0.1,
+		"xPos": 0.00,
+		"yPos": -500.00,
+		"zPos": 0.00
+	},
+	{
+		"name": "WolfInCave",
+		"specialID" : 18,
+		"fbxPath": "Data/Models/CH_wolf_02/CH_wolf_02.fbx",
+		"spawnDuration": 29.16,
+		"loopDuration": 58.32,
+		"endDuration": 18.75,
+		"xPos": -1182.403,
+		"yPos": -200.00,
+		"zPos": -9238.574
+	},
+	{
+		"name": "SquirrelInCircles",
+		"specialID" : 19,
+		"fbxPath": "Data/Models/CH_squirrel_05/CH_squirrel_05.fbx",
+		"spawnDuration": 7.83,
+		"loopDuration": 43.3,
+		"endDuration": 9.7,
+		"xPos": 2780.842,
+		"yPos": -100.0,
+		"zPos": -3778.507
+	},
+	{
+		"name": "WolfBesideRiver",
+		"specialID" : 20,
+		"fbxPath": "Data/Models/CH_wolf_03/CH_wolf_03.fbx",
+		"spawnDuration": 35.66,
+		"loopDuration": 71.32,
+		"endDuration": 35.66,
+		"xPos": 5346.375,
+		"yPos": -200.0,
+		"zPos": -2292.577
+	},
+	{
+		"name": "WolfByOldHouse",
+		"specialID" : 21,
+		"fbxPath": "Data/Models/CH_wolf_04/CH_wolf_04.fbx",
+		"spawnDuration": 18.37,
+		"loopDuration": 36.74,
+		"endDuration": 18.37,
+		"xPos": 9144.096,
+		"yPos": -200.0,
+		"zPos": -5784.709
+	},
+	{
+		"name": "RatByOldHouse",
+		"specialID" : 22,
+		"fbxPath": "Data/Models/CH_Rodent_05/CH_rodent_05.fbx",
+		"spawnDuration": 7.541,
+		"loopDuration": 84.48,
+		"endDuration": 21.12,
+		"xPos": 9300.474,
+		"yPos": -100.0,
+		"zPos": -7762.997
+	},
+	{
+		"name": "SparrowSouthFlight",
+		"specialID" : 23,
+		"fbxPath": "Data/Models/CH_sparrow_04/CH_sparrow_04.fbx",
+		"spawnDuration": 23.37,
+		"loopDuration": 46.74,
+		"endDuration": 23.37,
+		"xPos": 512.683,
+		"yPos": -500.0,
+		"zPos": 5993.9
+	},
+	{
+		"name": "SparrowNorthFlight",
+		"specialID" : 24,
+		"fbxPath": "Data/Models/CH_sparrow_05/CH_sparrow_05.fbx",
+		"spawnDuration": 23.37,
+		"loopDuration": 46.74,
+		"endDuration": 23.37,
+		"xPos": 1996.568,
+		"yPos": -500.0,
+		"zPos": -9100.554
+	}
+  ]
+}

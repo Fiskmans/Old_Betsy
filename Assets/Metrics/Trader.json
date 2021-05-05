@@ -1,0 +1,59 @@
+{
+  "TradeValues": {
+    "Potato": 0.75,
+    "Carrot": 1.0,
+    "Cabbage": 2,
+    "Onion": 1.5,
+    "Wool": 0.2,
+    "Pea": 1.0,
+    "Seeds": 0.8,
+	"CabbageSeed": 2,
+    "Rhubarb": 3,
+    "Radish": 1.2,
+    "Chicken": 4,
+	"MagicFlower": 10,
+	"PeaSeed": 2,
+	"OnionSeed": 2,
+	"CarrotSeed": 2,
+	"RadishSeed": 2,
+	"RhubarbSeed": 2,
+	"MagicFlowerSeed": 2
+  },
+  "TraderValue": 28,
+  "LootTables": [
+    {
+      "ValidDays": "All",
+      "Items": [
+        "Seeds",
+		"CabbageSeed",
+        "Chicken",
+		"Carrot",
+		"CarrotSeed"
+		
+		
+      ]
+    },
+    {
+      "ValidDays": {
+        "From": 5,
+        "To": 15
+      },
+      "Items": [
+        "Potato",
+        "Onion",
+        "Wool",
+		"RhubarbSeed",
+		"RadishSeed"
+      ]
+    },
+    {
+      "ValidDays": [ 1, 2, 3, 4, 5, 8, 12, 14 ],
+      "Items": [
+        "Pea",
+        "Carrot"
+		"OnionSeed",
+		"PeaSeed"
+      ]
+    }
+  ]
+}

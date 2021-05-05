@@ -1,0 +1,17 @@
+	bloodHandprint01
+*	bloodHandprint02	5	400
+	bloodleak01
+	bloodleak02
+*	Bloodsplatter01		60	400
+*	Bloodsplatter02		60	400
+*	Bloodsplatter03		60	400
+*	Bloodsplatter04		60	400
+*	Bloodsplatter05		30	400
+**	BulletHole		--	--
+	DirtDecal
+	dirtFloor01		90	400
+	dirtFloor02
+	dirtFloor03
+*	dirtWall01		60	400
+	dirtWall02
+*	dirtWall03		60	400

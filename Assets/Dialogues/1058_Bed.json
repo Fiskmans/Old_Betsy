@@ -1,0 +1,22 @@
+{
+  "Daily" : true,
+  
+  "Dialogues": [
+    [
+      "Ruth#Oh my, this is Grandma's bed!",
+	  
+	  "#*Standing in front of the bed Ruth thinks\nshe can hear faint breaths behind her.*",
+	  
+	  "#*Looking back at the painting the motif no longer\nis unmoving like in her youth.",
+	  
+	  "#*There are tiny black dots travelling the painting's sky.\nBirds, she realizes. And in the grass a dark hole\nhas appeared.*"
+	  
+	 
+    ],
+	[
+      "#*The bed is warm to the touch. As if someone has been sleeping there\njust recently.*"
+	  
+	 
+    ]
+  ]
+}

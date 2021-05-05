@@ -1,0 +1,38 @@
+{
+  "ImagesPath": "Data\\UI\\UIButtons",
+  
+  "BackButton": {
+    "name": "Back",
+    "PosX": 0.0875,
+    "PosY": 0.509
+  },
+  
+    "BackButton": {
+    "name": "Resolution Text",
+    "PosX": 0.278,
+    "PosY": 0.442
+  },
+
+  "ResolutionButtons": [
+    {
+      "Name": "1280x720",
+      "PosX": 0.297,
+      "PosY": 0.636
+    },
+    {
+      "Name": "1366x768",
+      "PosX": 0.425,
+      "PosY": 0.619
+    },
+    {
+      "Name": "1600x900",
+      "PosX": 0.570,
+      "PosY": 0.594
+    },
+    {
+      "Name": "1920x1080",
+      "PosX": 0.7385,
+      "PosY": 0.563
+    }
+  ]
+}

@@ -1,0 +1,912 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraFactory.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectX11Framework.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicEngine.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="InputHandler.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowHandler.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Spline.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="SpriteFactory.cpp" />
+    <ClCompile Include="SpriteInstance.cpp" />
+    <ClCompile Include="video.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="videoplayer.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="LightLoader.cpp">
+      <Filter>Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugTools.cpp" />
+    <ClCompile Include="Particle.cpp">
+      <Filter>Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleInstance.cpp">
+      <Filter>Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="ForwardRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleFactory.cpp">
+      <Filter>Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="FullscreenRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferredRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="MathFunc.cpp">
+      <Filter>InternetCode</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationData.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Animator.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteRenderer.cpp">
+      <Filter>Sprites</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteInstance.cpp">
+      <Filter>Sprites</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteFactory.cpp">
+      <Filter>Sprites</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Sprites</Filter>
+    </ClCompile>
+    <ClCompile Include="TextInstance.cpp">
+      <Filter>Text</Filter>
+    </ClCompile>
+    <ClCompile Include="TextFactory.cpp">
+      <Filter>Text</Filter>
+    </ClCompile>
+    <ClCompile Include="FullscreenTexture.cpp">
+      <Filter>Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="FullscreenTextureFactory.cpp">
+      <Filter>Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureLoader.cpp">
+      <Filter>Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderStateManager.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderManager.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugDrawer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderTypes.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderCompiler.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelInstance.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Environmentlight.cpp">
+      <Filter>Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="Shaders.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="CGraphManager.cpp" />
+    <ClCompile Include="NodeMouseInWorld.cpp">
+      <Filter>Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeCNodeTypePrint.cpp">
+      <Filter>Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeCNodeTypeStart.cpp">
+      <Filter>Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="BlueprintUtilities\Source\ax\Builders.cpp">
+      <Filter>BlueprintUtilities</Filter>
+    </ClCompile>
+    <ClCompile Include="BlueprintUtilities\Source\ax\Drawing.cpp">
+      <Filter>BlueprintUtilities</Filter>
+    </ClCompile>
+    <ClCompile Include="BlueprintUtilities\Source\ax\Widgets.cpp">
+      <Filter>BlueprintUtilities</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowControl.cpp" />
+    <ClCompile Include="NodeNot.cpp">
+      <Filter>Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationController.cpp">
+      <Filter>InternetCode</Filter>
+    </ClCompile>
+    <ClCompile Include="CGraphManager.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="CNodeType_Partial_definition.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="CNodeType_Partial_registry.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="CNodeInstance.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeDataTypes.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="NodePollingStation.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraPan.cpp">
+      <Filter>Cinematic</Filter>
+    </ClCompile>
+    <ClCompile Include="CinematicEvent.cpp">
+      <Filter>Cinematic</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetImportHelpers.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="GBuffer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleBurst.cpp">
+      <Filter>Cinematic</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="FadeScreen.cpp" />
+    <ClCompile Include="WindSystem.cpp" />
+    <ClCompile Include="TextRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="PathFinderData.cpp">
+      <Filter>Path finding</Filter>
+    </ClCompile>
+    <ClCompile Include="PathFinder.cpp">
+      <Filter>Path finding</Filter>
+    </ClCompile>
+    <ClCompile Include="CinematicPath.cpp">
+      <Filter>Cinematic</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeAttackTarget.cpp">
+      <Filter>Nodes\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSeekTarget.cpp">
+      <Filter>Nodes\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSetTarget.cpp">
+      <Filter>Nodes\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSetToidle.cpp">
+      <Filter>Nodes\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeCeil.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeAtan.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeAbs.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeCNodeTypeMathAdd.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeGreater.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeFloor.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeCos.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeForeach.cpp">
+      <Filter>Nodes\Flow</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeIf.cpp">
+      <Filter>Nodes\Flow</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeMul.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSin.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSplitVec3.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeWithinRange.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeToRadians.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeToDegrees.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSub.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeGetPlayerPosition.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeGetObjectPos.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeMergeVec3.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeLerp.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSetObjectScale.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSetObjectPosition.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeStopTimer.cpp">
+      <Filter>Nodes\Flow</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeTimer.cpp">
+      <Filter>Nodes\Flow</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeStartCinematic.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSpawnEnemy.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSetTargetPosition.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeStore.cpp">
+      <Filter>Nodes\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeChangeLevel.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeLengthSqr.cpp">
+      <Filter>Nodes\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeRetrieve.cpp">
+      <Filter>Nodes\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeGetPlayerID.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeWithinRangeOfSeekingFriends.cpp">
+      <Filter>Nodes\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSpawnAbility.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeOnTrigger.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeWithinAttackRange.cpp">
+      <Filter>Nodes\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="ForEachEnemyWithinRange.cpp">
+      <Filter>Nodes\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSetObjectRotation.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveObject.cpp">
+      <Filter>Cinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayAnimation.cpp">
+      <Filter>Cinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="CinematicTarget.cpp">
+      <Filter>Cinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="HighlightRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="SpotLightFactory.cpp" />
+    <ClCompile Include="DepthRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeOnButtonHit.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeSetColliderStatus.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="DecalFactory.cpp" />
+    <ClCompile Include="NodeEnemySpawner.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeGetMayaPos.cpp">
+      <Filter>Nodes\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeLoadLevel.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeUnloadLevel.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeContinuousSpawner.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeInteractWith.cpp">
+      <Filter>Nodes\Interact</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeDialogue.cpp">
+      <Filter>Nodes\Interact</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeCameraOffset.cpp">
+      <Filter>Nodes\GameControl</Filter>
+    </ClCompile>
+    <ClCompile Include="FontFactory.cpp" />
+    <ClCompile Include="SpriteFontInclude.cpp" />
+    <ClCompile Include="NodeDialogOver.cpp">
+      <Filter>Nodes\Interact</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeChangeInteractableMesh.cpp">
+      <Filter>Nodes\Interact</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeGetInteractable.cpp">
+      <Filter>Nodes\Interact</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeDayOver.cpp">
+      <Filter>Nodes\Interact</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeMoveInteractable.cpp">
+      <Filter>Nodes\Interact</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetLoader.cpp">
+      <Filter>Loaders</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraFactory.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectX11Framework.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicEngine.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="InputHandler.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowHandler.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Spline.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowData.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="NameThread.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="SpriteFactory.h" />
+    <ClInclude Include="SpriteInstance.h" />
+    <ClInclude Include="video.h">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="videoplayer.h">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="Environmentlight.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugTools.h" />
+    <ClInclude Include="Particle.h">
+      <Filter>Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleInstance.h">
+      <Filter>Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="ForwardRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleFactory.h">
+      <Filter>Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="FullscreenRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="DeferredRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationController.h">
+      <Filter>InternetCode</Filter>
+    </ClInclude>
+    <ClInclude Include="MathFunc.h">
+      <Filter>InternetCode</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationData.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animator.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteRenderer.h">
+      <Filter>Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteInstance.h">
+      <Filter>Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteFactory.h">
+      <Filter>Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="TextInstance.h">
+      <Filter>Text</Filter>
+    </ClInclude>
+    <ClInclude Include="TextFactory.h">
+      <Filter>Text</Filter>
+    </ClInclude>
+    <ClInclude Include="FullscreenTexture.h">
+      <Filter>Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="FullscreenTextureFactory.h">
+      <Filter>Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureLoader.h">
+      <Filter>Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderStateManager.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderManager.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugDrawer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderTypes.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderFlags.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderCompiler.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelInstance.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="LightLoader.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderBuffers.h" />
+    <ClInclude Include="Shaders.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="CGraphManager.h" />
+    <ClInclude Include="NodeMouseInWorld.h">
+      <Filter>Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeCNodeTypePrint.h">
+      <Filter>Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeCNodeTypeStart.h">
+      <Filter>Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="BlueprintUtilities\Include\ax\Drawing.h">
+      <Filter>BlueprintUtilities</Filter>
+    </ClInclude>
+    <ClInclude Include="BlueprintUtilities\Include\ax\Math2D.h">
+      <Filter>BlueprintUtilities</Filter>
+    </ClInclude>
+    <ClInclude Include="BlueprintUtilities\Include\ax\Widgets.h">
+      <Filter>BlueprintUtilities</Filter>
+    </ClInclude>
+    <ClInclude Include="BlueprintUtilities\Include\ax\Builders.h">
+      <Filter>BlueprintUtilities</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowControl.h" />
+    <ClInclude Include="NodeNot.h">
+      <Filter>Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="CGraphManager.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="CNodeInstance.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="CNodeType.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeDataTypes.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="NodePollingStation.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraPan.h">
+      <Filter>Cinematic</Filter>
+    </ClInclude>
+    <ClInclude Include="CinematicEvent.h">
+      <Filter>Cinematic</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetImportHelpers.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="GBuffer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleBurst.h">
+      <Filter>Cinematic</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="FadeScreen.h" />
+    <ClInclude Include="WindSystem.h" />
+    <ClInclude Include="TextRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="PathFinderData.h">
+      <Filter>Path finding</Filter>
+    </ClInclude>
+    <ClInclude Include="PathFinder.h">
+      <Filter>Path finding</Filter>
+    </ClInclude>
+    <ClInclude Include="CinematicPath.h">
+      <Filter>Cinematic</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeAttackTarget.h">
+      <Filter>Nodes\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSeekTarget.h">
+      <Filter>Nodes\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSetTarget.h">
+      <Filter>Nodes\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSetToIdle.h">
+      <Filter>Nodes\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeCeil.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeAtan.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeAbs.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeCNodeTypeMathAdd.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeGreater.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeFloor.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeCos.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeForeach.h">
+      <Filter>Nodes\Flow</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeIf.h">
+      <Filter>Nodes\Flow</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeMul.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSin.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSplitVec3.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeWithinRange.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeToRadians.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeToDegrees.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSub.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeGetPlayerPosition.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeGetObjectPos.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeMergeVec3.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeLerp.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSetObjectPosition.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSetObjectScale.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeStopTimer.h">
+      <Filter>Nodes\Flow</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeTimer.h">
+      <Filter>Nodes\Flow</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeStartCinematic.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSpawnEnemy.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSetTargetPosition.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeStore.h">
+      <Filter>Nodes\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeChangeLevel.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeLengthSqr.h">
+      <Filter>Nodes\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeRetrieve.h">
+      <Filter>Nodes\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeGetPlayerID.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeWithinRangeOfSeekingFriends.h">
+      <Filter>Nodes\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSpawnAbility.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeOnTrigger.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeWithinAttackRange.h">
+      <Filter>Nodes\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="ForEachEnemyWithinRange.h">
+      <Filter>Nodes\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSetObjectRotation.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveObject.h">
+      <Filter>Cinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayAnimation.h">
+      <Filter>Cinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="CinematicTarget.h">
+      <Filter>Cinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="HighlightRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h" />
+    <ClInclude Include="SpotLightFactory.h" />
+    <ClInclude Include="DepthRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeOnButtonHit.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeSetColliderStatus.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="Decal.h" />
+    <ClInclude Include="DecalFactory.h" />
+    <ClInclude Include="NodeEnemySpawner.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeGetMayaPos.h">
+      <Filter>Nodes\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeLoadLevel.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeUnloadLevel.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeContinuousSpawner.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeInteractWith.h">
+      <Filter>Nodes\Interact</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeDisplayText.h" />
+    <ClInclude Include="NodePlayAnimation.h" />
+    <ClInclude Include="SpriteFontInclude.h">
+      <Filter>Text</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeDialogue.h">
+      <Filter>Nodes\Interact</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeCameraOffset.h">
+      <Filter>Nodes\GameControl</Filter>
+    </ClInclude>
+    <ClInclude Include="FontFactory.h">
+      <Filter>Text</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeDialogOver.h">
+      <Filter>Nodes\Interact</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeChangeInteractableMesh.h">
+      <Filter>Nodes\Interact</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeGetInteractable.h">
+      <Filter>Nodes\Interact</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeMoveInteractable.h">
+      <Filter>Nodes\Interact</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeDayOver.h">
+      <Filter>Nodes\Interact</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetLoader.h">
+      <Filter>Loaders</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{99546279-e651-492b-908c-e31bcf7d998a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{fabcc3e8-f63a-4e05-abb7-2c74046ae919}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lights">
+      <UniqueIdentifier>{3fb11d20-d5cc-4719-ad54-66b62989c4d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Video">
+      <UniqueIdentifier>{2e7c50a0-07b0-41fb-9864-e6a6686c4699}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Particles">
+      <UniqueIdentifier>{ed9b4a54-ae85-49a2-be39-c409b9c0b46c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderers">
+      <UniqueIdentifier>{5e05b2e5-178e-4a62-a361-02c1befc1806}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InternetCode">
+      <UniqueIdentifier>{af663ab4-daf9-4f88-a338-91069ec66180}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Animation">
+      <UniqueIdentifier>{1493ee76-32ca-4d34-8435-835843d2b8f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sprites">
+      <UniqueIdentifier>{89c344ba-87fe-4755-bc13-fab1689efd48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text">
+      <UniqueIdentifier>{df293bb8-463b-4902-9cdb-7b3e8fad0f77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Textures">
+      <UniqueIdentifier>{028f9811-2742-4936-89d7-7b2e403a13aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{570d3698-6e8e-4ef4-b8b4-be0683841445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Models">
+      <UniqueIdentifier>{6f918c4d-192b-4e66-97e8-e6181c37e1b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BlueprintUtilities">
+      <UniqueIdentifier>{a527ce0a-5272-45f6-b046-966699f29bd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nodes">
+      <UniqueIdentifier>{ce4c8223-39ff-4040-aea9-84a09eb5cce2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script">
+      <UniqueIdentifier>{91bac902-4b8d-4a33-934f-5352e7d9f1a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cinematic">
+      <UniqueIdentifier>{2ff7d40b-883c-461c-a45d-19a1de6ce911}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Path finding">
+      <UniqueIdentifier>{21ee1966-1da9-4b2e-939e-9a66d9101c90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nodes\AI">
+      <UniqueIdentifier>{69bb2ed6-7763-418d-a167-37d9df732266}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nodes\Math">
+      <UniqueIdentifier>{2ed924fd-b112-4798-ae0d-339c01a15b31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nodes\Flow">
+      <UniqueIdentifier>{4240d817-cc9f-46b9-92fe-79088286388e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nodes\GameControl">
+      <UniqueIdentifier>{53cfa005-70a5-4413-8baf-ef66885a4b84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nodes\Utility">
+      <UniqueIdentifier>{16e782cf-df2b-48e4-a08f-19a574e27480}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cinematics">
+      <UniqueIdentifier>{b5884aa0-7d42-422a-a261-5c0998f9957a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nodes\Interact">
+      <UniqueIdentifier>{a6f0bb9f-b68d-44d5-9833-2a2fd5a87917}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Loaders">
+      <UniqueIdentifier>{8992d15b-50c6-4ae6-8e0e-50ae349df2f6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BlueprintUtilities\Include\ax\Math2D.inl">
+      <Filter>BlueprintUtilities</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GamlaBettan.rc" />
+  </ItemGroup>
+</Project>

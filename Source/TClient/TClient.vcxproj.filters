@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Client">
+      <UniqueIdentifier>{3cc8a243-2522-4ef8-a967-d91e45c955e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PrecompiledHeader">
+      <UniqueIdentifier>{660bfb2f-6918-4fb2-ad0b-c11160bc6642}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="targetver.h">
+      <Filter>PrecompiledHeader</Filter>
+    </ClInclude>
+    <ClInclude Include="TClient.h" />
+    <ClInclude Include="..\Precompiled\Macros.h" />
+    <ClInclude Include="..\Precompiled\pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TClient.cpp" />
+    <ClCompile Include="..\Precompiled\pch.cpp" />
+  </ItemGroup>
+</Project>

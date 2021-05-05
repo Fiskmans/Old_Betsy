@@ -1,0 +1,31 @@
+{
+  "GlobalPrefix": "Data/Ui/InventoryBar/",
+  "GlobalSuffix": ".dds",
+  "Bindings": {
+    "Hoe": "Hoe_icon",
+    "Seeds": "Seeds_icon",
+	"CabbageSeed": "CabbageSeeds_icon",
+	"CarrotSeed": "CarrotSeeds_icon",
+	"PeaSeed": "PeaSeeds_icon",
+	"OnionSeed": "OnionSeeds_icon",
+	"RadishSeed": "RadishSeeds_icon",
+	"RhubarbSeed": "RhubarbSeeds_icon",
+	"MagicFlowerSeed": "MagicPlantSeeds_icon",
+    "WateringCan": "WateringCan_icon",
+    "WateringCanFilled": "WateringCanFilled_icon",
+	  "Carrot": "Carrot_icon",
+	  "Onion": "Onion_icon",
+	  "Cabbage": "Cabbage_icon",
+	  "Pea": "Pea_icon",
+	  "Potato": "Potato_icon",
+	  "Rhubarb": "Rhubarb_icon",
+	  "Radish": "Radish_icon",
+	  "Eggs": "Eggs_icon",
+	  "RandomSeed": "RandomSeed_icon",
+	  "Chicken": "Chicken_icon",
+	  "MagicFlower": "MagicPlant_icon",
+    "Wool": "Wool_icon",
+    "Scissor":  "Scissor_icon",
+    "Basket":  "Basket_icon"
+  }
+}

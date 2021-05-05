@@ -1,0 +1,562 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Development|x64">
+      <Configuration>Development</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Retail|x64">
+      <Configuration>Retail</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{BAA0FBC0-921E-4FFE-8BC6-DEB85D196A4F}</ProjectGuid>
+    <RootNamespace>GamlaBettan</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>GamlaBettan</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\LibraryBuild.props" />
+    <Import Project="..\Cxx17.props" />
+    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
+    <Import Project="..\SharedPCH.props" />
+    <Import Project="..\ZmSwitch.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\LibraryBuild.props" />
+    <Import Project="..\Cxx17.props" />
+    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
+    <Import Project="..\SharedPCH.props" />
+    <Import Project="..\ZmSwitch.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\LibraryBuild.props" />
+    <Import Project="..\Cxx17.props" />
+    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
+    <Import Project="..\SharedPCH.props" />
+    <Import Project="..\ZmSwitch.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\LibraryBuild.props" />
+    <Import Project="..\Cxx17.props" />
+    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
+    <Import Project="..\SharedPCH.props" />
+    <Import Project="..\ZmSwitch.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;$(SolutionDir)Audio\Wwise\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib;Wwise_$(Configuration).lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;$(SolutionDir)Audio\Wwise\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib;Audio_$(Configuration).lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;$(SolutionDir)Audio\Wwise\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PreprocessorDefinitions>_RELEASE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib;Wwise_$(Configuration).lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;$(SolutionDir)Audio\Wwise\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PreprocessorDefinitions>_RETAIL;NDEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_release.lib;Wwise_release.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="AnimationData.cpp" />
+    <ClCompile Include="Animator.cpp" />
+    <ClCompile Include="AssetImportHelpers.cpp" />
+    <ClCompile Include="AssetLoader.cpp" />
+    <ClCompile Include="CinematicTarget.cpp" />
+    <ClCompile Include="DecalFactory.cpp" />
+    <ClCompile Include="FontFactory.cpp" />
+    <ClCompile Include="ForEachEnemyWithinRange.cpp" />
+    <ClCompile Include="NodeCameraOffset.cpp" />
+    <ClCompile Include="NodeChangeInteractableMesh.cpp" />
+    <ClCompile Include="NodeContinuousSpawner.cpp" />
+    <ClCompile Include="NodeDayOver.cpp" />
+    <ClCompile Include="NodeDialogOver.cpp" />
+    <ClCompile Include="NodeDialogue.cpp" />
+    <ClCompile Include="NodeGetInteractable.cpp" />
+    <ClCompile Include="NodeGetMayaPos.cpp" />
+    <ClCompile Include="NodeInteractWith.cpp" />
+    <ClCompile Include="NodeLoadLevel.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="NodeMoveInteractable.cpp" />
+    <ClCompile Include="NodeOnButtonHit.cpp" />
+    <ClCompile Include="NodeSetColliderStatus.cpp" />
+    <ClCompile Include="NodeSetObjectRotation.cpp" />
+    <ClCompile Include="NodeEnemySpawner.cpp" />
+    <ClCompile Include="NodeSpawnAbility.cpp" />
+    <ClCompile Include="NodeUnloadLevel.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="NodeWithinAttackRange.cpp" />
+    <ClCompile Include="NodeWithinRangeOfSeekingFriends.cpp" />
+    <ClCompile Include="NodeAttackTarget.cpp" />
+    <ClCompile Include="BlueprintUtilities\Source\ax\Builders.cpp" />
+    <ClCompile Include="BlueprintUtilities\Source\ax\Drawing.cpp" />
+    <ClCompile Include="BlueprintUtilities\Source\ax\Widgets.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CameraFactory.cpp" />
+    <ClCompile Include="CameraPan.cpp" />
+    <ClCompile Include="CGraphManager.cpp" />
+    <ClCompile Include="CinematicEvent.cpp" />
+    <ClCompile Include="CinematicPath.cpp" />
+    <ClCompile Include="CNodeInstance.cpp" />
+    <ClCompile Include="CNodeType_Partial_definition.cpp" />
+    <ClCompile Include="CNodeType_Partial_registry.cpp" />
+    <ClCompile Include="DebugDrawer.cpp" />
+    <ClCompile Include="DebugTools.cpp" />
+    <ClCompile Include="DeferredRenderer.cpp" />
+    <ClCompile Include="DirectX11Framework.cpp" />
+    <ClCompile Include="Environmentlight.cpp" />
+    <ClCompile Include="FadeScreen.cpp" />
+    <ClCompile Include="ForwardRenderer.cpp" />
+    <ClCompile Include="FullscreenRenderer.cpp" />
+    <ClCompile Include="FullscreenTexture.cpp" />
+    <ClCompile Include="FullscreenTextureFactory.cpp" />
+    <ClCompile Include="GBuffer.cpp" />
+    <ClCompile Include="HighlightRenderer.cpp" />
+    <ClCompile Include="MoveObject.cpp" />
+    <ClCompile Include="NodeChangeLevel.cpp" />
+    <ClCompile Include="NodeGetPlayerID.cpp" />
+    <ClCompile Include="NodeGreater.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="NodeIf.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="NodeMergeVec3.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="NodeGetPlayerPosition.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="GraphicEngine.cpp" />
+    <ClCompile Include="NodeOnTrigger.cpp" />
+    <ClCompile Include="NodeRetrieve.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="NodeSeekTarget.cpp" />
+    <ClCompile Include="NodeSetTarget.cpp" />
+    <ClCompile Include="NodeSetTargetPosition.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="NodeSetToidle.cpp" />
+    <ClCompile Include="NodeSpawnEnemy.cpp" />
+    <ClCompile Include="NodeSplitVec3.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="NodeNot.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="NodeStartCinematic.cpp" />
+    <ClCompile Include="NodeStopTimer.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="NodeStore.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="NodeTimer.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="ParticleBurst.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="PathFinder.cpp" />
+    <ClCompile Include="PathFinderData.cpp" />
+    <ClCompile Include="AnimationController.cpp" />
+    <ClCompile Include="PlayAnimation.cpp" />
+    <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="DepthRenderer.cpp" />
+    <ClCompile Include="SpotLightFactory.cpp" />
+    <ClCompile Include="SpriteFontInclude.cpp" />
+    <ClCompile Include="WindowControl.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
+    <ClCompile Include="LightLoader.cpp" />
+    <ClCompile Include="MathFunc.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ModelInstance.cpp" />
+    <ClCompile Include="ModelLoader.cpp" />
+    <ClCompile Include="NodeAbs.cpp" />
+    <ClCompile Include="NodeAtan.cpp" />
+    <ClCompile Include="NodeCeil.cpp" />
+    <ClCompile Include="NodeCNodeTypeMathAdd.cpp" />
+    <ClCompile Include="NodeCNodeTypePrint.cpp" />
+    <ClCompile Include="NodeCNodeTypeStart.cpp" />
+    <ClCompile Include="NodeCos.cpp" />
+    <ClCompile Include="NodeDataTypes.cpp" />
+    <ClCompile Include="NodeFloor.cpp" />
+    <ClCompile Include="NodeForeach.cpp" />
+    <ClCompile Include="NodeGetObjectPos.cpp" />
+    <ClCompile Include="NodeLengthSqr.cpp" />
+    <ClCompile Include="NodeLerp.cpp" />
+    <ClCompile Include="NodeMouseInWorld.cpp" />
+    <ClCompile Include="NodeMul.cpp" />
+    <ClCompile Include="NodePollingStation.cpp" />
+    <ClCompile Include="NodeSetObjectPosition.cpp" />
+    <ClCompile Include="NodeSetObjectScale.cpp" />
+    <ClCompile Include="NodeSin.cpp" />
+    <ClCompile Include="NodeSub.cpp" />
+    <ClCompile Include="NodeToDegrees.cpp" />
+    <ClCompile Include="NodeToRadians.cpp" />
+    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="ParticleFactory.cpp" />
+    <ClCompile Include="ParticleInstance.cpp" />
+    <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="RenderStateManager.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="ShaderCompiler.cpp" />
+    <ClCompile Include="Shaders.cpp" />
+    <ClCompile Include="ShaderTypes.cpp" />
+    <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="Spline.cpp" />
+    <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="SpriteFactory.cpp" />
+    <ClCompile Include="SpriteInstance.cpp" />
+    <ClCompile Include="SpriteRenderer.cpp" />
+    <ClCompile Include="TextFactory.cpp" />
+    <ClCompile Include="TextInstance.cpp" />
+    <ClCompile Include="TextRenderer.cpp" />
+    <ClCompile Include="TextureLoader.cpp" />
+    <ClCompile Include="video.cpp" />
+    <ClCompile Include="videoplayer.cpp" />
+    <ClCompile Include="WindowHandler.cpp" />
+    <ClCompile Include="NodeWithinRange.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="WindSystem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AnimationController.h" />
+    <ClInclude Include="AnimationData.h" />
+    <ClInclude Include="Animator.h" />
+    <ClInclude Include="AssetImportHelpers.h" />
+    <ClInclude Include="AssetLoader.h" />
+    <ClInclude Include="CinematicTarget.h" />
+    <ClInclude Include="Decal.h" />
+    <ClInclude Include="DecalFactory.h" />
+    <ClInclude Include="FontFactory.h" />
+    <ClInclude Include="ForEachEnemyWithinRange.h" />
+    <ClInclude Include="NodeCameraOffset.h" />
+    <ClInclude Include="NodeChangeInteractableMesh.h" />
+    <ClInclude Include="NodeContinuousSpawner.h" />
+    <ClInclude Include="NodeDayOver.h" />
+    <ClInclude Include="NodeDialogOver.h" />
+    <ClInclude Include="NodeDialogue.h" />
+    <ClInclude Include="NodeDisplayText.h" />
+    <ClInclude Include="NodeGetInteractable.h" />
+    <ClInclude Include="NodeGetMayaPos.h" />
+    <ClInclude Include="NodeInteractWith.h" />
+    <ClInclude Include="NodeLoadLevel.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="NodeMoveInteractable.h" />
+    <ClInclude Include="NodeOnButtonHit.h" />
+    <ClInclude Include="NodePlayAnimation.h" />
+    <ClInclude Include="NodeSetColliderStatus.h" />
+    <ClInclude Include="NodeSetObjectRotation.h" />
+    <ClInclude Include="NodeEnemySpawner.h" />
+    <ClInclude Include="NodeSpawnAbility.h" />
+    <ClInclude Include="NodeUnloadLevel.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="NodeWithinAttackRange.h" />
+    <ClInclude Include="NodeWithinRangeOfSeekingFriends.h" />
+    <ClInclude Include="NodeAttackTarget.h" />
+    <ClInclude Include="BlueprintUtilities\Include\ax\Builders.h" />
+    <ClInclude Include="BlueprintUtilities\Include\ax\Drawing.h" />
+    <ClInclude Include="BlueprintUtilities\Include\ax\Math2D.h" />
+    <ClInclude Include="BlueprintUtilities\Include\ax\Widgets.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraFactory.h" />
+    <ClInclude Include="CameraPan.h" />
+    <ClInclude Include="CGraphManager.h" />
+    <ClInclude Include="CinematicEvent.h" />
+    <ClInclude Include="CinematicPath.h" />
+    <ClInclude Include="CNodeInstance.h" />
+    <ClInclude Include="CNodeType.h" />
+    <ClInclude Include="DebugDrawer.h" />
+    <ClInclude Include="DebugTools.h" />
+    <ClInclude Include="DeferredRenderer.h" />
+    <ClInclude Include="DirectX11Framework.h" />
+    <ClInclude Include="Environmentlight.h" />
+    <ClInclude Include="FadeScreen.h" />
+    <ClInclude Include="ForwardRenderer.h" />
+    <ClInclude Include="FullscreenRenderer.h" />
+    <ClInclude Include="FullscreenTexture.h" />
+    <ClInclude Include="FullscreenTextureFactory.h" />
+    <ClInclude Include="GBuffer.h" />
+    <ClInclude Include="HighlightRenderer.h" />
+    <ClInclude Include="MoveObject.h" />
+    <ClInclude Include="NodeChangeLevel.h" />
+    <ClInclude Include="NodeGetPlayerID.h" />
+    <ClInclude Include="NodeGreater.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="NodeIf.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="NodeMergeVec3.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="NodeGetPlayerPosition.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="GraphicEngine.h" />
+    <ClCompile Include="ParticleRenderer.cpp" />
+    <ClInclude Include="NodeOnTrigger.h" />
+    <ClInclude Include="NodeRetrieve.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="NodeSeekTarget.h" />
+    <ClInclude Include="NodeSetTarget.h" />
+    <ClInclude Include="NodeSetTargetPosition.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="NodeSpawnEnemy.h" />
+    <ClInclude Include="NodeSplitVec3.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="NodeNot.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="NodeStartCinematic.h" />
+    <ClInclude Include="NodeStopTimer.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="NodeStore.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="NodeTimer.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="ParticleBurst.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="PathFinder.h" />
+    <ClInclude Include="PathFinderData.h" />
+    <ClInclude Include="NodeSetToIdle.h" />
+    <ClInclude Include="PlayAnimation.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="DepthRenderer.h" />
+    <ClInclude Include="SpotLight.h" />
+    <ClInclude Include="SpotLightFactory.h" />
+    <ClInclude Include="SpriteFontInclude.h" />
+    <ClInclude Include="WindowControl.h" />
+    <ClInclude Include="MathFunc.h" />
+    <ClInclude Include="NameThread.h" />
+    <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="LightLoader.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="ModelInstance.h" />
+    <ClInclude Include="ModelLoader.h" />
+    <ClInclude Include="NodeAbs.h" />
+    <ClInclude Include="NodeAtan.h" />
+    <ClInclude Include="NodeCeil.h" />
+    <ClInclude Include="NodeCNodeTypeMathAdd.h" />
+    <ClInclude Include="NodeCNodeTypePrint.h" />
+    <ClInclude Include="NodeCNodeTypeStart.h" />
+    <ClInclude Include="NodeCos.h" />
+    <ClInclude Include="NodeDataTypes.h" />
+    <ClInclude Include="NodeFloor.h" />
+    <ClInclude Include="NodeForeach.h" />
+    <ClInclude Include="NodeGetObjectPos.h" />
+    <ClInclude Include="NodeLengthSqr.h" />
+    <ClInclude Include="NodeLerp.h" />
+    <ClInclude Include="NodeMouseInWorld.h" />
+    <ClInclude Include="NodeMul.h" />
+    <ClInclude Include="NodePollingStation.h" />
+    <ClInclude Include="NodeSetObjectPosition.h" />
+    <ClInclude Include="NodeSetObjectScale.h" />
+    <ClInclude Include="NodeSin.h" />
+    <ClInclude Include="NodeSub.h" />
+    <ClInclude Include="NodeToDegrees.h" />
+    <ClInclude Include="NodeToRadians.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="ParticleFactory.h" />
+    <ClInclude Include="ParticleInstance.h" />
+    <ClInclude Include="ParticleRenderer.h" />
+    <ClInclude Include="PointLight.h" />
+    <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="RenderStateManager.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="ShaderBuffers.h" />
+    <ClInclude Include="ShaderCompiler.h" />
+    <ClInclude Include="ShaderFlags.h" />
+    <ClInclude Include="Shaders.h" />
+    <ClInclude Include="ShaderTypes.h" />
+    <ClInclude Include="Skybox.h" />
+    <ClInclude Include="Spline.h" />
+    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="SpriteFactory.h" />
+    <ClInclude Include="SpriteInstance.h" />
+    <ClInclude Include="SpriteRenderer.h" />
+    <ClInclude Include="TextFactory.h" />
+    <ClInclude Include="TextInstance.h" />
+    <ClInclude Include="TextRenderer.h" />
+    <ClInclude Include="TextureLoader.h" />
+    <ClInclude Include="video.h" />
+    <ClInclude Include="videoplayer.h" />
+    <ClInclude Include="WindowData.h" />
+    <ClInclude Include="WindowHandler.h" />
+    <ClInclude Include="NodeWithinRange.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="WindSystem.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BlueprintUtilities\Include\ax\Math2D.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GamlaBettan.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+  </Target>
+</Project>

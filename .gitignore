@@ -26,10 +26,20 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
+[Bb]in/*.exe
+[Bb]in/*.log
+[Bb]in/*.ilk
+[Bb]in/*.lib
+[Bb]in/*.pdb
+[Bb]in/*.exp
+[Bb]in/*.iobj
+[Bb]in/*.ipdb
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+[Ss]ource/[Ll]ibs/
+[Ss]ource/[Ww]orkbed/
+[Ss]ource/pch/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

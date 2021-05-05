@@ -1,0 +1,30 @@
+{
+  "ToolTips": {
+    "Hoe": "Hoe#It's a hoe",
+    "Seeds": "Potato Seeds#This will grow some mighty fine taters",
+	"CabbageSeed": "Cabbage seeds#Some cabbage seeds",
+	"CarrotSeed": "Carrot seeds#Some carrot seeds",
+	"OnionSeed": "Onion seeds#Some onion seeds",
+	"PeaSeed": "Pea seeds#Some pea seeds",
+	"RadishSeed": "Radish seeds#Some radish seeds",
+	"RhubarbSeed": "Rhubarb seeds#Some rhubarb seeds",
+	"MagicFlowerSeed": "Magic seeds#Some magic seeds",
+	"MagicFlower": "Magic Flower#Some magic seeds",
+    "WateringCan": "Watering can#It's an empty watering can",
+    "WateringCanFilled": "Watering can#It's a watering can",
+	"Carrot": "Carrot#It's a carrot",
+	"Onion": "Onion#It's an onion",
+	"Cabbage": "Cabbage#It's a cabbage",
+	"Pea": "Pea#It's a pea",
+	"Potato": "Potato#It's a tater",
+	"Rhubarb": "Rhubarb#It's a rhubarb",
+	"Radish": "Radish#It's a radish",
+	"Eggs": "Egg#It's a eggyweggy",
+	"RandomSeed": "Random seed#I wonder what will grow!",
+	"Chicken": "Chicken#I'm gonna need to show her where too sleep or she'll just run away",
+    "Wool": "Wool#It's.. so.. FLUFFY!",
+    "Scissor":  "Scissors#Good to give the sheep a new hairstyle!",
+    "Basket":  "Basket#Old but sturdy, plenty of room for eggs and crops"
+	
+  }
+}

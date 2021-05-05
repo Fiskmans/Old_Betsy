@@ -1,0 +1,101 @@
+{
+
+	"Daily": true,
+
+	"Dialogues": [
+		[
+			"Ruth#God day, my dear stone. Hope the wind is treating you\nnicely today.",
+	  
+	        "Stone#...",
+			
+			"Ruth#I'll come back and check on you again tomorrow.\nDon't get to lonely out here!",
+			
+			"Stone#..."
+    ],
+
+    [
+      "Ruth#Awfully sunny today, isn't it? I certainly wouldn't\nwant to stand still in the sun the whole day like you.",
+	  
+	  "Ruth#But I guess it's good that we're different,\nyou do your thing my dear stone.",
+	  
+	  "Stone#..."
+    ],
+	[
+      "Ruth#You know what, I dreamed of you today, little stone.",
+	  
+	  "Ruth#You had the most beautiful wings, and they could\ntake you all up over the highest mountain and away,\nbut you were just annoyed with them because they\nmade it hard for you to stand firmly on the ground,\nand so you cut them off and then you've been standing\nhere ever since.",
+	  
+	  "Ruth#...",
+	  
+	  "Ruth#I guess I can understand you.\nThis is a very place.",
+	  
+	  "Stone#..."
+    ],
+	[
+      "Ruth#I think I've become more appreciative of stones\nsince I moved back, you know.",
+	  
+	  "Ruth#Grey is just such a beautiful everchanging color.",
+	  
+	  "Stone#..."
+    ],
+	[
+      "Ruth#You know what, I could swear that your beautiful\nsymbols have faded a bit since I first met you.",
+	  
+	  "Ruth#Would you let me just brush you up real quick?",
+	  
+	  "Stone#...",
+	  
+	  "Ruth#Okay, I'm going to do this. I'll be really gentle,\ndon't you worry.",
+	  
+	  "#*Ruth carefully cleans the inscriptions in the stone,\nwhen a sudden heat overtakes the stone.*",
+	  
+	  "#*Stepping back she can see a faint glow creeping up from inside the stone.*",
+	  
+	  "Ruth#Oh my! Just look at you, how handsome!",
+	  
+	  "Stone#Wumumwum.",
+	  
+	  "Ruth#Oh, you talk!",
+	  
+	  "Ruth#And what a beautiful voice you have! I'm deeply\nimpressed, I must say. Deeply impressed."
+    ],
+	[
+      "Stone#Wumwumumwum.",
+	  
+	  "Ruth#Oh how nice it is to hear your voice!",
+	  
+	  "Ruth#Say... you wouldn't want to sing something, would you?",
+	  
+	  "Stone#Wuum.",
+	  
+	  "Ruth#Okay, I'll listen intently.",
+	  
+	  "#*The stone is silent for a while as it prepares.*",
+	  
+	  "#As it starts to sing it's as if the air itself stops to listen to it's ancient timbre.",
+	  
+	  "Stone#Wuuuu-uuuu-uuu",
+	  
+	  "Stone#Mmmmmmm, wum um wwwwwuuum.",
+	  
+	  "Stone#Wuuuuuuuuum wum wummmumwum.",
+	  
+	  "Stone#uuuuuuuuuuuuu uuuuuuuuuuuuu",
+	  
+	  "Stone#UM!",
+	  
+	  "Ruth#Oh my! Thank you, deary! How happy I am to have met you.",
+	  
+	  "*As Ruth leaves the stone's song still hangs\nin the air, making the world older, deeper.*"
+	  
+    ],
+	[
+      "Stone#Wumwumumwum.",
+	  
+	  "Ruth#How delightful!",
+	  
+	  "Ruth#I do so look forward to hearing this next song you're talking about,\nmaybe they'll even hear it below the mountain,\nthat might make the world nicer, I think!"
+    ]
+
+]
+}

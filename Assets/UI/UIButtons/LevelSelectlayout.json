@@ -1,0 +1,53 @@
+{
+  "ImagesPath": "Data\\UI\\UIButtons",
+  
+  "BackButton": {
+    "name": "Back",
+    "PosX": 0.0875,
+    "PosY": 0.442
+  },
+
+
+  "LevelButtons": [
+    {
+      "Name": "Level 1_1",
+      "PosX": 0.297,
+      "PosY": 0.442
+    },
+    {
+      "Name": "Level 1_2",
+      "PosX": 0.453,
+      "PosY": 0.442
+    },
+    {
+      "Name": "Level 1_3",
+      "PosX": 0.608,
+      "PosY": 0.442
+    },
+    {
+      "Name": "Level 1_4",
+      "PosX": 0.764,
+      "PosY": 0.442
+    },
+    {
+      "Name": "Level 2_1",
+      "PosX": 0.297,
+      "PosY": 0.618
+    },
+    {
+      "Name": "Level 2_2",
+      "PosX": 0.453,
+      "PosY": 0.618
+    },
+    {
+      "Name": "Level 2_3",
+      "PosX": 0.608,
+      "PosY": 0.618
+    },
+	{
+      "Name": "Level 2_4",
+      "PosX": 0.764,
+      "PosY": 0.618
+    }
+  ]
+}
