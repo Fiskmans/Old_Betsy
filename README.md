@@ -5,13 +5,15 @@ An open-souce game engine for anyone who wants to develop a game 'closer to the 
 - Models
   - Fbx
 - Textures
-  - DDs
+  - Dds
 - Particles
   - if you have a lot of patience
+- Sounds
+  - if you understand the magic of .bnk files
 
 # Contributing
 If there is something you want to see added feel free to open a pull request.
-Only submit code or resources to this project that you havve the permission to so with.
+Only submit code or resources to this project that you have the permission to so with.
 
 
 ## Check out the [TODO](TODO.md)
