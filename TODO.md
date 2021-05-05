@@ -22,4 +22,4 @@
   - Freecam
 - Add VR Support
   - using [OpenVR](https://github.com/ValveSoftware/openvr)
-
+- Make tests for tools being used
