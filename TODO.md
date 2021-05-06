@@ -9,6 +9,7 @@
 - Figure out preinstalled depencies/SDK's and list them on the main readme file
 - Replace levelloader with something competent
   - Inengine editor?
+- Flip all chiralities and axles to match the default in blender
 
 ## Improve
 - Rework asset loading to allow easier asset loading
