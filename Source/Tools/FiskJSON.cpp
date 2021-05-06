@@ -4,238 +4,228 @@
 #include <stack>
 #include <sstream>
 #include <iostream>
-
-#include "StringManipulation.h"
+#include <charconv>
 
 
 
 namespace FiskJSON
 {
-	void Object::Parse(const std::string& aDocument)
+	namespace FiskJson_Help
 	{
-		std::string cleaned = aDocument;
-		Tools::trim(cleaned);
-		CleanUpChildren();
-		if (cleaned.empty())
+		bool IsWhiteSpace(char aChar)
 		{
-			throw Invalid_JSON("Json document is empty");
+			return !isprint(aChar);
 		}
-		std::stack<char> escapeKeys;
-		std::stringstream keyBuffer;
-		std::stringstream ValueBuffer;
-		if (cleaned[0] == '[')
-		{
-			myType = Type::Array;
-			myValue = std::vector<Object*>();
-		}
-		else if (cleaned[0] == '{')
-		{
-			myType = Type::Object;
-		}
-		else
-		{
-			myType = Type::Value;
-		}
-		if (myType == Type::Value)
-		{
-			ParseAsValue(cleaned);
-			return;
-		}
-		enum class ScopeType
-		{
-			Key,
-			ObjectValue,
-			UnkownValue,
-			WhiteSpace
-		};
-		ScopeType currentScope = myType == Type::Array ? ScopeType::UnkownValue : ScopeType::WhiteSpace;
 
-
-		if (cleaned.length() < 2)
+		const char* FindStart(const char* aBegin, const char* aEnd)
 		{
-			myValue.reset();
-			return;
+			const char* start = aBegin;
+			while (IsWhiteSpace(*start) && ++start < aEnd);
+			return start;
 		}
-		std::string data = cleaned.substr(1, cleaned.length() - 2); // trim start and end bracket
 
-		const auto PushChild = [&]()
+		const char* FindEnd(const char* aBegin, const char* aEnd)
 		{
-			Object* obj = new Object();
-			obj->Parse(ValueBuffer.str());
-			if (myType == Type::Array)
+			const char* end = aEnd;
+			while (IsWhiteSpace(*(end - 1)) && --end > aBegin);
+			return end;
+		}
+
+		const char* FindEndOfString(const char* aBegin, const char* aEnd)
+		{
+			const char* start = aBegin;
+			while ((*start != '"' || (*(start - 1)) == '\\') && ++start < aEnd);
+			return start;
+		}
+
+		const char* FindFirstWhitespaceInSameScope(const char* aBegin, const char* aEnd)
+		{
+			const char* begin = aBegin;
+
+			std::stack<char> scopeStack;
+
+			while (begin < aEnd)
 			{
-				try
+				char c = *begin;
+				if (scopeStack.empty())
 				{
-					std::get<std::vector<Object*>>(myValue.value()).push_back(obj);
-
-				}
-				catch (const std::bad_variant_access&)
-				{
-					throw Invalid_JSON("Somehow tried to parse into arrayobject that was not previously an array");
-				}
-			}
-			else
-			{
-				myChildren[keyBuffer.str()] = obj;
-			}
-		};
-
-		const auto AppendChar = [&](char c)
-		{
-			if (currentScope == ScopeType::Key)
-			{
-				keyBuffer << c;
-			}
-			else if (currentScope == ScopeType::ObjectValue)
-			{
-				ValueBuffer << c;
-			}
-			else if (currentScope == ScopeType::UnkownValue)
-			{
-				switch (c)
-				{
-				case ' ':
-				case '\n':
-				case '\r':
-					// Ignore whitespace
-					break;
-				default:
-					ValueBuffer << c;
-					break;
-				}
-			}
-		};
-
-		char last = '\0';
-		size_t at = 0;
-		for (char c : data)
-		{
-			++at;
-			bool poppedStack = false;
-			if (!escapeKeys.empty() && c == escapeKeys.top())
-			{
-				if (!(c == '"' && last == '\\'))
-				{
-					poppedStack = true;
-					escapeKeys.pop();
-				}
-			}
-			last = c;
-			if (!escapeKeys.empty())
-			{
-				if (escapeKeys.top() != '"')
-				{
-					if (c == '{')
+					if(IsWhiteSpace(c))
 					{
-						escapeKeys.push('}');
-					}
-					else if (c == '[')
-					{
-						escapeKeys.push(']');
-					}
-				}
-				AppendChar(c);
-				continue;
-			}
-			switch (c)
-			{
-			case '[':
-				if (escapeKeys.empty())
-				{
-					currentScope = ScopeType::ObjectValue;
-				}
-				escapeKeys.push(']');
-				AppendChar(c);
-				break;
-			case '{':
-				if (escapeKeys.empty())
-				{
-					currentScope = ScopeType::ObjectValue;
-				}
-				escapeKeys.push('}');
-				AppendChar(c);
-				break;
-			case '}':
-			case ']':
-				AppendChar(c);
-				if (escapeKeys.empty())
-				{
-					currentScope = ScopeType::WhiteSpace;
-				}
-				break;
-			case '"':
-				if (!poppedStack)
-				{
-					escapeKeys.push('"');
-					if (myType == Type::Array)
-					{
-						currentScope = ScopeType::ObjectValue;
-						AppendChar(c);
-					}
-					else
-					{
-						if (keyBuffer.str().empty())
-						{
-							currentScope = ScopeType::Key;
-						}
-						else
-						{
-							if (!ValueBuffer.str().empty())
-							{
-								ValueBuffer.str("");
-								ValueBuffer.clear();
-								//throw Invalid_JSON("String values got assigned to an object that already has a value, original value: [" + ValueBuffer.str() + "] Around " + std::to_string(at) + " Are you missing a ','?");
-							}
-							currentScope = ScopeType::ObjectValue;
-							AppendChar(c);
-						}
+						break;
 					}
 				}
 				else
 				{
-					if (currentScope == ScopeType::Key)
+					if (c == scopeStack.top())
 					{
-						currentScope = ScopeType::WhiteSpace;
-					}
-					else
-					{
-						AppendChar(c);
+						scopeStack.pop();
+						begin++;
+						if (scopeStack.empty())
+						{
+							break;
+						}
+						continue;
 					}
 				}
-				break;
-			case ',':
-				if (escapeKeys.empty())
-				{
-					PushChild();
-				}
-				ValueBuffer.str("");
-				ValueBuffer.clear();
-				keyBuffer.str("");
-				keyBuffer.clear();
-				break;
-			case ':':
-				currentScope = ScopeType::UnkownValue;
-				break;
-			default:
-				AppendChar(c);
-				break;
-			}
-		}
-		if (escapeKeys.empty())
-		{
-			PushChild();
-		}
-		else
-		{
-			std::ostringstream stack;
-			while (escapeKeys.size() > 1)
-			{
-				stack << escapeKeys.top() << ",";
-				escapeKeys.pop();
-			}
-			stack << escapeKeys.top();
 
-			throw Invalid_JSON("Opening characters don't match up 1:1 with closing characters scopes not yet closed: [" + stack.str() + "]");
+				switch (c)
+				{
+				case '"':
+				{
+					const char* stringEnd = FindEndOfString(begin + 1, aEnd);
+					if (stringEnd == aEnd)
+					{
+						throw Invalid_JSON("Unmatched string");
+					}
+					begin = stringEnd;
+					if (scopeStack.empty())
+					{
+						return begin + 1;
+					}
+				}
+					break;
+				case '[':
+					scopeStack.push(']');
+					break;
+				case '{':
+					scopeStack.push('}');
+					break;
+				}
+				begin++;
+			}
+			return begin;
+		}
+
+		bool ContainsChar(const char* aBegin, const char* aEnd, char aValue)
+		{
+			for (const char* begin = aBegin; begin < aEnd; begin++)
+			{
+				if (*begin == aValue)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
+	void Object::Parse(const std::string& aDocument)
+	{
+		Parse(aDocument.c_str(), aDocument.c_str() + aDocument.length());
+	}
+
+	void Object::Parse(const char* aBegin, const char* aEnd)
+	{
+		const char* begin = FiskJson_Help::FindStart(aBegin, aEnd);
+		const char* end = FiskJson_Help::FindEnd(aBegin, aEnd);
+
+		if (begin == end)
+		{
+			throw Invalid_JSON("Json document is empty");
+		}
+
+
+		switch (*begin)
+		{
+		case '[':
+			MakeArray();
+			break;
+		case '{':
+			MakeObject();
+			break;
+		default:
+			MakeValue();
+			ParseAsValue(begin, end);
+			return;
+		}
+
+		if (begin - end < 2)
+		{
+			throw Invalid_JSON("Parsed object is too small");
+		}
+
+		begin++; // step into brackets
+		end--;
+
+		if ((*end) != (myType == Type::Array) ? ']' : '}')
+		{
+			throw Invalid_JSON("Object end character wrongly matched");
+		}
+
+		while (begin < end)
+		{
+			const char* nextStart = FiskJson_Help::FindStart(begin, end);
+			if (nextStart == end)
+			{
+				break;
+			}
+
+			const char* endOfValue;
+
+			if (myType == Type::Object)
+			{
+				if ((*nextStart) != '"')
+				{
+					throw Invalid_JSON("Object contained malformed child");
+				}
+				const char* nameEnd = FiskJson_Help::FindEndOfString(nextStart + 1,end);
+				if(nameEnd == end)
+				{
+					throw Invalid_JSON("Childname runs until end of object");
+				}
+				const char* colon = FiskJson_Help::FindStart(nameEnd + 1, end);
+
+				if (colon == end)
+				{
+					throw Invalid_JSON("Child has no value after name");
+				}
+				if(*colon != ':')
+				{
+					throw Invalid_JSON("Child is missing :");
+				}
+
+				const char* startOfValue = FiskJson_Help::FindStart(colon + 1, end);
+				if (startOfValue == end)
+				{
+					throw Invalid_JSON("Child does not have a value");
+				}
+				endOfValue = FiskJson_Help::FindFirstWhitespaceInSameScope(startOfValue, end);
+
+				if (endOfValue == end)
+				{
+					throw Invalid_JSON("Childvalue ends unexpectedly");
+				}
+
+				Object* obj = new Object();
+				obj->Parse(startOfValue,endOfValue);
+				AddChild(std::string(nextStart + 1, nameEnd), obj);
+			}
+			else
+			{
+				endOfValue = FiskJson_Help::FindFirstWhitespaceInSameScope(nextStart, end);
+
+				if (endOfValue == end)
+				{
+					throw Invalid_JSON("Childvalue ends unexpectedly");
+				}
+
+				Object* obj = new Object();
+				obj->Parse(nextStart, endOfValue);
+				PushChild(obj);
+			}
+
+			const char* commaOrEnd = FiskJson_Help::FindFirstWhitespaceInSameScope(endOfValue, end);
+			if (commaOrEnd == end)
+			{
+				break;
+			}
+
+			if (*commaOrEnd != ',')
+			{
+				throw Invalid_JSON("Unexpected character between values");
+			}
+
+			begin = commaOrEnd + 1;
 		}
 	}
 
@@ -250,7 +240,8 @@ namespace FiskJSON
 		{
 			return *static_cast<Object*>(nullptr);
 		}
-		return *myChildren[aKey];
+		auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+		return *children[aKey];
 	}
 
 	Object& Object::operator[](const char* aKey)
@@ -279,12 +270,13 @@ namespace FiskJSON
 
 	bool Object::Has(const std::string& aKey)
 	{
-		return myChildren.count(aKey) != 0;
+		auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+		return children.count(aKey) != 0;
 	}
 
 	void Object::AddChild(const std::string& aKey, Object* aChild)
 	{
-		
+
 		if (myType == Type::Value || myType == Type::None)
 		{
 			MakeObject();
@@ -293,13 +285,14 @@ namespace FiskJSON
 		{
 			throw Invalid_Object("Trying to add a child to a object that can't have children");
 		}
-		if (myChildren.count(aKey) != 0)
+		auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+		if (children.count(aKey) != 0)
 		{
-			delete myChildren[aKey];
+			delete children[aKey];
 		}
-		myChildren[aKey] = aChild;
+		children[aKey] = aChild;
 	}
-	
+
 	void Object::MakeObject()
 	{
 		if (myType != Type::Object)
@@ -380,33 +373,26 @@ namespace FiskJSON
 				}
 				for (size_t index = 0; index < content.size(); index++)
 				{
-					try
+					std::string data = content[index]->Serialize(aPretty);
+					if (index != 0)
 					{
-						std::string data = content[index]->Serialize(aPretty);
-						if (index != 0)
-						{
-							stream << ',';
-						}
+						stream << ',';
+					}
+					if (containExpanded)
+					{
+						stream << '\n';
+					}
+					if (aPretty)
+					{
 						if (containExpanded)
 						{
-							stream << '\n';
+							stream << '\t';
 						}
-						if (aPretty)
-						{
-							if (containExpanded)
-							{
-								stream << '\t';
-							}
-							stream << Indent(data);
-						}
-						else
-						{
-							stream << data;
-						}
+						stream << Indent(data);
 					}
-					catch (const Invalid_Object& e)
+					else
 					{
-						myExceptions.push_back(new Invalid_Object(e));
+						stream << data;
 					}
 				}
 				if (containExpanded && aPretty)
@@ -420,31 +406,24 @@ namespace FiskJSON
 			stream << '{';
 			{
 				bool first = true;
-				for (auto& it : myChildren)
+				for (auto& it : *this)
 				{
-					try
+					std::string data = it.second->Serialize(aPretty);
+					if (!first)
 					{
-						std::string data = it.second->Serialize(aPretty);
-						if (!first)
-						{
-							stream << ',';
-						}
-						first = false;
-						if (aPretty)
-						{
-							stream << "\n\t";
-						}
-						stream << '"' << it.first << "\":";
-						if (aPretty)
-						{
-							stream << ' ';
-						}
-						stream << Indent(data);
+						stream << ',';
 					}
-					catch (const Invalid_Object& e)
+					first = false;
+					if (aPretty)
 					{
-						myExceptions.push_back(new Invalid_Object(e));
+						stream << "\n\t";
 					}
+					stream << '"' << it.first << "\":";
+					if (aPretty)
+					{
+						stream << ' ';
+					}
+					stream << Indent(data);
 				}
 				if (aPretty)
 				{
@@ -491,11 +470,6 @@ namespace FiskJSON
 		return stream.str();
 	}
 
-	std::vector<std::exception*> Object::GetExceptions()
-	{
-		return myExceptions;
-	}
-
 	void Object::MakeValue()
 	{
 		CleanUpChildren();
@@ -514,45 +488,60 @@ namespace FiskJSON
 		}
 		if (myType == Type::Object)
 		{
-			for (auto& child : myChildren)
+			auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+			for (auto& child : children)
 			{
 				delete child.second;
 			}
-			myChildren.clear();
+			children.clear();
 		}
 	}
 
-	void Object::ParseAsValue(const std::string& aValue)
+	void Object::ParseAsValue(const char* aBegin, const char* aEnd)
 	{
-		std::string trimmed = aValue;
-		Tools::trim(trimmed);
-
-		if (trimmed.size() > 1 && trimmed[0] == '"' && trimmed[trimmed.size() - 1] == '"')
+		if (aEnd - aBegin > 2 && *aBegin == '"' && *(aEnd - 1) == '"')
 		{
-			myValue = trimmed.substr(1, trimmed.size() - 2); // remove quotationmarks
+			myValue = std::string(aBegin + 1, aEnd - 1);
 		}
-		else if (!trimmed.empty() && trimmed.find_first_not_of("-.e0123456789") == std::string::npos) // number
+		else if (aEnd - aBegin > 4 && memcmp(aBegin, "true", 4) == 0)
 		{
-			if (trimmed.find_first_of("e.") != std::string::npos) // double
-			{
-				myValue = std::stod(trimmed);
-			}
-			else
-			{
-				myValue = std::stoll(trimmed);
-			}
+			myValue = true;
 		}
-		else if (trimmed == "true" || trimmed == "false") // bool
+		else if (aEnd - aBegin > 5 && memcmp(aBegin, "false", 5) == 0)
 		{
-			myValue = (trimmed == "true");
+			myValue = false;
 		}
-		else if (trimmed == "null" || trimmed.empty())
+		else if (aEnd - aBegin > 4 && memcmp(aBegin, "null", 4) == 0)
 		{
 			myValue.reset();
 		}
-		else
+		else if (FiskJson_Help::ContainsChar(aBegin,aEnd,'.')) // floating point
 		{
-			throw Invalid_JSON("Could not parse value: [" + trimmed + "]");
+			double val;
+			auto result = std::from_chars(aBegin, aEnd, val);
+			if (result.ptr != aEnd)
+			{
+				throw Invalid_JSON("Floating point number contained invalid character");
+			}
+			if (result.ec == std::errc::result_out_of_range)
+			{
+				throw Invalid_JSON("Floating point number is out of range");
+			}
+			myValue = val;
+		}
+		else 
+		{
+			long long val;
+			auto result = std::from_chars(aBegin, aEnd, val);
+			if (result.ptr != aEnd)
+			{
+				throw Invalid_JSON("Number contained invalid character");
+			}
+			if (result.ec == std::errc::result_out_of_range)
+			{
+				throw Invalid_JSON("Number is out of range");
+			}
+			myValue = val;
 		}
 	}
 
@@ -560,15 +549,18 @@ namespace FiskJSON
 	{
 		if (this && myType == Type::Object)
 		{
-			return myChildren.begin();
+			auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+			return children.begin();
 		}
 		return std::unordered_map<std::string, Object*>::iterator();
 	}
+
 	std::unordered_map<std::string, Object*>::iterator Object::end()
 	{
 		if (this && myType == Type::Object)
 		{
-			return myChildren.end();
+			auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+			return children.end();
 		}
 		return std::unordered_map<std::string, Object*>::iterator();
 	}

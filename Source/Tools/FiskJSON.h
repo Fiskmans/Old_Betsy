@@ -5,6 +5,7 @@
 #include <variant>
 #include <vector>
 
+
 namespace FiskJSON
 {
 	class Key_Unavailable : public std::exception
@@ -38,18 +39,22 @@ namespace FiskJSON
 		friend class Array;
 	public:
 		void Parse(const std::string& aDocument);
+		void Parse(const char* aBegin, const char* aEnd);
 
 		~Object();
 
 		Object& operator[](const std::string& aKey);
 		Object& operator[](const char* aKey);
+
 		Object& operator[](size_t aIndex);
 		Object& operator[](int aIndex);
 		Object& operator[](long aIndex);
+
 		bool Has(const std::string& aKey);
-		void AddChild(const std::string& aKey, Object* aChild);
+
 		template<typename T>
 		void AddValueChild(const std::string& aKey, T aValue);
+		void AddChild(const std::string& aKey, Object* aChild);
 
 		void MakeObject();
 		void PushChild(Object* aChild);
@@ -58,8 +63,6 @@ namespace FiskJSON
 		void MakeArray();
 
 		std::string Serialize(bool aPretty = false);
-
-		std::vector<std::exception*> GetExceptions();
 
 		Object& operator=(const long long& aValue);
 		Object& operator=(const long& aValue);
@@ -82,7 +85,7 @@ namespace FiskJSON
 		template<typename Type>
 		inline bool GetIf(Type& aValueToPlaceIn)
 		{
-			if (Is<Type>() && this)
+			if (this && Is<Type>())
 			{
 				aValueToPlaceIn = Get<Type>();
 				return true;
@@ -97,7 +100,7 @@ namespace FiskJSON
 
 		void MakeValue();
 		void CleanUpChildren();
-		void ParseAsValue(const std::string& aValue);
+		void ParseAsValue(const char* aBegin, const char* aEnd);
 
 		enum class Type
 		{
@@ -107,9 +110,16 @@ namespace FiskJSON
 			Value
 		};
 		Type myType = Type::None;
-		std::unordered_map<std::string, Object*> myChildren;
-		std::optional<std::variant<long long, double, std::string, bool,std::vector<Object*>>> myValue;
-		std::vector<std::exception*> myExceptions;
+
+		std::optional<
+			std::variant<
+				long long,
+				double, 
+				std::string, 
+				bool,
+				std::vector<Object*>,
+				std::unordered_map<std::string, Object*>>> myValue;
+
 	};
 
 	class Array
