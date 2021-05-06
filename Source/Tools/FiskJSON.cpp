@@ -299,6 +299,7 @@ namespace FiskJSON
 		{
 			CleanUpChildren();
 			myType = Type::Object;
+			myValue = std::unordered_map<std::string, Object*>();
 		}
 	}
 
