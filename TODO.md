@@ -4,7 +4,7 @@
 - Yeet the levelloader system all the way to the depths where it belongs
 - Remove the script system/node editor
   - It didn't live up to any expectations and didn't work all that well, better to remove it completely and build a new system from scratch
-- Make FiskJSON even remotely readable
+- __Make FiskJSON even remotely readable__
 - Remove or isolate Moonview Mountain from the engine
 - Figure out preinstalled depencies/SDK's and list them on the main readme file
 - Replace levelloader with something competent
