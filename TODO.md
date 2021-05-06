@@ -10,6 +10,7 @@
 - Replace levelloader with something competent
   - Inengine editor?
 - Flip all chiralities and axles to match the default in blender
+- Switch from VS filters to folders
 
 ## Improve
 - Rework asset loading to allow easier asset loading
