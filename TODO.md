@@ -15,7 +15,7 @@
   - Massloading a folder
   - Asset packing into single Data file
   - Quickloading by packing *_DESC structs along with pre-parsed data
-- Remove direct loads and asset handling with asset-handles
+- Remove direct loads and asset handling with an asset manager and asset-handles
 - Centralize and standardize Entities so we can reliably select/view entity data
 - Editor tools
   - Play/Pause
