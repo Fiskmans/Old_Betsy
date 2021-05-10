@@ -490,7 +490,7 @@ void DepthRenderer::Render(Camera* aCamera, const std::vector<ModelInstance*>& a
 		Model::LodLevel* lodlevel;
 		for (size_t modelIndex = 0; modelIndex < aModelList.size(); modelIndex++)
 		{
-			model = aModelList[modelIndex]->GetModel();
+			model = aModelList[modelIndex]->GetModelAsset().GetAsModel();
 			if (!model->ShouldRender() || aModelList[modelIndex]->GetIsUsingSecondaryFov() || !aModelList[modelIndex]->GetCastsShadows())
 			{
 				continue;

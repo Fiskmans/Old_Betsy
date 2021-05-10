@@ -18,14 +18,14 @@
 
 int ModelInstance::myGlobalEventStatus = 0;
 
-ModelInstance::ModelInstance(Model* aModel) : myGaphicBoundsModifier(1.f)
+ModelInstance::ModelInstance(AssetHandle& aModel) : myGaphicBoundsModifier(1.f)
 {
 	static unsigned int ids;
 	myFriendlyName = "[" + std::to_string(ids++) + "] ";
 
-	if (!aModel)
+	if (aModel.GetType() != Asset::AssetType::Model)
 	{
-		SYSCRASH("no model make me sad :c");
+		SYSCRASH("Asset was not a model");
 	}
 	myModel = aModel;
 	myScale = { 1.0f,1.0f,1.0f };
@@ -39,7 +39,7 @@ ModelInstance::ModelInstance(Model* aModel) : myGaphicBoundsModifier(1.f)
 	ResetSpawnTime();
 }
 
-Model* ModelInstance::GetModel()
+AssetHandle& ModelInstance::GetModelAsset()
 {
 	return myModel;
 }
@@ -59,13 +59,13 @@ std::array<V4F, NUMBEROFANIMATIONBONES> ModelInstance::GetBonePositions()
 		i = V4F(0, 0, 0, 1);
 	}
 
-	auto& boneData = GetModel()->myBoneData;
+	auto& boneData = myModel.GetAsModel()->myBoneData;
 	auto toWorld = GetModelToWorldTransform();
 
 	for (size_t i = 0; i < boneData.size(); i++)
 	{
-		auto finalTrans = transforms[i];
-		auto offset = boneData[i].BoneOffset;
+		const M44F& finalTrans = transforms[i];
+		const M44F& offset = boneData[i].BoneOffset;
 		M44F total = finalTrans * M44F::GetRealInverse(offset);
 		positions[i] = positions[i] * M44F::Transpose(total);
 		positions[i] = positions[i] * toWorld;
@@ -251,7 +251,7 @@ void ModelInstance::SetAnimation(int aAnimation)
 	}
 	else
 	{
-		SYSWARNING("Trying to animate something without an animator",myModel->GetModelData()->myFilePath);
+		SYSWARNING("Trying to animate something without an animator",myModel.GetAsModel()->GetModelData()->myFilePath);
 	}
 }
 
@@ -263,7 +263,7 @@ void ModelInstance::StepAnimation(float aDeltaTime)
 	}
 	else
 	{
-		SYSERROR("Trying to step animation on model that doesnt have an animator", myModel->GetModelData()->myFilePath);
+		SYSERROR("Trying to step animation on model that doesnt have an animator", myModel.GetAsModel()->GetModelData()->myFilePath);
 	}
 }
 
@@ -293,7 +293,7 @@ M44F ModelInstance::GetTransformOfBone(int aIndex)
 
 bool ModelInstance::HasAnimations()
 {
-	return !!(myModel->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones);
+	return !!(myModel.GetAsModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones);
 }
 
 void ModelInstance::SetTint(V4F aTint)
@@ -333,12 +333,12 @@ CommonUtilities::Vector3<float> ModelInstance::GetPosition() const
 
 const std::string ModelInstance::GetFriendlyName()
 {
-	return myFriendlyName + myModel->GetFriendlyName();
+	return myFriendlyName + myModel.GetAsModel()->GetFriendlyName();
 }
 
 void ModelInstance::SetupanimationMatrixes(std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES>& aMatrixes)
 {
-	if (myGBPhysXCharacter == nullptr || myGBPhysXCharacter->GetIsRagDoll() == false) 
+	if (myGBPhysXCharacter == nullptr || myGBPhysXCharacter->GetIsRagDoll() == false)
 	{
 		if (myAnimator)
 		{
@@ -349,12 +349,12 @@ void ModelInstance::SetupanimationMatrixes(std::array<CommonUtilities::Matrix4x4
 			static bool onetimeWarning = true;
 			if (onetimeWarning)
 			{
-				SYSWARNING("Model instance with bones tried to animate without an attached controller", myModel->GetModelData()->myFilePath);
+				SYSWARNING("Model instance with bones tried to animate without an attached controller", myModel.GetAsModel()->GetModelData()->myFilePath);
 				onetimeWarning = false;
 			}
 		}
 	}
-	else 
+	else
 	{
 		myGBPhysXCharacter->UpdateRagDollMatrices(aMatrixes);
 	}
@@ -381,9 +381,9 @@ bool ModelInstance::ImGuiNode(std::map<std::string, std::vector<std::string>>& a
 
 	}
 	static std::bitset<NUMBEROFANIMATIONBONES> bonesToCross;
-	if (myModel)
+	if (myModel.IsLoaded())
 	{
-		if (myModel->myBoneNameLookup.size() > 0)
+		if (myModel.GetAsModel()->myBoneNameLookup.size() > 0)
 		{
 			if (ImGui::Button("Bones"))
 			{
@@ -391,10 +391,10 @@ bool ModelInstance::ImGuiNode(std::map<std::string, std::vector<std::string>>& a
 			}
 			if (ImGui::BeginPopup("boneIndexer"))
 			{
-				for (auto& i : myModel->myBoneNameLookup)
+				for (auto& i : myModel.GetAsModel()->myBoneNameLookup)
 				{
 					bool state = bonesToCross[i.second];
-					if (ImGui::Checkbox(i.first.c_str(),&state))
+					if (ImGui::Checkbox(i.first.c_str(), &state))
 					{
 						bonesToCross[i.second] = state;
 					}
@@ -407,7 +407,11 @@ bool ModelInstance::ImGuiNode(std::map<std::string, std::vector<std::string>>& a
 			}
 		}
 	}
-	
+	else
+	{
+		ImGui::TextColored(ImColor(1, 0, 0), "%s","Model not loaded yet");
+	}
+
 	if (bonesToCross.any())
 	{
 		auto bonepos = GetBonePositions();
@@ -444,7 +448,7 @@ CommonUtilities::Sphere<float> ModelInstance::GetGraphicBoundingSphere(float aRa
 	{
 		return myAttachedToModel->GetGraphicBoundingSphere(aRangeModifier);
 	}
-	return CommonUtilities::Sphere<float>(myPosition, myModel->GetGraphicSize() * myGaphicBoundsModifier * aRangeModifier);
+	return CommonUtilities::Sphere<float>(myPosition, myModel.GetAsModel()->GetGraphicSize() * myGaphicBoundsModifier * aRangeModifier);
 }
 
 const float ModelInstance::GetSpawnTime()

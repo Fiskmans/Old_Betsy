@@ -96,6 +96,8 @@
 #include "DirectX11Framework.h"
 #include "NodeChangeInteractableMesh.h"
 
+#include "AssetManager.h"
+
 GameWorld::GameWorld() :
 	myEntityID(0),
 	myUsingFreeCamera(true),
@@ -986,7 +988,7 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 									modelInstance = nullptr;
 								}
 								SAFE_DELETE(animator);
-								modelInstance = DebugTools::myModelLoader->InstantiateModel(i);
+								modelInstance = AssetManager::GetInstance().GetModel(i).InstansiateModel();
 								if (modelInstance)
 								{
 									myScenePtr->AddToScene(modelInstance);
@@ -1011,7 +1013,7 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 					}
 					if (showBoundingBoxes && modelInstance)
 					{
-						for (auto& i : modelInstance->GetModel()->myCollisions)
+						for (auto& i : modelInstance->GetModelAsset().GetAsModel()->myCollisions)
 						{
 							DebugDrawer::GetInstance().DrawBoundingBox(i);
 						}
@@ -1116,18 +1118,22 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 					}
 					else
 					{
-						if (modelInstance && modelInstance->GetModel() && modelInstance->GetModel()->ShouldRender() && modelInstance->GetModel()->GetModelData()->myFilePath != "" && modelInstance->GetModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones)
+						if (modelInstance)
 						{
-							animator = new Animator();
-							std::vector<std::string> allAnimations;
-							myAnimMapping.clear();
-							AnimationComponent::ParseAnimations(modelInstance->GetModel()->GetModelData()->myAnimations, myAnimMapping, allAnimations);
+							Model* model = modelInstance->GetModelAsset().GetAsModel();
+							if(model && model->ShouldRender() && model->GetModelData()->myFilePath != "" && model->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones)
+							{
+								animator = new Animator();
+								std::vector<std::string> allAnimations;
+								myAnimMapping.clear();
+								AnimationComponent::ParseAnimations(model->GetModelData()->myAnimations, myAnimMapping, allAnimations);
 
-							animator->Init(modelInstance->GetModel()->GetModelData()->myFilePath, &modelInstance->GetModel()->myBoneData, allAnimations);
+								animator->Init(model->GetModelData()->myFilePath, &model->myBoneData, allAnimations);
 
 
 
-							modelInstance->AttachAnimator(animator);
+								modelInstance->AttachAnimator(animator);
+							}
 						}
 					}
 					ImGui::EndTabItem();
@@ -1149,7 +1155,7 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 							bool selected = (file == skyboxPath);
 							if (ImGui::Selectable(file.c_str(), &selected))
 							{
-								Skybox* newBox = DebugTools::myModelLoader->InstanciateSkybox(file);
+								Skybox* newBox = AssetManager::GetInstance().GetSkybox(file).InstansiateSkybox();
 								if (newBox)
 								{
 									myScenePtr->SetSkybox(newBox);
@@ -1313,7 +1319,7 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 				ImGui::Checkbox("Draw Skeleton", &drawSkeleton);
 				ImGui::Checkbox("Draw Skeleton spaces", &drawSkeletonSpaces);
 				modelInstance->ImGuiNode(*DebugTools::FileList, myScenePtr->GetMainCamera());
-				Model* model = modelInstance->GetModel();
+				Model* model = modelInstance->GetModelAsset().GetAsModel();
 				if (model)
 				{
 					ImGui::Separator();

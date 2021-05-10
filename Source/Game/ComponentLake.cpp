@@ -85,7 +85,7 @@ void ComponentLake::PrepareObjectsInPools(
 {
 	for (auto& it : *((CommonUtilities::ObjectPool<Mesh>*)myComponentPools[typeid(Mesh)]))
 	{
-		it.PreInit(aModelLoader, aScene);
+		it.PreInit(aScene);
 	}
 	for (auto& it : *((CommonUtilities::ObjectPool<Light>*)myComponentPools[typeid(Light)]))
 	{

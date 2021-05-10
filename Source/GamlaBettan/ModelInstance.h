@@ -4,6 +4,7 @@
 #include <Vector3.hpp>
 #include <Vector4.hpp>
 #include <Sphere.hpp>
+#include "Asset.h"
 
 #if USEIMGUI
 #include <map>
@@ -11,7 +12,6 @@
 #include <string>
 #endif
 
-class Model;
 class Camera;
 class Animator;
 class GBPhysXCharacter;
@@ -19,8 +19,8 @@ class GBPhysXCharacter;
 class ModelInstance
 {
 public:
-	ModelInstance(Model* aModel);
-	Model* GetModel();
+	ModelInstance(AssetHandle& aModel);
+	AssetHandle& GetModelAsset();
 	CommonUtilities::Matrix4x4<float> GetModelToWorldTransform();
 	M44F GetModelToWorldTransformWithPotentialBoneAttachement(BoneTextureCPUBuffer& aBoneData, std::unordered_map<ModelInstance*, short>& aBoneMapping);
 	void SetPosition(const CommonUtilities::Vector4<float>& aPosition);
@@ -107,7 +107,7 @@ private:
 	CommonUtilities::Vector3<float> myScale;
 
 	class Animator* myAnimator;
-	Model* myModel;
+	AssetHandle myModel;
 
 	float myGaphicBoundsModifier;
 

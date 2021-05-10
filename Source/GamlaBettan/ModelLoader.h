@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include "GBPhysX.h"
 
+#include "Asset.h"
+
 class Model;
 class ModelInstance;
 struct ID3D11Device;
@@ -41,7 +43,7 @@ class ModelLoader
 		{
 			myModel = another.myModel;
 			myFilePath = another.myFilePath;
-			myEmpty = (another.myEmpty == true ? true : false); //Mumsmums
+			myEmpty = another.myEmpty.load();
 
 			return (*this);
 		}
@@ -52,20 +54,12 @@ public:
 	ModelLoader(); 
 	~ModelLoader();
 
-	Skybox* InstanciateSkybox(std::string aFilepath);
+	_NODISCARD Asset* LoadModel(const std::string& aFilePath);
+	_NODISCARD Asset* LoadSkybox(const std::string& aFilePath);
 
-	_NODISCARD ModelInstance* InstantiateModel(std::string aFilePath);
-	_NODISCARD ModelInstance* InstanciateCube();
-	_NODISCARD ModelInstance* InstanciateCube(CommonUtilities::Vector4<float>& aPosition, bool aRandomizeRotation = false);
-	void InstanciateCubes(Scene* aScene, std::vector<CommonUtilities::Vector4<float>>& aPositionList, bool aRandomizeRotation = false);
 	bool Init(DirectX11Framework* aFramework);
 	ID3D11Device* myDevice;
 	ID3D11DeviceContext* myDeviceContext;
-
-#if USEIMGUI
-	std::unordered_map<std::string, Model*>::iterator begin() { return myLoadedModels.begin(); };
-	std::unordered_map<std::string, Model*>::iterator end() { return myLoadedModels.end(); };
-#endif // !_RETAIL
 
 	bool CompilePixelShader(std::string aData, ID3D11PixelShader*& aShaderOutput);
 	bool CompileVertexShader(std::string aData, ID3D11VertexShader*& aShaderOutput, void* aCompiledOutput);
@@ -76,8 +70,6 @@ public:
 private:
 
 	void PrepareModel(Model* aModel, const std::string& aPath);
-	_NODISCARD Model* LoadModel(const std::string& aFilePath);
-	void ReloadModel(const std::string& aFilePath);
 
 	void LoadLoop();
 
@@ -87,8 +79,6 @@ private:
 	bool InternalInit(ID3D11Device* aDevice);
 
 	bool myIsRunning = true;
-	Model* myCubeModel;
-	std::unordered_map<std::string, Model*> myLoadedModels;
 
 #if USEFILEWATHCER
 	Tools::FileWatcher myWatcher;

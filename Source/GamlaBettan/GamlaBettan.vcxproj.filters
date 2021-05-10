@@ -400,6 +400,8 @@
     <ClCompile Include="AssetLoader.cpp">
       <Filter>Loaders</Filter>
     </ClCompile>
+    <ClCompile Include="AssetManager.cpp" />
+    <ClCompile Include="Asset.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -820,6 +822,8 @@
     <ClInclude Include="AssetLoader.h">
       <Filter>Loaders</Filter>
     </ClInclude>
+    <ClInclude Include="AssetManager.h" />
+    <ClInclude Include="Asset.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">

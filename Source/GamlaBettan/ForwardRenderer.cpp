@@ -200,7 +200,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 	Model* model = nullptr;
 	for (size_t i = 0; i < modelsAndLightsList.size(); i++)
 	{
-		model = modelsAndLightsList[i].first->GetModel();
+		model = modelsAndLightsList[i].first->GetModelAsset().GetAsModel();
 		if (!model->ShouldRender())
 		{
 			continue;
@@ -261,7 +261,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 
 	for (size_t i = 0; i < modelsToDrawAgain.size(); i++)
 	{
-		model = modelsToDrawAgain[i]->first->GetModel();
+		model = modelsToDrawAgain[i]->first->GetModelAsset().GetAsModel();
 		myContext->PSSetShader(*model->GetModelData()->myPixelShader, nullptr, 0);
 
 
@@ -280,7 +280,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 	aStateManager.SetDepthStencilState(RenderStateManager::DepthStencilState::ReadOnly);
 	for (size_t i = 0; i < filteredEffects.size(); i++)
 	{
-		model = filteredEffects[i].first->GetModel();
+		model = filteredEffects[i].first->GetModelAsset().GetAsModel();
 
 		myContext->PSSetShader(*model->GetModelData()->myPixelShader, nullptr, 0);
 
@@ -305,7 +305,7 @@ void ForwardRenderer::SetSkyboxTexture(Texture* aTexture)
 
 void ForwardRenderer::SetSkybox(Skybox* aSkyBox)
 {
-	SetSkyboxTexture(aSkyBox->GetModel()->GetModelData()->myTextures[0]);
+	SetSkyboxTexture(aSkyBox->GetModelAsset().GetAsModel()->GetModelData()->myTextures[0]);
 	myskybox = aSkyBox;
 }
 
@@ -327,7 +327,7 @@ inline void ForwardRenderer::RenderModel(ModelInstance* aModelInstance, std::arr
 	static HRESULT result;
 	float now = Tools::GetTotalTime();
 
-	model = aModelInstance->GetModel();
+	model = aModelInstance->GetModelAsset().GetAsModel();
 
 	modelData = model->GetModelData();
 

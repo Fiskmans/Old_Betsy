@@ -191,7 +191,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 
 		for (size_t i = 0; i < aModelList.size(); i++)
 		{
-			model = aModelList[i]->GetModel();
+			model = aModelList[i]->GetModelAsset().GetAsModel();
 			if (!model->ShouldRender())
 			{
 				continue;
@@ -302,7 +302,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 
 		for (size_t i = 0; i < drawn.size(); i++)
 		{
-			model = drawn[i]->GetModel();
+			model = drawn[i]->GetModelAsset().GetAsModel();
 			modelData = model->GetModelData();
 
 			oData.myModelToWorldSpace = CommonUtilities::Matrix4x4<float>::Transpose(drawn[i]->GetModelToWorldTransform());

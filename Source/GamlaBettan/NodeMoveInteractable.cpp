@@ -45,7 +45,7 @@ int NodeMoveInteractable::OnEnter(CNodeInstance* aTriggeringNodeInstance, const 
 				collider->Reset();
 				collider->Init(ent);
 				collider->SetGBPhysXPtr(ourGBPhysXPtr);
-				collider->SetFilePath(mesh->GetModelInstance()->GetModel()->GetModelData()->myFilePath);
+				collider->SetFilePath(mesh->GetModelInstance()->GetModelAsset().GetAsModel()->GetModelData()->myFilePath);
 			}
 		}
 	}

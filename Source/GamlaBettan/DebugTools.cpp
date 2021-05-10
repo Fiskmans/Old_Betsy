@@ -7,6 +7,8 @@
 #include <AABB3D.hpp>
 #include <Octree.h>
 
+#include "AssetManager.h"
+
 #ifdef _DEBUG
 ModelLoader* DebugTools::myModelLoader;
 CommonUtilities::PlaneVolume<float> DebugTools::CameraFrustum;
@@ -163,13 +165,13 @@ void DebugTools::UpdateGizmo()
 
 void DebugTools::Setup(Scene* aScene)
 {
-	gizmoParts[0] = myModelLoader->InstantiateModel("Develop/x.fbx");
-	gizmoParts[1] = myModelLoader->InstantiateModel("Develop/y.fbx");
-	gizmoParts[2] = myModelLoader->InstantiateModel("Develop/z.fbx");
+	gizmoParts[0] = AssetManager::GetInstance().GetModel("Develop/x.fbx").InstansiateModel();
+	gizmoParts[1] = AssetManager::GetInstance().GetModel("Develop/y.fbx").InstansiateModel();
+	gizmoParts[2] = AssetManager::GetInstance().GetModel("Develop/z.fbx").InstansiateModel();
 
-	gizmoParts[3] = myModelLoader->InstantiateModel("Develop/xy.fbx");
-	gizmoParts[4] = myModelLoader->InstantiateModel("Develop/xz.fbx");
-	gizmoParts[5] = myModelLoader->InstantiateModel("Develop/yz.fbx");
+	gizmoParts[3] = AssetManager::GetInstance().GetModel("Develop/xy.fbx").InstansiateModel();
+	gizmoParts[4] = AssetManager::GetInstance().GetModel("Develop/xz.fbx").InstansiateModel();
+	gizmoParts[5] = AssetManager::GetInstance().GetModel("Develop/yz.fbx").InstansiateModel();
 
 	myScene = aScene;
 }

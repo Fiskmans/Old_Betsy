@@ -177,8 +177,10 @@
   <ItemGroup>
     <ClCompile Include="AnimationData.cpp" />
     <ClCompile Include="Animator.cpp" />
+    <ClCompile Include="Asset.cpp" />
     <ClCompile Include="AssetImportHelpers.cpp" />
     <ClCompile Include="AssetLoader.cpp" />
+    <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="CinematicTarget.cpp" />
     <ClCompile Include="DecalFactory.cpp" />
     <ClCompile Include="FontFactory.cpp" />
@@ -360,8 +362,10 @@
     <ClInclude Include="AnimationController.h" />
     <ClInclude Include="AnimationData.h" />
     <ClInclude Include="Animator.h" />
+    <ClInclude Include="Asset.h" />
     <ClInclude Include="AssetImportHelpers.h" />
     <ClInclude Include="AssetLoader.h" />
+    <ClInclude Include="AssetManager.h" />
     <ClInclude Include="CinematicTarget.h" />
     <ClInclude Include="Decal.h" />
     <ClInclude Include="DecalFactory.h" />

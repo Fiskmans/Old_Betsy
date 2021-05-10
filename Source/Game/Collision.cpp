@@ -377,7 +377,7 @@ void Collision::OnKillMe()
 bool Collision::CheckCollisionVsSubMeshes(Collision* aCollitionComponent)
 {
 	Mesh* mesh = (Mesh*)myEntity->GetComponent<Mesh>();
-	auto model = mesh->GetModelInstance()->GetModel();
+	auto model = mesh->GetModelInstance()->GetModelAsset().GetAsModel();
 
 	CommonUtilities::AABB3D<float> oobb;
 	CommonUtilities::Vector3<float> oobbPos;

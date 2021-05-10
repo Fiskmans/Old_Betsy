@@ -178,7 +178,6 @@ bool LoadVerticies(aiMesh* fbxMesh, char** aVertexBuffer, size_t* aVertexCount, 
 ModelLoader::ModelLoader()
 {
 	myDevice = nullptr;
-	myCubeModel = nullptr;
 	myDeviceContext = nullptr;
 	myGbPhysX = nullptr;
 }
@@ -187,10 +186,6 @@ ModelLoader::~ModelLoader()
 {
 	myIsRunning = false;
 	myWorkHorse.join();
-	for (auto& i : myLoadedModels)
-	{
-		SAFE_DELETE(i.second);
-	}
 }
 
 struct LodToLoad
@@ -973,31 +968,12 @@ void ModelLoader::PrepareModel(Model* aModel, const std::string& aPath)
 	QueueLoad(aModel, aPath);
 }
 
-Model* ModelLoader::LoadModel(const std::string& aFilePath)
+Asset* ModelLoader::LoadModel(const std::string& aFilePath)
 {
 	PERFORMANCETAG("Model loading");
 	Model* model = new Model();
 	PrepareModel(model, aFilePath);
-	myLoadedModels[aFilePath] = model;
-#if USEFILEWATHCER
-	{
-		PERFORMANCETAG("Filewatch");
-		myfileHandles.push_back(myWatcher.RegisterCallback(aFilePath, std::bind(&ModelLoader::ReloadModel, this, std::placeholders::_1), false));
-	}
-#endif // USEFILEWATHCER
-	return model;
-}
-
-void ModelLoader::ReloadModel(const std::string& aFilePath)
-{
-	if (myLoadedModels.count(aFilePath) != 0)
-	{
-		SYSINFO("Reloading: " + aFilePath);
-		Model* model = myLoadedModels[aFilePath];
-		model->ResetAndRelease();
-		PrepareModel(model, aFilePath);
-		QueueLoad(model, aFilePath);
-	}
+	return new ModelAsset(model);
 }
 
 bool ModelLoader::InternalInit(ID3D11Device* aDevice)
@@ -1009,221 +985,11 @@ bool ModelLoader::InternalInit(ID3D11Device* aDevice)
 
 	myDevice = aDevice;
 	SetErrorTexture(myDevice, "Data/Textures/error.dds");
-#pragma region CUBEWORLD :)
 
-#pragma region BufferSetup
-
-
-	static_assert(sizeof(float) == 4, "Things are fucked beyond comprehension");
-
-	ID3D11Buffer* vertexBuffer;
-	ID3D11Buffer* indexBuffer;
-	UINT indexCount;
-
-	{
-
-		float sideLength = 0.5f;
-		Vertex verticies[] =
-		{
-			{ sideLength, sideLength, sideLength ,1 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,1,0}, // top left
-			{ sideLength, sideLength,-sideLength ,1 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,1,0}, // top right
-			{ sideLength,-sideLength, sideLength ,1 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,1,1}, // bottom left
-			{-sideLength, sideLength, sideLength ,1 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,0,0}, // bottom right
-			{ sideLength,-sideLength,-sideLength ,1 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,1,1}, // ^^ but back
-			{-sideLength, sideLength,-sideLength ,1 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,0,0},
-			{-sideLength,-sideLength, sideLength ,1 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,0,1},
-			{-sideLength,-sideLength,-sideLength ,1 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,0,1},
-		};
-
-		CD3D11_BUFFER_DESC vertexBufferDescription;
-		ZeroMemory(&vertexBufferDescription, sizeof(vertexBufferDescription));
-		vertexBufferDescription.ByteWidth = sizeof(verticies);
-		vertexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-		vertexBufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-		D3D11_SUBRESOURCE_DATA vertexSubresourceData;
-		ZeroMemory(&vertexSubresourceData, sizeof(vertexSubresourceData));
-		vertexSubresourceData.pSysMem = verticies;
-
-		DirectX11Framework::AddMemoryUsage(vertexBufferDescription.ByteWidth, "Cube" , "Model Vertex Buffer");
-
-
-		result = myDevice->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, &vertexBuffer);
-		if (FAILED(result))
-		{
-			SYSERROR("could not create vertex buffer for cube", "");
-			return false;
-		}
-
-		struct index
-		{
-			UINT index;
-		} indexes[] =
-		{
-			0, 2, 1,
-			0, 1, 3,
-			0, 3, 2,
-			1, 2, 4,
-			2, 3, 6,
-			3, 1, 5,
-			4, 5, 1,
-			5, 6, 3,
-			6, 4, 2,
-			7, 6, 5,
-			7, 5, 4,
-			7, 4, 6
-		};
-
-		assert(sizeof(indexes) / sizeof(indexes[0]) % 3 == 0 && "Not Multiple of 3");
-
-		CD3D11_BUFFER_DESC indexBufferDescription;
-		ZeroMemory(&indexBufferDescription, sizeof(indexBufferDescription));
-		indexBufferDescription.ByteWidth = sizeof(indexes);
-		indexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-		indexBufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-		D3D11_SUBRESOURCE_DATA indexSubresourceData;
-		ZeroMemory(&indexSubresourceData, sizeof(indexSubresourceData));
-		indexSubresourceData.pSysMem = indexes;
-
-		DirectX11Framework::AddMemoryUsage(indexBufferDescription.ByteWidth, "Cube", "Model Index Buffer");
-		result = myDevice->CreateBuffer(&indexBufferDescription, &indexSubresourceData, &indexBuffer);
-		if (FAILED(result))
-		{
-			SYSERROR("Could not create index buffer for cube", "")
-				return false;
-		}
-
-		indexCount = sizeof(indexes) / sizeof(indexes[0]);
-	}
-
-
-#pragma endregion
-
-	//////////////////////////////////////////////
-
-#pragma region Shaders
-
-	ID3D11VertexShader* vertexShader;
-
-	std::string vertexShaderData = "#include \"Data/Shaders/ShaderStructs.hlsli\"\n"
-		"VertexToPixel vertexShader(VertexInput input)\n"
-		"{\n"
-		"	VertexToPixel returnValue;\n"
-		"	float4 worldPosition = mul(input.myPosition, modelToWorldMatrix);\n"
-		"	float4 cameraPosition = mul(worldPosition, worldToCameraMatrix);\n"
-		"	returnValue.myPosition = mul(cameraPosition, cameraToProjectionMatrix);\n"
-		"	returnValue.myUV = input.myUV;\n"
-		"	return returnValue;\n"
-		"}";
-	ID3DBlob* vsData = nullptr;
-
-
-	if (!CompileVertexShader(vertexShaderData, vertexShader, static_cast<void*>(&vsData)))
-	{
-		SYSERROR("Could not create vertex shader for cube", "");
-		return false;
-	}
-
-	ID3D11PixelShader* pixelShader;
-
-	std::string pixelShaderData =
-		"#include \"Data/Shaders/ShaderStructs.hlsli\"\n"
-		"PixelOutput pixelShader(VertexToPixel input)\n"
-		"{\n"
-		"	PixelOutput returnValue;\n"
-		"	returnValue.myColor.rgba = AlbedoMap.Sample(defaultSampler,input.myUV.xy).rgba * 0.5;\n"
-		"	returnValue.myColor.rgb += tint.rgb * 0.5;\n"
-		"	returnValue.myColor.a = 1;\n"
-		"	return returnValue;\n"
-		"}";
-
-	if (!CompilePixelShader(pixelShaderData, pixelShader))
-	{
-		SYSERROR("Could not create pixel shader for cube", "");
-		return false;
-	}
-
-#pragma endregion
-
-	//////////////////////////////////////////////
-
-#pragma region Layout
-
-	D3D11_INPUT_ELEMENT_DESC layout[] =
-	{
-		{"POSITION" ,0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"NORMAL"   ,0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"TANGENT"  ,0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"BITANGENT",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"UV"		,0,DXGI_FORMAT_R32G32_FLOAT		 ,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0}
-	};
-
-	ID3D11InputLayout* inputLayout;
-	result = myDevice->CreateInputLayout(layout, sizeof(layout) / sizeof(layout[0]), vsData->GetBufferPointer(), vsData->GetBufferSize(), &inputLayout);
-	if (FAILED(result))
-	{
-		SYSERROR("could not create input layout", "");
-		return false;
-	}
-	result = vsData->Release();
-
-	if (FAILED(result))
-	{
-		SYSERROR("Could not release shader blob", "");
-	}
-#pragma endregion
-
-	//////////////////////////////////////////////
-
-#pragma region Texture
-
-	std::string fileName = "Data/Textures/gamlaBettan.dds";
-	Texture* albedoResourceView = LoadTexture(myDevice, fileName);
-
-
-#pragma endregion
-
-
-
-
-#pragma region Model
-	Model* model = new Model();
-	if (!model)
-	{
-		return false;
-	}
-	Model::LodLevel* level = new Model::LodLevel();
-	level->myNumberOfIndexes = indexCount;
-	level->myVertexBuffer = new ID3D11Buffer * (vertexBuffer);
-	level->myIndexBuffer = indexBuffer;
-
-	Model::CModelData modelData;
-	modelData.myStride = sizeof(Vertex);
-	modelData.myOffset = 0;
-	modelData.myVertexShader = new VertexShader(vertexShader);
-	modelData.myPixelShader = new PixelShader(pixelShader);
-	modelData.myPrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	modelData.myInputLayout = inputLayout;
-	modelData.myIndexBufferFormat = DXGI_FORMAT_R32_UINT;
-	modelData.myTextures[0] = albedoResourceView;
-	modelData.myTextures[1] = nullptr;
-	modelData.myTextures[2] = nullptr;
-	modelData.myshaderTypeFlags = ShaderFlags::None;
-
-
-	model->Init(modelData, this, "", "", "Debug cube");
-	model->ApplyLodLevel(level, 0);
-
-#pragma endregion
-
-
-#pragma endregion
-	myCubeModel = model;
 	return !!aDevice;
 }
 
-Skybox* ModelLoader::InstanciateSkybox(std::string aFilePath)
+Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 {
 	static size_t skyBoxCounter = 0;
 	++skyBoxCounter;
@@ -1394,71 +1160,7 @@ Skybox* ModelLoader::InstanciateSkybox(std::string aFilePath)
 	model->Init(modelData, this, "Data/Shaders/SkyboxShader.hlsl", "Data/Shaders/SkyboxShader.hlsl", "", "SkyBox: " + std::string(aFilePath.begin(), aFilePath.end()));
 	model->ApplyLodLevel(level, 0);
 
-	myLoadedModels["Skybox: " + std::string(aFilePath.begin(), aFilePath.end())] = model;
-
-	return new Skybox(model);
-}
-
-ModelInstance* ModelLoader::InstantiateModel(std::string aFilePath)
-{
-	assert(myDevice != nullptr && "Yo, wtf, init plz");
-	PERFORMANCETAG("Model instansiation");
-
-	if (aFilePath[0] == '"')
-	{
-		aFilePath = aFilePath.substr(1, aFilePath.length() - 2);
-	}
-
-	Model* model;
-	if (myLoadedModels.count(aFilePath) != 0)
-	{
-		model = myLoadedModels[aFilePath];
-	}
-	else
-	{
-		model = LoadModel(aFilePath);
-	}
-	return new ModelInstance(model);
-
-}
-
-ModelInstance* ModelLoader::InstanciateCube()
-{
-	return new ModelInstance(myCubeModel);
-}
-
-ModelInstance* ModelLoader::InstanciateCube(CommonUtilities::Vector4<float>& aPosition, bool aRandomizeRotation)
-{
-	ModelInstance* cube = new ModelInstance(myCubeModel);
-	if (!cube)
-	{
-		SYSERROR("Could not make cube, is bad :c", "");
-		return nullptr;
-	}
-
-	if (aRandomizeRotation)
-	{
-		cube->Rotate(CommonUtilities::Vector3<float>((rand() % 360) / 57.f, (rand() % 360) / 57.f, (rand() % 360) / 57.f));
-	}
-	cube->SetPosition(aPosition);
-
-	return cube;
-}
-
-void ModelLoader::InstanciateCubes(Scene* aScene, std::vector<CommonUtilities::Vector4<float>>& aPositionList, bool aRandomizeRotation)
-{
-	for (auto& i : aPositionList)
-	{
-		ModelInstance* model = InstanciateCube(i);
-		if (model)
-		{
-			if (aRandomizeRotation)
-			{
-				model->Rotate(CommonUtilities::Vector3<float>((rand() % 360) / 57.f, (rand() % 360) / 57.f, (rand() % 360) / 57.f));
-			}
-			aScene->AddToScene(model);
-		}
-	}
+	return new ModelAsset(model);
 }
 
 bool ModelLoader::Init(DirectX11Framework* aFramework)

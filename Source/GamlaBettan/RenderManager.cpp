@@ -198,7 +198,7 @@ void RenderManager::Render(Scene* aScene)
 		PERFORMANCETAG("BoneTexture Generation");
 		static std::vector<ModelInstance*> buffer;
 		buffer.clear();
-		std::copy_if(aScene->begin(), aScene->end(), std::back_inserter(buffer), [](ModelInstance* aInstance) { return !!(aInstance->GetModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones); });
+		std::copy_if(aScene->begin(), aScene->end(), std::back_inserter(buffer), [](ModelInstance* aInstance) { return !!(aInstance->GetModelAsset().GetAsModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones); });
 		SetupBoneTexture(buffer);
 	}
 
@@ -464,7 +464,7 @@ void RenderManager::SetupBoneTexture(const std::vector<ModelInstance*>& aModelLi
 		{
 			break;
 		}
-		if (model->GetModel()->ShouldRender() && model->GetModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones)
+		if (model->GetModelAsset().GetAsModel()->ShouldRender() && model->GetModelAsset().GetAsModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones)
 		{
 			std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES>& matrixes = myBoneBuffer[boneIndexOffset];
 			for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)

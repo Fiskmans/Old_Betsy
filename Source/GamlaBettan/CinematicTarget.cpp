@@ -38,7 +38,7 @@ void CinematicTarget::Load(FiskJSON::Object& aObject, Scene* aScene)
 		ModelInstance* model = nullptr;
 		for (auto& i : *aScene)
 		{
-			if (i->GetModel()->GetModelData()->myFilePath == path)
+			if (i->GetModelAsset().GetAsModel()->GetModelData()->myFilePath == path)
 			{
 				float distance = pos.DistanceSqr(i->GetPosition());
 				if (distance < closest)
@@ -57,7 +57,7 @@ void CinematicTarget::Load(FiskJSON::Object& aObject, Scene* aScene)
 
 void CinematicTarget::AppendTo(FiskJSON::Object& aObject)
 {
-	aObject.AddValueChild("ObjectType", myModel->GetModel()->GetModelData()->myFilePath);
+	aObject.AddValueChild("ObjectType", myModel->GetModelAsset().GetAsModel()->GetModelData()->myFilePath);
 	aObject.AddValueChild("ObjectPos", V3F(myOriginalPosition));
 }
 

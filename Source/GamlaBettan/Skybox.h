@@ -2,12 +2,12 @@
 #include "ModelInstance.h"
 
 class Camera;
-class Skybox : public ModelInstance
+class Skybox : 
+	public ModelInstance
 {
 
 public:	
-	Skybox(Model* aModel);
-	void Render(Camera* aCamera);
+	Skybox(AssetHandle& aModel);
 
 private:
 

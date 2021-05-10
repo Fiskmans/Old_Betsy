@@ -108,7 +108,7 @@ void HighlightRenderer::Render(const std::vector<class ModelInstance*>& aModels,
 	for (size_t i = 0; i < aModels.size(); i++)
 	{
 
-		model = aModels[i]->GetModel();
+		model = aModels[i]->GetModelAsset().GetAsModel();
 		if (!model->ShouldRender())
 		{
 			continue;

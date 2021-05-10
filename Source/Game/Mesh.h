@@ -11,7 +11,7 @@ class Mesh : public Graphics, public Observer
 public:
 	Mesh();
 	virtual ~Mesh();
-	void PreInit(ModelLoader* aModelLoader, Scene* aScene);
+	void PreInit(Scene* aScene);
 	virtual void Init(Entity* aEntity) override;
 	void SetUpModel(const std::string& aPath = "Cube.fbx") override;
 	void AddModelToScene(int aModelIndex = 0);
@@ -57,7 +57,6 @@ private:
 	V4F myTint;
 	float myFalloff = 2.8f;
 	bool myIsFadingOut;
-	ModelLoader* myModelLoader;
 	Scene* myScene;
 
 	ModelInstance* myModelInstance;

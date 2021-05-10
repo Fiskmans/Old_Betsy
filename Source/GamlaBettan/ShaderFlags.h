@@ -1,6 +1,6 @@
 #pragma once
 
-enum ShaderFlags: unsigned long long
+enum ShaderFlags : unsigned char
 {
 	None = 0,
 	HasVertexColors = 1ULL << 0,
@@ -8,7 +8,7 @@ enum ShaderFlags: unsigned long long
 	HasBones = 1ULL << 2,
 
 
-	NumBonesOffset = 32,
-	BoneMask = 1ULL << 32 | 1ULL << 33 | 1ULL << 34 | 1ULL << 35,
+	NumBonesOffset = 4,
+	BoneMask = 1ULL << 4 | 1ULL << 5 | 1ULL << 6 | 1ULL << 7,
 	Count
 };

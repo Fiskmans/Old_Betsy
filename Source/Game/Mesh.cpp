@@ -7,10 +7,10 @@
 #include <algorithm>
 #include "Macros.h"
 #include <Model.h>
+#include "AssetManager.h"
 
 
 Mesh::Mesh() :
-	myModelLoader(nullptr),
 	myScene(nullptr),
 	myIsFadingOut(false),
 	myUpdateOverridden(false),
@@ -24,9 +24,8 @@ Mesh::~Mesh()
 	Reset();
 }
 
-void Mesh::PreInit(ModelLoader* aModelLoader, Scene* aScene)
+void Mesh::PreInit(Scene* aScene)
 {
-	myModelLoader = aModelLoader;
 	myScene = aScene;
 	myIsFadingOut = false;
 	myTint = V4F(0, 0, 0, 1);
@@ -42,7 +41,7 @@ void Mesh::Init(Entity* aEntity)
 
 void Mesh::SetUpModel(const std::string& aPath)
 {
-	myModelInstance = myModelLoader->InstantiateModel(aPath);
+	myModelInstance = AssetManager::GetInstance().GetModel(aPath).InstansiateModel();
 	SubscribeToMyMessages();
 }
 
@@ -99,7 +98,7 @@ void Mesh::UpdateInstancePosition()
 		instance->SetPosition(CommonUtilities::Vector4<float>(position.x, position.y, position.z, 1.0f));
 		instance->SetRotation(mat);
 #ifdef _DEBUG
-		if (instance->GetModel()->myIsMissNamed)
+		if (instance->GetModelAsset().GetAsModel()->myIsMissNamed)
 		{
 			instance->SetTint(V4F(1, 0, 0, 1));
 			DebugDrawer::GetInstance().SetColor(V4F(1, 0, 0, 1));

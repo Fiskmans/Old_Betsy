@@ -439,16 +439,16 @@ void DebugDrawer::DrawSkeleton(ModelInstance* aInstance)
 {
 #if USEDEBUGLINES
 	SetColor(V4F(0, 1, 0, 1));
-	if (aInstance->GetModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones)
+	if (aInstance->GetModelAsset().GetAsModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones)
 	{
 
 		auto positions = aInstance->GetBonePositions();
 
-		for (size_t i = 0; i < aInstance->GetModel()->myBoneData.size(); i++)
+		for (size_t i = 0; i < aInstance->GetModelAsset().GetAsModel()->myBoneData.size(); i++)
 		{
-			if (aInstance->GetModel()->myBoneData[i].parent != -1)
+			if (aInstance->GetModelAsset().GetAsModel()->myBoneData[i].parent != -1)
 			{
-				DrawLine(positions[aInstance->GetModel()->myBoneData[i].parent], positions[i]);
+				DrawLine(positions[aInstance->GetModelAsset().GetAsModel()->myBoneData[i].parent], positions[i]);
 			}
 			else
 			{

@@ -44,14 +44,6 @@ void Light::Init(Entity* aEntity)
 	myLight->color = myColor;
 	myLight->intensity = myIntensity;
 	myLight->range = myRange;
-#ifdef _DEBUG
-	V4F pos = V4F(myEntity->GetPosition(), 1);
-	ModelInstance* lightShower = DebugTools::myModelLoader->InstanciateCube(pos);
-	myLight->myModel = lightShower;
-	//lightShower->Scale({ myRange,myRange,myRange });
-	lightShower->SetTint(V4F(myColor,1));
-	myScene->AddToScene(lightShower);
-#endif // _DEBUG
 	myLight->position = myEntity->GetPosition();
 
 }

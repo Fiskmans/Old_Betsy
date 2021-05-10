@@ -32,7 +32,7 @@ void AnimationComponent::Update(const float aDeltaTime)
 	if (myModelImWaitingFor)
 	{
 		PERFORMANCETAG("Attach model")
-			if (myModelImWaitingFor->GetModel()->ShouldRender())
+			if (myModelImWaitingFor->GetModelAsset().GetAsModel()->ShouldRender())
 			{
 				AttachToModel(myModelImWaitingFor);
 				myModelImWaitingFor = nullptr;
@@ -119,12 +119,6 @@ void AnimationComponent::Reset()
 	myShouldAnimate = true;
 	myShouldUseEntityMessage = true;
 	myHasAttackedToModel = false;
-
-	//TODO RAGDOLL
-	/*
-	myEntity->GetComponent<Mesh>()->GetModelInstance()->DetachAnimator();
-	SAFE_DELETE(myAnimator);
-	*/
 }
 
 void AnimationComponent::OnAttach()
@@ -184,7 +178,7 @@ void AnimationComponent::AttachToMesh(Mesh* aMeshcomponent, int aModelIndex)
 {
 	LOGVERBOSE("AnimationComponent Attached To mesh");
 	ModelInstance* model = aMeshcomponent->GetModelInstance(aModelIndex);
-	if (model->GetModel()->ShouldRender())
+	if (model->GetModelAsset().GetAsModel()->ShouldRender())
 	{
 		myModelImWaitingFor = model;
 		AttachToModel(model);
@@ -198,7 +192,7 @@ void AnimationComponent::AttachToMesh(Mesh* aMeshcomponent, int aModelIndex)
 void AnimationComponent::AttachToModel(ModelInstance* aModel)
 {
 	LOGVERBOSE("AnimationComponent attached To model");
-	Model::CModelData* modelData = aModel->GetModel()->GetModelData();
+	Model::CModelData* modelData = aModel->GetModelAsset().GetAsModel()->GetModelData();
 	myAnimator = new Animator();
 	std::vector<std::string> allAnimations;
 	{
@@ -207,7 +201,7 @@ void AnimationComponent::AttachToModel(ModelInstance* aModel)
 	}
 	{
 		PERFORMANCETAG("Init");
-		myAnimator->Init(modelData->myFilePath, &aModel->GetModel()->myBoneData, allAnimations);
+		myAnimator->Init(modelData->myFilePath, &aModel->GetModelAsset().GetAsModel()->myBoneData, allAnimations);
 	}
 	myModelImWaitingFor->AttachAnimator(myAnimator);
 }
