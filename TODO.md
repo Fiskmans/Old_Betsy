@@ -11,6 +11,8 @@
   - Inengine editor?
 - Flip all chiralities and axles to match the default in blender
 - Switch from VS filters to folders
+- SetErrorTexture() move call to better place than modelloader, cause uhm wtf
+- Remove Skybox class, make it a assetType instead
 
 ## Improve
 - Rework asset loading to allow easier asset loading
