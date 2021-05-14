@@ -27,3 +27,4 @@
 - Add VR Support
   - using [OpenVR](https://github.com/ValveSoftware/openvr)
 - Make tests for tools being used
+- migrate to cmake instead of raw vs files
