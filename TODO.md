@@ -13,6 +13,7 @@
 - Switch from VS filters to folders
 - SetErrorTexture() move call to better place than modelloader, cause uhm wtf
 - Remove Skybox class, make it a assetType instead
+- Rename All projects and folders to english
 
 ## Improve
 - Rework asset loading to allow easier asset loading
