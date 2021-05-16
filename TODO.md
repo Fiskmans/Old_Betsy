@@ -15,6 +15,9 @@
 - Remove Skybox class, make it a assetType instead
 - Rename All projects and folders to english
 
+## Fixes
+- Make a levelInstance with the metadata for levelloading (current index, current step etc) so the asset doesn't include any instance specific data and can be reused without issues 
+
 ## Improve
 - Rework asset loading to allow easier asset loading
   - Massloading a folder
