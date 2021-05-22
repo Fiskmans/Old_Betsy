@@ -34,4 +34,5 @@
 - Make tests for tools being used
 - migrate to cmake instead of raw vs files
 - clean up matrix and vector operators to reduce copy operations
-- Quickly and quitely hide and murder the pch hack 
+- Quickly and quitely hide and murder the pch hack
+- Animator::TransormOfBone() should fetch only the bone needed
