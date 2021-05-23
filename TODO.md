@@ -17,6 +17,7 @@
 
 ## Fixes
 - Make a levelInstance with the metadata for levelloading (current index, current step etc) so the asset doesn't include any instance specific data and can be reused without issues 
+- use fixed dt physx stepping in GameState::Update
 
 ## Improve
 - Rework asset loading to allow easier asset loading
@@ -32,3 +33,6 @@
   - using [OpenVR](https://github.com/ValveSoftware/openvr)
 - Make tests for tools being used
 - migrate to cmake instead of raw vs files
+- clean up matrix and vector operators to reduce copy operations
+- Quickly and quitely hide and murder the pch hack
+- Add animations back to modelviewer, maybe its own editor?
