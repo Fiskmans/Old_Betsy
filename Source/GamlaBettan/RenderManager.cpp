@@ -595,7 +595,7 @@ bool RenderManager::CreateTextures(const unsigned int aWidth, const unsigned int
 
 	static_assert(sizeof(BoneTextureCPUBuffer) == (width * height * bytesPerPixel) && "Something got missmatched");
 
-	DirectX11Framework::AddMemoryUsage(sizeof(BoneTextureCPUBuffer) * DirectX11Framework::FormatToSizeLookup[desc.Format], "Bone Texture", "Engine Texture");
+	DirectX11Framework::AddMemoryUsage(static_cast<size_t>(sizeof(BoneTextureCPUBuffer) * DirectX11Framework::FormatToSizeLookup[desc.Format]), "Bone Texture", "Engine Texture");
 
 
 	HRESULT result = device->CreateTexture2D(&desc, nullptr, &myBoneBufferTexture);

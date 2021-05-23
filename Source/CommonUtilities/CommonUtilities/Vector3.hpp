@@ -302,6 +302,14 @@ namespace CommonUtilities
 		return (x == aVector.x && y == aVector.y && z == aVector.z);
 	}
 
+	template<>
+	inline bool Vector3<float>::operator==(const Vector3& aVector) const
+	{
+		const float eps = 1e-5f;
+		bool out = (abs(x - aVector.x) < eps && abs(y - aVector.y) < eps && abs(z - aVector.z) < eps);
+		return out;
+	}
+
 	template<class T>
 	inline bool Vector3<T>::operator!=(const Vector3& aVector) const
 	{

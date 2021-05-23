@@ -4,7 +4,7 @@ typedef size_t ItemIdType;
 
 struct ItemId
 {
-	ItemIdType ID;
+	ItemIdType ID = -1;
 	size_t stackSize = 1;
 
 	ItemId() = default;

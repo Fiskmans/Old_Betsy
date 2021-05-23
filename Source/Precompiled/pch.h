@@ -1,5 +1,8 @@
 #pragma once
 
+#pragma warning(disable : 26812) // Prefer scoped enum
+
+
 #include <Macros.h>
 
 //Windows

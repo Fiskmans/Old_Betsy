@@ -68,7 +68,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 
 	myDevice = device;
 
-	DirectX11Framework::AddMemoryUsage(tdesc.Height * tdesc.Width * DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R32_TYPELESS], "Poitlight Depth", "Engine Depth");
+	DirectX11Framework::AddMemoryUsage(static_cast<size_t>(tdesc.Height * tdesc.Width * DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R32_TYPELESS]), "Poitlight Depth", "Engine Depth");
 	result = device->CreateTexture2D(&tdesc, nullptr, &tex);
 	if (FAILED(result))
 	{
@@ -78,7 +78,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 
 	tdesc.Width = ENVIRONMENTSHADOWRESOLUTION;
 	tdesc.Height = ENVIRONMENTSHADOWRESOLUTION;
-	DirectX11Framework::AddMemoryUsage(tdesc.Height * tdesc.Width * DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R32_TYPELESS], "Environment Depth", "Engine Depth");
+	DirectX11Framework::AddMemoryUsage(static_cast<size_t>(tdesc.Height * tdesc.Width * DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R32_TYPELESS]), "Environment Depth", "Engine Depth");
 	result = device->CreateTexture2D(&tdesc, nullptr, &texEnvironment);
 	if (FAILED(result))
 	{

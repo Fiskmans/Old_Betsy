@@ -9,7 +9,7 @@
 void Animation::GetInterpolation(float aTime, float aWeight, AnimationFrame& aOutSnapshot)
 {
     size_t firstFrame = size_t(aTime) % myKeyFrames.size();
-    size_t secondFrame = size_t(aTime + 1ull) % myKeyFrames.size();
+    size_t secondFrame = (size_t(aTime) + 1) % myKeyFrames.size();
 
     float fraction = fmodf(aTime, 1.f);
     
@@ -47,7 +47,7 @@ namespace Loader
 {
     struct BoneIfo
     {
-        size_t myIndex;
+        size_t myIndex = -1;
         aiMatrix4x4 myOffset;
     };
 

@@ -30,7 +30,7 @@ public:
 private:
 	AssetHandle& GetPixelShader(size_t flags);
 
-	DepthRenderer* myShadowRenderer;
+	DepthRenderer* myShadowRenderer = nullptr;
 
 	GAMEMETRIC(float, myCloudIntensity, CLOUDINTENSITY, 0.3f);
 

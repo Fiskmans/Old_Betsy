@@ -7,9 +7,6 @@
 
 PxQueryHitType::Enum GBPhysXQueryFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags)
 {
-	PX_UNUSED(actor);
-	PX_UNUSED(queryFlags);
-	int word = shape->getQueryFilterData().word0;
 	if ((shape->getQueryFilterData().word0 & filterData.word1) && (filterData.word0 & shape->getQueryFilterData().word1))
 	{
 		return PxQueryHitType::eBLOCK;
@@ -30,9 +27,6 @@ PxQueryHitType::Enum GBPhysXQueryFilterCallback::postFilter(const PxFilterData& 
 
 PxQueryHitType::Enum GBPhysXBulletQueryFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags)
 {
-	PX_UNUSED(actor);
-	PX_UNUSED(queryFlags);
-	int shapeWord = shape->getQueryFilterData().word0;
 	if ((shape->getQueryFilterData().word0 & filterData.word0) == 0)
 	{
 		return PxQueryHitType::eNONE;
@@ -42,8 +36,6 @@ PxQueryHitType::Enum GBPhysXBulletQueryFilterCallback::preFilter(const PxFilterD
 PxQueryHitType::Enum GBPhysXBulletQueryFilterCallback::postFilter(const PxFilterData& filterData, const PxQueryHit& hit)
 {
 	PxShape* shape = hit.shape;
-
-	int shapeWord = shape->getQueryFilterData().word0;
 	if (filterData.word0 & shape->getQueryFilterData().word0)
 	{
 		return PxQueryHitType::eBLOCK;
@@ -53,9 +45,6 @@ PxQueryHitType::Enum GBPhysXBulletQueryFilterCallback::postFilter(const PxFilter
 
 PxQueryHitType::Enum GBPhysXInteractQueryFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags)
 {
-	PX_UNUSED(actor);
-	PX_UNUSED(queryFlags);
-	int shapeWord = shape->getQueryFilterData().word0;
 	if ((shape->getQueryFilterData().word0 & filterData.word0) == 0)
 	{
 		return PxQueryHitType::eNONE;
@@ -66,8 +55,6 @@ PxQueryHitType::Enum GBPhysXInteractQueryFilterCallback::postFilter(const PxFilt
 {
 	PxShape* shape = hit.shape;
 
-	//SYSINFO("used bulletqueryfilter");
-	int shapeWord = shape->getQueryFilterData().word0;
 	if (filterData.word0 & shape->getQueryFilterData().word0)
 	{
 		return PxQueryHitType::eBLOCK;

@@ -219,7 +219,7 @@ namespace NavMeshLoader_Private
 					NavMeshLink l;
 					l.toNode = neighbors[i] - aNavMesh->myNodes.data();
 					l.weight = (node.myCenter - neighbors[i]->myCenter).Length();
-					node.myLinks[0] = l;
+					node.myLinks[i] = l;
 				}
 				else
 				{

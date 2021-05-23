@@ -359,6 +359,88 @@ void PathFinder::Imgui()
 				ImGui::Checkbox("Draw waypoints", &myDrawWaypoints);
 				ImGui::Unindent();
 			}
+
+
+			if (ImGui::GetIO().KeyAlt)
+			{
+				bool open = true;
+				ImGuiBackendFlags flags = ImGuiWindowFlags_None;
+				flags |= ImGuiWindowFlags_AlwaysAutoResize; 
+				flags |= ImGuiWindowFlags_NoScrollbar; 
+				flags |= ImGuiWindowFlags_NoCollapse; 
+				flags |= ImGuiWindowFlags_NoTitleBar;
+				flags |= ImGuiWindowFlags_NoScrollWithMouse;
+
+				ImGui::SetNextWindowPos(ImGui::GetIO().MousePos);
+
+				if (ImGui::Begin("PF_ToolTip", &open, flags))
+				{
+					static const V4F colors[3] =
+					{
+						V4F(0.9f,0.6f,0.6f,1.0f),
+						V4F(0.6f,0.9f,0.6f,1.0f),
+						V4F(0.6f,0.6f,0.9f,1.0f)
+					};
+
+					ImGui::ColorButton("Color##0", ImVec4(colors[0].x, colors[0].y, colors[0].z, colors[0].w)); ImGui::SameLine();
+					ImGui::ColorButton("Color##1", ImVec4(colors[1].x, colors[1].y, colors[1].z, colors[1].w)); ImGui::SameLine();
+					ImGui::ColorButton("Color##2", ImVec4(colors[2].x, colors[2].y, colors[2].z, colors[2].w));
+
+					NavMesh* mesh = myNavMesh.GetAsNavMesh();
+					if (!mesh)
+					{
+						ImGui::Text("No navmesh");
+					}
+					else
+					{
+						NavMeshIndexType nodeindex = FindNode(*DebugTools::LastKnownMouseRay);
+
+						ImGui::Text("Nodeindex: %d", nodeindex);
+
+						if (nodeindex != -1)
+						{
+							NavMeshNode& node = mesh->myNodes[nodeindex];
+
+							DebugDrawer::GetInstance().SetColor(colors[0]);
+							DebugDrawer::GetInstance().DrawCross(mesh->myVertexCollection[node.myCorners[0]], 9);
+							DebugDrawer::GetInstance().DrawLine(mesh->myVertexCollection[node.myCorners[0]], mesh->myVertexCollection[node.myCorners[1]]);
+							if (node.myLinks[0].toNode != -1)
+							{
+								NavMeshNode& neighboor = mesh->myNodes[node.myLinks[0].toNode];
+								DebugDrawer::GetInstance().DrawLine(LERP(mesh->myVertexCollection[neighboor.myCorners[0]], neighboor.myCenter, 0.1f), LERP(mesh->myVertexCollection[neighboor.myCorners[1]], neighboor.myCenter, 0.1f));
+								DebugDrawer::GetInstance().DrawLine(LERP(mesh->myVertexCollection[neighboor.myCorners[1]], neighboor.myCenter, 0.1f), LERP(mesh->myVertexCollection[neighboor.myCorners[2]], neighboor.myCenter, 0.1f));
+								DebugDrawer::GetInstance().DrawLine(LERP(mesh->myVertexCollection[neighboor.myCorners[2]], neighboor.myCenter, 0.1f), LERP(mesh->myVertexCollection[neighboor.myCorners[0]], neighboor.myCenter, 0.1f));
+							}
+
+							DebugDrawer::GetInstance().SetColor(colors[1]);
+							DebugDrawer::GetInstance().DrawCross(mesh->myVertexCollection[node.myCorners[1]], 9);
+							DebugDrawer::GetInstance().DrawLine(mesh->myVertexCollection[node.myCorners[1]], mesh->myVertexCollection[node.myCorners[2]]);
+							if (node.myLinks[1].toNode != -1)
+							{
+								NavMeshNode& neighboor = mesh->myNodes[node.myLinks[1].toNode];
+								DebugDrawer::GetInstance().DrawLine(LERP(mesh->myVertexCollection[neighboor.myCorners[0]], neighboor.myCenter, 0.1f), LERP(mesh->myVertexCollection[neighboor.myCorners[1]], neighboor.myCenter, 0.1f));
+								DebugDrawer::GetInstance().DrawLine(LERP(mesh->myVertexCollection[neighboor.myCorners[1]], neighboor.myCenter, 0.1f), LERP(mesh->myVertexCollection[neighboor.myCorners[2]], neighboor.myCenter, 0.1f));
+								DebugDrawer::GetInstance().DrawLine(LERP(mesh->myVertexCollection[neighboor.myCorners[2]], neighboor.myCenter, 0.1f), LERP(mesh->myVertexCollection[neighboor.myCorners[0]], neighboor.myCenter, 0.1f));
+							}
+
+							DebugDrawer::GetInstance().SetColor(colors[2]);
+							DebugDrawer::GetInstance().DrawCross(mesh->myVertexCollection[node.myCorners[2]], 9);
+							DebugDrawer::GetInstance().DrawLine(mesh->myVertexCollection[node.myCorners[2]], mesh->myVertexCollection[node.myCorners[0]]);
+							if (node.myLinks[2].toNode != -1)
+							{
+								NavMeshNode& neighboor = mesh->myNodes[node.myLinks[2].toNode];
+								DebugDrawer::GetInstance().DrawLine(LERP(mesh->myVertexCollection[neighboor.myCorners[0]], neighboor.myCenter, 0.1f), LERP(mesh->myVertexCollection[neighboor.myCorners[1]], neighboor.myCenter, 0.1f));
+								DebugDrawer::GetInstance().DrawLine(LERP(mesh->myVertexCollection[neighboor.myCorners[1]], neighboor.myCenter, 0.1f), LERP(mesh->myVertexCollection[neighboor.myCorners[2]], neighboor.myCenter, 0.1f));
+								DebugDrawer::GetInstance().DrawLine(LERP(mesh->myVertexCollection[neighboor.myCorners[2]], neighboor.myCenter, 0.1f), LERP(mesh->myVertexCollection[neighboor.myCorners[0]], neighboor.myCenter, 0.1f));
+							}
+
+						}
+					}
+				}
+				ImGui::End();
+			}
+
+
 		});
 #endif
 }

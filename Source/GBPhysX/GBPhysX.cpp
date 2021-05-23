@@ -494,8 +494,8 @@ PxArticulation* CreateArticulation(PxVec3 aWorldPos, GBPhysXCharacter* aCharacte
 	PxArticulation* articulation = gPhysics->createArticulation();
 
 	//CREATE ROOT FROM HIP NODE
-	auto rootTransform = boneTransforms[1];
-	auto rootBoneOffset = aHitboxes[0]->GetHitBox().parentBoneData.BoneOffset;
+	const auto& rootTransform = boneTransforms[1];
+	const auto& rootBoneOffset = aHitboxes[0]->GetHitBox().parentBoneData.BoneOffset;
 
 	M44F rootoffsetInversed = rootBoneOffset;
 	rootoffsetInversed = M44F::GetRealInverse(rootoffsetInversed);
@@ -577,8 +577,8 @@ PxArticulation* CreateArticulation(PxVec3 aWorldPos, GBPhysXCharacter* aCharacte
 		M44F final = cuMatrix;
 
 
-		auto childBoneOffset = sortedHitBox.GetHitBox().childBoneData.BoneOffset;
-		auto childTrans = boneTransforms[sortedHitBox.GetHitBox().myTargetNodeIndex];
+		const auto& childBoneOffset = sortedHitBox.GetHitBox().childBoneData.BoneOffset;
+		const auto& childTrans = boneTransforms[sortedHitBox.GetHitBox().myTargetNodeIndex];
 
 		M44F childOffsetInversed = childBoneOffset;
 		childOffsetInversed = M44F::GetRealInverse(childOffsetInversed);
@@ -1426,6 +1426,7 @@ GBPhysXCharacter::GBPhysXCharacter()
 	myIsCrouching = false;
 	myIsGrounded = false;
 	myFilterData = nullptr;
+	myLinkToLookAt = { nullptr };
 }
 
 GBPhysXCharacter::~GBPhysXCharacter()
