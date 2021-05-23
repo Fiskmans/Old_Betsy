@@ -63,8 +63,8 @@ private:
 	ID3D11Buffer* myVertexBuffer = nullptr;
 	ID3D11Buffer* myConstantBuffer = nullptr;
 	ID3D11Buffer* myColorBuffer = nullptr;
-	ID3D11PixelShader* myPixelShader = nullptr;
-	ID3D11VertexShader* myVertexShader = nullptr;
+	AssetHandle myPixelShader;
+	AssetHandle myVertexShader;
 	ID3D11InputLayout* myInputLayout = nullptr;
 
 	V4F myColor;

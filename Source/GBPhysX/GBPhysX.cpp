@@ -1023,82 +1023,6 @@ PxController* CreateCharacterController(V3F aPosition, PxFilterData* aFilterData
 	return controller;
 }
 
-std::vector<GBPhysXActor*> GBPhysX::GBCreateHangingLantern(V3F aPosition)
-{
-	std::vector<GBPhysXActor*> returnVector;
-
-	auto chainVector = GBCreateChain(aPosition, V3F(5.0f, 5.0f, 5.0f), 3, 10.0f);
-	returnVector.push_back(chainVector[0]);
-	returnVector.push_back(chainVector[1]);
-	returnVector.push_back(chainVector[2]);
-
-	PxRigidDynamic* prev = (PxRigidDynamic*)chainVector[chainVector.size() - 1]->myRigidActor;
-	PxVec3 offset(20.0f / 2, 0, 0);
-	PxTransform localTm(offset);
-
-	PxRigidDynamic* lamp = PxCreateDynamic(*gPhysics, prev->getGlobalPose() * localTm, PxBoxGeometry(25.0f, 10.0f, 10.0f), *gMaterial, 10.0f);
-	createDampedD6(prev, PxTransform(offset), lamp, PxTransform(-offset));
-	gScene->addActor(*lamp);
-
-	GBPhysXActor* gbLampActor = new GBPhysXActor();
-	gbLampActor->myGBPhysX = this;
-	gbLampActor->myRigidActor = lamp;
-	returnVector.push_back(gbLampActor);
-
-	return returnVector;
-}
-
-std::array<GBPhysXActor*, 8> GBPhysX::GBCreateBarrelDestructable(V3F aPosition, V3F aRotation)
-{
-	std::array<GBPhysXActor*, 8> returnArray;
-	V3F dir = aRotation.GetNormalized();
-	dir = dir * 600.0f;
-	//LID fbx1
-	returnArray[0] = GBCreateDynamicBox(aPosition + V3F(-2.0f, 116.0f, 2.8f), V3F(33.0f, 4.0f, 33.0f), dir, 10.0f);
-	//doublepiece fbx2
-	returnArray[1] = GBCreateDynamicBox(aPosition + V3F(10.80f, 52.1f, -36.0f), V3F(18.0f, 48.681f, 6.208f), dir, 10.0f);
-	//singlepiece fbx3
-	returnArray[2] = GBCreateDynamicBox(aPosition + V3F(38.624f, 55.444f, -13.886f), V3F(5.0f, 48.681f, 9.892f), dir, 10.0f);
-	//singlepiece fbx4
-	returnArray[3] = GBCreateDynamicBox(aPosition + V3F(40.409f, 55.351f, 17.715f), V3F(4.0f, 48.681f, 10.338f), dir, 10.0f);
-	//Singlepiece fbx5
-	returnArray[4] = GBCreateDynamicBox(aPosition + V3F(27.197f, 55.647f, 39.977f), V3F(7.342f, 48.681f, 5.307f), dir, 10.0f);
-	//doublepiece fbx6
-	returnArray[5] = GBCreateDynamicBox(aPosition + V3F(-36.082f, 53.470f, -25.616f), V3F(10.517f, 48.681f, 12.589f), dir, 10.0f);
-	//doublepiece fbx7
-	returnArray[6] = GBCreateDynamicBox(aPosition + V3F(-36.848f, 55.127f, 28.365f), V3F(10.517f, 48.681f, 17.692f), dir, 10.0f);
-	//singlepiece fbx8
-	returnArray[7] = GBCreateDynamicBox(aPosition + V3F(-3.167f, 54.744f, 45.588f), V3F(10.517f, 48.681f, 7.461f), dir, 10.0f);
-
-	return returnArray;
-}
-
-std::array<GBPhysXActor*, 8> GBPhysX::GBCreateBoxDestructable(V3F aPosition, V3F aRotation)
-{
-	std::array<GBPhysXActor*, 8> returnArray;
-	V3F dir = aRotation.GetNormalized();
-	dir = dir * 600.0f;
-	//HEL SIDA fbx 1
-	returnArray[0] = GBCreateDynamicBox(aPosition + V3F(45.69f, 42.08f, 0.784f), V3F(7.72f, 31.0f, 43.0f), dir, 10.0f);
-
-	//BOTTEN fbx 2
-	returnArray[1] = GBCreateDynamicBox(aPosition + V3F(0.0f, 0.0f, 0.0f), V3F(53.0f, 4.0f, 58.0f), dir, 10.0f);
-
-	//LOCK BIT ETT OCH TVÅ fbx 3
-	returnArray[2] = GBCreateDynamicBox(aPosition + V3F(-3.45f, 90.45f, -27.08f), V3F(53.0f, 4.5f, 28.0f), dir, 10.0f);
-	returnArray[3] = GBCreateDynamicBox(aPosition + V3F(-3.45f, 90.45f, 35.70f), V3F(53.0f, 4.5f, 28.0f), dir, 10.0f);
-
-	// PLANKA SIDA ETT TVÅ TRE fbx 5
-	returnArray[4] = GBCreateDynamicBox(aPosition + V3F(-1.24f, 65.06f, 45.88f), V3F(33.5f, 8.0f, 4.0f), dir, 10.0f);
-	returnArray[5] = GBCreateDynamicBox(aPosition + V3F(-1.24f, 42.06f, 45.88f), V3F(33.5f, 8.0f, 4.0f), dir, 10.0f);
-	returnArray[6] = GBCreateDynamicBox(aPosition + V3F(-1.24f, 18.06f, 45.88f), V3F(33.5f, 8.0f, 4.0f), dir, 10.0f);
-
-	// HÖRNBIT fbx 6
-	returnArray[7] = GBCreateDynamicBox(aPosition + V3F(-50.65f, 46.95f, 48.82f), V3F(8.0f, 37.0f, 10.0f), dir, 10.0f);
-
-	return returnArray;
-}
-
 GBPhysXCharacter* GBPhysX::GBCreateCapsuleController(V3F aPosition, V3F aRotation, float aHeight, float aRadius, bool aIsPlayer)
 {
 	physx::PxRigidDynamic* actor;
@@ -1339,16 +1263,6 @@ void GBPhysX::SaveNodeParents(std::unordered_map<int, int> nodeParents)
 	myRagdollNodeParents = nodeParents;
 }
 
-void GBPhysX::GBCreateRagDoll(V3F aPos, GBPhysXCharacter* aChar, V3F aDirection)
-{
-
-	PxVec3 worldPos = PxVec3(aPos.x, aPos.y, aPos.z);
-
-	aChar->SetArticulation(CreateArticulation(worldPos, aChar, aChar->myHitBoxes, myRagdollNodeParents, aDirection));
-	aChar->SetIsRagDoll(true);
-	aChar->GetEntity()->GetComponent<Mesh>()->GetModelInstance()->SetGBPhysXCharacter(aChar);
-}
-
 void GBPhysX::SetGBPhysXActive(bool aActive)
 {
 	myIsActive = aActive;
@@ -1487,16 +1401,6 @@ std::string GBPhysXActor::GetName()
 	return myRigidActor->getName();
 }
 
-void GBPhysXCharacter::SetIsRagDoll(bool aIsRagDoll)
-{
-	myIsRagDoll = aIsRagDoll;
-}
-
-bool GBPhysXCharacter::GetIsRagDoll()
-{
-	return myIsRagDoll;
-}
-
 void GBPhysXCharacter::SetArticulation(physx::PxArticulation* aArticulation)
 {
 	myArticulation = aArticulation;
@@ -1515,107 +1419,6 @@ void GBPhysXCharacter::SetDeathMomentBoneTransformations(std::array<CommonUtilit
 void GBPhysXCharacter::SetDeathMomentCharTransform(M44F& aTransform)
 {
 	myDeathMomentCharTransform = aTransform;
-}
-
-void GBPhysXCharacter::UpdateRagDollMatrices(std::array<CommonUtilities::Matrix4x4<float>, 64>& aMatrixes)
-{
-	static float currentTestXRotationOffset = 0.0f;
-
-	if (myIsRagDoll == true)
-	{
-		auto nodeParents = myGBPhysX->myRagdollNodeParents;
-
-		auto listoflinks = myLinkToLookAt;
-		listoflinks[25] = listoflinks[30];
-		listoflinks[38] = listoflinks[43];
-
-
-
-		int size = myArticulation->getNbLinks();
-		PxArticulationLink* buffer[64];
-		int nrOfWrittenToBuffer = myArticulation->getLinks(buffer, 64, 0);
-		PxTransform linkTransform;
-
-		auto boneInfo = GetEntity()->GetComponent<AnimationComponent>()->GetAnimator()->GetBoneInfo();
-
-		//DEBUG SANITY CHECKS
-		PxTransform deathMomentTransform = MatToTransform(myDeathMomentCharTransform);
-		PxTransform inverseCharTransform = MatToTransform(myDeathMomentCharTransform).getInverse();
-		PxTransform debugLinkTransform = listoflinks[2]->getGlobalPose();
-		M44F debugBoneoffset = (*boneInfo)[1].BoneOffset;
-		M44F debugBoneoffsetinverse = M44F::GetRealInverse(debugBoneoffset);
-		PxTransform debugBoneTrans = MatToTransform(debugBoneoffset);
-		PxTransform debugtemp = debugBoneTrans * debugLinkTransform * inverseCharTransform;
-
-
-		M44F tempMatrix = TransformToMat(debugtemp);
-		M44F finalMat = M44F::GetRealInverse(TransformToMat(debugtemp));
-		M44F saveMatrix = M44F();
-		for (int index = 0; index < 64; index++)
-		{
-			if (index == 1)
-			{
-				linkTransform = listoflinks[2]->getGlobalPose();
-				linkTransform = inverseCharTransform * linkTransform;
-
-				M44F linkFinal = TransformToMat(linkTransform);
-				M44F linkCuMatrix = M44F::Transpose(linkFinal);
-
-
-				M44F linkMatrix(linkCuMatrix(1, 1), linkCuMatrix(1, 2), linkCuMatrix(1, 3), linkCuMatrix(1, 4),
-					linkCuMatrix(2, 1), linkCuMatrix(2, 2), linkCuMatrix(2, 3), linkCuMatrix(2, 4),
-					linkCuMatrix(3, 1), linkCuMatrix(3, 2), linkCuMatrix(3, 3), linkCuMatrix(3, 4),
-					linkCuMatrix(4, 1), linkCuMatrix(4, 2), linkCuMatrix(4, 3), linkCuMatrix(4, 4));
-
-				M44F linkBoneOffset = (*boneInfo)[index].BoneOffset;
-
-				M44F linkTrans = linkBoneOffset * linkMatrix;
-
-				//tempMatrix = TransformToMat(linkTransform);
-
-				//PxTransform boneTrans = MatToTransform((*boneInfo)[index].BoneOffset);
-				//boneTrans = boneTrans.getInverse();
-
-				//VERSION WITH BONEOFFSET * world
-				//finalMat = tempMatrix * (*boneInfo)[index].BoneOffset;
-				//PxTransform temp = boneTrans * linkTransform * inverseCharTransform;
-				//finalMat = TransformToMat(temp);
-				//finalMat = M44F::GetRealInverse(finalMat);
-				aMatrixes[index] = linkTrans;
-				//aMatrixes[index] = finalMat;
-				//saveMatrix = tempMatrix;
-
-				aMatrixes[index] = myDeathMomentBoneTransformations[index];
-			}
-			else if (index > 1)
-			{
-				linkTransform = listoflinks[(nodeParents[index] + 1)]->getGlobalPose();
-				linkTransform = inverseCharTransform * linkTransform;
-				tempMatrix = TransformToMat(linkTransform);
-
-				//VERSION WITH BONEOFFSET * world
-				finalMat = tempMatrix * (*boneInfo)[index].BoneOffset;
-				aMatrixes[index] = finalMat;
-				//aMatrixes[index] = myDeathMomentBoneTransformations[index];
-
-				//VERSION WITH JUST REMOVED DEATHMOMENT
-				//M44F deathMomentMat = myDeathMomentBoneTransformations[index];
-				//M44F deathMomentInverseMat = M44F::GetRealInverse(deathMomentMat);
-				//
-				//M44F finalMat = deathMomentInverseMat * tempMatrix;
-				//aMatrixes[index] = finalMat;
-
-				//VERSION WITH REMOVED BONEOFFSET
-				//M44F removedBoneOffset = M44F::GetRealInverse((*boneInfo)[index].BoneOffset) * tempMatrix;
-				//aMatrixes[index] = removedBoneOffset;
-			}
-			else
-			{
-				aMatrixes[index] = myDeathMomentBoneTransformations[index];
-			}
-		}
-
-	}
 }
 
 GBPhysXCharacter::GBPhysXCharacter()

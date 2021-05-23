@@ -8,7 +8,7 @@
 struct SpotLight
 {
 	Camera* myCamera;
-	Texture* myTexture;
+	AssetHandle myTexture;
 	float myRange;
 	float myIntensity;
 };

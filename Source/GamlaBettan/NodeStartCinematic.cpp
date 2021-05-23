@@ -22,14 +22,13 @@ int NodeStartCinematic::OnEnter(CNodeInstance* aTriggeringNodeInstance, const in
 		return -1;
 	}
 
-	class ModelLoader* loader = aTriggeringNodeInstance->ourPollingStation->GetModelLoader();
 	class Scene* scene = aTriggeringNodeInstance->ourPollingStation->GetScene();
 	class ParticleFactory* factory = aTriggeringNodeInstance->ourPollingStation->GetParticleFactory();
 	class SpriteFactory* sfactory = aTriggeringNodeInstance->ourPollingStation->GetSpriteFactory();
-	if (loader && scene && factory && sfactory)
+	if (scene && factory && sfactory)
 	{
 		CinematicState* state = new CinematicState();
-		if (state->Init("Data/Cinematics/" + name + ".cinm", loader, scene, factory, sfactory))
+		if (state->Init("Data/Cinematics/" + name + ".cinm", scene, factory, sfactory))
 		{
 			Message message;
 			message.myMessageType = MessageType::PushState;

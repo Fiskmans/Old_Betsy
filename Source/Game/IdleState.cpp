@@ -55,7 +55,7 @@ void IdleState::Update(float aDeltaTime)
 
 void IdleState::OnEnter()
 {
-	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle, myEntity->GetComponent<AIController>()->GetAnimationIndex(), false, false);
+	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle);
 }
 
 void IdleState::OnExit()

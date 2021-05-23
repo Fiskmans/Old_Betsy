@@ -29,8 +29,6 @@ int NodeChangeInteractableMesh::OnEnter(CNodeInstance* aTriggeringNodeInstance, 
 	if (!aTriggeringNodeInstance->ReadData(2, id)) { return -1; }
 	aTriggeringNodeInstance->WriteData(4, id);
 
-	path = "Data/Models/" + path + ".fbx";
-
 	if (id.myInteral)
 	{
 		Entity* ent = reinterpret_cast<Entity*>(id.myInteral);
@@ -58,7 +56,7 @@ int NodeChangeInteractableMesh::OnEnter(CNodeInstance* aTriggeringNodeInstance, 
 			collider->SetFilePath(path);
 		}
 
-		if (path == "Data/Models/P_firePlace_02/P_firePlace_02.fbx")
+		if (path == "P_firePlace_02/P_firePlace_02.fbx")
 		{
 			ent->AddComponent<ParticlesWhileAlive>()->Init(ent);
 			ent->GetComponent<ParticlesWhileAlive>()->SetParticle("FireSmoke.part", V3F(0, 0, 0), V3F(1, 1, 1), V3F(25, 75, 10));

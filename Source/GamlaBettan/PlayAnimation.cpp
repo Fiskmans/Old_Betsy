@@ -31,7 +31,8 @@ void PlayAnimation::Update(float aTime)
 				myIsplaying = true;
 				if (myTarget.Get())
 				{
-					myTarget.Get()->SetAnimation(myAnimation);
+					ONETIMEWARNING("Cinematic animations are currently broken","");
+					//myTarget.Get()->SetAnimation(myAnimation);
 				}
 			}
 		}

@@ -76,7 +76,6 @@ enum class MessageType
 
 	PlayIntro,
 
-	NextRenderPass,
 	MainMenuStateActivated,
 
 	//LEVEL
@@ -187,22 +186,13 @@ enum class MessageType
 	StartInGameAudio,
 
 	//Secrets
-	EnableDiscoMode,
-	EnableHastfan,
 	SuperTinyWindow,
 	WindowSmallerThanAMouse,
 	PleaseResetTheWindowThanks,
-	GiveMeAdam,
-	EnableScreeps,
 
 	//Menu
 	MenuButtonActive,
 	MenuButtonHit,
-
-	//NetWork
-	AnnounceDeathMarker,
-	DeathMarkerRecieved,
-	ConnectedToServer,
 
 	//Bob
 	WinGameAndAlsoLife,

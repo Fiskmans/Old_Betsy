@@ -14,19 +14,16 @@
 #include <MetricValue.h>
 
 #include "AnimationData.h"
-
-#if USEIMGUI
-#include <map>
-#endif // !_RETAIL
-
+#include "Asset.h"
 
 struct ID3D11Buffer;
 struct ID3D11PixelShader;
 struct ID3D11VertexShader;
 struct ID3D11InputLayout;
-class Texture;
 
 class ModelLoader;
+
+class AssetHandle;
 
 
 class Model
@@ -40,10 +37,9 @@ public:
 		UINT myNumberOfIndexes = 0;
 	};
 
-	struct CModelData
+	struct ModelData
 	{
 		bool myForceForward = false;
-		bool myIsEffect = false;
 
 		size_t myshaderTypeFlags;
 		UINT myStride = 0;
@@ -56,13 +52,13 @@ public:
 #pragma warning(pop)
 
 		Model::LodLevel* myLodLevels[8] = { nullptr };
-		class PixelShader* myPixelShader = nullptr;
-		class VertexShader* myVertexShader = nullptr;
+		AssetHandle myPixelShader;
+		AssetHandle myVertexShader;
 		ID3D11InputLayout* myInputLayout = nullptr;
 
-		Texture* myTextures[3] = { nullptr ,nullptr, nullptr};
+		AssetHandle myTextures[3];
 
-		std::vector<std::string> myAnimations;
+		AssetHandle myAnimations;
 		std::string myFilePath;
 	};
 
@@ -77,13 +73,11 @@ public:
 	Model();
 	~Model();
 	
-	void Init(const CModelData& data, ModelLoader* aLoader, const std::string& aPixelShaderFileName, const std::string& aVertexShaderFileName, const std::string& aFilePath = "", const std::string& aFriendlyName = "");
+	void Init(const ModelData& data, ModelLoader* aLoader, const std::string& aPixelShaderFileName, const std::string& aVertexShaderFileName, const std::string& aFilePath = "", const std::string& aFriendlyName = "");
 
 	void ResetAndRelease();
 
-	CModelData* GetModelData();
-
-	static void FlushChanges();
+	ModelData* GetModelData();
 
 	std::string GetFriendlyName();
 
@@ -116,16 +110,7 @@ private:
 	bool myShouldRender = true;
 	ModelLoader* myLoader;
 
-	bool ReloadPixelShader(const std::string& aFilePath);
-	bool ReloadVertexShader(const std::string& aFilePath);
-
-	CModelData myModelData;
-
-#if USEFILEWATHCER
-	static Tools::FileWatcher ourFileWatcher;
-	Tools::FileWatcher::UniqueID myPSFileHandle;
-	Tools::FileWatcher::UniqueID myVSFileHandle;
-#endif
+	ModelData myModelData;
 
 	std::string myFriendlyName;
 	std::string myFilePath;

@@ -3,7 +3,6 @@
 #include "CNodeInstance.h"
 #include "NodeDataTypes.h"
 #include "..//Game/DataStructs.h"
-#include "..//Game/AbilityFactory.h"
 
 NodeSpawnAbility::NodeSpawnAbility() :
 	myAbilityFactory(nullptr)

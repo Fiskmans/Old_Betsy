@@ -9,9 +9,9 @@
 struct Decal
 {
 	Camera* myCamera;
-	std::vector<Texture*> myTextures;
+	std::vector<AssetHandle> myTextures;
 	ID3D11ShaderResourceView* myDepth = nullptr;
-	PixelShader* myPixelShader = nullptr;
+	AssetHandle myPixelShader;
 	float myRange;
 	float myIntensity;
 	float myTimestamp;

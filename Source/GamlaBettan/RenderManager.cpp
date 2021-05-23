@@ -14,7 +14,9 @@
 #include "ShaderFlags.h"
 #include "ModelInstance.h"
 #include "Model.h"
-#include "TextureLoader.h"
+
+#include "AssetManager.h"
+
 
 #if USEIMGUI
 #include <ImGuiHelpers.h>
@@ -75,11 +77,9 @@ bool RenderManager::Init(DirectX11Framework* aFramework, WindowHandler* aWindowH
 	{
 		return false;
 	}
-	myPerlinView = GeneratePerlin(aFramework->GetDevice(), { 1024,1024 }, { 2,2 }, 2);
-	myLutTexture1 = LoadTexture(aFramework->GetDevice(),"Data/Textures/SharedTextures/RGBTable16x1_Autumn.dds");
-	myLutTexture2 = LoadTexture(aFramework->GetDevice(),"Data/Textures/SharedTextures/RGBTable16x1_Winter.dds");
+	myPerlinView = AssetManager::GetInstance().GetPerlinTexture({ 1024,1024 }, { 2,2 }, 2);
 
-	if (!myForwardRenderer.Init(aFramework, "Data/Shaders/ThroughWall.hlsl", "Data/Shaders/ThroughWallEnemy.hlsl", &myPerlinView,&myShadowRenderer))
+	if (!myForwardRenderer.Init(aFramework, "ThroughWall.hlsl", "ThroughWallEnemy.hlsl", myPerlinView, &myShadowRenderer))
 	{
 		return false;
 	}
@@ -99,7 +99,7 @@ bool RenderManager::Init(DirectX11Framework* aFramework, WindowHandler* aWindowH
 	{
 		return false;
 	}
-	if (!myDeferredRenderer.Init(aFramework, &myPerlinView, &myShadowRenderer))
+	if (!myDeferredRenderer.Init(aFramework, myPerlinView, &myShadowRenderer))
 	{
 		return false;
 	}
@@ -225,10 +225,16 @@ void RenderManager::Render(Scene* aScene)
 	if (myDoSSAO)
 	{
 		PERFORMANCETAG("SSAO");
-		myFrameworkPtr->GetContext()->OMSetRenderTargets(8, resetTargets, nullptr);
-		myFrameworkPtr->GetContext()->PSSetShaderResources(0, 16, resetViews);
+		UnbindTargets();
+		UnbindResources();
 		myGBuffer.SetAllAsResources();
-		myFrameworkPtr->GetContext()->PSSetShaderResources(9, 1, *myRandomNormalview);
+
+		ID3D11ShaderResourceView* texture[1] =
+		{
+			myRandomNormal.GetAsTexture()
+		};
+
+		myFrameworkPtr->GetContext()->PSSetShaderResources(9, 1, texture);
 		myDeferredRenderer.MapEnvLightBuffer(aScene);
 		myTextures[static_cast<int>(Textures::BackFaceBuffer)].SetAsResourceOnSlot(10);
 		myTextures[ENUM_CAST(Textures::IntermediateDepth)].SetAsResourceOnSlot(8);
@@ -236,8 +242,8 @@ void RenderManager::Render(Scene* aScene)
 
 		myFullscreenRenderer.Render(FullscreenRenderer::Shader::SSAO);
 
-		myFrameworkPtr->GetContext()->OMSetRenderTargets(8, resetTargets, nullptr);
-		myFrameworkPtr->GetContext()->PSSetShaderResources(0, 16, resetViews);
+		UnbindTargets();
+		UnbindResources();
 		myTextures[static_cast<int>(Textures::SSAOBuffer)].SetAsResourceOnSlot(0);
 		myGBuffer.SetAsActiveTarget(GBuffer::Textures::AmbientOcclusion);
 
@@ -285,15 +291,6 @@ void RenderManager::Render(Scene* aScene)
 		myTextures[static_cast<int>(Textures::IntermediateTexture)].SetAsActiveTarget(&myTextures[static_cast<int>(Textures::IntermediateDepth)]);
 		myForwardRenderer.Render(modelsLeftToRender, aScene->GetMainCamera(), aScene, affectingLights, myBoneOffsetMap, myStateManerger, myBoneBuffer);
 		myStateManerger.SetBlendState(RenderStateManager::BlendState::Disable);
-	}
-
-	{
-		PERFORMANCETAG("LUT");
-		myFrameworkPtr->GetContext()->PSSetShaderResources(1, 1, *myLutTexture1);
-		myFrameworkPtr->GetContext()->PSSetShaderResources(2, 1, *myLutTexture2);
-		myStateManerger.SetSamplerState(RenderStateManager::SamplerState::Point);
-		FullscreenPass({ Textures::IntermediateTexture }, Textures::LUT, FullscreenRenderer::Shader::LUT);
-		FullscreenPass({ Textures::LUT }, Textures::IntermediateTexture, FullscreenRenderer::Shader::COPY);
 	}
 
 	{
@@ -417,19 +414,11 @@ void RenderManager::AddExtraSpriteToRender(SpriteInstance* aSprite)
 void RenderManager::SubscribeToMessages()
 {
 	PostMaster::GetInstance()->Subscribe(MessageType::WindowResize, this);
-	PostMaster::GetInstance()->Subscribe(MessageType::NextRenderPass, this);
-	myDeferredRenderer.SubscribeToMessages();
-	myParticleRenderer.SubscribeToMessages();
-	myForwardRenderer.SubscribeToMessages();
 }
 
 void RenderManager::UnsubscribeToMessages()
 {
 	PostMaster::GetInstance()->UnSubscribe(MessageType::WindowResize, this);
-	PostMaster::GetInstance()->UnSubscribe(MessageType::NextRenderPass, this);
-	myDeferredRenderer.UnsubscribeToMessages();
-	myParticleRenderer.UnsubscribeToMessages();
-	myForwardRenderer.UnsubscribeToMessages();
 }
 
 void RenderManager::RecieveMessage(const Message& aMessage)
@@ -469,7 +458,7 @@ void RenderManager::SetupBoneTexture(const std::vector<ModelInstance*>& aModelLi
 			std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES>& matrixes = myBoneBuffer[boneIndexOffset];
 			for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)
 			{
-				matrixes[i] = CommonUtilities::Matrix4x4<float>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+				matrixes[i] = CommonUtilities::Matrix4x4<float>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 			}
 			model->SetupanimationMatrixes(matrixes);
 			myBoneOffsetMap[model] = boneIndexOffset;
@@ -500,66 +489,6 @@ void RenderManager::Imgui()
 	ImGui::Checkbox("SSAO", &myDoSSAO);
 #endif
 	ImGui::Checkbox("Anti aliasing", &myDoAA);
-	if (ImGui::TreeNode("Perlin"))
-	{
-		static CommonUtilities::Vector2<float> scale = { 1,1 };
-		static CommonUtilities::Vector2<size_t> size = { 256,256 };
-		static int seed = 0;
-		bool update = false;
-		update |= ImGui::SliderFloat("XScale", &scale.x, 0.01f, 200.f);
-		update |= ImGui::SliderFloat("YScale", &scale.y, 0.01f, 200.f);
-		update |= ImGui::InputInt("Seed", &seed);
-
-		if (ImGui::Button("X+"))
-		{
-			if (size.x < 1 << 13)
-			{
-				size.x *= 2;
-				update |= true;
-			}
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("X-"))
-		{
-			if (size.x > 64)
-			{
-				size.x /= 2;
-				update |= true;
-			}
-		}
-		ImGui::SameLine();
-		ImGui::Text(("width: " + std::to_string(size.x)).c_str());
-		if (ImGui::Button("Y+"))
-		{
-			if (size.y < 1 << 13)
-			{
-				size.y *= 2;
-				update |= true;
-			}
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Y-"))
-		{
-			if (size.y > 64)
-			{
-				size.y /= 2;
-				update |= true;
-			}
-		}
-		ImGui::SameLine();
-		ImGui::Text(("height: " + std::to_string(size.y)).c_str());
-		if (update)
-		{
-			Texture* newperlin = GeneratePerlin(myFrameworkPtr->GetDevice(), size, scale, seed);
-			if (newperlin)
-			{
-				myPerlinView->Release();
-				myPerlinView = newperlin;
-			}
-		}
-		Tools::ZoomableImGuiImage(myPerlinView->operator ID3D11ShaderResourceView *(),ImVec2(300,300));
-		ImGui::TreePop();
-	}
 	ImGui::Separator();
 	Tools::ZoomableImGuiSnapshot(myTextures[static_cast<int>(Textures::BackBuffer)].GetResourceView(),ImVec2(192*2,108*2));
 	ImGui::Separator();
@@ -629,7 +558,7 @@ bool RenderManager::CreateTextures(const unsigned int aWidth, const unsigned int
 
 	myTextures[static_cast<int>(Textures::LUT)] = myFullscreenFactory.CreateTexture({ aWidth, aHeight }, DXGI_FORMAT_R8G8B8A8_UNORM, "LUT buffer");
 
-	myRandomNormalview = LoadTexture(myFrameworkPtr->GetDevice(), "Data/Textures/SSAONormal.dds");
+	myRandomNormal = AssetManager::GetInstance().GetTexture("engine/SSAONormal.dds");
 	myGBuffer = myFullscreenFactory.CreateGBuffer({ aWidth,aHeight }, "main gBuffer");
 	myBufferGBuffer = myFullscreenFactory.CreateGBuffer({ aWidth,aHeight }, "secondary GBuffer");
 

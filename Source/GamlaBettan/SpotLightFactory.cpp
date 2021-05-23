@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "SpotLightFactory.h"
 #include "CameraFactory.h"
-#include "TextureLoader.h"
+#include "AssetManager.h"
 
 void SpotLightFactory::Init(ID3D11Device* aDevice)
 {
@@ -17,7 +17,7 @@ SpotLight* SpotLightFactory::LoadSpotlight(const std::string& aTexturePath, floa
 	light->myCamera->SetResolution(V2F(128, 128));
 	light->myRange = aRange;
 	light->myIntensity = aIntensity;
-	light->myTexture = LoadTexture(myDevice,aTexturePath);
+	light->myTexture = AssetManager::GetInstance().GetTexture(aTexturePath);
 	return light;
 }
 
@@ -29,6 +29,6 @@ SpotLight* SpotLightFactory::LoadSpotlight(const std::string& aTexturePath, floa
 	light->myCamera->SetResolution(V2F(128, 128));
 	light->myRange = aRange;
 	light->myIntensity = aIntensity;
-	light->myTexture = LoadTexture(myDevice, aTexturePath);
+	light->myTexture = AssetManager::GetInstance().GetTexture(aTexturePath);
 	return light;
 }

@@ -7,7 +7,6 @@
 #include <assert.h>
 #include "MainMenuState.h"
 #include <DirectX11Framework.h>
-#include "VideoState.h"
 
 Game::Game() :
 	myInputManager(nullptr)
@@ -19,7 +18,7 @@ Game::~Game()
 	SAFE_DELETE(myInputManager);
 }
 
-bool Game::Init(WindowHandler* aWindowHandler, CommonUtilities::InputHandler* aInputHandler, ModelLoader* aModelLoader, LightLoader* aLightLoader, SpriteFactory* aSpriteFactory,
+bool Game::Init(WindowHandler* aWindowHandler, CommonUtilities::InputHandler* aInputHandler, LightLoader* aLightLoader, SpriteFactory* aSpriteFactory,
 	DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer)
 {
 	myInputManager = new InputManager();
@@ -29,7 +28,7 @@ bool Game::Init(WindowHandler* aWindowHandler, CommonUtilities::InputHandler* aI
 	message.myMessageType = MessageType::PushState;
 
 	MainMenuState* menu = new MainMenuState();
-	if (menu->Init(myInputManager, aModelLoader, aSpriteFactory, aLightLoader, aWindowHandler, aFramework, aAudioManager, aSpriteRenderer) == false)
+	if (menu->Init(myInputManager, aSpriteFactory, aLightLoader, aWindowHandler, aFramework, aAudioManager, aSpriteRenderer) == false)
 	{
 		//TODO: PROPER DELETE OF DATA
 		delete menu;

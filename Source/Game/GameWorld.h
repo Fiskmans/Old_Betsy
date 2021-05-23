@@ -41,7 +41,6 @@ class DirectX11Framework;
 class Inventory;
 class AudioManager;
 class CharacterData;
-class AbilityData;
 class TextFactory;
 class GBPhysX;
 class GBPhysXColliderFactory;
@@ -56,8 +55,8 @@ public:
 	GameWorld();
 	~GameWorld();
 
-	void Init(ModelLoader* aModelLoader, SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, Camera* aCamera,NodePollingStation* aNodePollingStation, SpotLightFactory* aSpotlightFactory);
-	void SystemLoad(ModelLoader* aModelLoader, SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, SpriteRenderer* aSpriteRenderer, LightLoader* aLightLoader);
+	void Init(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, Camera* aCamera,NodePollingStation* aNodePollingStation, SpotLightFactory* aSpotlightFactory);
+	void SystemLoad(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, SpriteRenderer* aSpriteRenderer, LightLoader* aLightLoader);
 	void Update(CommonUtilities::InputHandler& aInputHandler, float aDeltatime);
 	void UpdateDirectionalLight(float aDeltatime);
 	void SetupPlayerAndCamera(CommonUtilities::Vector3<float> aSpawnPos);
@@ -138,7 +137,6 @@ private:
 
 	UIManager* myUIManager;
 	CharacterData* myCharacterData;
-	AbilityData* myAbilityData;
 	SpotLight* myPlayerSpotlight;
 	ModelLoader* myModelLoader;
 

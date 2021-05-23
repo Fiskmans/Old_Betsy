@@ -1,7 +1,6 @@
 #include <pch.h>
 #include "LevelSelectState.h"
 #include "GraphicEngine.h"
-#include "VideoState.h"
 #include "DirectX11Framework.h"
 #include "SpriteInstance.h"
 #include "video.h"
@@ -130,10 +129,9 @@ GameState* LevelSelectState::CreateGameState(const int& aStartLevel)
 {
 	GameState* state = new GameState();
 
-	if (!state->Init(myStateInitData.myWindowHandler, myStateInitData.myInputManager, myStateInitData.myModelLoader,
+	if (!state->Init(myStateInitData.myWindowHandler, myStateInitData.myInputManager,
 		myStateInitData.mySpriteFactory, myStateInitData.myLightLoader, myStateInitData.myFrameWork, myStateInitData.myAudioManager, myStateInitData.mySpriteRenderer))
 	{
-		//TODO: PROPER DELETE OF DATA
 		delete state;
 		return nullptr;
 	}

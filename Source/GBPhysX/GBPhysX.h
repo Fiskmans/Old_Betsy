@@ -122,21 +122,17 @@ public:
 	void UpdateHitBoxes();
 	void Kill();
 	void ReleaseHitBoxes();
-	void SetIsRagDoll(bool aIsRagDoll);
-	bool GetIsRagDoll();
 	void SetArticulation(physx::PxArticulation* aArticulation);
 	void SetLinkToLookAt(std::array<physx::PxArticulationLink*, 64>& aLinkToLookAtArray);
 	
 	void SetDeathMomentBoneTransformations(std::array<CommonUtilities::Matrix4x4<float>, 64> aMatrixes);
 	void SetDeathMomentCharTransform(M44F& aTransform);
-	void UpdateRagDollMatrices(std::array<CommonUtilities::Matrix4x4<float>, 64> & aMatrixes);
 private:
 	physx::PxController* myController = nullptr;
 	physx::PxFilterData* myFilterData = nullptr;
 	bool myIsCrouching;
 	bool myIsGrounded;
 	float myCurrentFallVelocity = 0.0f;
-	bool myIsRagDoll = false;
 	std::vector<GBPhysXHitBox*> myHitBoxes;
 	physx::PxArticulation* myArticulation = nullptr;
 	std::array<CommonUtilities::Matrix4x4<float>, 64> myDeathMomentBoneTransformations;
@@ -157,10 +153,6 @@ public:
 	GBPhysXActor* GBCreatePlayerBlockBox(V3F aPosition, V3F aSize, V3F aRotation);
 	GBPhysXActor* GBCreateKinematicBox(V3F aPosition, V3F aSize, V3F aForce, float aDensity);
 	std::vector<GBPhysXActor*> GBCreateChain(V3F aPosition, V3F aSize, int aLength, float aSeparation);
-
-	std::vector<GBPhysXActor*> GBCreateHangingLantern(V3F aPosition);
-	std::array<GBPhysXActor*, 8> GBCreateBarrelDestructable(V3F aPosition, V3F aRotation);
-	std::array<GBPhysXActor*, 8> GBCreateBoxDestructable(V3F aPosition, V3F aRotation);
 
 	GBPhysXCharacter* GBCreateCapsuleController(V3F aPosition, V3F aRotation, float aHeight, float aRadius, bool aIsPlayer);
 
@@ -186,8 +178,6 @@ public:
 
 	void SaveNodeParents(std::unordered_map<int, int> nodeParents);
 	std::unordered_map<int, int> myRagdollNodeParents;
-
-	void GBCreateRagDoll(V3F aPos, GBPhysXCharacter* aChar, V3F aDirection);
 
 private:
 

@@ -22,13 +22,13 @@ DialogInstance::~DialogInstance()
 	UnsubscribeToMessages();
 }
 
-void DialogInstance::Init(DirectX::SpriteFont* aFont, const DialogData* someDialog, const V2F& aBuffer, SpriteInstance* aBackground)
+void DialogInstance::Init(const AssetHandle& aFont, const DialogData* someDialog, const V2F& aBuffer, SpriteInstance* aBackground)
 {
 	myDialog = someDialog;
 	myBackgroundBuffer = aBuffer;
 	myBackground = aBackground;
 	myCurrentIndex = 0;
-	mySpriteFontPtr = aFont;
+	mySpriteFont = aFont;
 
 	myTitle = &myDialog->data[myDialog->currentIndex][myCurrentIndex].speaker;
 	myText = &myDialog->data[myDialog->currentIndex][myCurrentIndex].text;
@@ -43,12 +43,6 @@ void DialogInstance::Init(DirectX::SpriteFont* aFont, const DialogData* someDial
 
 void DialogInstance::Render(DirectX::SpriteBatch* aSpriteBatch)
 {
-	if (!mySpriteFontPtr)
-	{
-		SYSERROR("Oh no text no have font :c", "");
-		return;
-	}
-
 	if (myShouldDraw && myText && myTitle)
 	{
 		if (myBackground)
@@ -60,12 +54,11 @@ void DialogInstance::Render(DirectX::SpriteBatch* aSpriteBatch)
 			ourBackgroundRendererPtr->Render({ myBackground });
 		}
 
-		mySpriteFontPtr->DrawString(aSpriteBatch, myText->c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + V2F(0.f, GetTitleSize().y)), ToShitVector(myColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myScale), CAST(DirectX::SpriteEffects, myEffect));
+		mySpriteFont.GetAsFont()->DrawString(aSpriteBatch, myText->c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + V2F(0.f, GetTitleSize().y)), ToShitVector(myColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myScale), CAST(DirectX::SpriteEffects, myEffect));
 
 		if (!myTitle->empty())
 		{
-			mySpriteFontPtr->DrawString(aSpriteBatch, myTitle->c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + GetTitleSize() * (myPivot * V2F(myTitleScale.x - myScale.x, 0.5f))), ToShitVector(myTitleColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myTitleScale), CAST(DirectX::SpriteEffects, myEffect));
-
+			mySpriteFont.GetAsFont()->DrawString(aSpriteBatch, myTitle->c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + GetTitleSize() * (myPivot * V2F(myTitleScale.x - myScale.x, 0.5f))), ToShitVector(myTitleColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myTitleScale), CAST(DirectX::SpriteEffects, myEffect));
 		}
 	}
 }

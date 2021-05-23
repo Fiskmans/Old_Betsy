@@ -54,7 +54,7 @@ void StaticObjectFactory::CreateStaticObject(std::string aFilePath, CommonUtilit
 		entity->Init(EntityType::EnvironmentStatic, *myEntityIDInt);
 		*myEntityIDInt = *myEntityIDInt + 1;
 
-		if (aFilePath == "Data/Models/G_soil_unplowed/G_Soil_Unplowed.fbx")
+		if (aFilePath == "G_soil_unplowed/G_Soil_Unplowed.fbx")
 		{
 			PERFORMANCETAG("Soil Edge case");
 			entity->SetEntityType(EntityType::EnvironmentInteractable);
@@ -96,7 +96,7 @@ void StaticObjectFactory::CreateStaticObject(std::string aFilePath, CommonUtilit
 
 			{
 				PERFORMANCETAG("Edge case finding");
-				if (aFilePath == "Data/Models/P_cabin_01/P_Cabin_01.fbx")
+				if (aFilePath == "P_cabin_01/P_Cabin_01.fbx")
 				{
 					entity->SetEntityType(EntityType::EnvironmentInteractable);
 					entity->AddComponent<House>()->Init(entity);
@@ -104,7 +104,7 @@ void StaticObjectFactory::CreateStaticObject(std::string aFilePath, CommonUtilit
 					entity->GetComponent<House>()->SetTextFactory(myUIManager->GetTextFactory());
 					entity->myInteractPoint = { -141, 0, 770 };
 				}
-				if (aFilePath == "Data/Models/P_stash_01/P_Stash_01.fbx")
+				if (aFilePath == "P_stash_01/P_Stash_01.fbx")
 				{
 					entity->SetEntityType(EntityType::EnvironmentInteractable);
 					entity->AddComponent<FoodCellar>()->Init(entity);
@@ -115,7 +115,7 @@ void StaticObjectFactory::CreateStaticObject(std::string aFilePath, CommonUtilit
 					entity->AddComponent<AnimationComponent>()->Init(entity);
 					entity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle);
 				}
-				if (aFilePath == "Data/Models/P_waterstream_02/p_Waterstream_02.fbx")
+				if (aFilePath == "P_waterstream_02/p_Waterstream_02.fbx")
 				{
 					entity->SetEntityType(EntityType::EnvironmentInteractable);
 					entity->AddComponent<WaterSource>()->Init(entity);
@@ -125,13 +125,13 @@ void StaticObjectFactory::CreateStaticObject(std::string aFilePath, CommonUtilit
 					message.myData = entity;
 					SendMessages(message);
 				}
-				if (aFilePath == "Data/Models/P_chickenhouse_01/P_chickenhouse_01.fbx")
+				if (aFilePath == "P_chickenhouse_01/P_chickenhouse_01.fbx")
 				{
 					entity->SetEntityType(EntityType::EnvironmentInteractable);
 					entity->AddComponent<ChickenCoop>()->Init(entity);
 					entity->myInteractPoint = { -969, 0, 293 };
 				}
-				if (aFilePath == "Data/Models/P_windturbine_01/P_WindTurbine_01.fbx")
+				if (aFilePath == "P_windturbine_01/P_WindTurbine_01.fbx")
 				{
 					entity->AddComponent<AnimationComponent>()->Init(entity);
 					entity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle);

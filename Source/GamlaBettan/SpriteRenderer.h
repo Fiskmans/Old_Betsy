@@ -5,12 +5,8 @@
 
 class DirectX11Framework;
 class SpriteInstance;
-class Camera;
 struct ID3D11DeviceContext;
 struct ID3D11Buffer;
-
-class VertexShader;
-class PixelShader;
 
 class SpriteRenderer
 {
@@ -37,7 +33,7 @@ private:
 	ID3D11DeviceContext*	myContext;
 	ID3D11Buffer*			myObjectBuffer;
 
-	VertexShader* myVertexShader;
-	PixelShader* myPixelShader;
+	AssetHandle myVertexShader;
+	AssetHandle myPixelShader;
 };
 

@@ -17,6 +17,8 @@
 
 #include "DebugTools.h"
 
+#include "AssetManager.h"
+
 CGraphicsEngine::CGraphicsEngine()
 {
 	myFrameWork = new DirectX11Framework();
@@ -66,15 +68,8 @@ bool CGraphicsEngine::Init(const Window::WindowData& aWindowData, ID3D11Device* 
 		}
 	}
 
+	AssetManager::GetInstance().Init(myFrameWork->GetDevice(), "../assets", "../baked");
 	CCameraFactory::Init(myWindowHandler, NEARPLANE, FARPLANE);
-	if (!myModelLoader.Init(myFrameWork))
-	{
-		SYSCRASH("Cound not init model loader :c");
-		return false;
-	}
-#ifdef _DEBUG
-	DebugTools::myModelLoader = &myModelLoader;
-#endif // _DEBUG
 
 
 
@@ -126,7 +121,6 @@ void CGraphicsEngine::EndFrame()
 {
 	myRendreManarger->EndFrame();
 	myFrameWork->EndFrame();
-	myModelLoader.FlushChanges();
 }
 
 void CGraphicsEngine::AddExtraSpriteToRender(SpriteInstance* aSprite)
@@ -170,11 +164,6 @@ void CGraphicsEngine::UnsubscribeToMessages()
 {
 	myRendreManarger->UnsubscribeToMessages();
 	myWindowHandler->UnSubscrideToMessages();
-}
-
-ModelLoader& CGraphicsEngine::GetModelLoader()
-{
-	return myModelLoader;
 }
 
 SpriteFactory& CGraphicsEngine::GetSpriteFactory()

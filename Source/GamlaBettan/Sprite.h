@@ -14,13 +14,10 @@ class Sprite
 public:
 	struct SpriteData
 	{
-		Texture* myTexture = nullptr;
+		AssetHandle myTexture;
 		CommonUtilities::Vector2<unsigned int> mySize = { 0, 0 };
 		std::string myFilePath;
 	};
-
-	Sprite();
-	~Sprite();
 
 	void Init(const SpriteData& aSpriteData);
 	SpriteData& GetSpriteData();

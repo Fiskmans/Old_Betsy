@@ -19,7 +19,7 @@ class GBPhysXCharacter;
 class ModelInstance
 {
 public:
-	ModelInstance(AssetHandle& aModel);
+	ModelInstance(const AssetHandle& aModel);
 	AssetHandle& GetModelAsset();
 	CommonUtilities::Matrix4x4<float> GetModelToWorldTransform();
 	M44F GetModelToWorldTransformWithPotentialBoneAttachement(BoneTextureCPUBuffer& aBoneData, std::unordered_map<ModelInstance*, short>& aBoneMapping);
@@ -33,18 +33,12 @@ public:
 	void SetUsePlayerThroughWallShader(const bool aFlag);
 	void SetShouldRender(const bool aFlag);
 	void AttachAnimator(Animator* aAnimator);
-	void SetAnimation(int aAnimation);
-	void StepAnimation(float aDeltaTime);
 	void ResetSpawnTime();
 	void AttachToBone(ModelInstance* aParentModel, size_t aBone);
 	void SetCastsShadows(bool aValue);
 
 	std::array<V4F, NUMBEROFANIMATIONBONES> GetBonePositions();
-	M44F GetTransformOfBone(int aIndex);
 
-	//TODO RAGDOLL
-	
-	//void DetachAnimator();
 	void SetGBPhysXCharacter(GBPhysXCharacter* aGBPhysXCharacter);
 	
 	bool HasAnimations();

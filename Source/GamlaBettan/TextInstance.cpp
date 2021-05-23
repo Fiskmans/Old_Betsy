@@ -9,7 +9,6 @@
 SpriteRenderer* TextInstance::ourBackgroundRendererPtr;
 
 TextInstance::TextInstance() :
-	mySpriteFontPtr(nullptr),
 	myTitle(L""),
 	myColor({ 1.f, 1.f, 1.f, 1.f }),
 	myTitleColor({ 1.f, 1.f, 1.f, 1.f }),
@@ -20,13 +19,14 @@ TextInstance::TextInstance() :
 	myBackgroundBuffer({ 0.f, 0.f }),
 	myRotation(0.f),
 	myShouldDraw(true),
+	myIsAddedToScene(false),
 	myEffect(TextEffect::None),
 	myBackground(nullptr)
 {
 }
 
-TextInstance::TextInstance(DirectX::SpriteFont* aFont) :
-	mySpriteFontPtr(aFont),
+TextInstance::TextInstance(const AssetHandle& aFont) :
+	mySpriteFont(aFont),
 	myText(L""),
 	myTitle(L""),
 	myColor({ 1.f, 1.f, 1.f, 1.f }),
@@ -38,6 +38,7 @@ TextInstance::TextInstance(DirectX::SpriteFont* aFont) :
 	myBackgroundBuffer({ 0.f, 0.f }),
 	myRotation(0.f),
 	myShouldDraw(true),
+	myIsAddedToScene(false),
 	myEffect(TextEffect::None),
 	myBackground(nullptr)
 {
@@ -53,12 +54,6 @@ TextInstance::~TextInstance()
 
 void TextInstance::Render(DirectX::SpriteBatch* aSpriteBatch)
 {
-	if (!mySpriteFontPtr)
-	{
-		SYSERROR("Oh no text no have font :c","");
-		return;
-	}
-
 	if (myShouldDraw && (!myText.empty() || !myTitle.empty()))
 	{
 		if (myBackground)
@@ -77,11 +72,11 @@ void TextInstance::Render(DirectX::SpriteBatch* aSpriteBatch)
 		}
 
 
-		mySpriteFontPtr->DrawString(aSpriteBatch, myText.c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + V2F(0.f, GetTitleSize().y)), ToShitVector(myColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myScale), CAST(DirectX::SpriteEffects, myEffect));
+		mySpriteFont.GetAsFont()->DrawString(aSpriteBatch, myText.c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + V2F(0.f, GetTitleSize().y)), ToShitVector(myColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myScale), CAST(DirectX::SpriteEffects, myEffect));
 
 		if (!myTitle.empty())
 		{
-			mySpriteFontPtr->DrawString(aSpriteBatch, myTitle.c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + GetTitleSize() * (myPivot * V2F(myTitleScale.x - myScale.x, 0.5f))), ToShitVector(myTitleColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myTitleScale), CAST(DirectX::SpriteEffects, myEffect));
+			mySpriteFont.GetAsFont()->DrawString(aSpriteBatch, myTitle.c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + GetTitleSize() * (myPivot * V2F(myTitleScale.x - myScale.x, 0.5f))), ToShitVector(myTitleColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myTitleScale), CAST(DirectX::SpriteEffects, myEffect));
 
 		}
 	}
@@ -119,8 +114,8 @@ V2F TextInstance::GetSize() const
 
 V2F TextInstance::GetSize(const std::wstring& someText, const std::wstring& aTitle) const
 {
-	V2F size = FromShitVector(mySpriteFontPtr->MeasureString(someText.c_str())) * myScale;
-	V2F titleSize = (aTitle.empty() ? V2F() : FromShitVector(mySpriteFontPtr->MeasureString(aTitle.c_str())) * myTitleScale);
+	V2F size = FromShitVector(mySpriteFont.GetAsFont()->MeasureString(someText.c_str())) * myScale;
+	V2F titleSize = (aTitle.empty() ? V2F() : FromShitVector(mySpriteFont.GetAsFont()->MeasureString(aTitle.c_str())) * myTitleScale);
 
 	size.y += titleSize.y;
 	size.x = MAX(titleSize.x, size.x);

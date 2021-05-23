@@ -8,7 +8,6 @@
 #include "Octree.h"
 #include "Life.h"
 #include "Audio.h"
-#include "AbilityData.h"
 #include "CharacterInstance.h"
 #include "GBPhysXKinematicComponent.h"
 #include "FollowCamera.h"
@@ -193,7 +192,7 @@ void PlayerController::RecieveMessage(const Message& aMessage)
 	if (aMessage.myMessageType == MessageType::LockPlayer)
 	{
 		myShouldBlockEverything = true;
-		myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle, 0);
+		myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle);
 		return;
 	}
 
@@ -549,7 +548,7 @@ bool PlayerController::Interact(Entity* aEntity)
 		}
 		int id = aEntity->GetComponent<AIController>()->GetCharacterID();
 
-		if (id == 2 && aEntity->GetComponent<AIController>()->GetIsNaked() == false && invent && invent->GetSelectedItem() && invent->GetSelectedItem()->myItemId == PreCalculatedItemIds::Scissor)
+		if (id == 2 && invent && invent->GetSelectedItem() && invent->GetSelectedItem()->myItemId == PreCalculatedItemIds::Scissor)
 		{
 			if (myCuttingSheepEvent.SheepEntity && myCuttingSheepEvent.timer > 0)
 			{
@@ -558,8 +557,6 @@ bool PlayerController::Interact(Entity* aEntity)
 
 			myIsDoingAction = true;
 			myAction = Action::CuttingWool;
-
-			aEntity->GetComponent<AIController>()->SetSheepNaked(true);
 
 			myEntity->GetComponent<Movement3D>()->ClearMovementTargetPoints();
 			myWayPoints.clear();
@@ -664,17 +661,17 @@ void PlayerController::HandleInputStates()
 
 	if (myIsDoingAction)
 	{
-		myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Action, static_cast<int>(myAction));
+		myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Action);
 	}
 	else
 	{
 		if (myEntity->GetComponent<Movement3D>()->IsMoving())
 		{
-			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Walking, id);
+			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Walking);
 		}
 		else
 		{
-			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle, id);
+			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle);
 		}
 	}
 }

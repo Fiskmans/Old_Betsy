@@ -73,16 +73,16 @@ void WildPlant::Update(const float aDeltaTime)
 				switch (rand)
 				{
 				case 1:
-					buffer.aFilePath = "Data/Models/G_dirt_01/G_dirt_01.fbx";
+					buffer.aFilePath = "G_dirt_01/G_dirt_01.fbx";
 					break;
 				case 2:
-					buffer.aFilePath = "Data/Models/G_dirt_02/G_dirt_02.fbx";
+					buffer.aFilePath = "G_dirt_02/G_dirt_02.fbx";
 					break;
 				case 3:
-					buffer.aFilePath = "Data/Models/G_dirt_03/G_dirt_03.fbx";
+					buffer.aFilePath = "G_dirt_03/G_dirt_03.fbx";
 					break;
 				default:
-					buffer.aFilePath = "Data/Models/G_dirt_01/G_dirt_01.fbx";
+					buffer.aFilePath = "G_dirt_01/G_dirt_01.fbx";
 					break;
 				}
 

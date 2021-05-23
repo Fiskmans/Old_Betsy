@@ -19,11 +19,11 @@
 
 class SpriteFactory;
 
-void CinematicEditor::Init(ModelLoader* aLoader,Scene* aScene,ParticleFactory* aPartFactory, SpriteFactory* aSpriteFactory)
+void CinematicEditor::Init(Scene* aScene,ParticleFactory* aPartFactory, SpriteFactory* aSpriteFactory)
 {
 	myScene = aScene;
 	myState = new CinematicState();
-	myState->Init("", aLoader, aScene, aPartFactory, aSpriteFactory);
+	myState->Init("", aScene, aPartFactory, aSpriteFactory);
 	bool fal = false;
 	memcpy(reinterpret_cast<char*>(const_cast<bool*>(&myState->myShouldDeleteOnPop)),&fal,sizeof(bool));
 }

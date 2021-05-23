@@ -3,7 +3,7 @@
 
 struct Stats
 {
-	std::string name = "";
+	std::string name = "Name not loaded";
 	int characterID = 0;
 	std::string fbxPath = "";
 	float modelScale = 0;

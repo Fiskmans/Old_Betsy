@@ -213,7 +213,7 @@ void SeekTargetState::Update(float aDeltaTime)
 
 		if (myEntity->GetComponent<GBPhysXKinematicComponent>()->GetDeltaMovement().LengthSqr() > 10)
 		{
-			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Walking, myEntity->GetComponent<AIController>()->GetAnimationIndex(), false, false);
+			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Walking);
 		}
 		else
 		{
@@ -227,7 +227,7 @@ void SeekTargetState::OnEnter()
 {
 	myPollingStation->AddSeekingEnemy(myEntity);
 	myEntity->GetComponent<GBPhysXKinematicComponent>()->Walk();
-	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Walking, myEntity->GetComponent<AIController>()->GetAnimationIndex(), false, false);
+	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Walking);
 }
 
 void SeekTargetState::OnExit()

@@ -23,12 +23,9 @@ InputManager::InputManager()
 
 	myCurrentMousePosition = { 0 };
 
-	mySecrets.emplace_back("DISCO", MessageType::EnableDiscoMode);
-	mySecrets.emplace_back("HASTFAN", MessageType::EnableHastfan);
 	mySecrets.emplace_back("SUPERTINYWINDOW", MessageType::SuperTinyWindow, true);
 	mySecrets.emplace_back("REALLYSUPERSMALLWINDOW", MessageType::WindowSmallerThanAMouse, true);
 	mySecrets.emplace_back("RESETWINDOW", MessageType::PleaseResetTheWindowThanks, true);
-	mySecrets.emplace_back("HEEEJ", MessageType::GiveMeAdam, true);
 }
 
 InputManager::~InputManager()

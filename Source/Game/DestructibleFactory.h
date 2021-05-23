@@ -13,7 +13,6 @@ class Octree;
 class Entity;
 class ComponentLake;
 class CharacterData;
-class AbilityData;
 
 class DestructibleFactory : public Observer
 {
@@ -22,7 +21,7 @@ public:
 	DestructibleFactory();
 	~DestructibleFactory();
 
-	void Init(Octree* aOctTree, std::vector<Entity*>* aEntityVector, CommonUtilities::ObjectPool<Entity>* aEntityPool, ComponentLake* aComponentLake, unsigned int* aEntityIDInt, CharacterData* aCharacterData, AbilityData* aAbilityData);
+	void Init(Octree* aOctTree, std::vector<Entity*>* aEntityVector, CommonUtilities::ObjectPool<Entity>* aEntityPool, ComponentLake* aComponentLake, unsigned int* aEntityIDInt, CharacterData* aCharacterData);
 	void CreateDestructibleObject(std::string aFilePath, CommonUtilities::Vector3<float> aPos, CommonUtilities::Vector3<float> aRot, CommonUtilities::Vector3<float> aScale, int aType);
 
 private:
@@ -33,5 +32,4 @@ private:
 	CommonUtilities::ObjectPool<Entity>* myEntityPool;
 	unsigned int* myEntityIDInt;
 	CharacterData* myCharacterData;
-	AbilityData* myAbilityData;
 };

@@ -34,11 +34,6 @@ namespace Tools
 	}
 
 
-	void ZoomableImGuiImage(Texture* aTexture, ImVec2 aSize)
-	{
-		ZoomableImGuiImage(aTexture->operator ID3D11ShaderResourceView * (), aSize);
-	}
-
 	void ZoomableImGuiImage(void* aTexture, ImVec2 aSize)
 	{
 		ImVec2 drawPos = ImGui::GetCursorScreenPos();
@@ -158,11 +153,6 @@ namespace Tools
 		ImguiHelperGlobals::globalContext->IASetInputLayout(old.InputLayout); if (old.InputLayout) old.InputLayout->Release();
 
 		return texture.GetResourceView();
-	}
-
-	void ZoomableImGuiSnapshot(Texture* aTexture, ImVec2 aSize)
-	{
-		ZoomableImGuiSnapshot(aTexture->operator ID3D11ShaderResourceView * (), aSize);
 	}
 
 	void ZoomableImGuiSnapshot(void* aTexture, ImVec2 aSize)

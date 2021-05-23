@@ -13,6 +13,7 @@
 #include "PlayerController.h"
 #include "Inventory.h"
 #include "Sprite.h"
+#include "AssetManager.h"
 
 
 UIManager::UIManager() :
@@ -102,7 +103,7 @@ void UIManager::Init(Entity* aPlayer, Scene& aScene, SpriteFactory& aSpriteFacto
 
 	ProgressBar::SetSpriteFactory(mySpriteFactory);
 
-	myFadeSprite = mySpriteFactory->CreateSprite("Data/UI/fadeScreen.dds");
+	myFadeSprite = mySpriteFactory->CreateSprite("engine/fadeScreen.dds");
 
 #if !DEMOSCENE
 #if !DIRECTTOGAME
@@ -114,19 +115,19 @@ void UIManager::Init(Entity* aPlayer, Scene& aScene, SpriteFactory& aSpriteFacto
 	myFadeSprite->SetScale(CommonUtilities::Vector2<float>(1000.0f, 1000.0f));
 	mySprites.push_back(myFadeSprite);
 
-	myVignette = CreateAndAddSpriteToScene("Data/UI/vignette.dds", V2F(0.0f, 0.0f));
+	myVignette = CreateAndAddSpriteToScene("ui/vignette.dds", V2F(0.0f, 0.0f));
 	myVignette->SetUVMinMaxInTexels(V2F(0,0),V2F(1920,1080));
 	myVignette->SetSize(V2F(1.f, 1.f));
-	myInventoryBackground = mySpriteFactory->CreateSprite("Data/UI/InventoryBar/Inventory.dds");
+	myInventoryBackground = mySpriteFactory->CreateSprite("ui/inventory/background.dds");
 	myInventoryBackground->SetPosition(V2F(0.5f, 0.5f));
 	myInventoryBackground->SetPivot(V2F(0.5f, 0.5f));
-	myToolBar = CreateAndAddSpriteToScene("Data/UI/InventoryBar/inventorybar.dds", V2F(0.5f, 1.f), V2F(0.5f, 1.f));
+	myToolBar = CreateAndAddSpriteToScene("ui/toolbar/background.dds", V2F(0.5f, 1.f), V2F(0.5f, 1.f));
 	myToolBar->SetDepth(0.1f);
 	myPlayerPtr->GetComponent<Inventory>()->AddToolbarToScene();
 
 
-	myClockWheel = CreateAndAddSpriteToScene("Data/UI/ClockBackground.dds", V2F(0.9f, 0.125f), V2F(0.5f, 0.5f));
-	myClockForeground = CreateAndAddSpriteToScene("Data/UI/ClockForeground.dds", V2F(0.9f, 0.125f), V2F(0.5f, 0.177));
+	myClockWheel = CreateAndAddSpriteToScene("ui/clock/background.dds", V2F(0.9f, 0.125f), V2F(0.5f, 0.5f));
+	myClockForeground = CreateAndAddSpriteToScene("ui/clock/foreground.dds", V2F(0.9f, 0.125f), V2F(0.5f, 0.177));
 	myClockWheel->SetDepth(0.05f);
 	myClockText = myTextFactory->CreateText();
 	myClockText->SetText("Hour: 6");
@@ -140,81 +141,82 @@ void UIManager::Init(Entity* aPlayer, Scene& aScene, SpriteFactory& aSpriteFacto
 	myDayText->SetPosition(V2F(0.9f - (20.0f / Sprite::ourWindowSize.x), 0.125f + (100.0f / Sprite::ourWindowSize.y)));
 	myDayText->SetColor(V4F(0.0f, 0.0f, 0.0f, 1.0f));
 	
-	myInventoryImage = CreateAndAddSpriteToScene("Data/UI/InventoryBar/Inventory_icon.dds", V2F(1.0f -(128.0f /Sprite::ourWindowSize.x), 1.0f - (128.0f / Sprite::ourWindowSize.y)));
+	myInventoryImage = CreateAndAddSpriteToScene("ui/icons/inventory.dds", V2F(1.0f -(128.0f /Sprite::ourWindowSize.x), 1.0f - (128.0f / Sprite::ourWindowSize.y)));
 
-	myDaysPassedBarSprite = CreateAndAddSpriteToScene("Data/UI/InventoryBar/StorageInventoryBar.dds", V2F(0.9f - (60.0f / Sprite::ourWindowSize.x), 0.125f + (121.0f / Sprite::ourWindowSize.y)), V2F(0.0f,0.5f));
+	myDaysPassedBarSprite = CreateAndAddSpriteToScene("ui/storage/background.dds", V2F(0.9f - (60.0f / Sprite::ourWindowSize.x), 0.125f + (121.0f / Sprite::ourWindowSize.y)), V2F(0.0f,0.5f));
 	myDaysPassedBarSprite->SetScale(V2F(0.5f, 2.0f));
 	myDaysPassedBarSprite->SetColor(V4F(0.35f, 0.4f, 0.48f, 1.0f));
 
-	myCaloriesCollectedBarSprite = CreateAndAddSpriteToScene("Data/UI/InventoryBar/StorageInventoryBar.dds", V2F(0.9f - (60.0f / Sprite::ourWindowSize.x), 0.125f + (154.0f / Sprite::ourWindowSize.y)), V2F(0.0f, 0.5f));
+	myCaloriesCollectedBarSprite = CreateAndAddSpriteToScene("ui/storage/bar.dds", V2F(0.9f - (60.0f / Sprite::ourWindowSize.x), 0.125f + (154.0f / Sprite::ourWindowSize.y)), V2F(0.0f, 0.5f));
 	myCaloriesCollectedBarSprite->SetScale(V2F(0.1f, 2.0f));
 	myCaloriesCollectedBarSprite->SetColor(V4F(0.35f, 0.4f, 0.48f, 1.0f));
 
-	myEndScreenBlackBackground = mySpriteFactory->CreateSprite("Data/UI/fadeScreen.dds");
+	myEndScreenBlackBackground = mySpriteFactory->CreateSprite("engine/fadeScreen.dds");
 	myEndScreenBlackBackground->SetSize(V2F(1.f, 1.f));
 	myEndScreenBlackBackground->SetPosition(V2F(0.0f, 0.0f));
 
-	myEndScreen = mySpriteFactory->CreateSprite("Data/UI/endscreenBackground.dds");
+	myEndScreen = mySpriteFactory->CreateSprite("ui/endscreen/background.dds");
 	myEndScreen->SetPivot(V2F(0.1f, 0.5f));
 	myEndScreen->SetPosition(V2F(0.5f, 0.5f));
 
-	myCursorIcons[static_cast<int>(MouseIcons::Default)] = mySpriteFactory->CreateSprite("Data/UI/mouse.dds");
-	myCursorIcons[static_cast<int>(MouseIcons::WaterBucket)] = mySpriteFactory->CreateSprite("Data/UI/InventoryBar/WateringCanFilled_icon.dds");
-	myCursorIcons[static_cast<int>(MouseIcons::Hoe)] = mySpriteFactory->CreateSprite("Data/UI/InventoryBar/Hoe_icon.dds");
-	myCursorIcons[static_cast<int>(MouseIcons::Basket)] = mySpriteFactory->CreateSprite("Data/UI/InventoryBar/Basket_icon.dds");
-	myCursorIcons[static_cast<int>(MouseIcons::Scissor)] = mySpriteFactory->CreateSprite("Data/UI/InventoryBar/Scissor_icon.dds");
-	myCursorIcons[static_cast<int>(MouseIcons::CanPlant)] = mySpriteFactory->CreateSprite("Data/UI/InventoryBar/RandomSeed_icon.dds");
-	myCursorIcons[static_cast<int>(MouseIcons::CanHarvest)] = mySpriteFactory->CreateSprite("Data/UI/InventoryBar/Basket_icon.dds");
-	myCursorIcons[static_cast<int>(MouseIcons::CollectWater)] = mySpriteFactory->CreateSprite("Data/UI/InventoryBar/WateringCanFilled_icon.dds");
+	myCursorIcons[static_cast<int>(MouseIcons::Default)] = mySpriteFactory->CreateSprite("ui/mouse.dds");
+	myCursorIcons[static_cast<int>(MouseIcons::WaterBucket)] = mySpriteFactory->CreateSprite("ui/icons/WateringCanFilled_icon.dds");
+	myCursorIcons[static_cast<int>(MouseIcons::Hoe)] = mySpriteFactory->CreateSprite("ui/icons/Hoe_icon.dds");
+	myCursorIcons[static_cast<int>(MouseIcons::Basket)] = mySpriteFactory->CreateSprite("ui/icons/Basket_icon.dds");
+	myCursorIcons[static_cast<int>(MouseIcons::Scissor)] = mySpriteFactory->CreateSprite("ui/icons/Scissor_icon.dds");
+	myCursorIcons[static_cast<int>(MouseIcons::CanPlant)] = mySpriteFactory->CreateSprite("ui/icons/RandomSeed_icon.dds");
+	myCursorIcons[static_cast<int>(MouseIcons::CanHarvest)] = mySpriteFactory->CreateSprite("ui/icons/Basket_icon.dds");
+	myCursorIcons[static_cast<int>(MouseIcons::CollectWater)] = mySpriteFactory->CreateSprite("ui/icons/WateringCanFilled_icon.dds");
 
 	myMouseCursor = myCursorIcons[static_cast<int>(MouseIcons::Default)];
 	myMouseCursor->SetPosition(0.5, 0.5);
 	mySprites.push_back(myMouseCursor);
 
-	myEndScreenStoryText = myTextFactory->CreateText("Data/Fonts/endScreen.spritefont");
+	AssetHandle font = AssetManager::GetInstance().GetFont("endScreen.spritefont");
+	myEndScreenStoryText = font.InstansiateText();
 	myEndScreenStoryText->SetText("Error ");
 
-	myEndScreenStoryText2 = myTextFactory->CreateText("Data/Fonts/endScreen.spritefont");
+	myEndScreenStoryText2 = font.InstansiateText();
 	myEndScreenStoryText2->SetText("Error ");
 
-	myEndScreenStoryText3 = myTextFactory->CreateText("Data/Fonts/endScreen.spritefont");
+	myEndScreenStoryText3 = font.InstansiateText();
 	myEndScreenStoryText3->SetText("Error ");
 
-	myEndScreenStoryText4 = myTextFactory->CreateText("Data/Fonts/endScreen.spritefont");
+	myEndScreenStoryText4 = font.InstansiateText();
 	myEndScreenStoryText4->SetText("Error ");
 
-	myEndScreenStoryText5 = myTextFactory->CreateText("Data/Fonts/endScreen.spritefont");
+	myEndScreenStoryText5 = font.InstansiateText();
 	myEndScreenStoryText5->SetText("Error ");
 
-	myEndScreenStoryText6 = myTextFactory->CreateText("Data/Fonts/endScreen.spritefont");
+	myEndScreenStoryText6 = font.InstansiateText();
 	myEndScreenStoryText6->SetText("Error ");
 
 
 	//CALORIES
-	myTotalCaloriesAmountText = myTextFactory->CreateText("Data/Fonts/endScreen.spritefont");
+	myTotalCaloriesAmountText = font.InstansiateText();
 	myTotalCaloriesAmountText->SetText("Error ");
 	myTotalCaloriesAmountText->SetPivot(V2F(0.5f, 0.5f));
 	myTotalCaloriesAmountText->SetPosition(V2F(0.6f, 0.4f));
 
 	//secrets
-	mySecretsText = myTextFactory->CreateText("Data/Fonts/endScreen.spritefont");
+	mySecretsText = font.InstansiateText();
 	mySecretsText->SetText("Secrets: ");
-	mySecretsAmountText = myTextFactory->CreateText("Data/Fonts/endScreen.spritefont");
+	mySecretsAmountText = font.InstansiateText();
 	mySecretsAmountText->SetText("5 / 10");
 
-	myGameMessage = myTextFactory->CreateText("Data/Fonts/MoonviewDialogue.spritefont");
-	myGameMessage->SetScale({1,1});
-	myGameMessage->SetPosition({0.5, 0.3});
-	myGameMessage->SetPivot({0.5f, 0.5f});
+	myGameMessage = AssetManager::GetInstance().GetFont("MoonviewDialogue.spritefont").InstansiateText();
+	myGameMessage->SetScale({ 1,1 });
+	myGameMessage->SetPosition({ 0.5, 0.3 });
+	myGameMessage->SetPivot({ 0.5f, 0.5f });
 	myGameMessageTimer = 0;
-	
+
 	myIsFadingIn = true;
 	myFirstFadeInDone = false;
 	myCurrentLevel = 0;
 	myUIFadeTimer = 5.0f;
 
 
-	myInteractMessage = CreateAndAddSpriteToScene("Data/UI/Use.dds", V2F(0.5f, 0.1f), V2F(0.5f, 0.5f));
+	myInteractMessage = CreateAndAddSpriteToScene("ui/icons/Use.dds", V2F(0.5f, 0.1f), V2F(0.5f, 0.5f));
 }
 
 void UIManager::Update(const float aDeltaTime)
@@ -483,7 +485,7 @@ void UIManager::DisplayEndScreen()
 	int index = 0;
 	for (auto& item : itemsAndAmounts)
 	{
-		TextInstance* text = myTextFactory->CreateText("Data/Fonts/endScreen.spritefont");
+		TextInstance* text = AssetManager::GetInstance().GetFont("endScreen.spritefont").InstansiateText();
 		text->SetText("" + StringFromItemId(ItemFromID(item.first)) + ": x" + std::to_string(item.second));
 		text->SetPosition(V2F(myItemTextStartXY.x + (myItemTextXOffset * (index / myItemTextColumnMax)), myItemTextStartXY.y + (myItemTextYOffset * (index % myItemTextColumnMax))));
 		text->SetColor(V4F(0.0f, 0.0f, 0.0f, 1.0f));

@@ -136,7 +136,7 @@ void Mesh::Reset()
 	LOGINFO("removed model from scene");
 }
 
-ModelInstance* Mesh::GetModelInstance(int aModelIndex)
+ModelInstance* Mesh::GetModelInstance()
 {
 	return myModelInstance;
 }

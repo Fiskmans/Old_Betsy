@@ -27,33 +27,6 @@ class Skybox;
 class GBPhysX;
 class SpriteRenderer;
 
-
-struct LevelParseResult
-{
-	std::vector<StaticObjectInstanceBuffer> myStaticObjects;
-	std::vector<InteractableInstanceBuffer> myInteractables;
-	std::vector<EnemyInstanceBuffer> myEnemyObjects;
-	std::vector<TriggerBoxInstanceBuffer> myTriggerBuffer;
-	std::vector<std::pair<int, V3F>> myMayaPositions;
-	std::vector<PointLightInstanceBuffer> myPointLights;
-	std::vector<PhysXBoxInstanceBuffer> myCollsionBoxes;
-	std::vector<DestructibleObjectInstanceBuffer> myDestrucables;
-	std::vector<SpotLightBuffer> mySpotlights;
-	std::vector<DecalBuffer> myDecals;
-
-	size_t myCounter;
-	size_t myStep;
-
-	std::string myLevelFile;
-	std::string mySkyboxPath;
-	int myWorldAxisSize;
-	DirLightInstanceBuffer myEnvironmentlight;
-	std::string myNavMeshPath;
-	V3F myPlayerStart;
-	bool myIsComplete;
-	bool myIsSuccessfull;
-};
-
 class GameState : public BaseState,public Publisher,public Observer
 {
 public:
@@ -61,14 +34,13 @@ public:
 	GameState(bool aShouldDeleteOnPop = true);
 	~GameState();
 	virtual void Update(const float aDeltaTime) override;
-	bool Init(WindowHandler* aWindowHandler, InputManager* aInputManager, ModelLoader* aModelLoader, SpriteFactory* aSpritefactory, LightLoader* aLightLoader, DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);
+	bool Init(WindowHandler* aWindowHandler, InputManager* aInputManager, SpriteFactory* aSpritefactory, LightLoader* aLightLoader, DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);
 	virtual void Render(CGraphicsEngine* aGraphicsEngine) override;
 
 	void LoadLevel(const int& aLevel);
 
 	void PreSetup(const float aDeltaTime);
 private:
-	void RecieveNetMessage(NetMessage* aMessage);
 
 	void RunImGui(float aDeltatime);
 	void SetDefaultLevel(const std::string& aLevel);
@@ -77,11 +49,7 @@ private:
 	void MergeNextLevel();
 	bool MergeLevel(const std::string& aFilePath);
 	bool MergeQueuedLevelPartially(float aTimeBudget);
-	LevelParseResult myQueuedPartialLevel;
-	std::future<LevelParseResult> myAsyncPartialLevel;
-
-
-	LevelParseResult ParseLevelFile(const std::string& aFilePath);
+	AssetHandle myLoadingLevel;
 
 	void UnloadCurrentLevel();
 	void UnloadLevel(std::string aFilepath);
@@ -99,7 +67,6 @@ private:
 	bool myFinnishGameAfterFadeOut;
 
 	InputManager* myInputManager;
-	ModelLoader* myModelLoader;
 	SpriteFactory* mySpriteFactory;
 	LightLoader* myLightLoader;
 	AudioManager* myAudioManager;

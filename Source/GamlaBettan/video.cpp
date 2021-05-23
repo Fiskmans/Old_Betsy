@@ -6,6 +6,7 @@
 #include <d3d11_1.h>
 #include "SpriteInstance.h"
 #include "SpriteFactory.h"
+#include "AssetManager.h"
 
 Video::Video() : myPlayer(nullptr)
  {
@@ -122,7 +123,14 @@ bool Video::Init(const char* aPath, ID3D11Device* aDevice, SpriteFactory* aSprit
 	texture_desc.MiscFlags = 0;
 
 	aDevice->CreateTexture2D(&texture_desc, nullptr, &myVideoTexture);
-	aDevice->CreateShaderResourceView(myVideoTexture, NULL, *myVideoSprite->GetSprite()->GetSpriteData().myTexture);
+	ID3D11ShaderResourceView* view;
+	aDevice->CreateShaderResourceView(myVideoTexture, NULL, &view);
+
+	Asset* textureAsset = new TextureAsset(view);
+
+	myVideoSprite->GetSprite()->GetSpriteData().myTexture = AssetHandle(textureAsset);
+
+	AssetManager::GetInstance().AssumeOwnershipOfCustomAsset(textureAsset);
 
 	return true;
 }

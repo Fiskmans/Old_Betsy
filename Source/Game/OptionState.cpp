@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "OptionState.h"
 #include "GraphicEngine.h"
-#include "VideoState.h"
 #include "DirectX11Framework.h"
 #include "SpriteInstance.h"
 #include "video.h"

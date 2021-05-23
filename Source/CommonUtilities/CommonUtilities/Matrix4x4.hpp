@@ -3,9 +3,6 @@
 
 #define M44F CommonUtilities::Matrix4x4<float>
 
-#define DATASIZE 4
-#define ELEMENTSIZE 16
-
 namespace CommonUtilities
 {
 	template <class T>
@@ -54,7 +51,7 @@ namespace CommonUtilities
 		Matrix4x4<T> &operator=(const Matrix4x4<T> &aMatrix);
 
 		Matrix4x4<T> operator+(const Matrix4x4<T> &aMatrix) const;
-		Matrix4x4<T> operator+=(const Matrix4x4<T> &aMatrix);
+		Matrix4x4<T>& operator+=(const Matrix4x4<T> &aMatrix);
 
 		Matrix4x4<T> operator-(const Matrix4x4<T> &aMatrix) const;
 		Matrix4x4<T> operator-=(const Matrix4x4<T> &aMatrix);
@@ -63,7 +60,10 @@ namespace CommonUtilities
 		Matrix4x4<T> operator*=(const Matrix4x4<T> &aMatrix);
 
 		Matrix4x4<T> operator*(const T aScalar) const;
-		Matrix4x4<T> operator*=(const T aScalar);
+		Matrix4x4<T>& operator*=(const T aScalar);
+
+		Matrix4x4<T> operator/(const T aScalar) const;
+		Matrix4x4<T>& operator/=(const T aScalar);
 
 		//Vector4<T> &operator*(const Vector4<T> &aVector, const Matrix4x4<T> &aMatrix) //has to be non-member
 
@@ -83,15 +83,12 @@ namespace CommonUtilities
 		T& operator[](const unsigned int anIndex);
 		const T& operator[](const unsigned int anIndex) const;
 
-		const T(&GetElements())[16];
-		const T(&GetElements() const)[16];
-
 	private:
 
 		union
 		{
-			T myData[DATASIZE][DATASIZE];
-			T myElements[ELEMENTSIZE];
+			T myData[4][4];
+			T myElements[16];
 		};
 	};
 
@@ -106,7 +103,7 @@ namespace CommonUtilities
 	template<class T>
 	inline Matrix4x4<T>::Matrix4x4(const Matrix4x4<T> &aMatrix) : myElements{}
 	{
-		for (size_t index = 0; index < ELEMENTSIZE; index++)
+		for (size_t index = 0; index < sizeof(myElements) / sizeof(T); index++)
 		{
 			myElements[index] = aMatrix.myElements[index];
 		}
@@ -122,9 +119,9 @@ namespace CommonUtilities
 	template<class T>
 	inline Matrix4x4<T>::Matrix4x4(const T(&anArrayMatrix)[4][4]) : myElements{}
 	{
-		for (size_t row = 0; row < DATASIZE; ++row)
+		for (size_t row = 0; row < 4; ++row)
 		{
-			for (size_t column = 0; column < DATASIZE; ++column)
+			for (size_t column = 0; column < 4; ++column)
 			{
 				myData[row][column] = anArrayMatrix[row][column];
 			}
@@ -134,11 +131,11 @@ namespace CommonUtilities
 	template<class T>
 	inline Matrix4x4<T>::Matrix4x4(const T(&anArrayMatrix)[16]) : myElements{}
 	{
-		for (size_t row = 0; row < DATASIZE; ++row)
+		for (size_t row = 0; row < 4; ++row)
 		{
-			for (size_t column = 0; column < DATASIZE; ++column)
+			for (size_t column = 0; column < 4; ++column)
 			{
-				myData[row][column] = anArrayMatrix[row * DATASIZE + column];
+				myData[row][column] = anArrayMatrix[row * 4 + column];
 			}
 		}
 	}
@@ -180,12 +177,12 @@ namespace CommonUtilities
 	template<class T>
 	inline Matrix4x4<T>::Matrix4x4(const std::initializer_list<T>& anInitList) : myElements{}
 	{
-		if (anInitList.size() > ELEMENTSIZE)
+		if (anInitList.size() > sizeof(myElements) / sizeof(T))
 		{
 			SYSERROR("Initializer list for Matrix4x4 too big!","");
 		}
 
-		for (size_t i = 0; i < ELEMENTSIZE; ++i)
+		for (size_t i = 0; i < sizeof(myElements) / sizeof(T); ++i)
 		{
 			myElements[i] = i < anInitList.size() ? *(anInitList.begin() + i) : T();
 		}
@@ -271,17 +268,17 @@ namespace CommonUtilities
 	template<class T>
 	inline Matrix4x4<T> Matrix4x4<T>::Transpose(const Matrix4x4<T> &aMatrixToTranspose)
 	{
-		static T transpose[DATASIZE][DATASIZE];
+		Matrix4x4<T> transpose;
 
-		for (size_t row = 0; row < DATASIZE; ++row)
+		for (size_t row = 0; row < 4; ++row)
 		{
-			for (size_t column = 0; column < DATASIZE; ++column)
+			for (size_t column = 0; column < 4; ++column)
 			{
-				transpose[column][row] = aMatrixToTranspose.myData[row][column];
+				transpose.myData[column][row] = aMatrixToTranspose.myData[row][column];
 			}
 		}
 
-		return Matrix4x4<T>(transpose);
+		return transpose;
 	}
 
 	template<class T>
@@ -382,7 +379,7 @@ namespace CommonUtilities
 	template<class T>
 	inline Matrix4x4<T>& Matrix4x4<T>::operator=(const Matrix4x4<T>& aMatrix)
 	{
-		for (size_t index = 0; index < ELEMENTSIZE; ++index)
+		for (size_t index = 0; index < sizeof(myElements) / sizeof(T); ++index)
 		{
 			myElements[index] = aMatrix.myElements[index];
 		}
@@ -393,25 +390,28 @@ namespace CommonUtilities
 	template<class T>
 	inline Matrix4x4<T> Matrix4x4<T>::operator+(const Matrix4x4<T>& aMatrix) const
 	{
-		return Matrix4x4<T>(myElements[0] + aMatrix.myElements[0], myElements[1] + aMatrix.myElements[1], myElements[2] + aMatrix.myElements[2], myElements[3] + aMatrix.myElements[3], 
-							myElements[4] + aMatrix.myElements[4], myElements[5] + aMatrix.myElements[5], myElements[6] + aMatrix.myElements[6], myElements[7] + aMatrix.myElements[7], 
-							myElements[8] + aMatrix.myElements[8], myElements[9] + aMatrix.myElements[9], myElements[10] + aMatrix.myElements[10], myElements[11] + aMatrix.myElements[11],
-							myElements[12] + aMatrix.myElements[12], myElements[13] + aMatrix.myElements[13], myElements[14] + aMatrix.myElements[14], myElements[15] + aMatrix.myElements[15]);
+		Matrix4x4<T> copy(*this);
+		copy += aMatrix;
+		return copy;
 	}
 
 	template<class T>
-	inline Matrix4x4<T> Matrix4x4<T>::operator+=(const Matrix4x4<T>& aMatrix)
+	inline Matrix4x4<T>& Matrix4x4<T>::operator+=(const Matrix4x4<T>& aMatrix)
 	{
-		return (*this) = (*this) + aMatrix;
+		for (size_t i = 0; i < sizeof(myElements) / sizeof(T); i++)
+		{
+			myElements[i] += aMatrix.myElements[i];
+		}
+		return *this;
 	}
 
 	template<class T>
 	inline Matrix4x4<T> Matrix4x4<T>::operator-(const Matrix4x4<T>& aMatrix) const
 	{
 		return Matrix4x4<T>(myElements[0] - aMatrix.myElements[0], myElements[1] - aMatrix.myElements[1], myElements[2] - aMatrix.myElements[2], myElements[3] - aMatrix.myElements[3],
-							myElements[4] - aMatrix.myElements[4], myElements[5] - aMatrix.myElements[5], myElements[6] - aMatrix.myElements[6], myElements[7] - aMatrix.myElements[7],
-							myElements[8] - aMatrix.myElements[8], myElements[9] - aMatrix.myElements[9], myElements[10] - aMatrix.myElements[10], myElements[11] - aMatrix.myElements[11],
-							myElements[12] - aMatrix.myElements[12], myElements[13] - aMatrix.myElements[13], myElements[14] - aMatrix.myElements[14], myElements[15] - aMatrix.myElements[15]);
+			myElements[4] - aMatrix.myElements[4], myElements[5] - aMatrix.myElements[5], myElements[6] - aMatrix.myElements[6], myElements[7] - aMatrix.myElements[7],
+			myElements[8] - aMatrix.myElements[8], myElements[9] - aMatrix.myElements[9], myElements[10] - aMatrix.myElements[10], myElements[11] - aMatrix.myElements[11],
+			myElements[12] - aMatrix.myElements[12], myElements[13] - aMatrix.myElements[13], myElements[14] - aMatrix.myElements[14], myElements[15] - aMatrix.myElements[15]);
 	}
 
 	template<class T>
@@ -424,33 +424,33 @@ namespace CommonUtilities
 	inline Matrix4x4<T> Matrix4x4<T>::operator*(const Matrix4x4<T>& aMatrix) const
 	{
 		return Matrix4x4<T>(myData[0][0] * aMatrix.myData[0][0] + myData[0][1] * aMatrix.myData[1][0] + myData[0][2] * aMatrix.myData[2][0] + myData[0][3] * aMatrix.myData[3][0],
-							myData[0][0] * aMatrix.myData[0][1] + myData[0][1] * aMatrix.myData[1][1] + myData[0][2] * aMatrix.myData[2][1] + myData[0][3] * aMatrix.myData[3][1],
-							myData[0][0] * aMatrix.myData[0][2] + myData[0][1] * aMatrix.myData[1][2] + myData[0][2] * aMatrix.myData[2][2] + myData[0][3] * aMatrix.myData[3][2],
-							myData[0][0] * aMatrix.myData[0][3] + myData[0][1] * aMatrix.myData[1][3] + myData[0][2] * aMatrix.myData[2][3] + myData[0][3] * aMatrix.myData[3][3],
+			myData[0][0] * aMatrix.myData[0][1] + myData[0][1] * aMatrix.myData[1][1] + myData[0][2] * aMatrix.myData[2][1] + myData[0][3] * aMatrix.myData[3][1],
+			myData[0][0] * aMatrix.myData[0][2] + myData[0][1] * aMatrix.myData[1][2] + myData[0][2] * aMatrix.myData[2][2] + myData[0][3] * aMatrix.myData[3][2],
+			myData[0][0] * aMatrix.myData[0][3] + myData[0][1] * aMatrix.myData[1][3] + myData[0][2] * aMatrix.myData[2][3] + myData[0][3] * aMatrix.myData[3][3],
 
-							myData[1][0] * aMatrix.myData[0][0] + myData[1][1] * aMatrix.myData[1][0] + myData[1][2] * aMatrix.myData[2][0] + myData[1][3] * aMatrix.myData[3][0],
-							myData[1][0] * aMatrix.myData[0][1] + myData[1][1] * aMatrix.myData[1][1] + myData[1][2] * aMatrix.myData[2][1] + myData[1][3] * aMatrix.myData[3][1],
-							myData[1][0] * aMatrix.myData[0][2] + myData[1][1] * aMatrix.myData[1][2] + myData[1][2] * aMatrix.myData[2][2] + myData[1][3] * aMatrix.myData[3][2],
-							myData[1][0] * aMatrix.myData[0][3] + myData[1][1] * aMatrix.myData[1][3] + myData[1][2] * aMatrix.myData[2][3] + myData[1][3] * aMatrix.myData[3][3],
+			myData[1][0] * aMatrix.myData[0][0] + myData[1][1] * aMatrix.myData[1][0] + myData[1][2] * aMatrix.myData[2][0] + myData[1][3] * aMatrix.myData[3][0],
+			myData[1][0] * aMatrix.myData[0][1] + myData[1][1] * aMatrix.myData[1][1] + myData[1][2] * aMatrix.myData[2][1] + myData[1][3] * aMatrix.myData[3][1],
+			myData[1][0] * aMatrix.myData[0][2] + myData[1][1] * aMatrix.myData[1][2] + myData[1][2] * aMatrix.myData[2][2] + myData[1][3] * aMatrix.myData[3][2],
+			myData[1][0] * aMatrix.myData[0][3] + myData[1][1] * aMatrix.myData[1][3] + myData[1][2] * aMatrix.myData[2][3] + myData[1][3] * aMatrix.myData[3][3],
 
-							myData[2][0] * aMatrix.myData[0][0] + myData[2][1] * aMatrix.myData[1][0] + myData[2][2] * aMatrix.myData[2][0] + myData[2][3] * aMatrix.myData[3][0],
-							myData[2][0] * aMatrix.myData[0][1] + myData[2][1] * aMatrix.myData[1][1] + myData[2][2] * aMatrix.myData[2][1] + myData[2][3] * aMatrix.myData[3][1],
-							myData[2][0] * aMatrix.myData[0][2] + myData[2][1] * aMatrix.myData[1][2] + myData[2][2] * aMatrix.myData[2][2] + myData[2][3] * aMatrix.myData[3][2],
-							myData[2][0] * aMatrix.myData[0][3] + myData[2][1] * aMatrix.myData[1][3] + myData[2][2] * aMatrix.myData[2][3] + myData[2][3] * aMatrix.myData[3][3],
+			myData[2][0] * aMatrix.myData[0][0] + myData[2][1] * aMatrix.myData[1][0] + myData[2][2] * aMatrix.myData[2][0] + myData[2][3] * aMatrix.myData[3][0],
+			myData[2][0] * aMatrix.myData[0][1] + myData[2][1] * aMatrix.myData[1][1] + myData[2][2] * aMatrix.myData[2][1] + myData[2][3] * aMatrix.myData[3][1],
+			myData[2][0] * aMatrix.myData[0][2] + myData[2][1] * aMatrix.myData[1][2] + myData[2][2] * aMatrix.myData[2][2] + myData[2][3] * aMatrix.myData[3][2],
+			myData[2][0] * aMatrix.myData[0][3] + myData[2][1] * aMatrix.myData[1][3] + myData[2][2] * aMatrix.myData[2][3] + myData[2][3] * aMatrix.myData[3][3],
 
-							myData[3][0] * aMatrix.myData[0][0] + myData[3][1] * aMatrix.myData[1][0] + myData[3][2] * aMatrix.myData[2][0] + myData[3][3] * aMatrix.myData[3][0],
-							myData[3][0] * aMatrix.myData[0][1] + myData[3][1] * aMatrix.myData[1][1] + myData[3][2] * aMatrix.myData[2][1] + myData[3][3] * aMatrix.myData[3][1],
-							myData[3][0] * aMatrix.myData[0][2] + myData[3][1] * aMatrix.myData[1][2] + myData[3][2] * aMatrix.myData[2][2] + myData[3][3] * aMatrix.myData[3][2],
-							myData[3][0] * aMatrix.myData[0][3] + myData[3][1] * aMatrix.myData[1][3] + myData[3][2] * aMatrix.myData[2][3] + myData[3][3] * aMatrix.myData[3][3]);
+			myData[3][0] * aMatrix.myData[0][0] + myData[3][1] * aMatrix.myData[1][0] + myData[3][2] * aMatrix.myData[2][0] + myData[3][3] * aMatrix.myData[3][0],
+			myData[3][0] * aMatrix.myData[0][1] + myData[3][1] * aMatrix.myData[1][1] + myData[3][2] * aMatrix.myData[2][1] + myData[3][3] * aMatrix.myData[3][1],
+			myData[3][0] * aMatrix.myData[0][2] + myData[3][1] * aMatrix.myData[1][2] + myData[3][2] * aMatrix.myData[2][2] + myData[3][3] * aMatrix.myData[3][2],
+			myData[3][0] * aMatrix.myData[0][3] + myData[3][1] * aMatrix.myData[1][3] + myData[3][2] * aMatrix.myData[2][3] + myData[3][3] * aMatrix.myData[3][3]);
 	}
 
 	template<class T>
 	inline Vector4<T> operator*(const Vector4<T>& aVector, const Matrix4x4<T>& aMatrix)
 	{
-		return Vector4<T>(aVector.x * aMatrix(1, 1) + aVector.y * aMatrix(2, 1) + aVector.z * aMatrix(3, 1) + aVector.w * aMatrix(4, 1), 
-						  aVector.x * aMatrix(1, 2) + aVector.y * aMatrix(2, 2) + aVector.z * aMatrix(3, 2) + aVector.w * aMatrix(4, 2),
-						  aVector.x * aMatrix(1, 3) + aVector.y * aMatrix(2, 3) + aVector.z * aMatrix(3, 3) + aVector.w * aMatrix(4, 3),
-						  aVector.x * aMatrix(1, 4) + aVector.y * aMatrix(2, 4) + aVector.z * aMatrix(3, 4) + aVector.w * aMatrix(4, 4));
+		return Vector4<T>(aVector.x * aMatrix(1, 1) + aVector.y * aMatrix(2, 1) + aVector.z * aMatrix(3, 1) + aVector.w * aMatrix(4, 1),
+			aVector.x * aMatrix(1, 2) + aVector.y * aMatrix(2, 2) + aVector.z * aMatrix(3, 2) + aVector.w * aMatrix(4, 2),
+			aVector.x * aMatrix(1, 3) + aVector.y * aMatrix(2, 3) + aVector.z * aMatrix(3, 3) + aVector.w * aMatrix(4, 3),
+			aVector.x * aMatrix(1, 4) + aVector.y * aMatrix(2, 4) + aVector.z * aMatrix(3, 4) + aVector.w * aMatrix(4, 4));
 	}
 
 	template<class T>
@@ -462,46 +462,61 @@ namespace CommonUtilities
 	template<class T>
 	inline Matrix4x4<T> Matrix4x4<T>::operator*(const T aScalar) const
 	{
-		return Matrix4x4<T>(myElements[0] * aScalar, myElements[1] * aScalar, myElements[2] * aScalar, myElements[3] * aScalar,
-							myElements[4] * aScalar, myElements[5] * aScalar, myElements[6] * aScalar, myElements[7] * aScalar,
-							myElements[8] * aScalar, myElements[9] * aScalar, myElements[10] * aScalar, myElements[11] * aScalar,
-							myElements[12] * aScalar, myElements[13] * aScalar, myElements[14] * aScalar, myElements[15] * aScalar);
+		Matrix4x4<T> out(*this);
+		out *= aScalar;
+		return out;
 	}
 
 	template<class T>
-	inline Matrix4x4<T> Matrix4x4<T>::operator*=(const T aScalar)
+	inline Matrix4x4<T>& Matrix4x4<T>::operator*=(const T aScalar)
 	{
-		return (*this) = (*this) * aScalar;
+		for (size_t i = 0; i < sizeof(myElements) / sizeof(T); i++)
+		{
+			myElements[i] *= aScalar;
+		}
+		return (*this);
+	}
+
+	template<class T>
+	inline Matrix4x4<T> Matrix4x4<T>::operator/(const T aScalar) const
+	{
+		return operator *(1 / aScalar);
+	}
+
+	template<class T>
+	inline Matrix4x4<T>& Matrix4x4<T>::operator/=(const T aScalar)
+	{
+		return operator *=(1/aScalar);
 	}
 
 	template<class T>
 	inline Matrix4x4<T> Matrix4x4<T>::operator-(void)
 	{
-		return Matrix4x4<T>(-myElements[0],  -myElements[1],  -myElements[2],  -myElements[3],
-							-myElements[4],  -myElements[5],  -myElements[6],  -myElements[7], 
-							-myElements[8],  -myElements[9],  -myElements[10], -myElements[11],
-							-myElements[12], -myElements[13], -myElements[14], -myElements[15]);
+		return Matrix4x4<T>(-myElements[0], -myElements[1], -myElements[2], -myElements[3],
+			-myElements[4], -myElements[5], -myElements[6], -myElements[7],
+			-myElements[8], -myElements[9], -myElements[10], -myElements[11],
+			-myElements[12], -myElements[13], -myElements[14], -myElements[15]);
 	}
 
 	template<class T>
 	inline bool Matrix4x4<T>::operator==(const Matrix4x4<T>& aMatrix) const
 	{
 		return  (myElements[0] == aMatrix.myElements[0] &&
-				myElements[1] == aMatrix.myElements[1] &&
-				myElements[2] == aMatrix.myElements[2] &&
-				myElements[3] == aMatrix.myElements[3] &&
-				myElements[4] == aMatrix.myElements[4] &&
-				myElements[5] == aMatrix.myElements[5] &&
-				myElements[6] == aMatrix.myElements[6] &&
-				myElements[7] == aMatrix.myElements[7] &&
-				myElements[8] == aMatrix.myElements[8] &&
-				myElements[9] == aMatrix.myElements[9] &&
-				myElements[10] == aMatrix.myElements[10] &&
-				myElements[11] == aMatrix.myElements[11] &&
-				myElements[12] == aMatrix.myElements[12] &&
-				myElements[13] == aMatrix.myElements[13] &&
-				myElements[14] == aMatrix.myElements[14] &&
-				myElements[15] == aMatrix.myElements[15]);
+			myElements[1] == aMatrix.myElements[1] &&
+			myElements[2] == aMatrix.myElements[2] &&
+			myElements[3] == aMatrix.myElements[3] &&
+			myElements[4] == aMatrix.myElements[4] &&
+			myElements[5] == aMatrix.myElements[5] &&
+			myElements[6] == aMatrix.myElements[6] &&
+			myElements[7] == aMatrix.myElements[7] &&
+			myElements[8] == aMatrix.myElements[8] &&
+			myElements[9] == aMatrix.myElements[9] &&
+			myElements[10] == aMatrix.myElements[10] &&
+			myElements[11] == aMatrix.myElements[11] &&
+			myElements[12] == aMatrix.myElements[12] &&
+			myElements[13] == aMatrix.myElements[13] &&
+			myElements[14] == aMatrix.myElements[14] &&
+			myElements[15] == aMatrix.myElements[15]);
 	}
 
 	template<class T>
@@ -513,33 +528,33 @@ namespace CommonUtilities
 	template<class T>
 	inline T& Matrix4x4<T>::operator()(const unsigned int aRow, const unsigned int aColumn)
 	{
-		if (aRow > 0 && aRow <= DATASIZE && aColumn > 0 && aColumn <= DATASIZE)
+		if (aRow > 0 && aRow <= 4 && aColumn > 0 && aColumn <= 4)
 		{
 			return myData[aRow - 1][aColumn - 1];
 		}
 
-		SYSERROR("Matrix4x4 index out of range.","");
+		SYSERROR("Matrix4x4 index out of range.", "");
 		return myData[0][0];
 	}
 
 	template<class T>
 	inline const T& Matrix4x4<T>::operator()(const unsigned int aRow, const unsigned int aColumn) const
 	{
-		if (aRow > 0 && aRow <= DATASIZE && aColumn > 0 && aColumn <= DATASIZE)
+		if (aRow > 0 && aRow <= 4 && aColumn > 0 && aColumn <= 4)
 		{
 			return myData[aRow - 1][aColumn - 1];
 		}
 
-		SYSERROR("Matrix4x4 index out of range.","");
+		SYSERROR("Matrix4x4 index out of range.", "");
 		return myData[0][0];
 	}
 
 	template<class T>
 	inline T& Matrix4x4<T>::operator[](const unsigned int anIndex)
 	{
-		if (anIndex < 0 || anIndex >= ELEMENTSIZE)
+		if (anIndex < 0 || anIndex >= sizeof(myElements) / sizeof(T))
 		{
-			SYSERROR("Matrix4x4 index out of range.","");
+			SYSERROR("Matrix4x4 index out of range.", "");
 		}
 		return myElements[anIndex];
 	}
@@ -547,25 +562,10 @@ namespace CommonUtilities
 	template<class T>
 	inline const T& Matrix4x4<T>::operator[](const unsigned int anIndex) const
 	{
-		if (anIndex < 0 || anIndex >= ELEMENTSIZE)
+		if (anIndex < 0 || anIndex >= sizeof(myElements) / sizeof(T))
 		{
-			SYSERROR("Matrix4x4 index out of range.","");
+			SYSERROR("Matrix4x4 index out of range.", "");
 		}
 		return myElements[anIndex];
 	}
-
-	template<class T>
-	inline const T(&Matrix4x4<T>::GetElements())[16]
-	{
-		return myElements;
-	}
-
-	template<class T>
-	inline const T(&Matrix4x4<T>::GetElements() const)[16]
-	{
-		return myElements;
-	}
 }
-
-#undef DATASIZE 
-#undef ELEMENTSIZE 

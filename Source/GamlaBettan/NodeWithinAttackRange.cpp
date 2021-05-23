@@ -4,7 +4,6 @@
 #include "NodeDataTypes.h"
 #include "..//Game/Entity.h"
 #include "..//Game/CharacterInstance.h"
-#include "..//Game/AbilityData.h"
 
 NodeWithinAttackRange::NodeWithinAttackRange()
 {

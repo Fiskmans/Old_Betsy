@@ -95,7 +95,7 @@ namespace Logger
 			}
 		}
 #if USEIMGUI
-		//WindowControl::SetOpenState("Errors & Warnings", true);
+		WindowControl::SetOpenState("Errors & Warnings", true);
 		RapportTimeStamp = Tools::GetTotalTime();
 #endif // USEIMGUI
 
@@ -157,7 +157,7 @@ namespace Logger
 								{
 									for (auto& error : file.second) // errors
 									{
-										ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);
+										ImGui::SetNextItemOpen(false, ImGuiCond_Appearing);
 										if (ImGui::TreeNode(error.first.c_str()))
 										{
 											for (auto& arg : error.second)
@@ -186,6 +186,7 @@ namespace Logger
 			}, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus, []()
 			{
 				ImGui::SetNextWindowPos(ImVec2(0, 0));
+				ImGui::SetNextWindowSize(ImVec2(500, 400));
 			});
 #endif // USELOGGER
 	}

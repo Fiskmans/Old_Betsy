@@ -11,6 +11,7 @@
 #include "TextInstance.h"
 #include "AnimationComponent.h"
 #include "TimeHandler.h"
+#include "AssetManager.h"
 
 std::unordered_map<ItemIdType, double> FoodCellar::myCalorieLookupMap;
 std::unordered_map<ItemIdType, int> FoodCellar::myTypeAmounts;
@@ -54,22 +55,22 @@ void FoodCellar::SetUp(Scene* aScene, TextFactory* aTextFactory, SpriteFactory* 
 	mySpriteFactory = aSpriteFactory;
 	myPlayer = aPlayerPtr;
 
-	myStorageBlackBackground = mySpriteFactory->CreateSprite("Data/UI/fadeScreen.dds");
+	myStorageBlackBackground = mySpriteFactory->CreateSprite("engine/fadeScreen.dds");
 	myStorageBlackBackground->SetColor(V4F(1.0f, 1.0f, 1.0f, 0.5f));
 	myStorageBlackBackground->SetPosition(V2F(0.0f, 0.0f));
-	myStorageBlackBackground->SetScale(V2F(1000.f, 1000.f));
+	myStorageBlackBackground->SetSize(V2F(1.f, 1.f));
 
-	myStorageWindowBackground = mySpriteFactory->CreateSprite("Data/UI/InventoryBar/StorageInventory.dds");
+	myStorageWindowBackground = mySpriteFactory->CreateSprite("ui/storage/background.dds");
 	myStorageWindowBackground->SetPivot(V2F(0.5f, 0.5f));
 	myStorageWindowBackground->SetPosition(V2F(0.5f, 0.5f));
 
 	myCaloriesBarXPosition = 0.5f - (332.0f / Sprite::ourWindowSize.x);
 	myCaloriesBarXScaleForMaxFill = 150.0f;
-	myStoredAmountSprite = mySpriteFactory->CreateSprite("Data/UI/InventoryBar/StorageInventoryBar.dds");
+	myStoredAmountSprite = mySpriteFactory->CreateSprite("ui/storage/bar.dds");
 	myStoredAmountSprite->SetPivot(V2F(0.0f, 0.5f));
 	myStoredAmountSprite->SetPosition(V2F(myCaloriesBarXPosition, 0.5f - (457.0f / Sprite::ourWindowSize.y)));
 
-	myStoredAmountChangeSprite = mySpriteFactory->CreateSprite("Data/UI/InventoryBar/StorageInventoryBar.dds");
+	myStoredAmountChangeSprite = mySpriteFactory->CreateSprite("ui/storage/bar.dds");
 	myStoredAmountChangeSprite->SetPivot(V2F(0.0f, 0.5f));
 	
 	myStoredAmountChangeSprite->SetColor(V4F( 1.0f, 1.0f, 1.0f, 0.7f));
@@ -110,7 +111,7 @@ void FoodCellar::RecieveEntityMessage(EntityMessage aMessage, void* someData)
 {
 	if (aMessage == EntityMessage::InteractAnimationFinnished)
 	{
-		myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle, myIsOpen, false, false);
+		myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle);
 	}
 }
 
@@ -183,7 +184,7 @@ void FoodCellar::DisplayStorageMenu()
 	myScene->AddSprite(myCloseStorageButton->GetCurrentSprite());
 
 	myIsOpen = true;
-	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Interact, 0, false, false);
+	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Interact);
 
 	myScene->AddText(myStoredAmountText);
 	myStoredAmountText->SetText(std::to_string(CAST(int, ourStoredCalories)) + " / " + std::to_string(CAST(int, caloriesNeededForWinter)));
@@ -208,7 +209,7 @@ void FoodCellar::CloseStorageMenu()
 	PostMaster::GetInstance()->SendMessages(storedCaloriesMessage);
 
 	myIsOpen = false;
-	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Interact, 1, false, false);
+	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Interact);
 
 	myScene->RemoveText(myStoredAmountText);
 }
@@ -438,26 +439,14 @@ void FoodCellar::PopulateCalorieLookup()
 {
 	if (myCalorieLookupMap.empty())
 	{
-		FiskJSON::Object root;
-		try
+		FiskJSON::Object& root = AssetManager::GetInstance().GetJSON("metrics/Calories.json").GetAsJSON();
+		for (auto& plant : root)
 		{
-			root.Parse(Tools::ReadWholeFile("Data/Metrics/Calories.json"));
-			for (auto& plant : root)
+			float value;
+			if (plant.second->GetIf(value))
 			{
-				float value;
-				if (plant.second->GetIf(value))
-				{
-					myCalorieLookupMap[ItemIdFromString(plant.first).ID] = value;
-				}
+				myCalorieLookupMap[ItemIdFromString(plant.first).ID] = value;
 			}
-		}
-		catch (const FiskJSON::Invalid_JSON& e)
-		{
-			LOGERROR(e.what(), "Data/Metrics/Calories.json");
-		}
-		catch (const FiskJSON::Invalid_Object& e)
-		{
-			LOGERROR(e.what(), "Data/Metrics/Calories.json");
 		}
 	}
 }

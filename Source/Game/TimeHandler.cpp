@@ -4,11 +4,11 @@
 #include "AnimationEvent.h"
 #include "TemporaryItemEvent.h"
 
-#include <rapidjson/document.h>
-#include <rapidjson/filereadstream.h>
 #include "Random.h"
 #include "Entity.h"
 #include "ObjectPool.hpp"
+
+#include "AssetManager.h"
 
 TimeHandler::TimeHandler() :
 	myCurrentHour(6),
@@ -179,31 +179,23 @@ void TimeHandler::AddEventToDay(Event* aEvent, int aDayIndex, int aHourIndex)
 
 void TimeHandler::LoadSpecialDaysFromFile()
 {
-	rapidjson::Document SpecialDaysDoc;
+	FiskJSON::Object& root = AssetManager::GetInstance().GetJSON("events/Animation.json").GetAsJSON();
 
-#pragma warning(suppress : 4996)
-	FILE* fp = fopen("Data\\Metrics\\SpecialDays.json", "rb");
-	char readBuffer[4096];
-	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-	SpecialDaysDoc.ParseStream(is);
-	fclose(fp);
-
-	auto daysArray = SpecialDaysDoc["Days"].GetArray();
-
-	for (int i = 0; i < daysArray.Size(); ++i)
+	for (auto& i : root["days"].Get<FiskJSON::Array>())
 	{
-		int index = daysArray[i]["dayindex"].GetInt();
+		int index;
 		Day specialDay;
 
-		auto eventsArray = daysArray[i]["events"].GetArray();
-		for (int eventIndex = 0; eventIndex < eventsArray.Size(); eventIndex++)
+		(*i)["dayindex"].GetIf(index);
+
+		for (auto& inEvent : (*i)["events"].Get<FiskJSON::Array>())
 		{
 			Event* event = nullptr;
 			int specificID;
-			switch (eventsArray[eventIndex]["typeofevent"].GetInt())
+			switch ((*inEvent)["typeofevent"].Get<int>())
 			{
 			case 0:
-				specificID = eventsArray[eventIndex]["specificID"].GetInt();
+				specificID = (*inEvent)["specificID"].Get<int>();
 				if (specificID == 0)
 				{
 					event = CreateRandomAnimationEvent();
@@ -230,7 +222,7 @@ void TimeHandler::LoadSpecialDaysFromFile()
 
 			if (event)
 			{
-				specialDay.myEvents[eventsArray[eventIndex]["time"].GetInt()] = event;
+				specialDay.myEvents[(*inEvent)["time"].Get<int>()] = event;
 			}
 			else
 			{
@@ -244,30 +236,29 @@ void TimeHandler::LoadSpecialDaysFromFile()
 
 void TimeHandler::LoadAnimationEventsFromFile()
 {
-	//FISKJSON LOAD EVENTS
-	rapidjson::Document animationEventsDoc;
+	FiskJSON::Object& root = AssetManager::GetInstance().GetJSON("events/Animation.json").GetAsJSON();
 
-#pragma warning(suppress : 4996)
-	FILE* fp = fopen("Data\\Metrics\\AnimationEvents.json", "rb");
-	char readBuffer[4096];
-	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-	animationEventsDoc.ParseStream(is);
-	fclose(fp);
-
-	auto animationEventsArray = animationEventsDoc["AnimationEvents"].GetArray();
-
-	for (int i = 0; i < animationEventsArray.Size(); ++i)
+	for (auto& i : root["AnimationEvents"].Get<FiskJSON::Array>())
 	{
+		bool success = true;
+
 		AnimationEventData data;
-		data.name = animationEventsArray[i]["name"].GetString();
-		data.fbxPath = animationEventsArray[i]["fbxPath"].GetString();
-		data.spawnDuration = animationEventsArray[i]["spawnDuration"].GetFloat();
-		data.loopDuration = animationEventsArray[i]["loopDuration"].GetFloat();
-		data.endDuration = animationEventsArray[i]["endDuration"].GetFloat();
-		data.posX = animationEventsArray[i]["xPos"].GetFloat();
-		data.posY = animationEventsArray[i]["yPos"].GetFloat();
-		data.posZ = -animationEventsArray[i]["zPos"].GetFloat();
-		myLoadedAnimationEvents[i + 1] = data;
+		success &= (*i)["name"].GetIf(data.name);
+		success &= (*i)["fbxPath"].GetIf(data.fbxPath);
+		success &= (*i)["spawnDuration"].GetIf(data.spawnDuration);
+		success &= (*i)["loopDuration"].GetIf(data.loopDuration);
+		success &= (*i)["endDuration"].GetIf(data.endDuration);
+		success &= (*i)["xPos"].GetIf(data.posX);
+		success &= (*i)["yPos"].GetIf(data.posY);
+		success &= (*i)["zPos"].GetIf(data.posZ);
+
+		if (!success)
+		{
+			SYSERROR("Error loading animation event", data.name);
+		}
+
+
+		myLoadedAnimationEvents.push_back(data);
 	}
 }
 

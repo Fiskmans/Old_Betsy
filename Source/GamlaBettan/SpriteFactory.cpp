@@ -7,6 +7,7 @@
 #include "ShaderCompiler.h"
 #include "DirectX11Framework.h"
 #include "TextureLoader.h"
+#include "AssetManager.h"
 
 SpriteFactory::SpriteFactory()
 {
@@ -73,7 +74,7 @@ Sprite* SpriteFactory::LoadSprite(const std::string& aDDSPath, const bool aIsMov
 	HRESULT result;
 
 	std::wstring texturePath(aDDSPath.begin(), aDDSPath.end());
-	Texture* texture = LoadTexture(myDevice,aDDSPath);
+	AssetHandle texture = AssetManager::GetInstance().GetTexture(aDDSPath);
 	UINT ddsWidth = 0;
 	UINT ddsHeight = 0;
 	if (aIsMovie)
@@ -84,11 +85,20 @@ Sprite* SpriteFactory::LoadSprite(const std::string& aDDSPath, const bool aIsMov
 	else
 	{
 		ID3D11Resource* resource;
-		texture->operator ID3D11ShaderResourceView* ()->GetResource(&resource);
-		D3D11_TEXTURE2D_DESC desc;
-		((ID3D11Texture2D*)resource)->GetDesc(&desc);
-		ddsWidth = desc.Width;
-		ddsHeight = desc.Height;
+		texture.GetAsTexture()->GetResource(&resource);
+
+		ID3D11Texture2D* tex2d;
+		resource->QueryInterface(&tex2d);
+		if (tex2d)
+		{
+			D3D11_TEXTURE2D_DESC desc;
+			tex2d->GetDesc(&desc);
+			ddsWidth = desc.Width;
+			ddsHeight = desc.Height;
+			tex2d->Release();
+		}
+
+		resource->Release();
 	}
 
 

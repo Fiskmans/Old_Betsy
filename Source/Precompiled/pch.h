@@ -51,6 +51,7 @@
 #include <MetricValue.h>
 #include <TimeHelper.h>
 #include <FileHelpers.h>
+#include <StringManipulation.h>
 
 //Typedefs
 #include <typedefs.h>
@@ -78,7 +79,6 @@
 #include "../Game/Movement3D.h"
 #include "../Game/PlayerController.h"
 #include "../Game/CharacterInstance.h"
-#include "../Game/AbilityInstance.h"
 #include "../Game/ParticleOnHit.h"
 #include "AssetImportHelpers.h"
 

@@ -16,7 +16,6 @@
 #include "PostMaster.hpp"
 #include "TextureLoader.h"
 #include "ShaderBuffers.h"
-#include "Shaders.h"
 #include "ShaderFlags.h"
 #include "ShaderCompiler.h"
 #include "RenderStateManager.h"
@@ -24,17 +23,16 @@
 #include "DepthRenderer.h"
 #include "RenderManager.h"
 #include "FoldNumbers.h"
+#include "AssetManager.h"
 
 
 ForwardRenderer::~ForwardRenderer()
 {
-	myThroughWallShader->ReleaseShader();
-	myEnemyThroughWallShader->ReleaseShader();
-
-	WIPE(*this);
+	SAFE_RELEASE(myFrameBuffer);
+	SAFE_RELEASE(myObjectBuffer);
 }
 
-bool ForwardRenderer::Init(DirectX11Framework* aFramework, const std::string& aThroughWallPSName, const std::string& aEnemyThroughWallPSName, Texture** aPerlinPointer, DepthRenderer* aDepthRenderer)
+bool ForwardRenderer::Init(DirectX11Framework* aFramework, const std::string& aThroughWallPSName, const std::string& aEnemyThroughWallPSName, AssetHandle aPerlinHandle, DepthRenderer* aDepthRenderer)
 {
 	if (!aFramework)
 	{
@@ -82,24 +80,10 @@ bool ForwardRenderer::Init(DirectX11Framework* aFramework, const std::string& aT
 		return false;
 	}
 
-	myAdamTexture = LoadTexture(myDevice, "Data/Textures/surpriseTexture.dds");
-	if (IsErrorTexture(myAdamTexture))
-	{
-		myAdamTexture = nullptr;
-	}
+	myThroughWallShader = AssetManager::GetInstance().GetPixelShader(aThroughWallPSName);
+	myEnemyThroughWallShader = AssetManager::GetInstance().GetPixelShader(aEnemyThroughWallPSName);
 
-	if (aThroughWallPSName != "")
-	{
-		myThroughWallShader = GetPixelShader(myDevice, aThroughWallPSName);
-
-	}
-
-	if (aEnemyThroughWallPSName != "")
-	{
-		myEnemyThroughWallShader = GetPixelShader(myDevice, aEnemyThroughWallPSName);
-	}
-
-	myPerlinPointer = aPerlinPointer;
+	myPerlinHandle = aPerlinHandle;
 	myDepthRender = aDepthRenderer;
 
 	SYSINFO("Forward renderer launched correctly");
@@ -130,8 +114,6 @@ namespace RenderSort
 void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aCamera, Scene* aScene, std::vector<std::array<PointLight*, NUMBEROFPOINTLIGHTS>>& aLightList, std::unordered_map<ModelInstance*, short>& aBoneMapping, RenderStateManager& aStateManager, BoneTextureCPUBuffer& aBoneBuffer)
 {
 	std::vector<ModelAndLights> modelsAndLightsList;
-	static std::vector<ModelAndLights> filteredEffects;
-	filteredEffects.clear();
 	modelsAndLightsList.reserve(aModelList.size());
 	aStateManager.SetSamplerState(RenderStateManager::SamplerState::Point);
 
@@ -176,25 +158,43 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 
 	if (envoLight)
 	{
-		if (envoLight->myTexture)
+		if (envoLight->myTexture.IsValid())
 		{
-			myContext->PSSetShaderResources(4, 1, &envoLight->myTexture);
+			ID3D11ShaderResourceView* texture[1] =
+			{
+				envoLight->myTexture.GetAsTexture()
+			};
+
+			myContext->PSSetShaderResources(4, 1, texture);
 		}
 		fData.myEnvironmentLightDirection = V4F(envoLight->myDirection, 0);
 		fData.myEnvironmentLightColor = envoLight->myColor;
 		fData.myEnviromentLightIntensity = envoLight->myIntensity;
 	}
 
+	ID3D11ShaderResourceView* resource[1] =
+	{
+		myPerlinHandle.GetAsTexture()
+	};
 
 	myContext->VSSetConstantBuffers(0, 1, &myFrameBuffer);
 	myContext->PSSetConstantBuffers(0, 1, &myFrameBuffer);
-	myContext->VSSetShaderResources(7, 1, **myPerlinPointer);
-	myContext->PSSetShaderResources(7, 1, **myPerlinPointer);
+	myContext->VSSetShaderResources(7, 1, resource);
+	myContext->PSSetShaderResources(7, 1, resource);
 	myContext->GSSetShader(nullptr, nullptr, 0);
 
-	if (mySkyboxTexture)
+	if (mySkyboxTexture.IsValid())
 	{
-		myContext->PSSetShaderResources(3, 1, *mySkyboxTexture);
+		ID3D11ShaderResourceView* skyboxTexture[1] =
+		{
+			mySkyboxTexture.GetAsTexture()
+		};
+
+		myContext->PSSetShaderResources(3, 1, skyboxTexture);
+	}
+	else
+	{
+		ONETIMEWARNING("Rendering without a skybox set","");
 	}
 
 	Model* model = nullptr;
@@ -203,12 +203,6 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 		model = modelsAndLightsList[i].first->GetModelAsset().GetAsModel();
 		if (!model->ShouldRender())
 		{
-			continue;
-		}
-
-		if (model->GetModelData()->myIsEffect)
-		{
-			filteredEffects.push_back(modelsAndLightsList[i]);
 			continue;
 		}
 
@@ -229,19 +223,19 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 		memcpy(bufferData.pData, &fData, sizeof(fData));
 		myContext->Unmap(myFrameBuffer, 0);
 
-		myContext->PSSetShader(*model->GetModelData()->myPixelShader, nullptr, 0);
+		myContext->PSSetShader(model->GetModelData()->myPixelShader.GetAsPixelShader(), nullptr, 0);
 		RenderModel(modelsAndLightsList[i].first, modelsAndLightsList[i].second, aBoneMapping, bufferData, aCamera, aBoneBuffer);
 	}
 
 	aStateManager.SetDepthStencilState(RenderStateManager::DepthStencilState::OnlyCovered);
-	myContext->PSSetShader(*myEnemyThroughWallShader, nullptr, 0);
+	myContext->PSSetShader(myEnemyThroughWallShader.GetAsPixelShader(), nullptr, 0);
 	for (size_t i = 0; i < modelsToDrawAgain.size(); i++)
 	{
 		if (modelsToDrawAgain[i]->first->IsUsingPlayerThroughWallShader())
 		{
-			myContext->PSSetShader(*myThroughWallShader, nullptr, 0);
+			myContext->PSSetShader(myThroughWallShader.GetAsPixelShader(), nullptr, 0);
 			RenderModel(modelsToDrawAgain[i]->first, modelsToDrawAgain[i]->second, aBoneMapping, bufferData, aCamera, aBoneBuffer);
-			myContext->PSSetShader(*myEnemyThroughWallShader, nullptr, 0);
+			myContext->PSSetShader(myEnemyThroughWallShader.GetAsPixelShader(), nullptr, 0);
 			continue;
 		}
 
@@ -262,7 +256,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 	for (size_t i = 0; i < modelsToDrawAgain.size(); i++)
 	{
 		model = modelsToDrawAgain[i]->first->GetModelAsset().GetAsModel();
-		myContext->PSSetShader(*model->GetModelData()->myPixelShader, nullptr, 0);
+		myContext->PSSetShader(model->GetModelData()->myPixelShader.GetAsPixelShader(), nullptr, 0);
 
 
 		result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
@@ -276,29 +270,9 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 		myContext->Unmap(myFrameBuffer, 0);
 		RenderModel(modelsToDrawAgain[i]->first, modelsToDrawAgain[i]->second, aBoneMapping, bufferData, aCamera, aBoneBuffer);
 	}
-
-	aStateManager.SetDepthStencilState(RenderStateManager::DepthStencilState::ReadOnly);
-	for (size_t i = 0; i < filteredEffects.size(); i++)
-	{
-		model = filteredEffects[i].first->GetModelAsset().GetAsModel();
-
-		myContext->PSSetShader(*model->GetModelData()->myPixelShader, nullptr, 0);
-
-
-		result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
-		if (FAILED(result))
-		{
-			SYSERROR("Could not map frame buffer", "");
-			return;
-		}
-		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(filteredEffects[i].first->GetIsUsingSecondaryFov()));
-		memcpy(bufferData.pData, &fData, sizeof(fData));
-		myContext->Unmap(myFrameBuffer, 0);
-		RenderModel(filteredEffects[i].first, filteredEffects[i].second, aBoneMapping, bufferData, aCamera,aBoneBuffer);
-	}
 }
 
-void ForwardRenderer::SetSkyboxTexture(Texture* aTexture)
+void ForwardRenderer::SetSkyboxTexture(AssetHandle aTexture)
 {
 	mySkyboxTexture = aTexture;
 }
@@ -309,19 +283,9 @@ void ForwardRenderer::SetSkybox(Skybox* aSkyBox)
 	myskybox = aSkyBox;
 }
 
-void ForwardRenderer::SubscribeToMessages()
-{
-	PostMaster::GetInstance()->Subscribe(MessageType::GiveMeAdam, this);
-}
-
-void ForwardRenderer::UnsubscribeToMessages()
-{
-	PostMaster::GetInstance()->UnSubscribe(MessageType::GiveMeAdam, this);
-}
-
 inline void ForwardRenderer::RenderModel(ModelInstance* aModelInstance, std::array<PointLight*, NUMBEROFPOINTLIGHTS>* aLightList, std::unordered_map<ModelInstance*, short>& aBoneMapping, D3D11_MAPPED_SUBRESOURCE& aBuffer, const Camera* aCamera, BoneTextureCPUBuffer& aBoneBuffer)
 {
-	static Model::CModelData* modelData = nullptr;
+	static Model::ModelData* modelData = nullptr;
 	static Model* model = nullptr;
 	static ObjectBufferData oData;
 	static HRESULT result;
@@ -389,28 +353,22 @@ inline void ForwardRenderer::RenderModel(ModelInstance* aModelInstance, std::arr
 
 
 	myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
-	myContext->VSSetShader(*modelData->myVertexShader, nullptr, 0);
+	myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
 
 	myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
 
-	if (!myIsInAdamMode)
+	ID3D11ShaderResourceView* resources[3] =
 	{
-		if (modelData->myTextures[0]) { myContext->PSSetShaderResources(0, 1, *modelData->myTextures[0]); }
-		if (modelData->myTextures[1]) { myContext->PSSetShaderResources(1, 1, *modelData->myTextures[1]); }
-		if (modelData->myTextures[2]) { myContext->PSSetShaderResources(2, 1, *modelData->myTextures[2]); }
-		if (modelData->myTextures[0]) { myContext->VSSetShaderResources(0, 1, *modelData->myTextures[0]); }
-		if (modelData->myTextures[1]) { myContext->VSSetShaderResources(1, 1, *modelData->myTextures[1]); }
-		if (modelData->myTextures[2]) { myContext->VSSetShaderResources(2, 1, *modelData->myTextures[2]); }
-	}
-	else
-	{
-		myContext->PSSetShaderResources(0, 1, *myAdamTexture);
-		myContext->PSSetShaderResources(1, 1, *myAdamTexture);
-		myContext->PSSetShaderResources(2, 1, *myAdamTexture);
-		myContext->VSSetShaderResources(0, 1, *myAdamTexture);
-		myContext->VSSetShaderResources(1, 1, *myAdamTexture);
-		myContext->VSSetShaderResources(2, 1, *myAdamTexture);
-	}
+		nullptr,
+		nullptr,
+		nullptr
+	};
+	if(modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].GetAsTexture(); }
+	if(modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].GetAsTexture(); }
+	if(modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].GetAsTexture(); }
+
+	myContext->PSSetShaderResources(0, 3, resources);
+	myContext->VSSetShaderResources(0, 3, resources);
 
 	Model::LodLevel* lodlevel = model->GetOptimalLodLevel(aModelInstance->GetPosition().DistanceSqr(aCamera->GetPosition()));
 	if (lodlevel)
@@ -419,29 +377,5 @@ inline void ForwardRenderer::RenderModel(ModelInstance* aModelInstance, std::arr
 		myContext->IASetIndexBuffer(lodlevel->myIndexBuffer, modelData->myIndexBufferFormat, 0);
 		myContext->DrawIndexed(lodlevel->myNumberOfIndexes, 0, 0);
 
-	}
-#ifndef _RETAIL
-	else
-	{
-		//SYSWARNING("Rendered without any loaded lod levels");
-	}
-#endif
-}
-
-bool ForwardRenderer::ReloadPixelShader(const std::string& aFilePath)
-{
-	SYSINFO("Reloading: " + aFilePath);
-	::ReloadPixelShader(myDevice, aFilePath, ShaderFlags::None);
-	return true;
-}
-
-void ForwardRenderer::RecieveMessage(const Message& aMessage)
-{
-	if (aMessage.myMessageType == MessageType::GiveMeAdam)
-	{
-		if (myAdamTexture)
-		{
-			myIsInAdamMode = true;
-		}
 	}
 }

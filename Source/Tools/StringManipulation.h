@@ -7,6 +7,8 @@
 namespace Tools
 {
 
+	std::string PathWithoutFile(const std::string& aFilePath);
+
 	// trim from start (in place)
 	static inline void ltrim(std::string& s) {
 		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {

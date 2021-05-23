@@ -7,6 +7,7 @@
 #include "ShaderCompiler.h"
 #include <fstream>
 #include "WindSystem.h"
+#include "AssetManager.h"
 
 #if USEIMGUI
 #include <imgui.h>
@@ -48,9 +49,6 @@ struct ParticalEditData
 
 ParticleFactory::ParticleFactory() :
 	myDevice(nullptr),
-	myVertexShader(nullptr),
-	myGeometryShader(nullptr),
-	myPixelShader(nullptr),
 	myInputLayout(nullptr)
 {
 }
@@ -66,26 +64,9 @@ bool ParticleFactory::Init(DirectX11Framework* aFramework)
 {
 	myDevice = aFramework->GetDevice();
 
-	myPixelShader = GetPixelShader(myDevice, "Data/Shaders/Particle/ParticlePixelShader.hlsl");
-	if (!myPixelShader)
-	{
-		SYSERROR("Could not compile particle pixelshader","");
-		return false;
-	}
-
-	if (!LoadGeometryShader(myDevice, "Data/Shaders/Particle/ParticleGeometryShader.hlsl", myGeometryShader))
-	{
-		SYSERROR("Could not compile particle geometryshader","");
-		return false;
-	}
-
-	std::vector<char> vertexBlob;
-	myVertexShader = GetVertexShader(myDevice, "Data/Shaders/Particle/ParticleVertexShader.hlsl", vertexBlob);
-	if (!myVertexShader)
-	{
-		SYSERROR("Could not Compile particle vertexshader","");
-		return false;
-	}
+	myPixelShader = AssetManager::GetInstance().GetPixelShader("Particle.hlsl");
+	myGeometryShader = AssetManager::GetInstance().GetGeometryShader("Particle.hlsl");
+	myVertexShader = AssetManager::GetInstance().GetVertexShader("Particle.hlsl");
 
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
@@ -100,7 +81,7 @@ bool ParticleFactory::Init(DirectX11Framework* aFramework)
 		{ "FBTIMER", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
-	HRESULT result = myDevice->CreateInputLayout(layout, sizeof(layout) / sizeof(layout[0]), vertexBlob.data(), vertexBlob.size(), &myInputLayout);
+	HRESULT result = myDevice->CreateInputLayout(layout, sizeof(layout) / sizeof(layout[0]), myVertexShader.GetVertexShaderblob().data(), myVertexShader.GetVertexShaderblob().size(), &myInputLayout);
 	if (FAILED(result))
 	{
 		SYSERROR("could not create input layout for particle","");
@@ -365,16 +346,7 @@ void ParticleFactory::EditParticles(Scene* aScene)
 			{
 				SavingAndLoading::LoadInto(customizable, "Data/Particles/" + editing->first);
 
-				std::string after = customizable.myFilePath;
-				Texture* newTexture = LoadTexture(myDevice, after);
-				if (!IsErrorTexture(newTexture))
-				{
-					if (!IsErrorTexture(editing->second->GetData().myTexture))
-					{
-						editing->second->GetData().myTexture->Release();
-					}
-					editing->second->GetData().myTexture = newTexture;
-				}
+				editing->second->GetData().myTexture = AssetManager::GetInstance().GetTexture(customizable.myFilePath);
 			}
 			{
 				std::string before = customizable.myFilePath;
@@ -403,16 +375,7 @@ void ParticleFactory::EditParticles(Scene* aScene)
 
 				if (before != customizable.myFilePath)
 				{
-					std::string after = customizable.myFilePath;
-					Texture* newTexture = LoadTexture(myDevice, after);
-					if (!IsErrorTexture(newTexture))
-					{
-						if (!IsErrorTexture(editing->second->GetData().myTexture))
-						{
-							editing->second->GetData().myTexture->Release();
-						}
-						editing->second->GetData().myTexture = newTexture;
-					}
+					editing->second->GetData().myTexture = AssetManager::GetInstance().GetTexture(customizable.myFilePath);
 				}
 			}
 
@@ -512,7 +475,7 @@ Particle* ParticleFactory::LoadParticle(const std::string& aFilePath)
 	data.myStride = sizeof(Particle::Vertex);
 
 	std::string path = data.myCustomizable.myFilePath;
-	data.myTexture = LoadTexture(myDevice, path);
+	data.myTexture = AssetManager::GetInstance().GetTexture(path);
 
 	data.myParticleVertexBuffer = Constructing::CreateBufferFor(myDevice, data);
 

@@ -2,22 +2,17 @@
 #include "TextFactory.h"
 #include "TextInstance.h"
 #include "SpriteFactory.h"
+#include "AssetManager.h"
 
 TextFactory::TextFactory() 
 {
+	myDevicePtr = nullptr;
 	mySpriteFactoryPtr = nullptr;
 }
 
 TextFactory::~TextFactory()
 {
-
-	for (auto& font : ourFonts)
-	{
-		SAFE_DELETE(font.second);
-	}
-
-	ourFonts.clear();
-
+	myDevicePtr = nullptr;
 	mySpriteFactoryPtr = nullptr;
 }
 
@@ -37,9 +32,14 @@ bool TextFactory::Init(SpriteRenderer* aRenderer, SpriteFactory* aSpriteFactory)
 	return true;
 }
 
+TextInstance* TextFactory::CreateText()
+{
+	return AssetManager::GetInstance().GetFont("default.spritefont").InstansiateText();
+}
+
 TextInstance* TextFactory::CreateToolTip(SpriteInstance* aBackground, const V2F& aBuffer, const std::string& someText, const std::string& aFontPath)
 {
-	TextInstance* toolTip = CreateText(aFontPath);
+	TextInstance* toolTip = AssetManager::GetInstance().GetFont(aFontPath).InstansiateText();
 
 	if (toolTip)
 	{
@@ -54,9 +54,4 @@ TextInstance* TextFactory::CreateToolTip(SpriteInstance* aBackground, const V2F&
 TextInstance* TextFactory::CreateToolTip(const std::string& aBackgroundPath, const V2F& aBuffer, const std::string& someText, const std::string& aFontPath)
 {
 	return CreateToolTip(mySpriteFactoryPtr->CreateSprite(aBackgroundPath), aBuffer, someText, aFontPath);
-}
-
-TextInstance* TextFactory::CreateText(const std::string& aFontPath)
-{
-	return new TextInstance(GetFont(aFontPath));
 }

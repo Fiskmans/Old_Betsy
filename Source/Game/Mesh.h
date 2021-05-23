@@ -34,7 +34,7 @@ public:
 
 	void SetFading(bool aIsFading);
 
-	ModelInstance* GetModelInstance(int aModelIndex = 0);
+	ModelInstance* GetModelInstance();
 	int GetNumberOfMeshes();
 
 	virtual void SubscribeToMyMessages() override;

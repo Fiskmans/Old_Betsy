@@ -9,7 +9,7 @@ class SpriteFactory;
 class CinematicEditor
 {
 public:
-	void Init(ModelLoader* aLoader, Scene* aScene, ParticleFactory* aPartFactory, SpriteFactory* aSpriteFactory);
+	void Init(Scene* aScene, ParticleFactory* aPartFactory, SpriteFactory* aSpriteFactory);
 	void Init(CinematicState* aState);
 	bool Run();
 
@@ -37,7 +37,6 @@ private:
 	void VerifyTiming();
 
 	Scene* myScene = nullptr;
-	ModelLoader* myLoader = nullptr;
 	ParticleFactory* myPartFactory = nullptr;
 
 	CinematicState* myState = nullptr;

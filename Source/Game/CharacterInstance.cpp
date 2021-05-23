@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "CharacterInstance.h"
-#include "AbilityData.h"
 #include "Entity.h"
 
 CharacterInstance::CharacterInstance()

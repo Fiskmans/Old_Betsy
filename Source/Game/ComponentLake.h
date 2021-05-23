@@ -27,7 +27,6 @@ public:
 	~ComponentLake();
 
 	void PrepareObjectsInPools(
-		ModelLoader* aModelLoader, 
 		Scene* aScene, 
 		ParticleFactory* aParticleFactory, 
 		AudioManager* aAudioManager, 

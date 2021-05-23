@@ -204,7 +204,7 @@ void SpriteInstance::ImGui()
 	ImVec2 cursorposlocal = ImGui::GetCursorPos();
 	ImVec2 cursorpos = ImGui::GetCursorScreenPos();
 	ImVec2 iopos = ImVec2(ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
-	Tools::ZoomableImGuiImage(mySprite->GetSpriteData().myTexture->operator ID3D11ShaderResourceView * (), imageSize);
+	Tools::ZoomableImGuiImage(mySprite->GetSpriteData().myTexture.GetAsTexture(), imageSize);
 	V2F mpInImage = V2F((iopos.x - cursorpos.x) / imageSize.x, (iopos.y - cursorpos.y) / imageSize.y);
 
 	bool mouseInside = mpInImage.x > 0.f && mpInImage.x < 1.f && mpInImage.y > 0.f && mpInImage.y < 1.f;

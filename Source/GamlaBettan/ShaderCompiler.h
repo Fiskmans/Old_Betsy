@@ -2,25 +2,26 @@
 #include <string>
 #include "ShaderFlags.h"
 #include <vector>
-#include "Shaders.h"
 
 struct ID3D11Device;
 struct ID3D11VertexShader;
 struct ID3D11PixelShader;
 struct ID3D11GeometryShader;
 
-void ReleaseAllShaders();
+class ShaderCompiler
+{
+public:
+	ShaderCompiler(ID3D11Device* aDevice, const std::string& aBakedFolderPath);
 
-PixelShader* GetPixelShader(ID3D11Device* aDevice, const std::string& aPath, size_t aFlags = ShaderFlags::None);
-VertexShader* GetVertexShader(ID3D11Device* aDevice, const std::string& aPath, std::vector<char>& aVsBlob, size_t aFlags = ShaderFlags::None);
+	Asset* GetPixelShader(const std::string& aBaseFolder, const std::string& aShader, ShaderFlags aFlags);
+	Asset* GetVertexShader(const std::string& aBaseFolder, const std::string& aShader, ShaderFlags aFlags);
+	Asset* GetGeometryShader(const std::string& aBaseFolder, const std::string& aShader, ShaderFlags aFlags);
 
-void ReloadPixelShader(ID3D11Device* aDevice, const std::string& aPath, size_t aFlags);
-void ReloadVertexShader(ID3D11Device* aDevice, const std::string& aPath, size_t aFlags);
+	void ReloadShader(Asset* aAsset, const std::string& aBaseFolder, const std::string& aShader, ShaderFlags aFlags, const std::string& aFileChanged);
 
-bool LoadGeometryShader(ID3D11Device* aDevice, std::string aFilePath, ID3D11GeometryShader*& aShaderOutput);
+private:
+	std::vector<char> LoadOrCompileFromFile(const std::string& aBBaseFolder, const std::string& aFilePath, const std::string& aEntryPoint, const std::string& aCompiler, ShaderFlags aFlags);
 
-bool CompilePixelShader(ID3D11Device* aDevice, std::string aData, ID3D11PixelShader*& aShaderOutput, size_t aFlags = ShaderFlags::None);
-bool CompileGeometryShader(ID3D11Device* aDevice, std::string aData, ID3D11GeometryShader*& aShaderOutput);
-bool CompileVertexShader(ID3D11Device* aDevice, std::string aData, ID3D11VertexShader*& aShaderOutput, void* aCompiledOutput, size_t aFlags = ShaderFlags::None);
-
-void FlushShaderChanges();
+	ID3D11Device* myDevice;
+	std::string myBakedFolderPath;
+};

@@ -135,7 +135,7 @@ int Run()
 
 			AudioManager audioManager;
 			audioManager.Init();
-			bool shouldRun = game->Init(engine.GetWindowHandler(), &engine.GetWindowHandler()->GetInputHandler(), &engine.GetModelLoader(), engine.GetLightLoader(), &engine.GetSpriteFactory(), engine.GetFrameWork(), &audioManager, engine.GetSpriteRenderer());
+			bool shouldRun = game->Init(engine.GetWindowHandler(), &engine.GetWindowHandler()->GetInputHandler(), engine.GetLightLoader(), &engine.GetSpriteFactory(), engine.GetFrameWork(), &audioManager, engine.GetSpriteRenderer());
 
 			engine.SubscribeToMessages();
 

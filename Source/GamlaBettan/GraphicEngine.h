@@ -33,7 +33,6 @@ public:
 
 	void AddExtraSpriteToRender(SpriteInstance* aSprite);
 
-	ModelLoader& GetModelLoader();
 	SpriteFactory& GetSpriteFactory();
 	WindowHandler* GetWindowHandler();
 	DirectX11Framework* GetFrameWork();
@@ -55,7 +54,6 @@ private:
 
 	DirectX11Framework* myFrameWork;
 	WindowHandler* myWindowHandler;
-	ModelLoader myModelLoader;
 	SpriteFactory mySpriteFactory;
 	LightLoader* myLightLoader;
 };

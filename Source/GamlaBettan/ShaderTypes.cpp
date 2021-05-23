@@ -54,9 +54,10 @@ ShaderTypes::Offsets ShaderTypes::OffsetsFromFlags(size_t aFlags)
 	return out;
 }
 
-size_t ShaderTypes::FlagsFromMesh(aiMesh* aMesh)
+ShaderFlags ShaderTypes::FlagsFromMesh(aiMesh* aMesh)
 {
-	size_t result = 0;
+	std::underlying_type_t<ShaderFlags> result = 0;
+
 	if (aMesh->HasVertexColors(0))
 	{
 		result |= ShaderFlags::HasVertexColors;
@@ -86,7 +87,7 @@ size_t ShaderTypes::FlagsFromMesh(aiMesh* aMesh)
 		result |= (0xF & numberofBones) << ShaderFlags::NumBonesOffset;
 	}
 
-	return result;
+	return static_cast<ShaderFlags>(result);
 }
 
 std::string ShaderTypes::PostfixFromFlags(size_t aFlags)

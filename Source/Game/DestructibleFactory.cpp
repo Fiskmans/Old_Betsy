@@ -7,7 +7,6 @@
 #include "Mesh.h"
 #include "Collision.h"
 #include "CharacterData.h"
-#include "AbilityData.h"
 #include "Random.h"
 #include "Octree.h"
 #include "Movement3D.h"
@@ -20,7 +19,6 @@ DestructibleFactory::DestructibleFactory() :
 	myEntityPool(nullptr),
 	myEntityIDInt(nullptr),
 	myEntityVector(nullptr),
-	myAbilityData(nullptr),
 	myCharacterData(nullptr)
 {
 }
@@ -31,7 +29,7 @@ DestructibleFactory::~DestructibleFactory()
 	UnSubscribeToMessage(MessageType::NewOctreeCreated);
 }
 
-void DestructibleFactory::Init(Octree* aOctTree, std::vector<Entity*>* aEntityVector, CommonUtilities::ObjectPool<Entity>* aEntityPool, ComponentLake* aComponentLake, unsigned int* aEntityIDInt, CharacterData* aCharacterData, AbilityData* aAbilityData)
+void DestructibleFactory::Init(Octree* aOctTree, std::vector<Entity*>* aEntityVector, CommonUtilities::ObjectPool<Entity>* aEntityPool, ComponentLake* aComponentLake, unsigned int* aEntityIDInt, CharacterData* aCharacterData)
 {
 	SubscribeToMessage(MessageType::SpawnDestructibleObject);
 	SubscribeToMessage(MessageType::NewOctreeCreated);
@@ -41,7 +39,6 @@ void DestructibleFactory::Init(Octree* aOctTree, std::vector<Entity*>* aEntityVe
 	myEntityPool = aEntityPool;
 	myEntityIDInt = aEntityIDInt;
 	myCharacterData = aCharacterData;
-	myAbilityData = aAbilityData;
 }
 
 void DestructibleFactory::CreateDestructibleObject(std::string aFilePath, CommonUtilities::Vector3<float> aPos, CommonUtilities::Vector3<float> aRot, CommonUtilities::Vector3<float> aScale, int aType)

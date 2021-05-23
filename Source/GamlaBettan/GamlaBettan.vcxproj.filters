@@ -37,9 +37,6 @@
     <ClCompile Include="videoplayer.cpp">
       <Filter>Video</Filter>
     </ClCompile>
-    <ClCompile Include="LightLoader.cpp">
-      <Filter>Lights</Filter>
-    </ClCompile>
     <ClCompile Include="DebugTools.cpp" />
     <ClCompile Include="Particle.cpp">
       <Filter>Particles</Filter>
@@ -95,9 +92,6 @@
     <ClCompile Include="FullscreenTextureFactory.cpp">
       <Filter>Textures</Filter>
     </ClCompile>
-    <ClCompile Include="TextureLoader.cpp">
-      <Filter>Textures</Filter>
-    </ClCompile>
     <ClCompile Include="RenderStateManager.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
@@ -113,9 +107,6 @@
     <ClCompile Include="ShaderCompiler.cpp">
       <Filter>Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="ModelLoader.cpp">
-      <Filter>Models</Filter>
-    </ClCompile>
     <ClCompile Include="ModelInstance.cpp">
       <Filter>Models</Filter>
     </ClCompile>
@@ -124,9 +115,6 @@
     </ClCompile>
     <ClCompile Include="Environmentlight.cpp">
       <Filter>Lights</Filter>
-    </ClCompile>
-    <ClCompile Include="Shaders.cpp">
-      <Filter>Shaders</Filter>
     </ClCompile>
     <ClCompile Include="CGraphManager.cpp" />
     <ClCompile Include="NodeMouseInWorld.cpp">
@@ -147,12 +135,8 @@
     <ClCompile Include="BlueprintUtilities\Source\ax\Widgets.cpp">
       <Filter>BlueprintUtilities</Filter>
     </ClCompile>
-    <ClCompile Include="WindowControl.cpp" />
     <ClCompile Include="NodeNot.cpp">
       <Filter>Nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="AnimationController.cpp">
-      <Filter>InternetCode</Filter>
     </ClCompile>
     <ClCompile Include="CGraphManager.cpp">
       <Filter>Script</Filter>
@@ -194,9 +178,6 @@
     <ClCompile Include="WindSystem.cpp" />
     <ClCompile Include="TextRenderer.cpp">
       <Filter>Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="PathFinderData.cpp">
-      <Filter>Path finding</Filter>
     </ClCompile>
     <ClCompile Include="PathFinder.cpp">
       <Filter>Path finding</Filter>
@@ -345,7 +326,6 @@
     <ClCompile Include="HighlightRenderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="SpotLightFactory.cpp" />
     <ClCompile Include="DepthRenderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
@@ -380,7 +360,6 @@
     <ClCompile Include="NodeCameraOffset.cpp">
       <Filter>Nodes\GameControl</Filter>
     </ClCompile>
-    <ClCompile Include="FontFactory.cpp" />
     <ClCompile Include="SpriteFontInclude.cpp" />
     <ClCompile Include="NodeDialogOver.cpp">
       <Filter>Nodes\Interact</Filter>
@@ -402,6 +381,54 @@
     </ClCompile>
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Asset.cpp" />
+    <ClCompile Include="AudioManager.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="WwiseFramework.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="AK\SoundEngine\Win32\AkDefaultIOHookDeferred.cpp">
+      <Filter>AK</Filter>
+    </ClCompile>
+    <ClCompile Include="AK\SoundEngine\Win32\stdafx.cpp">
+      <Filter>AK</Filter>
+    </ClCompile>
+    <ClCompile Include="AK\SoundEngine\Win32\AkDefaultIOHookBlocking.cpp">
+      <Filter>AK</Filter>
+    </ClCompile>
+    <ClCompile Include="AK\SoundEngine\Common\AkFilePackageLUT.cpp">
+      <Filter>AK</Filter>
+    </ClCompile>
+    <ClCompile Include="AK\SoundEngine\Common\AkFilePackage.cpp">
+      <Filter>AK</Filter>
+    </ClCompile>
+    <ClCompile Include="AK\SoundEngine\Common\AkMultipleFileLocation.cpp">
+      <Filter>AK</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowControl.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="SpotLightFactory.cpp">
+      <Filter>Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelLoader.cpp">
+      <Filter>Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="LightLoader.cpp">
+      <Filter>Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureLoader.cpp">
+      <Filter>Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationLoader.cpp">
+      <Filter>Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="NavMeshLoader.cpp">
+      <Filter>Loaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -474,9 +501,6 @@
     <ClInclude Include="DeferredRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
-    <ClInclude Include="AnimationController.h">
-      <Filter>InternetCode</Filter>
-    </ClInclude>
     <ClInclude Include="MathFunc.h">
       <Filter>InternetCode</Filter>
     </ClInclude>
@@ -510,9 +534,6 @@
     <ClInclude Include="FullscreenTextureFactory.h">
       <Filter>Textures</Filter>
     </ClInclude>
-    <ClInclude Include="TextureLoader.h">
-      <Filter>Textures</Filter>
-    </ClInclude>
     <ClInclude Include="RenderStateManager.h">
       <Filter>Renderers</Filter>
     </ClInclude>
@@ -531,22 +552,13 @@
     <ClInclude Include="ShaderCompiler.h">
       <Filter>Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="ModelLoader.h">
-      <Filter>Models</Filter>
-    </ClInclude>
     <ClInclude Include="ModelInstance.h">
       <Filter>Models</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Models</Filter>
     </ClInclude>
-    <ClInclude Include="LightLoader.h">
-      <Filter>Lights</Filter>
-    </ClInclude>
     <ClInclude Include="ShaderBuffers.h" />
-    <ClInclude Include="Shaders.h">
-      <Filter>Shaders</Filter>
-    </ClInclude>
     <ClInclude Include="CGraphManager.h" />
     <ClInclude Include="NodeMouseInWorld.h">
       <Filter>Nodes</Filter>
@@ -569,7 +581,6 @@
     <ClInclude Include="BlueprintUtilities\Include\ax\Builders.h">
       <Filter>BlueprintUtilities</Filter>
     </ClInclude>
-    <ClInclude Include="WindowControl.h" />
     <ClInclude Include="NodeNot.h">
       <Filter>Nodes</Filter>
     </ClInclude>
@@ -610,9 +621,6 @@
     <ClInclude Include="WindSystem.h" />
     <ClInclude Include="TextRenderer.h">
       <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="PathFinderData.h">
-      <Filter>Path finding</Filter>
     </ClInclude>
     <ClInclude Include="PathFinder.h">
       <Filter>Path finding</Filter>
@@ -759,8 +767,6 @@
     <ClInclude Include="HighlightRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
-    <ClInclude Include="SpotLight.h" />
-    <ClInclude Include="SpotLightFactory.h" />
     <ClInclude Include="DepthRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
@@ -801,9 +807,6 @@
     <ClInclude Include="NodeCameraOffset.h">
       <Filter>Nodes\GameControl</Filter>
     </ClInclude>
-    <ClInclude Include="FontFactory.h">
-      <Filter>Text</Filter>
-    </ClInclude>
     <ClInclude Include="NodeDialogOver.h">
       <Filter>Nodes\Interact</Filter>
     </ClInclude>
@@ -824,6 +827,42 @@
     </ClInclude>
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Asset.h" />
+    <ClInclude Include="AudioManager.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Wwise_IDs.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="WwiseFramework.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowControl.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLightFactory.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelLoader.h">
+      <Filter>Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="LightLoader.h">
+      <Filter>Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureLoader.h">
+      <Filter>Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationLoader.h">
+      <Filter>Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="NavMeshLoader.h">
+      <Filter>Loaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
@@ -903,6 +942,15 @@
     </Filter>
     <Filter Include="Loaders">
       <UniqueIdentifier>{8992d15b-50c6-4ae6-8e0e-50ae349df2f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{3f666db8-d49c-4334-bf59-8d76f4a28784}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AK">
+      <UniqueIdentifier>{c8dd2c22-bd7d-46bb-8852-797ae141a152}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{97ccdb02-eb23-4d5b-a7f5-897e10f814d1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

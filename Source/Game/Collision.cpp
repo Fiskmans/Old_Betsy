@@ -9,7 +9,6 @@
 #include "Sphere.hpp"
 #include "EnemyFactory.h"
 #include "Life.h"
-#include "AbilityInstance.h"
 #include "GBPhysX.h"
 #include "Intersection.hpp"
 #include "GBPhysXComponent.h"
@@ -281,7 +280,7 @@ CommonUtilities::PlaneVolume<float> Collision::GetPlaneVolume()
 	for (size_t i = 0; i < myPoints.size(); i++)
 	{
 		CommonUtilities::Plane<float> p;
-		p.InitWith3Points(myPoints[i], myPoints[i] + V3F(0, 1m, 0), myPoints[(i + 1) % myPoints.size()]);
+		p.InitWith3Points(myPoints[i], myPoints[i] + V3F(0, 1_m, 0), myPoints[(i + 1) % myPoints.size()]);
 		out.AddPlane(p);
 	}
 

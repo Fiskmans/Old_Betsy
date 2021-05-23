@@ -34,13 +34,16 @@ bld/
 [Bb]in/*.exp
 [Bb]in/*.iobj
 [Bb]in/*.ipdb
-[Bb]in/crashdumps
+[Bb]aked/
+[Bb]in/crashdumps/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
 [Ss]ource/[Ll]ibs/
 [Ss]ource/[Ww]orkbed/
 [Ss]ource/pch/
+
+*.cso
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

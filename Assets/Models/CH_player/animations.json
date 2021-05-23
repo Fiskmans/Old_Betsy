@@ -1,0 +1,12 @@
+{
+
+	"UseStaticPaths":false,
+	"Animations":{
+		"Idle":[
+			"animations/CH_Player_idle_Axe.fbx"
+		],
+		"Walk":[
+			"animations/CH_Player_idle_Axe.fbx"
+		]
+	}
+}

@@ -22,7 +22,7 @@
 #include "Decal.h"
 #include "RenderManager.h"
 #include "FoldNumbers.h"
-
+#include "AssetManager.h"
 
 struct DefPixelEnvLightBuffer
 {
@@ -72,7 +72,7 @@ struct DefDecalBuffer
 };
 
 
-bool DeferredRenderer::Init(DirectX11Framework* aFramework, Texture** aPerlinPointer, DepthRenderer* aShadowRenderer)
+bool DeferredRenderer::Init(DirectX11Framework* aFramework, AssetHandle aPerlinHandle, DepthRenderer* aShadowRenderer)
 {
 	myShadowRenderer = aShadowRenderer;
 	myDevice = aFramework->GetDevice();
@@ -135,22 +135,11 @@ bool DeferredRenderer::Init(DirectX11Framework* aFramework, Texture** aPerlinPoi
 		}
 	}
 
-	myBackFaceShader = ::GetPixelShader(device, "Data/Shaders/Deferred/DeferredPixelShader_backfacing.hlsl");
-	if (!myBackFaceShader)
-	{
-		SYSCRASH("Could not compile pixel shader for deferred");
-		return false;
-	}
-
-	myAdamTexture = LoadTexture(device, "Data/Textures/surpriseTexture.dds");
-	if (IsErrorTexture(myAdamTexture))
-	{
-		myAdamTexture = nullptr;
-	}
+	myBackFaceShader = AssetManager::GetInstance().GetPixelShader("deferred/Deferred_backfacing.hlsl");
 
 	SYSINFO("Deferred renderer launched correctly");
 
-	myPerlinPointer = aPerlinPointer;
+	myPerlinHandle = aPerlinHandle;
 	myCreateTime = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
 
 	return true;
@@ -162,7 +151,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 	std::vector<class ModelInstance*> filtered;
 	std::vector<class ModelInstance*> drawn;
 	Model* model = nullptr;
-	Model::CModelData* modelData = nullptr;
+	Model::ModelData* modelData = nullptr;
 
 
 	HRESULT result;
@@ -178,10 +167,15 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 	fData.myCameraDirection = aCamera->GetForward();
 	fData.myTotalTime = RenderManager::GetTotalTime();
 
+	ID3D11ShaderResourceView* resource[1] =
+	{
+		myPerlinHandle.GetAsTexture()
+	};
+
 	myContext->VSSetConstantBuffers(0, 1, &myFrameBuffer);
 	myContext->PSSetConstantBuffers(0, 1, &myFrameBuffer);
-	myContext->VSSetShaderResources(7, 1, **myPerlinPointer);
-	myContext->PSSetShaderResources(7, 1, **myPerlinPointer);
+	myContext->VSSetShaderResources(7, 1, resource);
+	myContext->PSSetShaderResources(7, 1, resource);
 	myContext->GSSetShader(nullptr, nullptr, 0);
 
 	aGBuffer->SetAsActiveTarget(aDepth);
@@ -197,7 +191,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 				continue;
 			}
 			modelData = model->GetModelData();
-			myContext->PSSetShader(*GetPixelShader(modelData->myshaderTypeFlags), nullptr, 0);
+			myContext->PSSetShader(GetPixelShader(modelData->myshaderTypeFlags).GetAsPixelShader(), nullptr, 0);
 
 
 			result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
@@ -217,7 +211,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 			{
 				oData.myBoneOffsetIndex = aBoneMapping[aModelList[i]];
 			}
-			if (modelData->myIsEffect || modelData->myForceForward || aModelList[i]->ShouldBeDrawnThroughWalls() || oData.myTint != V4F(0, 0, 0, 1))
+			if (modelData->myForceForward || aModelList[i]->ShouldBeDrawnThroughWalls() || oData.myTint != V4F(0, 0, 0, 1))
 			{
 				filtered.push_back(aModelList[i]);
 				continue;
@@ -256,27 +250,22 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 
 
 			myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
-			myContext->VSSetShader(*modelData->myVertexShader, nullptr, 0);
+			myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
 
 			myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
-			if (myIsInAdamMode)
+
+			ID3D11ShaderResourceView* resources[3] =
 			{
-				myContext->PSSetShaderResources(0, 1, *myAdamTexture);
-				myContext->PSSetShaderResources(1, 1, *myAdamTexture);
-				myContext->PSSetShaderResources(2, 1, *myAdamTexture);
-				myContext->VSSetShaderResources(0, 1, *myAdamTexture);
-				myContext->VSSetShaderResources(1, 1, *myAdamTexture);
-				myContext->VSSetShaderResources(2, 1, *myAdamTexture);
-			}
-			else
-			{
-				myContext->PSSetShaderResources(0, 1, *modelData->myTextures[0]);
-				myContext->PSSetShaderResources(1, 1, *modelData->myTextures[1]);
-				myContext->PSSetShaderResources(2, 1, *modelData->myTextures[2]);
-				myContext->VSSetShaderResources(0, 1, *modelData->myTextures[0]);
-				myContext->VSSetShaderResources(1, 1, *modelData->myTextures[1]);
-				myContext->VSSetShaderResources(2, 1, *modelData->myTextures[2]);
-			}
+				nullptr,
+				nullptr,
+				nullptr
+			};
+			if (modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].GetAsTexture(); }
+			if (modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].GetAsTexture(); }
+			if (modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].GetAsTexture(); }
+
+			myContext->PSSetShaderResources(0, 3, resources);
+			myContext->VSSetShaderResources(0, 3, resources);
 
 			Model::LodLevel* lodlevel = model->GetOptimalLodLevel(aModelList[i]->GetPosition().DistanceSqr(aCamera->GetPosition()));
 			if (lodlevel)
@@ -297,7 +286,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 		PERFORMANCETAG("Backside");
 		aBacksideTexture->SetAsActiveTarget();
 		aRenderStateManager->SetRasterizerState(RenderStateManager::RasterizerState::CullFrontFacing);
-		myContext->PSSetShader(*myBackFaceShader, nullptr, 0);
+		myContext->PSSetShader(myBackFaceShader.GetAsPixelShader(), nullptr, 0);
 
 
 		for (size_t i = 0; i < drawn.size(); i++)
@@ -332,27 +321,23 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 
 
 			myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
-			myContext->VSSetShader(*modelData->myVertexShader, nullptr, 0);
+			myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
 
 			myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
-			if (myIsInAdamMode)
+
+			ID3D11ShaderResourceView* resources[3] =
 			{
-				myContext->PSSetShaderResources(0, 1, *myAdamTexture);
-				myContext->PSSetShaderResources(1, 1, *myAdamTexture);
-				myContext->PSSetShaderResources(2, 1, *myAdamTexture);
-				myContext->VSSetShaderResources(0, 1, *myAdamTexture);
-				myContext->VSSetShaderResources(1, 1, *myAdamTexture);
-				myContext->VSSetShaderResources(2, 1, *myAdamTexture);
-			}
-			else
-			{
-				myContext->PSSetShaderResources(0, 1, *modelData->myTextures[0]);
-				myContext->PSSetShaderResources(1, 1, *modelData->myTextures[1]);
-				myContext->PSSetShaderResources(2, 1, *modelData->myTextures[2]);
-				myContext->VSSetShaderResources(0, 1, *modelData->myTextures[0]);
-				myContext->VSSetShaderResources(1, 1, *modelData->myTextures[1]);
-				myContext->VSSetShaderResources(2, 1, *modelData->myTextures[2]);
-			}
+				nullptr,
+				nullptr,
+				nullptr
+			};
+			if (modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].GetAsTexture(); }
+			if (modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].GetAsTexture(); }
+			if (modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].GetAsTexture(); }
+
+			myContext->PSSetShaderResources(0, 3, resources);
+			myContext->VSSetShaderResources(0, 3, resources);
+
 
 			Model::LodLevel* lodlevel = model->GetOptimalLodLevel(drawn[i]->GetPosition().DistanceSqr(aCamera->GetPosition()));
 			if (lodlevel)
@@ -404,10 +389,6 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 		float now = Tools::GetTotalTime();
 		for (auto& i : aDecals)
 		{
-			if (!i->myPixelShader)
-			{
-				ONETIMEWARNING("Decal is using an invalid pixelshader, skipping", "");
-			}
 			DefDecalBuffer fData;
 
 			fData.Position = i->myCamera->GetPosition();
@@ -419,10 +400,13 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 			myContext->PSSetShaderResources(8, 1, &i->myDepth);
 			myContext->VSSetShaderResources(8, 1, &i->myDepth);
 
+			ID3D11ShaderResourceView* reources[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { nullptr };
+
 			for (size_t texIndex = 0; texIndex < i->myTextures.size(); texIndex++)
 			{
-				myContext->PSSetShaderResources(9 + texIndex, 1, *i->myTextures[texIndex]);
+				resource[texIndex] = i->myTextures[texIndex].GetAsTexture();
 			}
+			myContext->PSSetShaderResources(9, i->myTextures.size(), resource);
 
 			fData.myToCamera = M44F::GetFastInverse(i->myCamera->GetTransform());
 			fData.myToProj = i->myCamera->GetProjection(false);
@@ -461,6 +445,11 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 	WIPE(bufferData);
 	CommonUtilities::PlaneVolume<float> frustum = aScene->GetMainCamera()->GenerateFrustum();
 
+	ID3D11ShaderResourceView* perlinResource[1] =
+	{
+		myPerlinHandle.GetAsTexture()
+	};
+
 	{
 		PERFORMANCETAG("Environmentlight");
 
@@ -474,7 +463,6 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 		myContext->PSGetShaderResources(0, 16, oldShaderResources);
 		myContext->RSGetViewports(&oldPortCount, oldPort);
 		myContext->OMGetRenderTargets(1, &oldView, &oldDepth);
-		//TODO Cloud shadows
 		myShadowRenderer->RenderEnvironmentDepth(aScene->GetEnvironmentLight(), aScene, aBoneMapping);
 		myContext->OMSetRenderTargets(1, &oldView, oldDepth);
 		myContext->RSSetViewports(oldPortCount, oldPort);
@@ -482,7 +470,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 		myShadowRenderer->BindshadowsToSlots(9);
 
 		MapEnvLightBuffer(aScene);
-		myContext->PSSetShaderResources(10, 1, **myPerlinPointer);
+		myContext->PSSetShaderResources(10, 1, perlinResource);
 		aRenderStateManager->SetSamplerState(RenderStateManager::SamplerState::Trilinear);
 		aFullscreenRenderer.Render(FullscreenRenderer::Shader::PBREnvironmentLight);
 	}
@@ -493,7 +481,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 		WIPE(fData);
 		fData.CameraPosition = aScene->GetMainCamera()->GetPosition();
 		aRenderStateManager->SetBlendState(RenderStateManager::BlendState::AdditativeBlend);
-		myContext->PSSetShaderResources(7, 1, **myPerlinPointer);
+		myContext->PSSetShaderResources(7, 1, perlinResource);
 		const auto& shadowCameras = myShadowRenderer->GetCameras();
 
 		for (auto& i : aPointLightList)
@@ -527,7 +515,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 			}
 
 			myShadowRenderer->BindshadowsToSlots(8);
-			myContext->PSSetShaderResources(7, 1, **myPerlinPointer);
+			myContext->PSSetShaderResources(7, 1, perlinResource);
 			//Render Shadows on/to resource 8-14
 
 			for (size_t i = 0; i < 6; i++)
@@ -591,8 +579,13 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 			}
 
 			myShadowRenderer->BindshadowsToSlots(8);
-			myContext->PSSetShaderResources(9, 1, *i->myTexture);
-			myContext->PSSetShaderResources(7, 1, **myPerlinPointer);
+			ID3D11ShaderResourceView* resource[1] =
+			{
+				i->myTexture.GetAsTexture()
+			};
+
+			myContext->PSSetShaderResources(9, 1, resource);
+			myContext->PSSetShaderResources(7, 1, perlinResource);
 			//Render Shadows on/to resource 8-14
 
 			fData.myToCamera = M44F::GetFastInverse(i->myCamera->GetTransform());
@@ -616,34 +609,6 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 
 }
 
-void DeferredRenderer::RecieveMessage(const Message& aMessage)
-{
-	switch (aMessage.myMessageType)
-	{
-	case MessageType::EnableDiscoMode:
-		myIsDiscoEnabled = true;
-		break;
-	case MessageType::GiveMeAdam:
-		if (myAdamTexture)
-		{
-			myIsInAdamMode = true;
-		}
-		break;
-	}
-}
-
-void DeferredRenderer::SubscribeToMessages()
-{
-	PostMaster::GetInstance()->Subscribe(MessageType::EnableDiscoMode, this);
-	PostMaster::GetInstance()->Subscribe(MessageType::GiveMeAdam, this);
-}
-
-void DeferredRenderer::UnsubscribeToMessages()
-{
-	PostMaster::GetInstance()->UnSubscribe(MessageType::EnableDiscoMode, this);
-	PostMaster::GetInstance()->UnSubscribe(MessageType::GiveMeAdam, this);
-}
-
 void DeferredRenderer::MapEnvLightBuffer(Scene* aScene)
 {
 
@@ -665,16 +630,23 @@ void DeferredRenderer::MapEnvLightBuffer(Scene* aScene)
 	EnvironmentLight* envlight = aScene->GetEnvironmentLight();
 	if (envlight)
 	{
+		ID3D11ShaderResourceView* texture[1] =
+		{
+			envlight->myTexture.GetAsTexture()
+		};
+
+		myContext->PSSetShaderResources(8, 1, texture);
+
 		fData.myLightColor = envlight->myColor;
 		fData.myLightDirection = envlight->myDirection;
 		fData.myLightIntensity = envlight->myIntensity;
-		myContext->PSSetShaderResources(8, 1, &envlight->myTexture);
-		const Camera* cam = myShadowRenderer->GetEnvirontmentCamera();
-		fData.myToCamera = M44F::GetFastInverse(cam->GetTransform());
-		fData.myToProjection = cam->GetProjection(false);
-		fData.time = Tools::GetTotalTime();
-		fData.myCloudIntensity = myCloudIntensity;
 	}
+
+	const Camera* cam = myShadowRenderer->GetEnvirontmentCamera();
+	fData.myToCamera = M44F::GetFastInverse(cam->GetTransform());
+	fData.myToProjection = cam->GetProjection(false);
+	fData.time = Tools::GetTotalTime();
+	fData.myCloudIntensity = myCloudIntensity;
 
 	memcpy(bufferData.pData, &fData, sizeof(fData));
 
@@ -682,15 +654,11 @@ void DeferredRenderer::MapEnvLightBuffer(Scene* aScene)
 	myContext->PSSetConstantBuffers(0, 1, &myPixelEnvLightBuffer);
 }
 
-PixelShader* DeferredRenderer::GetPixelShader(size_t flags)
+AssetHandle& DeferredRenderer::GetPixelShader(size_t flags)
 {
 	if (myPixelShaders.count(flags) == 0)
 	{
-		myPixelShaders[flags] = ::GetPixelShader(myDevice, "Data/Shaders/Deferred/DeferredPixelShader.hlsl");
-		if (!myPixelShaders[flags])
-		{
-			SYSCRASH("Could not compile pixel shader for deferred");
-		}
+		myPixelShaders[flags] = AssetManager::GetInstance().GetPixelShader("deferred/Deferred.hlsl");
 	}
 	return myPixelShaders[flags];
 }

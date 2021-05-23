@@ -1,23 +1,14 @@
 #include "pch.h"
 #include "PathFinder.h"
-#include "PathFinderData.h"
 #include "DebugDrawer.h"
 #include <set>
 #include <unordered_set>
 #include <queue>
 
-#pragma warning(push)
-#pragma warning(disable: 26812)
-#include "assimp/cimport.h"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-#pragma warning(pop)
 
 #include <fstream>
 #include <sstream>
 #include <functional>
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
 
 #include "Intersection.hpp"
 
@@ -25,6 +16,8 @@
 #include <imgui.h>
 #include "WindowControl.h"
 #endif
+
+#include "NavMeshLoader.h"
 
 PathFinder::PathFinder() :
 	myIsDisabled(false),
@@ -40,12 +33,15 @@ PathFinder::PathFinder() :
 	myDrawWaypoints(false),
 	myDrawWalls(false)
 {
-	myNavMesh = new PathFinderData();
 }
 
 PathFinder::~PathFinder()
 {
-	delete myNavMesh;
+}
+
+void PathFinder::SetNavMesh(const AssetHandle& aNavMesh)
+{
+	myNavMesh = aNavMesh;
 }
 
 namespace Pathfinderhelpers
@@ -231,53 +227,34 @@ namespace Pathfinderhelpers
 	}
 }
 
-void PathFinder::GenerateFromMesh(const std::string& aFilePath)
-{
-	PERFORMANCETAG("Generating navmesh");
-	static std::unordered_map < std::string, std::function<void(const std::string&)>> fileTypeMapping;
-	if (fileTypeMapping.empty())
-	{
-		fileTypeMapping[".fbx"] = std::bind(&PathFinder::FBXLoader, this, std::placeholders::_1);
-		fileTypeMapping[".obj"] = std::bind(&PathFinder::OBJLoader, this, std::placeholders::_1);
-	}
-	std::string extension = std::experimental::filesystem::path(aFilePath).extension().string();
-	if (fileTypeMapping.count(extension) != 0)
-	{
-		PERFORMANCETAG("Loading");
-		fileTypeMapping[extension](aFilePath);
-	}
-	else
-	{
-		SYSERROR("Unrecogniesed NavMesh File Format", aFilePath);
-	}
-	FindNodeCentersAndPlanes();
-	Verify();
-	LinkNodes();
-	//Gridify();
-
-	return;
-}
-
 void PathFinder::DrawDebug()
 {
+	if (!myNavMesh.IsValid() || !myNavMesh.IsLoaded())
+	{
+		return;
+	}
+	NavMesh* mesh = myNavMesh.GetAsNavMesh();
 	if (myDrawNodes)
 	{
 		DebugDrawer::GetInstance().SetColor(myNodeColor);
-		for (auto& node : myNavMesh->myNodes)
+		for (auto& node : mesh->myNodes)
 		{
-			DebugDrawer::GetInstance().DrawLine(myNavMesh->myVertexCollection[node.myCorners[0]], myNavMesh->myVertexCollection[node.myCorners[1]]);
-			DebugDrawer::GetInstance().DrawLine(myNavMesh->myVertexCollection[node.myCorners[1]], myNavMesh->myVertexCollection[node.myCorners[2]]);
-			DebugDrawer::GetInstance().DrawLine(myNavMesh->myVertexCollection[node.myCorners[2]], myNavMesh->myVertexCollection[node.myCorners[0]]);
+			DebugDrawer::GetInstance().DrawLine(mesh->myVertexCollection[node.myCorners[0]], mesh->myVertexCollection[node.myCorners[1]]);
+			DebugDrawer::GetInstance().DrawLine(mesh->myVertexCollection[node.myCorners[1]], mesh->myVertexCollection[node.myCorners[2]]);
+			DebugDrawer::GetInstance().DrawLine(mesh->myVertexCollection[node.myCorners[2]], mesh->myVertexCollection[node.myCorners[0]]);
 		}
 	}
 	if (myDrawLinks)
 	{
 		DebugDrawer::GetInstance().SetColor(myLinkColor);
-		for (auto& node : myNavMesh->myNodes)
+		for (auto& node : mesh->myNodes)
 		{
 			for (auto& link : node.myLinks)
 			{
-				DebugDrawer::GetInstance().DrawArrow(node.myCenter, link.toNode->myCenter);
+				if (link.toNode != -1)
+				{
+					DebugDrawer::GetInstance().DrawArrow(node.myCenter, mesh->myNodes[link.toNode].myCenter);
+				}
 			}
 		}
 	}
@@ -295,6 +272,13 @@ void PathFinder::DrawDebug()
 
 V3F PathFinder::FindPoint(SlabRay aRay)
 {
+	if (!myNavMesh.IsValid() || !myNavMesh.IsLoaded())
+	{
+		return V3F(0, 0, 0);
+	}
+
+
+	NavMesh* mesh = myNavMesh.GetAsNavMesh();
 #pragma warning(suppress : 4056)
 	float closest = _HUGE_ENUF;
 	if (myIsDisabled)
@@ -304,16 +288,16 @@ V3F PathFinder::FindPoint(SlabRay aRay)
 
 	V3F result = V3F(0, 0, 0);
 
-	for (auto& node : myNavMesh->myNodes)
+	for (auto& node : mesh->myNodes)
 	{
 		//TODO: filter to increase performance
 		float t;
 		V3F inters = aRay.FindIntersection(node.myPlane, t);
 
 		if (Pathfinderhelpers::PointInTriangle(inters,
-			myNavMesh->myVertexCollection[node.myCorners[0]],
-			myNavMesh->myVertexCollection[node.myCorners[1]],
-			myNavMesh->myVertexCollection[node.myCorners[2]]))
+			mesh->myVertexCollection[node.myCorners[0]],
+			mesh->myVertexCollection[node.myCorners[1]],
+			mesh->myVertexCollection[node.myCorners[2]]))
 		{
 			if (t < closest)
 			{
@@ -328,15 +312,14 @@ V3F PathFinder::FindPoint(SlabRay aRay)
 
 std::vector<V3F> PathFinder::FindPath(V3F aFrom, V3F aTo)
 {
-	if (myIsDisabled)
+	if (myIsDisabled || !myNavMesh.IsValid() || !myNavMesh.IsLoaded())
 	{
 		return { aTo };
 	}
-	std::unordered_set<Node*> visited;
 	std::vector<V3F> result;
-	Node* start = FindNode(SlabRay(aFrom + V3F(0, 10000000.f, 0), V3F(0, -1, 0)));
-	Node* end = FindNode(SlabRay(aTo + V3F(0, 10000000.f, 0), V3F(0, -1, 0)));
-	std::vector<Node*> passedNodes;
+	NavMeshIndexType start = FindNode(SlabRay(aFrom + V3F(0, 10000000.f, 0), V3F(0, -1, 0)));
+	NavMeshIndexType end = FindNode(SlabRay(aTo + V3F(0, 10000000.f, 0), V3F(0, -1, 0)));
+	std::vector<NavMeshIndexType> passedNodes;
 	if (!start || !end || !FindPath(start, end, passedNodes))
 	{
 		return {};
@@ -348,7 +331,7 @@ std::vector<V3F> PathFinder::FindPath(V3F aFrom, V3F aTo)
 
 V3F PathFinder::Floorify(V3F aPoint)
 {
-	return FindPoint(SlabRay(aPoint + V3F(0, 100, 0), V3F(0, -1, 0)));
+	return FindPoint(SlabRay(aPoint + V3F(0, 1000_m, 0), V3F(0, -1_m, 0)));
 }
 
 void PathFinder::Imgui()
@@ -378,11 +361,6 @@ void PathFinder::Imgui()
 			}
 		});
 #endif
-}
-
-PathFinderData* PathFinder::GetMyPathFinderData()
-{
-	return myNavMesh;
 }
 
 bool PathFinder::IntersectionWithWalls(V3F aStart, V3F aEnd)
@@ -425,286 +403,8 @@ bool PathFinder::IntersectionWithWalls(V3F aStart, V3F aEnd)
 	return false;
 }
 
-void PathFinder::OBJLoader(const std::string& aFilePath)
-{
-	myNavMesh->myNodes.clear();
-	myNavMesh->myVertexCollection.clear();
 
-	std::ifstream inFile;
-	inFile.open(aFilePath);
-	std::string buffer;
-	while (std::getline(inFile, buffer))
-	{
-		std::stringstream ss(buffer);
-		std::string type;
-		ss >> type;
-		if (type == "v")
-		{
-			float x, y, z;
-			if (ss >> x >> y >> z)
-			{
-				myNavMesh->myVertexCollection.emplace_back(x, y, z);
-			}
-		}
-		else if (type == "f")
-		{
-			Node nextNode;
-#if TRACKLOADINGERROS
-			for (size_t i = 0; i < 3; i++)
-			{
-				nextNode.myCorners[i] = 0ULL;
-			}
-#endif
-			for (size_t i = 0; i < 3; i++)
-			{
-				std::string indexlist;
-				if (ss >> indexlist)
-				{
-					std::stringstream indexStream(indexlist);
-					indexStream >> nextNode.myCorners[i];
-				}
-			}
-#if TRACKLOADINGERROS
-			for (size_t i = 0; i < 3; i++)
-			{
-				if (nextNode.myCorners[i] == 0)
-				{
-					std::cout << "Error reading face" << std::endl;
-				}
-			}
-#endif
-			for (size_t i = 0; i < 3; i++)
-			{
-				nextNode.myCorners[i]--; // 0 indexed
-			}
-			myNavMesh->myNodes.push_back(nextNode);
-		}
-	}
-
-	FindNodeCentersAndPlanes();
-	LinkNodes();
-}
-
-void PathFinder::FBXLoader(const std::string& aFilePath)
-{
-	PERFORMANCETAG("FBX nav loader");
-	SYSINFO("Generating nav mesh from: " + aFilePath);
-	{
-		PERFORMANCETAG("Exist check");
-		if (!Tools::FileExists(aFilePath))
-		{
-			SYSERROR("Navmeshfile could not be found", aFilePath);
-		}
-	}
-	const aiScene* scene;
-	{
-		PERFORMANCETAG("Importing");
-		scene = aiImportFile(aFilePath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_ConvertToLeftHanded | aiProcess_Triangulate);
-	}
-
-	if (!scene)
-	{
-		SYSERROR("Could not load navmesh from", aFilePath);
-		SYSERROR(aiGetErrorString(), aFilePath);
-		return;
-	}
-	if (scene->mNumMeshes == 0)
-	{
-		SYSERROR("Nav mesh contains no meshes", aFilePath);
-		aiReleaseImport(scene);
-		return;
-	}
-	if (scene->mNumMeshes > 1)
-	{
-		SYSERROR("Nav mesh contains more than one mesh", aFilePath);
-	}
-
-	std::vector<std::set<size_t>> nodeIndexMapping;
-	{
-		PERFORMANCETAG("resize and reserve");
-		nodeIndexMapping.resize(scene->mMeshes[0]->mNumVertices);
-		myNavMesh->myNodes.clear();
-		myNavMesh->myNodes.reserve(scene->mMeshes[0]->mNumFaces);
-		myNavMesh->myVertexCollection.reserve(scene->mMeshes[0]->mNumVertices);
-	}
-	std::unordered_map<size_t, size_t> indexMapping;
-
-	const auto ConvertToEngine = [](const aiVector3D& aVec) -> V3F
-	{
-		return V3F(aVec.x, aVec.y, aVec.z);
-	};
-
-	auto FindNeighbor = [&](const size_t& aIndex1, const size_t& aIndex2, size_t aNode) -> Node*
-	{
-		static std::vector<size_t> filtered;
-		filtered.resize(scene->mMeshes[0]->mNumVertices);
-
-		auto end = std::set_intersection(nodeIndexMapping[aIndex1].begin(), nodeIndexMapping[aIndex1].end(), nodeIndexMapping[aIndex2].begin(), nodeIndexMapping[aIndex2].end(), filtered.begin());
-		auto it = filtered.begin();
-		while (it != end)
-		{
-			if ((*it) != aNode)
-			{
-				return &myNavMesh->myNodes[*it];
-			}
-			it++;
-		}
-		return nullptr;
-	};
-
-
-	{
-		PERFORMANCETAG("duplication checks");
-		for (size_t indexIndex = 0; indexIndex < scene->mMeshes[0]->mNumVertices; indexIndex++)
-		{
-			V3F pos = ConvertToEngine(scene->mMeshes[0]->mVertices[indexIndex]);
-			auto it = std::find(myNavMesh->myVertexCollection.begin(), myNavMesh->myVertexCollection.end(), pos);
-			indexMapping[indexIndex] = it - myNavMesh->myVertexCollection.begin();
-			if (it == myNavMesh->myVertexCollection.end())
-			{
-				myNavMesh->myVertexCollection.push_back(pos);
-			}
-		}
-	}
-
-
-
-	{
-		PERFORMANCETAG("Face creation");
-		for (size_t faceIndex = 0; faceIndex < scene->mMeshes[0]->mNumFaces; faceIndex++)
-		{
-			Node n;
-			for (size_t i = 0; i < 3; i++)
-			{
-				n.myCorners[i] = indexMapping[scene->mMeshes[0]->mFaces[faceIndex].mIndices[i]];
-			}
-			myNavMesh->myNodes.push_back(n);
-		}
-	}
-
-
-	{
-		PERFORMANCETAG("Neighbor finding");
-		for (size_t faceIndex = 0; faceIndex < scene->mMeshes[0]->mNumFaces; faceIndex++)
-		{
-			size_t at = scene->mMeshes[0]->mFaces[faceIndex].mIndices[0];
-			for (size_t i = 1; i < scene->mMeshes[0]->mFaces[faceIndex].mNumIndices; i++)
-			{
-				Node* neighbor = FindNeighbor(at, scene->mMeshes[0]->mFaces[faceIndex].mIndices[i], faceIndex);
-				if (neighbor)
-				{
-					Link l;
-					l.toNode = neighbor;
-					l.weight = (neighbor->myCenter - myNavMesh->myNodes[faceIndex].myCenter).Length();
-					myNavMesh->myNodes[faceIndex].myLinks.push_back(l);
-				}
-				at = scene->mMeshes[0]->mFaces[faceIndex].mIndices[i];
-			}
-			Node* neighbor = FindNeighbor(at, scene->mMeshes[0]->mFaces[faceIndex].mIndices[0], faceIndex);
-			if (neighbor)
-			{
-				Link l;
-				l.toNode = neighbor;
-				l.weight = (neighbor->myCenter - myNavMesh->myNodes[faceIndex].myCenter).Length();
-
-				myNavMesh->myNodes[faceIndex].myLinks.push_back(l);
-			}
-		}
-	}
-
-	{
-		PERFORMANCETAG("Releasing");
-		aiReleaseImport(scene);
-	}
-}
-
-void PathFinder::FindNodeCentersAndPlanes()
-{
-	PERFORMANCETAG("Node centers and planes");
-	for (auto& i : myNavMesh->myNodes)
-	{
-		i.myCenter = V3F(0, 0, 0);
-		i.myCenter += myNavMesh->myVertexCollection[i.myCorners[0]];
-		i.myCenter += myNavMesh->myVertexCollection[i.myCorners[1]];
-		i.myCenter += myNavMesh->myVertexCollection[i.myCorners[2]];
-		i.myCenter = i.myCenter / 3.f;
-		i.myPlane = CommonUtilities::Plane<float>(myNavMesh->myVertexCollection[i.myCorners[0]], myNavMesh->myVertexCollection[i.myCorners[1]], myNavMesh->myVertexCollection[i.myCorners[2]]);
-	}
-}
-
-void PathFinder::LinkNodes()
-{
-	PERFORMANCETAG("Node linking");
-	std::vector<std::set<Node*>> nodeMapping;
-	std::vector<Node*> intersectionVector;
-	intersectionVector.resize(2);
-
-	const auto FindIntersection = [&](size_t aFirst, size_t aSecond, Node* aToIgnore) -> Node*
-	{
-		auto end = std::set_intersection(nodeMapping[aFirst].begin(), nodeMapping[aFirst].end(), nodeMapping[aSecond].begin(), nodeMapping[aSecond].end(), intersectionVector.begin());
-		auto it = intersectionVector.begin();
-		while (it != end)
-		{
-			if (*it != aToIgnore)
-			{
-				return *it;
-			}
-			it++;
-		}
-		return nullptr;
-	};
-
-
-	nodeMapping.resize(myNavMesh->myVertexCollection.size());
-	for (auto& i : myNavMesh->myNodes)
-	{
-		nodeMapping[i.myCorners[0]].emplace(&i);
-		nodeMapping[i.myCorners[1]].emplace(&i);
-		nodeMapping[i.myCorners[2]].emplace(&i);
-	}
-	for (auto& node : myNavMesh->myNodes)
-	{
-		Node* neighbors[3];
-		neighbors[0] = FindIntersection(node.myCorners[0], node.myCorners[1], &node);
-		neighbors[1] = FindIntersection(node.myCorners[1], node.myCorners[2], &node);
-		neighbors[2] = FindIntersection(node.myCorners[2], node.myCorners[0], &node);
-		for (size_t i = 0; i < 3; i++)
-		{
-			if (neighbors[i])
-			{
-				Link l;
-				l.toNode = neighbors[i];
-				l.weight = (node.myCenter - neighbors[i]->myCenter).Length();
-				l.myPoints[0] = node.myCorners[i];
-				l.myPoints[1] = node.myCorners[(i + 1) % 3];
-				node.myLinks.push_back(l);
-			}
-			else
-			{
-				NavmeshWall wall;
-				wall.start = myNavMesh->myVertexCollection[node.myCorners[(i + 1) % 3]];
-				wall.end = myNavMesh->myVertexCollection[node.myCorners[i]];
-				wall.top = wall.start + V3F(0, 350, 0);
-				wall.plane.InitWith3Points(wall.start, wall.end, wall.top);
-				myNavmeshWalls.push_back(wall);
-			}
-		}
-	}
-}
-
-void PathFinder::Verify()
-{
-	PERFORMANCETAG("Verify");
-	for (auto& node : myNavMesh->myNodes)
-	{
-		if (node.myPlane.Normal().Length() < 0.5f)
-		{
-			SYSWARNING("Found dodgy nav node around " + node.myCenter.ToString(), "");
-		}
-	}
-}
-
-inline void FindMinMax(Node& node, V2F& aMin, V2F& aMax, PathFinderData* navmesh)
+inline void FindMinMax(NavMeshNode& node, V2F& aMin, V2F& aMax, NavMesh* navmesh)
 {
 	aMin = V2F(CAST(float, INT_MAX), CAST(float, INT_MAX));
 	aMax = V2F(CAST(float, INT_MIN), CAST(float, INT_MIN));
@@ -719,42 +419,23 @@ inline void FindMinMax(Node& node, V2F& aMin, V2F& aMax, PathFinderData* navmesh
 	}
 };
 
-void PathFinder::Gridify()
-{
-	PERFORMANCETAG("Gridify");
-	myGrid.Init({ -12800.f, -12800.f }, { 12800.f, 12800.f }, 100.f);
-	V2F min;
-	V2F max;
-	CU::Vector2<int> gridMin;
-	CU::Vector2<int> gridMax;
-
-	for (auto& node : myNavMesh->myNodes)
-	{
-		FindMinMax(node, min, max, myNavMesh);
-
-		gridMin = myGrid.GetGridIndex(min);
-		gridMax = myGrid.GetGridIndex(max);
-
-		for (int i = gridMin.x; i <= gridMax.x; i++)
-		{
-			for (int j = gridMin.y; j <= gridMax.y; j++)
-			{
-				myGrid(i, j).Add(&node, true);
-			}
-		}
-	}
-}
-
-bool PathFinder::FindPath(Node* aStart, Node* aEnd, std::vector<Node*>& aOutPath)
+bool PathFinder::FindPath(NavMeshIndexType aStart, NavMeshIndexType aEnd, std::vector<NavMeshIndexType>& aOutPath)
 {
 	if (aStart == aEnd)
 	{
 		return true;
 	}
 
+	if (!myNavMesh.IsValid() || !myNavMesh.IsLoaded())
+	{
+		return false;
+	}
+
+	NavMesh* mesh = myNavMesh.GetAsNavMesh();
+
 	struct navNode
 	{
-		Node* node;
+		NavMeshIndexType node;
 		float totalWeight;
 		float hueristics;
 	};
@@ -767,21 +448,26 @@ bool PathFinder::FindPath(Node* aStart, Node* aEnd, std::vector<Node*>& aOutPath
 		}
 	};
 
-	std::unordered_map<Node*, Node*> backwardsMap;
+	std::unordered_map<NavMeshIndexType, NavMeshIndexType> backwardsMap;
 	std::priority_queue<navNode, std::vector<navNode>, navNodeComparer> queue;
-	std::unordered_set<Node*> visited;
+	std::unordered_set<NavMeshIndexType> visited;
 
-	queue.push(navNode({ aEnd, 0, (aEnd->myCenter - aStart->myCenter).Length() }));
+	queue.push(navNode({ aEnd, 0, (mesh->myNodes[aEnd].myCenter - mesh->myNodes[aStart].myCenter).Length() }));
 	while (!queue.empty())
 	{
 		navNode current = queue.top();
 		queue.pop();
-		for (auto& link : current.node->myLinks)
+		for (auto& link : mesh->myNodes[current.node].myLinks)
 		{
+			if (link.toNode == -1)
+			{
+				continue;
+			}
 			if (visited.find(link.toNode) == visited.end())
 			{
 				backwardsMap[link.toNode] = current.node;
-				queue.push(navNode({ link.toNode,current.totalWeight + link.weight,(link.toNode->myCenter - aStart->myCenter).Length() }));
+				queue.push(navNode({ link.toNode,current.totalWeight + link.weight,(mesh->myNodes[link.toNode].myCenter - mesh->myNodes[aStart].myCenter).Length()
+					}));
 			}
 		}
 		visited.emplace(current.node);
@@ -796,18 +482,19 @@ bool PathFinder::FindPath(Node* aStart, Node* aEnd, std::vector<Node*>& aOutPath
 		DebugDrawer::GetInstance().SetColor(mySearchColor);
 		if (myDrawVisited)
 		{
-			for (auto& node : visited)
+			for (auto& index : visited)
 			{
-				DebugDrawer::GetInstance().DrawLine(myNavMesh->myVertexCollection[node->myCorners[0]], myNavMesh->myVertexCollection[node->myCorners[1]]);
-				DebugDrawer::GetInstance().DrawLine(myNavMesh->myVertexCollection[node->myCorners[1]], myNavMesh->myVertexCollection[node->myCorners[2]]);
-				DebugDrawer::GetInstance().DrawLine(myNavMesh->myVertexCollection[node->myCorners[2]], myNavMesh->myVertexCollection[node->myCorners[0]]);
+				NavMeshNode& node = mesh->myNodes[index];
+				DebugDrawer::GetInstance().DrawLine(mesh->myVertexCollection[node.myCorners[0]], mesh->myVertexCollection[node.myCorners[1]]);
+				DebugDrawer::GetInstance().DrawLine(mesh->myVertexCollection[node.myCorners[1]], mesh->myVertexCollection[node.myCorners[2]]);
+				DebugDrawer::GetInstance().DrawLine(mesh->myVertexCollection[node.myCorners[2]], mesh->myVertexCollection[node.myCorners[0]]);
 			}
 		}
 		if (myDrawFlow)
 		{
 			for (auto& link : backwardsMap)
 			{
-				DebugDrawer::GetInstance().DrawArrow(link.first->myCenter, link.second->myCenter);
+				DebugDrawer::GetInstance().DrawArrow(mesh->myNodes[link.first].myCenter, mesh->myNodes[link.second].myCenter);
 			}
 		}
 	}
@@ -818,7 +505,7 @@ bool PathFinder::FindPath(Node* aStart, Node* aEnd, std::vector<Node*>& aOutPath
 	}
 
 
-	Node* at = aStart;
+	NavMeshIndexType at = aStart;
 	while (at != aEnd)
 	{
 		aOutPath.push_back(at);
@@ -828,12 +515,14 @@ bool PathFinder::FindPath(Node* aStart, Node* aEnd, std::vector<Node*>& aOutPath
 	return true;
 }
 
-void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<Node*>& aNodesToPass, std::vector<V3F>& aOutPath)
+void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<NavMeshIndexType>& aNodesToPass, std::vector<V3F>& aOutPath)
 {
 	if (aNodesToPass.empty())
 	{
 		return;
 	}
+
+	NavMesh* mesh = myNavMesh.GetAsNavMesh();
 
 	enum class ImortantPoint
 	{
@@ -844,21 +533,26 @@ void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<Node*>& aN
 
 	struct passedEdge
 	{
-		Link* mylink;
+		NavMeshLink* mylink;
+		NavMeshIndexType myLeft;
+		NavMeshIndexType myRight;
 		ImortantPoint myImportantPoint;
 	};
 
 	std::vector<passedEdge> collectedEdges;
 
-	Node* at = aNodesToPass.front();
+	NavMeshIndexType at = aNodesToPass.front();
 	for (size_t i = 1; i < aNodesToPass.size(); i++)
 	{
-		for (auto& link : at->myLinks)
+		for (size_t l = 0; l < 3; l++)
 		{
-			if (link.toNode == aNodesToPass[i])
+			if (mesh->myNodes[i].myLinks[l].toNode == aNodesToPass[i])
 			{
 				passedEdge edge;
-				edge.mylink = &link;
+				edge.mylink = &mesh->myNodes[i].myLinks[l];
+				edge.myLeft = mesh->myNodes[i].myCorners[l];
+				edge.myRight = mesh->myNodes[i].myCorners[(l+2)%3];
+
 				if (collectedEdges.empty())
 				{
 					edge.myImportantPoint = ImortantPoint::Both;
@@ -866,7 +560,7 @@ void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<Node*>& aN
 				else
 				{
 					passedEdge last = collectedEdges.back();
-					if (last.mylink->myPoints[0] == link.myPoints[0] || last.mylink->myPoints[1] == link.myPoints[0]) // share the first point of new link
+					if (last.myLeft == edge.myLeft || last.myRight == edge.myLeft) // share the first point of new link
 					{
 						edge.myImportantPoint = ImortantPoint::Second;
 					}
@@ -889,7 +583,7 @@ void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<Node*>& aN
 		{
 			for (auto& edge : collectedEdges)
 			{
-				DebugDrawer::GetInstance().DrawLine(myNavMesh->myVertexCollection[edge.mylink->myPoints[0]], myNavMesh->myVertexCollection[edge.mylink->myPoints[1]]);
+				DebugDrawer::GetInstance().DrawLine(mesh->myVertexCollection[edge.myLeft], mesh->myVertexCollection[edge.myRight]);
 			}
 		}
 	}
@@ -915,11 +609,11 @@ void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<Node*>& aN
 	{
 		if (edge.myImportantPoint != ImortantPoint::Second)
 		{
-			lastLeft = myNavMesh->myVertexCollection[edge.mylink->myPoints[0]];
+			lastLeft = mesh->myVertexCollection[edge.myLeft];
 		}
 		if (edge.myImportantPoint != ImortantPoint::First)
 		{
-			lastRight = myNavMesh->myVertexCollection[edge.mylink->myPoints[1]];
+			lastRight = mesh->myVertexCollection[edge.myRight];
 		}
 
 		Pathfinderhelpers::Portal portal;
@@ -974,34 +668,34 @@ void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<Node*>& aN
 	}
 	Pathfinderhelpers::stringPull(portals, aOutPath);
 	aOutPath.push_back(aEnd);
-
-	/*
-	aOutPath.push_back(aNodesToPass[i]->myCenter);
-	*/
 }
 
-Node* PathFinder::FindNode(SlabRay aRay)
+NavMeshIndexType PathFinder::FindNode(SlabRay aRay)
 {
-	Node* foundNode = nullptr;
+	NavMeshIndexType foundNode = -1;
+
+	NavMesh* mesh = myNavMesh.GetAsNavMesh();
 
 #pragma warning(suppress : 4056)
 	float closest = _HUGE_ENUF;
 
-	for (auto& node : myNavMesh->myNodes)
+	for(NavMeshIndexType i = 0; i < mesh->myNodes.size(); i++)
 	{
+		auto& node = mesh->myNodes[i];
 		//TODO: filter to increase performance
+
 		float t;
 		V3F inters = aRay.FindIntersection(node.myPlane, t);
 
 		if (Pathfinderhelpers::PointInTriangle(inters,
-			myNavMesh->myVertexCollection[node.myCorners[0]],
-			myNavMesh->myVertexCollection[node.myCorners[1]],
-			myNavMesh->myVertexCollection[node.myCorners[2]]))
+			mesh->myVertexCollection[node.myCorners[0]],
+			mesh->myVertexCollection[node.myCorners[1]],
+			mesh->myVertexCollection[node.myCorners[2]]))
 		{
 			if (t < closest)
 			{
 				closest = t;
-				foundNode = &node;
+				foundNode = i;
 			}
 		}
 	}

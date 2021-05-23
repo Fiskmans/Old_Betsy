@@ -15,10 +15,8 @@ namespace Tools
 
 
 	struct TimeTree;
-	void ZoomableImGuiImage(Texture* aTexture, ImVec2 aSize);
 	void ZoomableImGuiImage(void* aTexture,ImVec2 aSize);
 
-	void ZoomableImGuiSnapshot(Texture* aTexture, ImVec2 aSize);
 	void ZoomableImGuiSnapshot(void* aTexture, ImVec2 aSize);
 
 	bool EditPosition(const char* aName, V3F& aVector, V3F* aAdditionalInput = nullptr, const char* aAdditionalInputName = nullptr);

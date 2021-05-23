@@ -4,9 +4,8 @@
 #include "SpriteInstance.h"
 #include "Sprite.h"
 #include <d3d11.h>
-#include "Shaders.h"
-#include "ShaderCompiler.h"
 #include "StateStack.h"
+#include "AssetManager.h"
 
 SpriteRenderer::SpriteRenderer()
 {
@@ -58,20 +57,8 @@ bool SpriteRenderer::Init(DirectX11Framework* aFramework)
 		return false;
 	}
 
-	std::vector<char> vsBlob;
-	myVertexShader = GetVertexShader(device, "Data/Shaders/Sprites/SpriteVertexShader.hlsl", vsBlob);
-	if (!myVertexShader)
-	{
-		SYSERROR("Failed to create vertex shader in SpriteRenderer::Init", "Data/Shaders/Sprites/SpriteVertexShader.hlsl");
-		return false;
-	}
-
-	myPixelShader = GetPixelShader(device, "Data/Shaders/Sprites/SpritePixelShader.hlsl");
-	if (!myPixelShader)
-	{
-		SYSERROR("Failed to create pixel shader in SpriteRenderer::Init", "Data/Shaders/Sprites/SpritePixelShader.hlsl");
-		return false;
-	}
+	myVertexShader = AssetManager::GetInstance().GetVertexShader("Sprite.hlsl");
+	myPixelShader = AssetManager::GetInstance().GetPixelShader("Sprite.hlsl");
 
 	return true;
 }
@@ -89,8 +76,8 @@ void SpriteRenderer::Render(/*const Camera* aCamera,*/ const std::vector<SpriteI
 	myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	myContext->IASetInputLayout(nullptr);
 	myContext->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
-	myContext->VSSetShader(*myVertexShader, nullptr, 0);
-	myContext->PSSetShader(*myPixelShader, nullptr, 0);
+	myContext->VSSetShader(myVertexShader.GetAsVertexShader(), nullptr, 0);
+	myContext->PSSetShader(myPixelShader.GetAsPixelShader(), nullptr, 0);
 	
 #ifdef _DEBUG
 #if USEIMGUI
@@ -116,17 +103,15 @@ void SpriteRenderer::Render(/*const Camera* aCamera,*/ const std::vector<SpriteI
 			}
 			ImGui::PopID();
 		});
-	static PixelShader* white = nullptr;
+	static AssetHandle white;
 	if (debug)
 	{
-		if (!white)
+		if (!white.IsValid())
 		{
-			ID3D11Device* device;
-			myPixelShader->operator ID3D11PixelShader* ()->GetDevice(&device);
-			white = GetPixelShader(device,"Data/Shaders/Sprites/SpritePixelShader_Debug.hlsl");
+			white = AssetManager::GetInstance().GetPixelShader("Sprites/SpritePixelShader_Debug.hlsl");
 		}
 
-		myContext->PSSetShader(*white, nullptr, 0);
+		myContext->PSSetShader(white.GetAsPixelShader(), nullptr, 0);
 	}
 #endif // 
 #endif // _DEBUG
@@ -134,7 +119,7 @@ void SpriteRenderer::Render(/*const Camera* aCamera,*/ const std::vector<SpriteI
 	
 	for (SpriteInstance* spriteInstance : listCopy)
 	{
-		const Sprite::SpriteData* spriteData = &spriteInstance->GetSprite()->GetSpriteData();
+		Sprite::SpriteData* spriteData = &spriteInstance->GetSprite()->GetSpriteData();
 
 		myObjectBufferData.myPivotToModel = spriteInstance->GetPivotTransform();
 		myObjectBufferData.myModelToWorld = spriteInstance->GetTransform();
@@ -145,6 +130,7 @@ void SpriteRenderer::Render(/*const Camera* aCamera,*/ const std::vector<SpriteI
 #if USEIMGUI
 		if (debug)
 		{
+			static_assert(sizeof(size_t) == sizeof(void*));
 			size_t seed = std::hash<size_t>()(reinterpret_cast<size_t>(spriteData));
 			srand(seed);
 			myObjectBufferData.myColor = V4F(rand() / double(RAND_MAX), rand() / double(RAND_MAX), rand() / double(RAND_MAX), 0.5f);
@@ -168,7 +154,13 @@ void SpriteRenderer::Render(/*const Camera* aCamera,*/ const std::vector<SpriteI
 
 		myContext->VSSetConstantBuffers(0, 1, &myObjectBuffer);
 		myContext->PSSetConstantBuffers(0, 1, &myObjectBuffer);
-		myContext->PSSetShaderResources(0, 1, *spriteData->myTexture);
+
+		ID3D11ShaderResourceView* texture[1] =
+		{
+			spriteData->myTexture.GetAsTexture()
+		};
+
+		myContext->PSSetShaderResources(0, 1, texture);
 
 		myContext->Draw(6, 0);
 	}

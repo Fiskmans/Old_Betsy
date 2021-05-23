@@ -7,12 +7,12 @@
 #include "ShaderTypes.h"
 #include "ShaderFlags.h"
 #include "ShaderBuffers.h"
-#include "Shaders.h"
 #include "ShaderCompiler.h"
 #include "SpotLight.h"
 #include "Decal.h"
 #include "Environmentlight.h"
 #include "RenderManager.h"
+#include "AssetManager.h"
 
 DepthRenderer::~DepthRenderer()
 {
@@ -42,12 +42,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	
 	HRESULT result;
 
-	myShader = GetPixelShader(device, "Data/Shaders/White.hlsl", ShaderFlags::None);
-	if (!myShader)
-	{
-		SYSERROR("could not compile White shader for shadowrender.", "");
-		return false;
-	}
+	myShader = AssetManager::GetInstance().GetPixelShader("White.hlsl", ShaderFlags::None);
 
 	ID3D11Texture2D* tex;
 	ID3D11Texture2D* texEnvironment;
@@ -273,7 +268,7 @@ void DepthRenderer::Render(PointLight* aLight, Scene* aScene, std::unordered_map
 	}
 
 
-	myContext->PSSetShader(*myShader, nullptr, 0);
+	myContext->PSSetShader(myShader.GetAsPixelShader(), nullptr, 0);
 	myContext->OMSetRenderTargets(1, &myRenderTarget1x6, myDepth1x6);
 
 	myContext->ClearDepthStencilView(myDepth1x6, D3D11_CLEAR_DEPTH, 1.f, 0);
@@ -311,7 +306,7 @@ void DepthRenderer::RenderSpotLightDepth(SpotLight* aSpotlight, Scene* aScene, s
 	port.MaxDepth = 1.f;
 	port.TopLeftX = 0;
 	port.TopLeftY = 0;
-	myContext->PSSetShader(*myShader, nullptr, 0);
+	myContext->PSSetShader(myShader.GetAsPixelShader(), nullptr, 0);
 	myContext->RSSetViewports(1, &port);
 	myContext->OMSetRenderTargets(1, &myRenderTarget1x6, myDepth1x6);
 
@@ -363,7 +358,7 @@ void DepthRenderer::RenderEnvironmentDepth(EnvironmentLight* aLight, Scene* aSce
 	{
 		aPreRenderFunction();
 	}
-	myContext->PSSetShader(*myShader, nullptr, 0);
+	myContext->PSSetShader(myShader.GetAsPixelShader(), nullptr, 0);
 	Render(myEnvironmentCamera, filtered, aBoneMapping);
 	myLastDepthView = myDepthsResource1x1;
 }
@@ -433,7 +428,7 @@ ID3D11ShaderResourceView* DepthRenderer::RenderDecalDepth(Decal* aDecal, Scene* 
 	port.MaxDepth = 1.f;
 	port.TopLeftX = 0;
 	port.TopLeftY = 0;
-	myContext->PSSetShader(*myShader, nullptr, 0);
+	myContext->PSSetShader(myShader.GetAsPixelShader(), nullptr, 0);
 	myContext->RSSetViewports(1, &port);
 	myContext->OMSetRenderTargets(1, &myDecalRenderTarget, depth);
 
@@ -450,7 +445,7 @@ void DepthRenderer::Render(Camera* aCamera, const std::vector<ModelInstance*>& a
 {
 	PERFORMANCETAG("DepthRender");
 	Model* model = nullptr;
-	Model::CModelData* modelData = nullptr;
+	Model::ModelData* modelData = nullptr;
 
 
 	HRESULT result;
@@ -531,12 +526,22 @@ void DepthRenderer::Render(Camera* aCamera, const std::vector<ModelInstance*>& a
 			myContext->IASetInputLayout(modelData->myInputLayout);
 
 			myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
-			myContext->VSSetShader(*modelData->myVertexShader, nullptr, 0);
+			myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
 
 			myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
-			if (modelData->myTextures[0]) { myContext->PSSetShaderResources(0, 1, *modelData->myTextures[0]); myContext->VSSetShaderResources(0, 1, *modelData->myTextures[0]); }
-			if (modelData->myTextures[1]) { myContext->PSSetShaderResources(1, 1, *modelData->myTextures[1]); myContext->VSSetShaderResources(1, 1, *modelData->myTextures[1]); }
-			if (modelData->myTextures[2]) { myContext->PSSetShaderResources(2, 1, *modelData->myTextures[2]); myContext->VSSetShaderResources(2, 1, *modelData->myTextures[2]); }
+
+			ID3D11ShaderResourceView* resources[3] =
+			{
+				nullptr,
+				nullptr,
+				nullptr
+			};
+			if (modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].GetAsTexture(); }
+			if (modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].GetAsTexture(); }
+			if (modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].GetAsTexture(); }
+
+			myContext->PSSetShaderResources(0, 3, resources);
+			myContext->VSSetShaderResources(0, 3, resources);
 
 			lodlevel = model->GetOptimalLodLevel(aModelList[modelIndex]->GetPosition().DistanceSqr(aCamera->GetPosition()));
 			if (lodlevel)

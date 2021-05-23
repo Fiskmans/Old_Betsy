@@ -2,6 +2,7 @@
 #include <Vector4.hpp>
 #include <Vector2.hpp>
 #include <d3dcommon.h>
+#include "Asset.h"
 
 typedef D3D_PRIMITIVE_TOPOLOGY D3D11_PRIMITIVE_TOPOLOGY;
 
@@ -79,12 +80,12 @@ public:
 		unsigned int myStride = 0;
 		unsigned int myOffset = 0;
 		struct ID3D11Buffer* myParticleVertexBuffer = nullptr;
-		class VertexShader* myVertexShader = nullptr;
-		struct ID3D11GeometryShader* myGeometryShader = nullptr;
-		class PixelShader* myPixelShader = nullptr;
+		AssetHandle myVertexShader;
+		AssetHandle myGeometryShader;
+		AssetHandle myPixelShader;
 		D3D11_PRIMITIVE_TOPOLOGY myPrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
 		struct ID3D11InputLayout* myInputLayout = nullptr;
-		Texture* myTexture = nullptr;
+		AssetHandle myTexture;
 #pragma warning(pop)
 
 		struct Customizable

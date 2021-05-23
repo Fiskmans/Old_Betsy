@@ -17,7 +17,7 @@ public:
 	~MainMenuState();
 	virtual void Update(const float aDeltaTime) override;
 	virtual void RecieveMessage(const Message& aMessage) override;
-	bool Init(InputManager* aInputManager, ModelLoader* aModelLoader, SpriteFactory* aSpritefactory, 
+	bool Init(InputManager* aInputManager, SpriteFactory* aSpritefactory, 
 		LightLoader* aLightLoader, WindowHandler* aWindowHandler, DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);
 	virtual void Render(CGraphicsEngine* aGraphicsEngine) override;
 
@@ -37,7 +37,6 @@ private:
 	{
 		InputManager* myInputManager;
 		WindowHandler* myWindowHandler;
-		ModelLoader* myModelLoader;
 		LightLoader* myLightLoader;
 		SpriteFactory* mySpriteFactory;
 		DirectX11Framework* myFrameWork;

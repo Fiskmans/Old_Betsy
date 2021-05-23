@@ -1,102 +1,133 @@
 #include "pch.h"
 #include "Animator.h"
-#include "AnimationController.h"
+#include "AnimationLoader.h"
 
+size_t Animator::ourTrackIdCounter;
 
-void Animator::Init(const std::string& aRig, std::vector<BoneInfo>* aBoneinfo, std::vector<std::string>& somePathsToAnimations)
+void Animator::Init(std::vector<BoneInfo>* aBoneinfo)
 {
-	myController = new AnimationController(aRig.c_str());
-	bool shouldLoadAnims;
-	{
-		PERFORMANCETAG("Import")
-	myController->Import3DFromFile(aRig, aBoneinfo, shouldLoadAnims);
-	}
-	SYSVERBOSE("Creating animator for " + aRig + " with " + std::to_string(somePathsToAnimations.size()) + " animation files");
-	if (shouldLoadAnims)
-	{
-		PERFORMANCETAG("Add from file");
-		for (std::string& s : somePathsToAnimations)
-		{
-			SYSVERBOSE("Baking: " + s);
-			myController->Add3DAnimFromFile(s);
-		}
-	}
-	myController->SetAnimIndex(1, true, 5.0f);
 	myBoneInfo = aBoneinfo;
 }
 
 Animator::~Animator()
 {
-	SAFE_DELETE(myController);
 	SYSVERBOSE("Animator Destroyed")
-}
-
-void Animator::BoneTransformWithBlend(std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES>& Transforms, float aBlendFactor)
-{
-	myController->SetBlendTime(aBlendFactor);
-	myController->BoneTransform(Transforms);
 }
 
 void Animator::BoneTransform(std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES>& Transforms)
 {
-	myController->BoneTransform(Transforms);
+	if (myTracks.empty())
+	{
+		for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)
+		{
+			Transforms[i] = M44F::Identity();
+		}
+		return;
+	}
+
+	float totalWeight[NUMBEROFANIMATIONBONES] = { 0.f };
+
+	std::vector<TrackID> toRemove;
+
+	for (auto& animationTrack : myTracks)
+	{
+		Animation* anim = animationTrack.myTrack.myAnimation.GetAsAnimation();
+		
+		float weight = animationTrack.myTrack.myWeight;
+
+		if (!animationTrack.myTrack.myLoop)
+		{
+			weight *= CLAMP(0.f, 1.f, INVERSELERP(0.f,animationTrack.myTrack.myTimeBeforeFalloff,anim->GetTimeToLoop(animationTrack.myTrack.myTime)));
+		}
+
+		if (animationTrack.myTrack.myFading)
+		{
+			weight *= CLAMP(0.f, 1.f, 1.f - INVERSELERP(animationTrack.myTrack.myStartedFadingAt, animationTrack.myTrack.myFullyFadedAt, animationTrack.myTrack.myTime));
+		}
+
+		if (animationTrack.myTrack.myLoop)
+		{
+			anim->GetInterpolation(animationTrack.myTrack.myTime, weight, Transforms);
+		}
+		else
+		{
+			if (anim->GetInterpolationUnlooped(animationTrack.myTrack.myTime, weight, Transforms))
+			{
+				toRemove.push_back(animationTrack.myID);
+			}
+		}
+
+		for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)
+		{
+			totalWeight[i] += anim->myWeights[i];
+		}
+	}
+	for (auto& i : toRemove)
+	{
+		StopAnimation(i);
+	}
+
+	for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)
+	{
+		Transforms[i] /= totalWeight[i];
+	}
 }
 
-void Animator::Step(float aDelta)
+M44F Animator::TransormOfBone(size_t aBoneIdex)
 {
-	myController->Update(aDelta);
+	std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES> allBones;
+	BoneTransform(allBones);
+	return allBones[aBoneIdex];
 }
 
-void Animator::SetBlend(float aBlend)
+Animator::TrackID Animator::AddAnimation(const AnimationTrack& aTrack)
 {
-	myController->SetBlendTime(aBlend);
-}
-void Animator::SetTime(float aTime)
-{
-	myController->SetTime(aTime);
+	TrackID id;
+	id.myId = ++ourTrackIdCounter;
+
+	myTracks.push_back(
+		{
+			id,
+			aTrack
+		});
+
+	return id;
 }
 
-float Animator::GetTime()
+void Animator::StopAnimation(const TrackID& aID)
 {
-	return myController->GetAnimTime();
-}
-void Animator::SetState(size_t aState, bool aKeepUpdatingOldAnim)
-{
-	SYSVERBOSE("Animator Set State " + std::to_string(static_cast<int>(aState)));
-	myController->SetAnimIndex(CAST(uint, aState), aKeepUpdatingOldAnim, 0.1f);
-}
-
-bool Animator::DoneBlending()
-{
-	return myController->IsDoneBlending();
-}
-
-bool Animator::Looped()
-{
-	return myController->JustLooped();
+	auto it = myTracks.begin();
+	while (it != myTracks.end())
+	{
+		if (it->myID == aID)
+		{
+			myTracks.erase(it);
+			break;
+		}
+		it++;
+	}
 }
 
-size_t Animator::GetAnimationCount()
+void Animator::FadeAnimation(const TrackID& aID, float aTimeToZero)
 {
-	return myController->GetMaxIndex();
+	auto it = myTracks.begin();
+	while (it != myTracks.end())
+	{
+		if (it->myID == aID)
+		{
+			it->myTrack.myFading = true;
+			it->myTrack.myStartedFadingAt = it->myTrack.myTime;
+			it->myTrack.myFullyFadedAt = it->myTrack.myTime + aTimeToZero;
+			break;
+		}
+		it++;
+	}
 }
 
-M44F Animator::TransformOfBone(int aBone)
+void Animator::Update(float aDt)
 {
-	return myController->TransformOfBone(aBone);
-}
-
-size_t Animator::GetTickCount()
-{
-	return myController->GetTickCount();
-}
-
-float Animator::GetCurrentProgress()
-{
-	return myController->GetAnimTime();;
-}
-
-std::vector<BoneInfo>* Animator::GetBoneInfo()
-{
-	return myBoneInfo;
+	for (auto& animationTrack : myTracks)
+	{
+		animationTrack.myTrack.myTime += animationTrack.myTrack.myAnimation.GetAsAnimation()->myFPS * aDt;
+	}
 }

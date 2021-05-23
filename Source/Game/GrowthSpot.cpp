@@ -5,11 +5,12 @@
 #include "DataStructs.h"
 #include "Random.h"
 #include "PlantLoader.h"
+#include "AssetManager.h"
 
 
-const char* DryFilePath = "Data/Models/G_Soil_Dry/G_Soil_Dry.fbx";
-const char* WetFilePath = "Data/Models/G_Soil_Wet/G_Soil_Wet.fbx";
-const char* UnPlowedFilePath = "Data/Models/G_Soil_Unplowed/G_Soil_Unplowed.fbx";
+const char* DryFilePath = "G_Soil_Dry/G_Soil_Dry.fbx";
+const char* WetFilePath = "G_Soil_Wet/G_Soil_Wet.fbx";
+const char* UnPlowedFilePath = "G_Soil_Unplowed/G_Soil_Unplowed.fbx";
 
 std::unordered_map<ItemIdType, std::string> GrowthSpot::ourSeedMapping;
 
@@ -353,29 +354,18 @@ void GrowthSpot::PopulateSeeds()
 {
 	if (ourSeedMapping.empty())
 	{
-		FiskJSON::Object root;
-		try
-		{
-			root.Parse(Tools::ReadWholeFile("Data/Metrics/Plantables.json"));
-			int size = 1; 
-			root["StackSize"].GetIf(size);
+		FiskJSON::Object& root = AssetManager::GetInstance().GetJSON("metrics/plantables.json").GetAsJSON();
 
-			for (auto& plant : root)
+		int size = 1; 
+		root["StackSize"].GetIf(size);
+
+		for (auto& plant : root)
+		{
+			std::string value;
+			if (plant.second->GetIf(value))
 			{
-				std::string value;
-				if (plant.second->GetIf(value))
-				{
-					ourSeedMapping[RegisterItem(plant.first, size).ID] = value;
-				}
+				ourSeedMapping[RegisterItem(plant.first, size).ID] = value;
 			}
-		}
-		catch (const FiskJSON::Invalid_JSON& e)
-		{
-			LOGERROR(e.what(), "Data/Metrics/Plantables.json");
-		}
-		catch (const FiskJSON::Invalid_Object& e)
-		{
-			LOGERROR(e.what(), "Data/Metrics/Plantables.json");
 		}
 	}
 
@@ -429,16 +419,16 @@ std::string GrowthSpot::GetRandomDirt()
 	switch (rand)
 	{
 	case 1:
-		buffer = "Data/Models/G_dirt_01/G_dirt_01.fbx";
+		buffer = "G_dirt_01/G_dirt_01.fbx";
 		break;
 	case 2:
-		buffer = "Data/Models/G_dirt_02/G_dirt_02.fbx";
+		buffer = "G_dirt_02/G_dirt_02.fbx";
 		break;
 	case 3:
-		buffer = "Data/Models/G_dirt_03/G_dirt_03.fbx";
+		buffer = "G_dirt_03/G_dirt_03.fbx";
 		break;
 	default:
-		buffer = "Data/Models/G_dirt_01/G_dirt_01.fbx";
+		buffer = "G_dirt_01/G_dirt_01.fbx";
 		break;
 	}
 	return buffer;

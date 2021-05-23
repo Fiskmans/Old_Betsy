@@ -22,11 +22,13 @@
 #include "AnimationData.h"
 #include "AssetImportHelpers.h"
 
+#include "AssetManager.h"
+
 #pragma warning(push)
 #pragma warning(disable: 26812)
-#include "assimp/cimport.h"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
+#include "assimp\cimport.h"
+#include "assimp\scene.h"
+#include "assimp\postprocess.h"
 #pragma warning(pop)
 
 struct Vertex
@@ -63,7 +65,7 @@ bool LoadVerticies(aiMesh* fbxMesh, char** aVertexBuffer, size_t* aVertexCount, 
 	memcpy(buffer, *aVertexBuffer, *aVertexCount * offsets.size);
 
 	delete[] * aVertexBuffer;
-	*aVertexBuffer = reinterpret_cast<char*>(buffer);
+	*aVertexBuffer = buffer;
 
 	*aVertexCount += fbxMesh->mNumVertices;
 
@@ -175,11 +177,10 @@ bool LoadVerticies(aiMesh* fbxMesh, char** aVertexBuffer, size_t* aVertexCount, 
 
 
 
-ModelLoader::ModelLoader()
+ModelLoader::ModelLoader(ID3D11Device* aDevice)
 {
-	myDevice = nullptr;
-	myDeviceContext = nullptr;
-	myGbPhysX = nullptr;
+	myWorkHorse = std::thread(std::bind(&ModelLoader::LoadLoop, this));
+	myDevice = aDevice;
 }
 
 ModelLoader::~ModelLoader()
@@ -332,123 +333,6 @@ void ModelLoader::LoadLoop()
 				i.BonePosition -= rootbone;
 			}
 
-
-			if (current.myModel->GetModelData()->myFilePath == "Data/Models/CH_NPC_Zombie_Female_01_18G1/CH_NPC_Zombie_Female_01_18G1.fbx")
-			{
-				std::vector<HitBox> hitBoxes;
-				std::unordered_map<int, int> nodeParentVector;
-
-				for (auto& i : current.myModel->myBoneData)
-				{
-					if (i.myName.find("Assimp") == std::string::npos)
-					{
-						aiNode* parent = nodeNameLookup[i.myName]->mParent;
-						std::string parentName = "";
-
-						while (true)
-						{
-							parentName = parent->mName.C_Str();
-							if (parentName.find("NoRag") == std::string::npos && parentName.find("noRag") == std::string::npos && parentName.find("Assimp") == std::string::npos)
-							{
-								break;
-							}
-							parent = parent->mParent;
-							if (parent == nullptr)
-							{
-								break;
-							}
-						}
-						//[BoneDataNR] ->  
-						nodeParentVector[current.myModel->myBoneNameLookup[i.myName]] = current.myModel->myBoneNameLookup[parent->mName.C_Str()];
-
-						if (i.myName.find("NoRag") == std::string::npos)
-						{
-							if (parent)
-							{
-								HitBox box;
-								box.childBoneData = i;
-								box.parentBoneData = current.myModel->myBoneData[current.myModel->myBoneNameLookup[parent->mName.C_Str()]];
-
-								box.childBoneOffsetInversed = M44F::GetRealInverse(box.childBoneData.BoneOffset);
-								box.parentBoneOffsetInversed = M44F::GetRealInverse(box.parentBoneData.BoneOffset);
-
-								if (box.parentBoneData.myName.find("Hand") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::Hand;
-								}
-								else if (box.parentBoneData.myName.find("ForeArm") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::LowerArm;
-								}
-								else if (box.parentBoneData.myName.find("Arm") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::UpperArm;
-								}
-								else if (box.parentBoneData.myName.find("Shoulder") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::Shoulder;
-								}
-								else if (box.parentBoneData.myName.find("Toe") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::Toe;
-								}
-								else if (box.parentBoneData.myName.find("Foot") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::Foot;
-								}
-								else if (box.parentBoneData.myName.find("UpLeg") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::Thigh;
-								}
-								else if (box.parentBoneData.myName.find("Leg") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::LowerLeg;
-								}
-								else if (box.parentBoneData.myName.find("Neck") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::Neck;
-								}
-								else if (box.parentBoneData.myName.find("Head") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::Head;
-								}
-								else if (box.parentBoneData.myName.find("Spine1") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::LowerMidTorso;
-								}
-								else if (box.parentBoneData.myName.find("Spine2") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::UpperMidTorso;
-								}
-								else if (box.parentBoneData.myName.find("Spine3") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::UpperTorso;
-								}
-								else if (box.parentBoneData.myName.find("Spine") != std::string::npos)
-								{
-									box.myHitBoxType = HitBoxType::LowerTorso;
-								}
-								else
-								{
-									box.myHitBoxType = HitBoxType::Torso;
-								}
-
-								box.myName = parent->mName.C_Str();
-								box.myTargetNodeIndex = current.myModel->myBoneNameLookup[i.myName];
-								box.myOriginNodeIndex = current.myModel->myBoneNameLookup[parent->mName.C_Str()];
-
-								if (box.parentBoneData.myName.find("joint1") == std::string::npos)
-								{
-									hitBoxes.push_back(box);
-								}
-
-							}
-						}
-					}
-				}
-				myGbPhysX->SetZombieHitBoxData(hitBoxes);
-				myGbPhysX->SaveNodeParents(nodeParentVector);
-			}
 
 #endif // DEBUGBONES
 
@@ -637,10 +521,10 @@ void ModelLoader::LoadLoop()
 			aiReleaseImport(scene);
 			continue;
 		}
-		size_t flags = ShaderTypes::FlagsFromMesh(scene->mMeshes[0]);
+		ShaderFlags flags = ShaderTypes::FlagsFromMesh(scene->mMeshes[0]);
 		for (size_t i = 0; i < scene->mNumMeshes; i++)
 		{
-			size_t flags2 = ShaderTypes::FlagsFromMesh(scene->mMeshes[i]);
+			ShaderFlags flags2 = ShaderTypes::FlagsFromMesh(scene->mMeshes[i]);
 			if (flags != flags2)
 			{
 				SYSERROR("FBX is corrupt (inconsistent vertex types) [" + ShaderTypes::PostfixFromFlags(flags) + "] != [" + ShaderTypes::PostfixFromFlags(flags2) + "]", package.myFilePath);
@@ -651,7 +535,6 @@ void ModelLoader::LoadLoop()
 
 
 		loadedScenes.insert(scene);
-		//loadedScenes.emplace(scene);
 
 #pragma endregion
 
@@ -659,39 +542,39 @@ void ModelLoader::LoadLoop()
 
 #pragma region Shaders
 
-		std::vector<char> vsBlob;
-
-		std::string baseFile = package.myFilePath.substr(0, package.myFilePath.length() - std::experimental::filesystem::path(package.myFilePath).extension().string().length());
-		std::string vertexShaderPath = "Data/Shaders/VertexShader.hlsl";
-		std::string pixelShaderPath = "Data/Shaders/Custom/PixelShaders/ToonShader.hlsl";
-		std::string AlbedoPath = baseFile + "_mat_D.dds";
-		std::string NormalPath = ""; // baseFile + "_mat_N.dds";
-		std::string MaterialPath = ""; // baseFile + "_mat_M.dds";
-		std::string AnimationPath = baseFile + ".anims";
+		std::string vertexShaderPath = "Model.hlsl";
+		std::string pixelShaderPath = "fullscreen_deferred/ToonShader.hlsl";
+		std::string AlbedoPath = "material.dds";
+		std::string NormalPath = "normal.dds";
+		std::string MaterialPath = "material.dds";
+		std::string AnimationPath = "animations.json";
 		std::unordered_map<std::string, std::string*> attributeMapping;
 		attributeMapping["VertexShader"] = &vertexShaderPath;
 		attributeMapping["PixelShader"] = &pixelShaderPath;
-		attributeMapping["Albedo"] = &AlbedoPath;
-		attributeMapping["NormalMap"] = &NormalPath;
-		attributeMapping["Material"] = &MaterialPath;
-		attributeMapping["AnimationsFile"] = &AnimationPath;
 
-		bool hasAlpha = false;
 		bool forceForward = false;
-		bool isEffect = false;
-		bool noop = false;
-		std::unordered_map<std::string, bool*> boolAttributeMapping;
-		boolAttributeMapping["HasAlpha"] = &hasAlpha;
-		boolAttributeMapping["ForceForward"] = &forceForward;
-		boolAttributeMapping["IsEffect"] = &isEffect;
 
+		if (scene->mNumMaterials == 0)
+		{
+			SYSWARNING("Model has no materials skipping", package.myFilePath);
+			continue;
+		}
+		if (scene->mNumMaterials > 1)
+		{
+			SYSWARNING("Model has more than 1 material only first will be used", package.myFilePath);
+		}
 
-		std::unordered_map<std::string, char> suppressedAttribute;
-		suppressedAttribute["IsNull"] = 0;
-		suppressedAttribute["RotationActive"] = 0;
-		suppressedAttribute["lockInfluenceWeights"] = 0;
-		suppressedAttribute["currentUVSet"] = 0;
+		aiMaterial* mat = scene->mMaterials[0];
 
+		aiString path;
+		if (mat->Get(AI_MATKEY_TEXTURE_DIFFUSE(0), path) == aiReturn::aiReturn_SUCCESS)
+		{
+			AlbedoPath = path.C_Str();
+		}
+		if (mat->Get(AI_MATKEY_TEXTURE_NORMALS(0), path) == aiReturn::aiReturn_SUCCESS)
+		{
+			NormalPath = path.C_Str();
+		}
 
 
 		SYSVERBOSE("Mapping attributes for: " + package.myFilePath);
@@ -710,81 +593,28 @@ void ModelLoader::LoadLoop()
 				aiMetadata* data = node->mMetaData;
 				for (size_t i = 0; i < data->mNumProperties; i++)
 				{
-					if (suppressedAttribute.count(data->mKeys[i].C_Str()) != 0)
-					{
-						//Noop
-					}
-					else if (data->mValues[i].mType == aiMetadataType::AI_AISTRING && strlen(((aiString*)data->mValues[i].mData)->C_Str()) > 1)
+					if (data->mValues[i].mType == aiMetadataType::AI_AISTRING && strlen(((aiString*)data->mValues[i].mData)->C_Str()) > 1)
 					{
 						auto it = attributeMapping.find(data->mKeys[i].C_Str());
 						if (it != attributeMapping.end())
 						{
-							SYSVERBOSE("Replacing value [" + std::string(data->mKeys[i].C_Str()) + "] with \"" + ((aiString*)data->mValues[i].mData)->C_Str() + "\"");
 							*(it->second) = ((aiString*)data->mValues[i].mData)->C_Str();
-						}
-						else
-						{
-							SYSWARNING("Could not find a changable attribute to match", std::string(data->mKeys[i].C_Str()));
-						}
-					}
-					else if (data->mValues[i].mType == aiMetadataType::AI_BOOL)
-					{
-						auto it = boolAttributeMapping.find(data->mKeys[i].C_Str());
-						if (it != boolAttributeMapping.end())
-						{
-							bool value = *((char*)data->mValues[i].mData) == AI_TRUE;
-							SYSVERBOSE("Replacing value [" + std::string(data->mKeys[i].C_Str()) + "] with \"" + (value ? "true" : "false") + "\"");
-							*(it->second) = value;
-						}
-						else
-						{
-							SYSWARNING("Could not find a changable attribute to match", std::string(data->mKeys[i].C_Str()));
 						}
 					}
 				}
 			}
 		}
 
-		forceForward |= hasAlpha;
-		forceForward |= isEffect;
-
-		if (pixelShaderPath != "Data/Shaders/Custom/PixelShaders/ToonShader.hlsl")
+		if (pixelShaderPath != "fullscreen_deferred/ToonShader.hlsl")
 		{
 			forceForward = true;
 		}
 
-		std::vector<std::string> animations;
-		if (flags & ShaderFlags::HasBones)
-		{
-			std::ifstream animsFile(AnimationPath);
-			std::string buffer;
-			SYSVERBOSE("Opening animations file: " + AnimationPath);
-			if (animsFile)
-			{
-				while (std::getline(animsFile, buffer))
-				{
-					animations.push_back(buffer);
-					SYSVERBOSE("Added animation: " + buffer);
-				}
-				SYSVERBOSE("Found " + std::to_string(animations.size()) + " animations");
-			}
-			else
-			{
-				SYSWARNING("Could not open animationfile", AnimationPath);
-			}
-		}
+		AssetHandle vertexShader = AssetManager::GetInstance().GetVertexShader(vertexShaderPath, flags);
+		AssetHandle pixelShader = AssetManager::GetInstance().GetPixelShader(pixelShaderPath, flags);
 
-		VertexShader* vertexShader = GetVertexShader(myDevice, vertexShaderPath, vsBlob, flags);
-		if (!vertexShader)
+		if (!vertexShader.IsValid() || !pixelShader.IsValid())
 		{
-			SYSERROR("Could not create vertexshader for", package.myFilePath);
-			continue;
-		}
-
-		PixelShader* pixelShader = GetPixelShader(myDevice, pixelShaderPath, flags);
-		if (!pixelShader)
-		{
-			SYSERROR("Could not create pixelshader for", package.myFilePath);
 			continue;
 		}
 
@@ -795,7 +625,7 @@ void ModelLoader::LoadLoop()
 		D3D11_INPUT_ELEMENT_DESC* layout = ShaderTypes::InputLayoutFromFlags(flags, layoutElements);
 
 		ID3D11InputLayout* inputLayout;
-		result = myDevice->CreateInputLayout(layout, CAST(UINT, layoutElements), vsBlob.data(), vsBlob.size(), &inputLayout);
+		result = myDevice->CreateInputLayout(layout, CAST(UINT, layoutElements), vertexShader.GetVertexShaderblob().data(), vertexShader.GetVertexShaderblob().size(), &inputLayout);
 		if (FAILED(result))
 		{
 			SYSERROR("Could not create inputlayout for: ", package.myFilePath);
@@ -807,7 +637,7 @@ void ModelLoader::LoadLoop()
 
 #pragma region Model
 
-		Model::CModelData modelData;
+		Model::ModelData modelData;
 		modelData.myshaderTypeFlags = flags;
 		modelData.myStride = CAST(UINT, ShaderTypes::OffsetsFromFlags(flags).size);
 		modelData.myOffset = 0;
@@ -816,42 +646,22 @@ void ModelLoader::LoadLoop()
 		modelData.myPrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		modelData.myInputLayout = inputLayout;
 		modelData.myIndexBufferFormat = DXGI_FORMAT_R32_UINT;
-		modelData.myTextures[0] = LoadTexture(myDevice, AlbedoPath);
-		modelData.myTextures[1] = modelData.myTextures[0];
-		modelData.myTextures[2] = modelData.myTextures[0];
-		if (NormalPath != "")
-		{
-			LOGINFO("Loading Custom normalTexture: " + NormalPath);
-			modelData.myTextures[1] = LoadTexture(myDevice, NormalPath);
-		}
-		else
-		{
-			modelData.myTextures[1] = modelData.myTextures[0];
-		}
-		if (MaterialPath != "")
-		{
-			LOGINFO("Loading Custom MaterialTexture: " + MaterialPath);
-			modelData.myTextures[2] = LoadTexture(myDevice, MaterialPath);
-		}
-		else
-		{
-			modelData.myTextures[2] = modelData.myTextures[0];
-		}
+		modelData.myTextures[0] = AssetManager::GetInstance().GetTextureRelative(package.myFilePath, AlbedoPath, true);
+		modelData.myTextures[1] = AssetManager::GetInstance().GetTextureRelative(package.myFilePath, NormalPath, true);
+		modelData.myTextures[2] = AssetManager::GetInstance().GetTextureRelative(package.myFilePath, MaterialPath, true);
 		modelData.myFilePath = package.myFilePath;
-		modelData.myAnimations = animations;
 		modelData.myForceForward = forceForward;
-		modelData.myIsEffect = isEffect;
+
+		if (flags & ShaderFlags::HasBones)
+		{
+			modelData.myAnimations = AssetManager::GetInstance().GetJSONRelative(package.myFilePath, AnimationPath);
+		}
 
 
 		package.myModel->Init(modelData, this, pixelShaderPath, vertexShaderPath, package.myFilePath, package.myFilePath);
 
 #pragma endregion
 
-		LodToLoad lod;
-		lod.myNode = scene->mRootNode;
-		lod.myModel = package.myModel;
-		lod.myScene = scene;
-		lod.myLevel = 0;
 		int lodCount = 0;
 
 		for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; i++)
@@ -884,11 +694,6 @@ void ModelLoader::LoadLoop()
 				lod.myScene = scene;
 				lod.myLevel = 2;
 				lodQueue.push(lod);
-				++lodCount;
-			}
-			else if (std::string(scene->mRootNode->mChildren[i]->mName.C_Str()).substr(0, 9) == std::string("collision") || std::string(scene->mRootNode->mChildren[i]->mName.C_Str()).substr(0, 9) == std::string("Collision"))
-			{
-				myGbPhysX->CookStaticTriangleMesh(package.myFilePath, scene, scene->mRootNode->mChildren[i]);
 				++lodCount;
 			}
 			else
@@ -940,29 +745,6 @@ void ModelLoader::QueueLoad(Model* aModel, std::string aFilePath)
 	}
 }
 
-bool ModelLoader::CompilePixelShader(std::string aData, ID3D11PixelShader*& aShaderOutput)
-{
-	return ::CompilePixelShader(myDevice, aData, aShaderOutput);
-}
-
-bool ModelLoader::CompileVertexShader(std::string aData, ID3D11VertexShader*& aShaderOutput, void* aCompiledOutput)
-{
-	return ::CompileVertexShader(myDevice, aData, aShaderOutput, aCompiledOutput);
-}
-
-void ModelLoader::FlushChanges()
-{
-#if USEFILEWATHCER
-	PERFORMANCETAG("Modelloader filewatch");
-	myWatcher.FlushChanges();
-#endif // USEFILEWATHCER
-}
-
-void ModelLoader::SetGbPhysX(GBPhysX* aGbPhysX)
-{
-	myGbPhysX = aGbPhysX;
-}
-
 void ModelLoader::PrepareModel(Model* aModel, const std::string& aPath)
 {
 	QueueLoad(aModel, aPath);
@@ -976,18 +758,6 @@ Asset* ModelLoader::LoadModel(const std::string& aFilePath)
 	return new ModelAsset(model);
 }
 
-bool ModelLoader::InternalInit(ID3D11Device* aDevice)
-{
-	myWorkHorse = std::thread(std::bind(&ModelLoader::LoadLoop, this));
-
-
-	HRESULT result;
-
-	myDevice = aDevice;
-	SetErrorTexture(myDevice, "Data/Textures/error.dds");
-
-	return !!aDevice;
-}
 
 Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 {
@@ -998,7 +768,6 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 	HRESULT result;
 
 #pragma region BufferSetup
-
 
 	static_assert(sizeof(float) == 4, "Things are fucked beyond comprehension");
 
@@ -1039,10 +808,7 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 			return nullptr;
 		}
 
-		struct index
-		{
-			UINT index;
-		} indexes[] =
+		UINT indexes[] =
 		{
 			2,0,  1,
 			1,0,  3,
@@ -1088,24 +854,9 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 
 #pragma region Shaders
 
-	VertexShader* vertexShader;
-	std::vector<char> vsData;
+	AssetHandle vertexShader = AssetManager::GetInstance().GetVertexShader("Skybox.hlsl");
+	AssetHandle pixelShader = AssetManager::GetInstance().GetPixelShader("Skybox.hlsl");
 
-	vertexShader = GetVertexShader(myDevice, "Data/Shaders/SkyboxShader.hlsl", vsData);
-	if (!vertexShader)
-	{
-		SYSERROR("Could not create vertex shader for skybox", aFilePath);
-		return nullptr;
-	}
-
-
-
-	PixelShader* pixelShader = GetPixelShader(myDevice, "Data/Shaders/SkyboxShader.hlsl");
-	if (!pixelShader)
-	{
-		SYSERROR("Could not create pixel shader for skybox", aFilePath);
-		return nullptr;
-	}
 #pragma endregion
 
 	//////////////////////////////////////////////
@@ -1116,16 +867,11 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 	D3D11_INPUT_ELEMENT_DESC* layout = ShaderTypes::InputLayoutFromFlags(0, layoutelements);
 
 	ID3D11InputLayout* inputLayout;
-	result = myDevice->CreateInputLayout(layout, CAST(UINT, layoutelements), vsData.data(), vsData.size(), &inputLayout);
+	result = myDevice->CreateInputLayout(layout, CAST(UINT, layoutelements), vertexShader.GetVertexShaderblob().data(), vertexShader.GetVertexShaderblob().size(), &inputLayout);
 	if (FAILED(result))
 	{
 		SYSERROR("could not create input layout", aFilePath);
 		return nullptr;
-	}
-
-	if (FAILED(result))
-	{
-		SYSERROR("Could not release shader blob", aFilePath);
 	}
 #pragma endregion
 
@@ -1144,7 +890,7 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 	level->myIndexBuffer = indexBuffer;
 
 
-	Model::CModelData modelData;
+	Model::ModelData modelData;
 	modelData.myStride = sizeof(Vertex);
 	modelData.myOffset = 0;
 	modelData.myVertexShader = vertexShader;
@@ -1152,20 +898,14 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 	modelData.myPrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	modelData.myInputLayout = inputLayout;
 	modelData.myIndexBufferFormat = DXGI_FORMAT_R32_UINT;
-	modelData.myTextures[0] = LoadTexture(myDevice, aFilePath, D3D11_RESOURCE_MISC_TEXTURECUBE);
+	modelData.myTextures[0] = AssetManager::GetInstance().GetCubeTexture(aFilePath);
 	modelData.myTextures[1] = nullptr;
 	modelData.myTextures[2] = nullptr;
 
 
-	model->Init(modelData, this, "Data/Shaders/SkyboxShader.hlsl", "Data/Shaders/SkyboxShader.hlsl", "", "SkyBox: " + std::string(aFilePath.begin(), aFilePath.end()));
+	model->Init(modelData, this, "Skybox.hlsl", "Skybox.hlsl", "", "SkyBox: " + std::string(aFilePath.begin(), aFilePath.end()));
 	model->ApplyLodLevel(level, 0);
 
 	return new ModelAsset(model);
-}
-
-bool ModelLoader::Init(DirectX11Framework* aFramework)
-{
-	myDeviceContext = aFramework->GetContext();
-	return InternalInit(aFramework->GetDevice());
 }
 

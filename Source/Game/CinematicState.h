@@ -18,7 +18,7 @@ class CinematicState : public BaseState
 		Cleanup
 	};
 public:
-	bool Init(const std::string& aManuscript, ModelLoader* aModelLoader, Scene* aScene, ParticleFactory* aParticleFactory,SpriteFactory* aSpriteFactory);
+	bool Init(const std::string& aManuscript, Scene* aScene, ParticleFactory* aParticleFactory,SpriteFactory* aSpriteFactory);
 
 	// Inherited via BaseState
 	virtual void Update(const float aDeltaTime) override;

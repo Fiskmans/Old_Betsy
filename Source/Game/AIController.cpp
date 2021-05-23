@@ -29,7 +29,6 @@ AIController::AIController() :
 {
 	myUpdatePathfindingTimer = 0;
 	myIsAnimLocked = false;
-	myAnimationIndex = 0;
 }
 
 AIController::~AIController()
@@ -139,10 +138,9 @@ void AIController::RecieveEntityMessage(EntityMessage aMessage, void* someData)
 {
 	if (aMessage == EntityMessage::CuttingAnimationFinnished)
 	{
-		if (myCharacterID == 2 && !GetIsNaked())
+		if (myCharacterID == 2)
 		{
-			SetSheepNaked(true);
-			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle, myAnimationIndex);
+			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle);
 		}
 	}
 }
@@ -165,8 +163,7 @@ void AIController::RecieveMessage(const Message& aMessage)
 	{
 		if (myCharacterID == 2)
 		{
-			SetSheepNaked(false);
-			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle, myAnimationIndex);
+			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle);
 		}
 	}
 }
@@ -191,23 +188,6 @@ void AIController::OnDisable()
 {
 	myPollingStation->RemoveSeekingEnemy(myEntity);
 	myIsDead = true;
-}
-
-void AIController::SetSheepNaked(bool aNaked)
-{
-	if (aNaked)
-	{
-		myAnimationIndex = 1;
-	}
-	else
-	{
-		myAnimationIndex = 0;
-	}
-}
-
-bool AIController::GetIsNaked()
-{
-	return (myAnimationIndex == 1);
 }
 
 void AIController::OnAttach()

@@ -26,7 +26,7 @@ class TextInstance
 {
 public:
 	TextInstance();
-	TextInstance(DirectX::SpriteFont* aFont);
+	TextInstance(const AssetHandle& aFont);
 	~TextInstance();
 
 	float GetWidth() const;
@@ -107,7 +107,7 @@ protected:
 
 	TextEffect myEffect;
 
-	DirectX::SpriteFont* mySpriteFontPtr;
+	AssetHandle mySpriteFont;
 
 	SpriteInstance* myBackground;
 	static SpriteRenderer* ourBackgroundRendererPtr;

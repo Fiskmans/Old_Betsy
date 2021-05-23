@@ -4,6 +4,8 @@
 #include "TextureLoader.h"
 #include <TimeHelper.h>
 
+#include "AssetManager.h"
+
 void DecalFactory::Init(ID3D11Device* aDevice)
 {
 	myDevice = aDevice;
@@ -34,32 +36,15 @@ Decal* DecalFactory::LoadDecal(const std::string& aDecalPath, V3F aRotation, V3F
 		std::string textureFilePath;
 		if (root["Texture"].GetIf(textureFilePath))
 		{
-			Texture* tex = LoadTexture(myDevice, textureFilePath);
-			if (tex)
-			{
-				decal->myTextures.push_back(tex);
-			}
-			else
-			{
-				SYSERROR("Decal image could not be loaded", textureFilePath);
-			}
+			decal->myTextures.push_back(AssetManager::GetInstance().GetTexture(textureFilePath));
 		};
 		for (auto& i : root["Texture"].Get<FiskJSON::Array>())
 		{
 			if (i->GetIf(textureFilePath))
 			{
-				Texture* tex = LoadTexture(myDevice, textureFilePath);
-				if (tex)
-				{
-					decal->myTextures.push_back(tex);
-				}
-				else
-				{
-					SYSERROR("Decal image could not be loaded", textureFilePath);
-				}
+				decal->myTextures.push_back(AssetManager::GetInstance().GetTexture(textureFilePath));
 			};
 		}
-
 
 		decal->myCamera = CCameraFactory::CreateCamera(fov, false, 20.f, range);
 		decal->myCamera->Rotate(TORAD(aRotation));
@@ -67,7 +52,7 @@ Decal* DecalFactory::LoadDecal(const std::string& aDecalPath, V3F aRotation, V3F
 		decal->myCamera->SetResolution(V2F(128, 128));
 		decal->myRange = range;
 		decal->myTimestamp = Tools::GetTotalTime();
-		decal->myPixelShader = GetPixelShader(myDevice, shaderFilePath);
+		decal->myPixelShader = AssetManager::GetInstance().GetPixelShader(shaderFilePath);
 		return decal;
 	}
 	SYSERROR("Failed to load decal", aDecalPath);
@@ -95,33 +80,17 @@ Decal* DecalFactory::LoadDecal(const std::string& aDecalPath, Camera* aCameraToC
 		std::string textureFilePath;
 		if (root["Texture"].GetIf(textureFilePath))
 		{
-			Texture* tex = LoadTexture(myDevice, textureFilePath);
-			if (tex)
-			{
-				decal->myTextures.push_back(tex);
-			}
-			else
-			{
-				SYSERROR("Decal image could not be loaded", textureFilePath);
-			}
+			decal->myTextures.push_back(AssetManager::GetInstance().GetTexture(textureFilePath));
 		};
 		for (auto& i : root["Texture"].Get<FiskJSON::Array>())
 		{
 			if (i->GetIf(textureFilePath))
 			{
-				Texture* tex = LoadTexture(myDevice, textureFilePath);
-				if (tex)
-				{
-					decal->myTextures.push_back(tex);
-				}
-				else
-				{
-					SYSERROR("Decal image could not be loaded", textureFilePath);
-				}
+				decal->myTextures.push_back(AssetManager::GetInstance().GetTexture(textureFilePath));
 			};
 		}
 		decal->myTimestamp = Tools::GetTotalTime();
-		decal->myPixelShader = GetPixelShader(myDevice, shaderFilePath);
+		decal->myPixelShader = AssetManager::GetInstance().GetPixelShader(shaderFilePath);
 
 		size_t count = 0;
 		for (auto& i : root["CustomData"].Get<FiskJSON::Array>())

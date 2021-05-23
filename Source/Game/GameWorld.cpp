@@ -46,8 +46,6 @@
 #include "ParticleFactory.h"
 #include <SpriteFactory.h>
 #include <SpriteInstance.h>
-#include "AbilityFactory.h"
-#include "FontFactory.h"
 
 #include "AudioManager.h"
 
@@ -60,7 +58,6 @@
 
 #include "UIManager.h"
 #include "CharacterData.h"
-#include "AbilityData.h"
 #include <WindSystem.h>
 #include "Skybox.h"
 #include "perlin_noise.h"
@@ -77,11 +74,9 @@
 #include "ParticleInstance.h"
 #include <SpotLight.h>
 #include <SpotLightFactory.h>
-#include "Attached.h"
 #include "LifeTime.h"
 #include "GBPhysXStaticComponent.h"
 #include "PointLight.h"
-#include "VideoState.h"
 #include "Growable.h"
 #include "GrowthSpot.h"
 #include "House.h"
@@ -116,7 +111,6 @@ GameWorld::GameWorld() :
 	myUIManager(nullptr),
 	myTextFactory(nullptr),
 	myCharacterData(nullptr),
-	myAbilityData(nullptr),
 	myNodePollingstationPtr(nullptr),
 	myGBPhysXColliderFactory(nullptr),
 	myDialogFactory(nullptr),
@@ -125,7 +119,12 @@ GameWorld::GameWorld() :
 #endif 
 	myMainCameraPtr(nullptr),
 	myAIPollingStation(nullptr),
-	myModelLoader(nullptr)
+	myModelLoader(nullptr),
+	myTrader(nullptr),
+	mySpriteFactory(nullptr),
+	myPlayerSpotlight(nullptr),
+	myRiverAudioEntity(nullptr),
+	mySpotlightFactory(nullptr)
 {
 	myEntityPool.Init(ENTITY_POOL_SIZE);
 }
@@ -139,7 +138,6 @@ GameWorld::~GameWorld()
 	UnSubscribeToMessage(MessageType::EnemyDied);
 	UnSubscribeToMessage(MessageType::TriggerEvent);
 	UnSubscribeToMessage(MessageType::FadeInComplete);
-	UnSubscribeToMessage(MessageType::DeathMarkerRecieved);
 	UnSubscribeToMessage(MessageType::StartDialogue);
 	UnSubscribeToMessage(MessageType::DialogueOver);
 	UnSubscribeToMessage(MessageType::RespawnTrader);
@@ -171,14 +169,13 @@ GameWorld::~GameWorld()
 	SAFE_DELETE(myUIManager);
 	SAFE_DELETE(myCharacterData);
 	SAFE_DELETE(myTextFactory);
-	SAFE_DELETE(myAbilityData);
 	SAFE_DELETE(myGBPhysXColliderFactory);
 	SAFE_DELETE(myAIPollingStation);
 	SAFE_DELETE(myTextFactory);
 	SAFE_DELETE(myDialogFactory);
 }
 
-void GameWorld::SystemLoad(ModelLoader* aModelLoader, SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, SpriteRenderer* aSpriteRenderer, LightLoader* aLightLoader)
+void GameWorld::SystemLoad(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, SpriteRenderer* aSpriteRenderer, LightLoader* aLightLoader)
 {
 	myWindowSize.x = 1920;
 	myWindowSize.y = 1080;
@@ -212,29 +209,23 @@ void GameWorld::SystemLoad(ModelLoader* aModelLoader, SpriteFactory* aSpriteFact
 	myCharacterData = new CharacterData();
 	myCharacterData->Load();
 
-	myAbilityData = new AbilityData;
-	myAbilityData->Load();
-
 	myAIPollingStation = new AIPollingStation;
 
 	myParticleFactory->Init(aFramework);
-	FontFactory::SetDevice(aFramework);
 	myTextFactory->Init(aSpriteRenderer, aSpriteFactory);
 	myDialogFactory->Init(aSpriteRenderer, aSpriteFactory);
 
 	ComponentLake::GetInstance().RegisterComponents();
-	ComponentLake::GetInstance().PrepareObjectsInPools(aModelLoader, aScene, myParticleFactory, aAudioManager, aLightLoader, &myEntitys, &myEntityPool, aSpriteFactory);
+	ComponentLake::GetInstance().PrepareObjectsInPools(aScene, myParticleFactory, aAudioManager, aLightLoader, &myEntitys, &myEntityPool, aSpriteFactory);
 
 	myEnemyFactory->Init(myAIPollingStation, myObjectTree, &myEnemies, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID, myCharacterData, myGBPhysXPtr);
 	myStaticObjectFactory->Init(myGBPhysXPtr, myObjectTree, &myEntitys, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID, myUIManager);
 	myDynamicObjectFactory->Init(myGBPhysXPtr, myObjectTree, &myEntitys, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID);
-	myDestructibleFactory->Init(myObjectTree, &myEntitys, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID, myCharacterData, myAbilityData);
+	myDestructibleFactory->Init(myObjectTree, &myEntitys, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID, myCharacterData);
 	myInteractableFactory->Init(myGBPhysXPtr, myObjectTree, &myEnemies, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID);
 	myTriggerBoxFactory->Init(myObjectTree, &myTriggers, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID);
 	myPointLightFactory->Init(&myLights, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID);
 	myGBPhysXColliderFactory->Init(myGBPhysXPtr);
-
-	aModelLoader->SetGbPhysX(myGBPhysXPtr);
 
 	FoodCellar::PopulateCalorieLookup();
 	GrowthSpot::PopulateSeeds();
@@ -245,7 +236,7 @@ void GameWorld::SystemLoad(ModelLoader* aModelLoader, SpriteFactory* aSpriteFact
 	TimeHandler::GetInstance().Init();
 }
 
-void GameWorld::Init(ModelLoader* aModelLoader, SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, Camera* aCamera, NodePollingStation* aNodePollingStation, SpotLightFactory* aSpotlightFactory)
+void GameWorld::Init(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, Camera* aCamera, NodePollingStation* aNodePollingStation, SpotLightFactory* aSpotlightFactory)
 {
 	myMainCameraPtr = aCamera;
 	myScenePtr = aScene;
@@ -257,7 +248,6 @@ void GameWorld::Init(ModelLoader* aModelLoader, SpriteFactory* aSpriteFactory, S
 	SubscribeToMessage(MessageType::EnemyDied);
 	SubscribeToMessage(MessageType::TriggerEvent);
 	SubscribeToMessage(MessageType::FadeInComplete);
-	SubscribeToMessage(MessageType::DeathMarkerRecieved);
 	SubscribeToMessage(MessageType::StartDialogue);
 	SubscribeToMessage(MessageType::DialogueOver);
 	SubscribeToMessage(MessageType::RespawnTrader);
@@ -289,7 +279,7 @@ void GameWorld::Init(ModelLoader* aModelLoader, SpriteFactory* aSpriteFactory, S
 	myDynamicObjectFactory->SetPlayerPtr(myPlayer);
 	myUIManager->Init(myPlayer, *myScenePtr, *aSpriteFactory, *myTextFactory, aCamera);
 
-	myCinEditor.Init(aModelLoader, aScene, myParticleFactory, aSpriteFactory);
+	myCinEditor.Init(aScene, myParticleFactory, aSpriteFactory);
 
 	Entity* loadEnemy = myEnemyFactory->CreateEnemy("", 1, V3F(0, -10000, 0), V3F(), V3F(), -1, 0, -1, true);
 	myEntitys.push_back(loadEnemy);
@@ -417,7 +407,7 @@ void GameWorld::SpawnPlayer()
 	myPlayer->RemoveAllComponents();
 
 	myPlayer->AddComponent<Mesh>()->Init(myPlayer);
-	myPlayer->GetComponent<Mesh>()->SetUpModel("Data/Models/CH_player/CH_player.fbx");
+	myPlayer->GetComponent<Mesh>()->SetUpModel("CH_player/CH_player.fbx");
 	myPlayer->GetComponent<Mesh>()->SetScale(V3F(1.f, 1.f, 1.f));
 
 	myPlayer->AddComponent<AnimationComponent>()->Init(myPlayer);
@@ -619,7 +609,7 @@ void GameWorld::RespawnPlayer(V3F& aPosition)
 	//	component->GetPhysXCharacter()->Teleport(myPlayer->GetPosition());
 	//	//TODO: add physx actor to physx scene
 	//}
-	myPlayer->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle, true);
+	myPlayer->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle);
 
 	myPlayer->GetComponent<Mesh>()->SetFading(false);
 }
@@ -696,31 +686,6 @@ void GameWorld::RecieveMessage(const Message& aMessage)
 		particle->RefreshTimeout(0.5f);
 		myScenePtr->AddInstance(particle);
 
-	}
-	break;
-
-	case MessageType::DeathMarkerRecieved:
-	{
-		V3F pos = *((V3F*)aMessage.myData);
-		pos -= V3F(0, 100.f, 0);
-		Entity* ent = myEntityPool.Retrieve();
-		ent->AddComponent<Mesh>()->Init(ent);
-		ent->GetComponent<Mesh>()->SetUpModel("Data/Models/P_MemorialCandle/P_MemorialCandle.fbx");
-		ent->GetComponent<Mesh>()->SetCastsShadows(false);
-		ent->SetRotation(V3F(0, Tools::RandomRange(0.f, PI * 2), 0));
-
-		ent->AddComponent<Light>()->Init(ent);
-		ent->GetComponent<Light>()->SetIntensity(200);
-		ent->GetComponent<Light>()->SetMinIntensity(0.1);
-		ent->GetComponent<Light>()->SetPeriod(2);
-		ent->GetComponent<Light>()->SetRange(300);
-		ent->GetComponent<Light>()->SetColor(V3F(1.f, 1.f, 0.f));
-		ent->GetComponent<Light>()->SetOffset(V3F(0.f, 21.f, 0.f));
-
-		ent->Spawn(pos);
-		myEntitys.push_back(ent);
-
-		LOGVERBOSE("Death marker recieved at X:" + std::to_string(pos.x) + " Y:" + std::to_string(pos.y) + " Z:" + std::to_string(pos.z))
 	}
 	break;
 
@@ -915,41 +880,9 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 	static float expectedLifetime = 10.f;
 	static ModelInstance* modelInstance = nullptr;
 	static Animator* animator = nullptr;
-	static std::vector<std::string> foundModels;
 	static size_t offset;
 	static Skybox* skybox;
 	static std::string skyboxPath;
-	auto SearchForModels = [&]()
-	{
-		offset = std::experimental::filesystem::canonical("Data/Models/").string().size() + 1;
-		foundModels.clear();
-		std::experimental::filesystem::recursive_directory_iterator it(std::experimental::filesystem::canonical("Data/Models/"));
-		while (it != std::experimental::filesystem::recursive_directory_iterator())
-		{
-			if (it->path().has_extension())
-			{
-				if (it->path().extension() == ".fbx")
-				{
-					if (std::distance(it->path().begin(), it->path().end()) > 2)
-					{
-						std::string folderName = (----(it->path().end()))->string();
-						std::string fileName = it->path().filename().string().substr(0, it->path().filename().string().size() - 4);
-
-						std::transform(folderName.begin(), folderName.end(), folderName.begin(),
-							[](unsigned char c) { return std::tolower(c); });
-						std::transform(fileName.begin(), fileName.end(), fileName.begin(),
-							[](unsigned char c) { return std::tolower(c); });
-
-						if (folderName == fileName)
-						{
-							foundModels.push_back(it->path().string());
-						}
-					}
-				}
-			}
-			++it;
-		}
-	};
 	bool modelViewerOpen = WindowControl::Window("Model Viewer", [&]()
 		{
 #ifdef _DEBUG
@@ -958,10 +891,6 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 				if (ImGui::BeginTabItem("Models"))
 				{
 					static bool movedCamera = false;
-					if (ImGui::Button("Search"))
-					{
-						SearchForModels();
-					}
 					ImGui::SameLine();
 					ImGui::Checkbox("Show Bounding Boxes", &showBoundingBoxes);
 					ImGui::Text("LifeTime: %f", modelInstance ? (Tools::GetTotalTime() - modelInstance->GetSpawnTime()) : 0.0f);
@@ -975,29 +904,6 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 					ImGui::Checkbox("Snap camera", &snapCameraOnLoad);
 
 					ImGui::Separator();
-					if (ImGui::BeginChild("selection box"))
-					{
-						for (auto& i : foundModels)
-						{
-							if (ImGui::Selectable(i.c_str() + offset))
-							{
-								if (modelInstance)
-								{
-									myScenePtr->RemoveModel(modelInstance);
-									delete modelInstance;
-									modelInstance = nullptr;
-								}
-								SAFE_DELETE(animator);
-								modelInstance = AssetManager::GetInstance().GetModel(i).InstansiateModel();
-								if (modelInstance)
-								{
-									myScenePtr->AddToScene(modelInstance);
-									movedCamera = false;
-									modelInstance->SetExpectedLifeTime(expectedLifetime);
-								}
-							}
-						}
-					}
 					ImGui::EndChild();
 					if (!movedCamera && modelInstance && snapCameraOnLoad)
 					{
@@ -1016,124 +922,6 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 						for (auto& i : modelInstance->GetModelAsset().GetAsModel()->myCollisions)
 						{
 							DebugDrawer::GetInstance().DrawBoundingBox(i);
-						}
-					}
-					if (animator)
-					{
-						static float animationSpeed = 1.f;
-						static float blend = 1.f;
-						static size_t old = 1, cur = 1;
-						if (!pauseAnimations)
-						{
-							animator->Step(aDeltatime * animationSpeed);
-						}
-						animator->SetBlend(1 - blend);
-						if (ImGui::Begin("Animations"))
-						{
-							static const char* names[] =
-							{
-								"Idle",
-								"Walking",
-								"Interact",
-								"Action",
-								"Eating",
-								"Cutting",
-								"Shake",
-								"Equip",
-								"Unequip",
-								"cinematic"
-							};
-							static_assert(sizeof(names) / sizeof(*names) == static_cast<int>(AnimationComponent::States::Count), "Update here too");
-
-							ImGui::Checkbox("Pause animation", &pauseAnimations);
-							if (!pauseAnimations)
-							{
-								ImGui::DragFloat("Playbackspeed", &animationSpeed, 0.001f, 0.001f, 10.f, "%.2fX");
-							}
-							ImGui::DragFloat("Blend", &blend, 0.001f, 0.f, 1.f, "%.2fX");
-
-							float at = animator->GetCurrentProgress();
-							size_t size = animator->GetTickCount();
-							float subat = fmodf(at, 1.f);
-							int curTick = int(floor(at)) % size;
-
-							if (pauseAnimations)
-							{
-								bool a = ImGui::SliderInt("Current tick", &curTick, 0, size);
-								bool b = ImGui::SliderFloat("Tick progress", &subat, 0.0f, 0.999f);
-
-								if (a || b)
-								{
-									animator->SetTime(curTick + subat);
-								}
-							}
-
-
-							ImGui::Columns(2);
-							ImGui::PushID("old");
-							for (auto& mapping : myAnimMapping)
-							{
-								ImGui::Text(names[static_cast<int>(mapping.first)]);
-								ImGui::Indent(40);
-								ImGui::PushID(static_cast<int>(mapping.first));
-								for (size_t i = mapping.second.first; i <= mapping.second.second; i++)
-								{
-									bool is = i == old;
-									if (ImGui::Selectable(std::to_string(i - mapping.second.first).c_str(), &is))
-									{
-										old = i;
-										animator->SetState(old);
-										animator->SetState(cur);
-									}
-								}
-								ImGui::PopID();
-								ImGui::Unindent(40);
-							}
-							ImGui::NextColumn();
-							ImGui::PopID();
-							ImGui::PushID("new");
-							for (auto& mapping : myAnimMapping)
-							{
-								ImGui::Text(names[static_cast<int>(mapping.first)]);
-								ImGui::Indent(40);
-								ImGui::PushID(static_cast<int>(mapping.first));
-								for (size_t i = mapping.second.first; i <= mapping.second.second; i++)
-								{
-									bool is = i == cur;
-									if (ImGui::Selectable(std::to_string(i - mapping.second.first).c_str(), &is))
-									{
-										cur = i;
-										animator->SetState(old);
-										animator->SetState(cur);
-									}
-								}
-								ImGui::PopID();
-								ImGui::Unindent(40);
-							}
-							ImGui::NextColumn();
-							ImGui::PopID();
-
-						}
-						ImGui::End();
-					}
-					else
-					{
-						if (modelInstance)
-						{
-							Model* model = modelInstance->GetModelAsset().GetAsModel();
-							if(model && model->ShouldRender() && model->GetModelData()->myFilePath != "" && model->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones)
-							{
-								animator = new Animator();
-								std::vector<std::string> allAnimations;
-								myAnimMapping.clear();
-								AnimationComponent::ParseAnimations(model->GetModelData()->myAnimations, myAnimMapping, allAnimations);
-
-								animator->Init(model->GetModelData()->myFilePath, &model->myBoneData, allAnimations);
-
-
-
-								modelInstance->AttachAnimator(animator);
-							}
 						}
 					}
 					ImGui::EndTabItem();
@@ -1246,10 +1034,6 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 			myScenePtr->Stash(Scene::StashOp::Push);
 			cameraPos = myScenePtr->GetMainCamera()->GetPosition();
 			myScenePtr->GetMainCamera()->SetPosition(myScenePtr->GetMainCamera()->GetForward() * -400.f);
-			if (foundModels.empty())
-			{
-				SearchForModels();
-			}
 		}
 		else
 		{

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "DialogFactory.h"
 #include "SpriteFactory.h"
+#include "AssetManager.h"
 
 
 DialogFactory::DialogFactory() :
@@ -30,7 +31,7 @@ DialogInstance* DialogFactory::CreateGameDialog(const std::string& aFilePath, co
 {
 	DialogInstance* inst = new DialogInstance();
 
-	inst->Init(GetFont(aFontPath), GetDialog(aFilePath), aBuffer, mySpriteFactoryPtr->CreateSprite(aBackgroundPath));
+	inst->Init(AssetManager::GetInstance().GetFont(aFontPath), GetDialog(aFilePath), aBuffer, mySpriteFactoryPtr->CreateSprite(aBackgroundPath));
 	inst->SetPosition({ 0.5f, 0.9f });
 	inst->SetPivot({ 0.5f, 1.f });
 	inst->SetColor(V4F(0, 0, 0, 1));
@@ -49,9 +50,7 @@ void DialogFactory::RecieveMessage(const Message& aMessage)
 
 bool DialogFactory::LoadDialog(const std::string& aFilePath)
 {
-	FiskJSON::Object dialogDoc;
-
-	dialogDoc.Parse(Tools::ReadWholeFile(aFilePath));
+	FiskJSON::Object& dialogDoc = AssetManager::GetInstance().GetJSON(aFilePath).GetAsJSON();
 
 	myLoadedDialogs[aFilePath] = DialogInstance::DialogData();
 

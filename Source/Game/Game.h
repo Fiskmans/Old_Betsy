@@ -19,7 +19,7 @@ public:
 	Game();
 	~Game();
 
-	bool Init(WindowHandler* aWindowHandler,CommonUtilities::InputHandler* aInputHandler, ModelLoader* aModelLoader, LightLoader* aLightLoader, SpriteFactory* aSpriteFactory,
+	bool Init(WindowHandler* aWindowHandler,CommonUtilities::InputHandler* aInputHandler, LightLoader* aLightLoader, SpriteFactory* aSpriteFactory,
 		DirectX11Framework* aFramework, AudioManager* aAudioManager, class SpriteRenderer* aSpriteRenderer);
 	bool Run(CGraphicsEngine* aEngine, float aDeltaTime);
 

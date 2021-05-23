@@ -11,7 +11,7 @@
 
 namespace Tools
 {
-	using CallbackFunction = void(const std::string&);
+	using CallbackFunction = std::function<void(const std::string&)>;
 
 	class FileHandle : public std::string
 	{
@@ -69,8 +69,8 @@ namespace Tools
 		FileWatcher();
 		~FileWatcher();
 
-		///Registers a filewatch with a callback, if using the callimmediately flag the function being called need to be thread safe
-		UniqueID RegisterCallback(std::string aFile,std::function<CallbackFunction> aCallback, bool aCallImmediately = false);
+		///Registers a filewatch with a callback, if using the callimmediately flag the function being called needs to be thread safe
+		UniqueID RegisterCallback(std::string aFile, Tools::CallbackFunction aCallback, bool aCallImmediately = false);
 		///Registers a file to manually watch, updates needs to be resolved using GetChangedFile
 		UniqueID RegisterFile(std::string aFile);
 
@@ -100,12 +100,12 @@ namespace Tools
 		//Flags
 		std::atomic<bool> myIsRunning = true;
 		std::atomic<bool> myHasPendingAdd = false;
-		bool myIsPaused = false;
+		std::atomic<bool> myIsPaused = false;
 
 	
 		//Registered files
-		std::unordered_map <FileHandle, std::function<CallbackFunction>> myCallbackMap;
-		std::unordered_map <FileHandle, std::function<CallbackFunction>> myThreadSafeMap;
+		std::unordered_map <FileHandle, Tools::CallbackFunction> myCallbackMap;
+		std::unordered_map <FileHandle, Tools::CallbackFunction> myThreadSafeMap;
 		std::vector<FileHandle> mySelfHandleMap;
 
 		//This filewatcher is using a lossy check with a single handover-point for simplicity,

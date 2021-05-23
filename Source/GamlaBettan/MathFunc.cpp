@@ -17,7 +17,6 @@ void color4_to_float4(const aiColor4D *c, float f[4])
 	f[3] = c->a;
 }
 
-
 uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
 	assert(pNodeAnim->mNumRotationKeys > 0);
@@ -123,7 +122,7 @@ const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string 
 {
 	for (uint i = 0; i < pAnimation->mNumChannels; ++i)
 	{
-		if (strcmp(pAnimation->mChannels[i]->mNodeName.C_Str(), nodeName.c_str()) == 0)
+		if (pAnimation->mChannels[i]->mNodeName.C_Str() == nodeName)
 		{
 			return pAnimation->mChannels[i];
 		}
@@ -162,31 +161,6 @@ void ShortMulM4(aiVector3D &out, const aiMatrix4x4 &m, const aiVector3D &in)
 	out.x = m.a1 * in.x + m.a2 * in.y + m.a3 * in.z;
 	out.y = m.b1 * in.x + m.b2 * in.y + m.b3 * in.z;
 	out.z = m.c1 * in.x + m.c2 * in.y + m.c3 * in.z;
-}
-
-long long GetCurrentTimeMillis()
-{
-#ifdef WIN32    
-	return GetTickCount();
-#else
-	timeval t;
-	gettimeofday(&t, NULL);
-
-	long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
-	return ret;
-#endif    
-}
-
-std::string getBasePath(const std::string& path)
-{
-	size_t pos = path.find_last_of("\\/");
-	return (std::string::npos == pos) ? "" : path.substr(0, pos + 1);
-}
-
-GLboolean abortGLInit(const char* abortMessage)
-{
-	MessageBoxA(NULL, abortMessage, "ERROR", MB_OK|MB_ICONEXCLAMATION);
-	exit(-61);									// quit and return False
 }
 
 void logInfo(const std::string &logString)

@@ -1,33 +1,32 @@
 #include "pch.h"
 #include "CharacterData.h"
-#include <rapidjson/document.h>
-#include <rapidjson/filereadstream.h>
+#include "AssetManager.h"
 
 void CharacterData::Load()
 {
-	rapidjson::Document charactersDoc;
+	FiskJSON::Object& root = AssetManager::GetInstance().GetJSON("metrics/Characters.json").GetAsJSON();
 
-#pragma warning(suppress : 4996)
-	FILE* fp = fopen("Data\\Metrics\\Characters.json", "rb");
-	char readBuffer[4096];
-	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-	charactersDoc.ParseStream(is);
-	fclose(fp);
-
-	for (int i = 0; i < charactersDoc["Characters"].GetArray().Size(); ++i)
+	for (auto& i : root["Characters"].Get<FiskJSON::Array>())
 	{
 		Stats* stats = new Stats();
+		bool success = true;
 
-		stats->name = charactersDoc["Characters"][i]["name"].GetString();
-		stats->characterID = charactersDoc["Characters"][i]["characterID"].GetInt();
-		stats->fbxPath = charactersDoc["Characters"][i]["fbxPath"].GetString();
-		stats->modelScale = charactersDoc["Characters"][i]["modelScale"].GetFloat();
-		stats->height = charactersDoc["Characters"][i]["height"].GetInt();
+		success &= (*i)["name"].GetIf(stats->name);
+		success &= (*i)["characterID"].GetIf(stats->characterID);
+		success &= (*i)["fbxPath"].GetIf(stats->fbxPath);
+		success &= (*i)["modelScale"].GetIf(stats->modelScale);
+		success &= (*i)["height"].GetIf(stats->height);
 		
-		stats->life = charactersDoc["Characters"][i]["life"].GetInt();
+		success &= (*i)["life"].GetIf(stats->life);
 		
-		stats->collisionRadius = charactersDoc["Characters"][i]["collisionRadius"].GetFloat();
-		stats->movementSpeed = charactersDoc["Characters"][i]["movementSpeed"].GetFloat();
+		success &= (*i)["collisionRadius"].GetIf(stats->collisionRadius);
+		success &= (*i)["movementSpeed"].GetIf(stats->movementSpeed);
+
+		if (!success)
+		{
+			SYSERROR("Error in loading Character data ", stats->name);
+			continue;
+		}
 
 		myCharacterTypes[stats->characterID] = stats;
 	}

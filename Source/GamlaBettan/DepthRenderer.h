@@ -28,7 +28,7 @@ private:
 	struct ID3D11Buffer* myFrameBuffer = nullptr;
 	struct ID3D11Buffer* myObjectBuffer = nullptr;
 	ID3D11DeviceContext* myContext;
-	PixelShader* myShader;
+	AssetHandle myShader;
 	ID3D11Device* myDevice;
 	std::array<Camera*,6> myCameras = { nullptr };
 	Camera* myEnvironmentCamera = { nullptr };

@@ -1,12 +1,19 @@
 #pragma once
 
 #include <atomic>
-#include "Model.h"
 
 #include "ShaderFlags.h"
+#include "SpriteFontInclude.h"
+#include "LevelLoader.h"
+#include "FileWatcher.h"
 
+struct ID3D11ShaderResourceView;
 class ModelInstance;
 class Skybox;
+class Model;
+class TextInstance;
+class NavMesh;
+class Animation;
 
 class Asset
 {
@@ -16,10 +23,19 @@ public:
 		Model,
 		SkyBox,
 		Texture,
-		PixelShader
+		PixelShader,
+		VertexShader,
+		GeometryShader,
+		JSON,
+		Font,
+		Level,
+		NavMesh,
+		Animation
 	};
 
-	Asset(AssetType aType);
+	Asset(AssetType aType,bool aIsLoaded = true);
+
+	bool CheckLoaded();
 
 	AssetType myType;
 
@@ -28,7 +44,9 @@ public:
 
 	void IncRefCount();
 	void DecRefCount();
-
+private:
+	friend class AssetManager;
+	Tools::FileWatcher::UniqueID myFileHandle;
 };
 
 
@@ -43,18 +61,37 @@ public:
 	AssetHandle& operator=(const AssetHandle& aOther);
 
 
-	bool IsLoaded();
+	bool IsValid() const;
+	bool IsLoaded() const;
 
-	Asset::AssetType GetType();
-	
-	ModelInstance*				InstansiateModel();
-	Skybox*						InstansiateSkybox();
+	Asset::AssetType GetType() const;
 
-	Model*						GetAsModel();
-	ID3D11ShaderResourceView*	GetAsShaderResource();
+	ModelInstance* InstansiateModel() const;
+	Skybox* InstansiateSkybox() const;
+	TextInstance* InstansiateText() const;
+
+	Model* GetAsModel() const;
+	ID3D11ShaderResourceView* GetAsTexture() const;
+
+	ID3D11PixelShader* GetAsPixelShader() const;
+	ID3D11VertexShader* GetAsVertexShader() const;
+	ID3D11GeometryShader* GetAsGeometryShader() const;
+
+	std::vector<char>& GetVertexShaderblob() const;
+
+	FiskJSON::Object& GetAsJSON() const;
+	std::string GetJSONFilePath() const;
+
+	DirectX::SpriteFont* GetAsFont() const;
+
+	LevelParseResult& GetAsLevel() const;
+
+	NavMesh* GetAsNavMesh() const;
+
+	Animation* GetAsAnimation() const;
 
 private:
-	Asset* myAsset;
+	Asset* myAsset = nullptr;
 };
 
 class ModelAsset
@@ -73,4 +110,88 @@ public:
 	SkyboxAsset(Skybox* aSkyBox);
 
 	Skybox* mySkybox;
+};
+
+class TextureAsset
+	: public Asset
+{
+public:
+	TextureAsset(ID3D11ShaderResourceView* aTexture);
+
+	ID3D11ShaderResourceView* myTexture;
+};
+
+class PixelShaderAsset
+	: public Asset
+{
+public:
+	PixelShaderAsset(ID3D11PixelShader* aShader);
+
+	ID3D11PixelShader* myShader;
+};
+
+class VertexShaderAsset
+	: public Asset
+{
+public:
+	VertexShaderAsset(ID3D11VertexShader* aShader,const std::vector<char>& aBlob);
+
+	ID3D11VertexShader* myShader;
+	std::vector<char> myBlob;
+};
+
+class GeometryShaderAsset
+	: public Asset
+{
+public:
+	GeometryShaderAsset(ID3D11GeometryShader* aShader);
+
+	ID3D11GeometryShader* myShader;
+};
+
+class JSONAsset
+	: public Asset
+{
+public:
+	JSONAsset(FiskJSON::Object* aObject,const std::string& aPath);
+
+	FiskJSON::Object* myObject;
+	std::string myPath;
+};
+
+class FontAsset
+	: public Asset
+{
+public:
+	FontAsset(DirectX::SpriteFont* aFont);
+
+	DirectX::SpriteFont* myFont;
+};
+
+class LevelAsset
+	: public Asset
+{
+public:
+	LevelAsset(std::future<LevelParseResult>&& aLevel);
+
+	LevelParseResult myLevel;
+	std::future<LevelParseResult> myLoadingLevel;
+};
+
+class NavMeshAsset
+	: public Asset
+{
+public:
+	NavMeshAsset(NavMesh* aNavmesh);
+
+	NavMesh* myNavMesh;
+};
+
+class AnimationAsset
+	: public Asset
+{
+public:
+	AnimationAsset(Animation* aAnimation);
+
+	Animation* myAnimation;
 };

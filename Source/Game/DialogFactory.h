@@ -1,5 +1,4 @@
 #pragma once
-#include "FontFactory.h"
 #include "Vector2.hpp"
 #include "DialogInstance.h"
 
@@ -9,7 +8,7 @@ class SpriteRenderer;
 class SpriteFactory;
 struct ID3D11Device;
 
-class DialogFactory : protected FontFactory, public Observer
+class DialogFactory : public Observer
 {
 public:
 	DialogFactory();

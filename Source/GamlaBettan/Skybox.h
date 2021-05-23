@@ -7,7 +7,7 @@ class Skybox :
 {
 
 public:	
-	Skybox(AssetHandle& aModel);
+	Skybox(const AssetHandle& aModel);
 
 private:
 

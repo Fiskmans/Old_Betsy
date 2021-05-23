@@ -2,7 +2,6 @@
 #include "NodePollingStation.h"
 #include "../Game/Entity.h"
 #include "..//Game/EnemyFactory.h"
-#include "../Game/AbilityFactory.h"
 
 void NodePollingStation::Reset()
 {
@@ -64,11 +63,6 @@ std::any NodePollingStation::GetSharedStorage(std::string aKey)
 	return myStorage[aKey];
 }
 
-ModelLoader* NodePollingStation::GetModelLoader()
-{
-	return myModelLoader;
-}
-
 Scene* NodePollingStation::GetScene()
 {
 	return myScene;
@@ -126,11 +120,6 @@ void NodePollingStation::SetTimerController(TimerController* aTimerController)
 void NodePollingStation::SetSharedStorage(std::string aKey, std::any aValue)
 {
 	myStorage[aKey] = aValue;
-}
-
-void NodePollingStation::SetModelLoader(ModelLoader* aModelLoader)
-{
-	myModelLoader = aModelLoader;
 }
 
 void NodePollingStation::SetScene(Scene* aScene)

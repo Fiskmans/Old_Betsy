@@ -6,16 +6,13 @@
 #include "ShaderCompiler.h"
 #include "ShaderFlags.h"
 #include "TextureLoader.h"
+#include "AssetManager.h"
 
 #if USEIMGUI
 #include <imgui.h>
 #include <ImGuiHelpers.h>
 #endif // !_RETAIL
 
-
-#if USEFILEWATHCER
-Tools::FileWatcher Model::ourFileWatcher;
-#endif
 
 Model::Model() : myModelData()
 {
@@ -24,42 +21,19 @@ Model::Model() : myModelData()
 
 Model::~Model()
 {
-#if  USEFILEWATHCER
-	ourFileWatcher.UnRegister(myPSFileHandle);
-	ourFileWatcher.UnRegister(myVSFileHandle);
-#endif //  USEFILEWATHCER
-
 	for (auto& i : myModelData.myLodLevels)
 	{
 		delete i;
 	}
 
 	SAFE_RELEASE(myModelData.myInputLayout);
-
-	if (myLoader)
-	{
-		if (myModelData.myTextures[0]) { myModelData.myTextures[0]->Release(); }
-		if (myModelData.myTextures[1]) { myModelData.myTextures[1]->Release(); }
-		if (myModelData.myTextures[2]) { myModelData.myTextures[2]->Release(); }
-	}
-
 }
 
-void Model::Init(const CModelData& data, ModelLoader* aLoader, const std::string& aPixelShaderFileName, const std::string& aVertexShaderFileName, const std::string& aFilePath, const std::string& aFriendlyName)
+void Model::Init(const ModelData& data, ModelLoader* aLoader, const std::string& aPixelShaderFileName, const std::string& aVertexShaderFileName, const std::string& aFilePath, const std::string& aFriendlyName)
 {
 	myLoader = aLoader;
 	myModelData = data;
 	myFilePath = aFilePath;
-#if USEFILEWATHCER
-	if (aPixelShaderFileName != "")
-	{
-		myPSFileHandle = ourFileWatcher.RegisterCallback(aPixelShaderFileName, std::bind(&Model::ReloadPixelShader, this, std::placeholders::_1), false);
-	}
-	if (aVertexShaderFileName != "")
-	{
-		myVSFileHandle = ourFileWatcher.RegisterCallback(aVertexShaderFileName, std::bind(&Model::ReloadVertexShader, this, std::placeholders::_1), false);
-	}
-#endif
 	myFriendlyName = aFriendlyName;
 	myIsLoaded = true;
 }
@@ -81,25 +55,13 @@ void Model::ResetAndRelease()
 		}
 	}
 	myModelData.myInputLayout->Release();
-	for (auto& i : myModelData.myTextures)
-	{
-		i->Release();
-		i = nullptr;
-	}
 	myBoneData.clear();
 	myBoneNameLookup.clear();
 }
 
-Model::CModelData* Model::GetModelData()
+Model::ModelData* Model::GetModelData()
 {
 	return &myModelData;
-}
-
-void Model::FlushChanges()
-{
-#if USEFILEWATHCER
-	ourFileWatcher.FlushChanges();
-#endif
 }
 
 std::string Model::GetFriendlyName()
@@ -220,85 +182,9 @@ void Model::ImGuiNode(std::map<std::string, std::vector<std::string>>& aFiles)
 	{
 		ImGui::Text("Draws using forward renderer");
 	}
-	if (myModelData.myIsEffect)
-	{
-		ImGui::Text("Is an effect");
-	}
 
 
 	ImGui::Text(("Tricount: " + std::to_string(facecount)).c_str());
-	ImGui::PushID("PS");
-	if (ImGui::Button("Change"))
-	{
-		ImGui::OpenPopup("PS-Popup");
-	}
-	ImGui::SameLine();
-#if USEFILEWATHCER
-	ImGui::Text(("PixelShader: " + myPSFileHandle).c_str());
-#endif
-
-
-	if (ImGui::BeginPopup("PS-Popup"))
-	{
-		ImGui::Text("Found files");
-		ImGui::Separator();
-		for (auto& i : aFiles[".hlsl"])
-		{
-			if (ImGui::Selectable(i.c_str()))
-			{
-				ID3D11Device* device;
-				myModelData.myPixelShader->operator ID3D11PixelShader* ()->GetDevice(&device);
-				PixelShader* shader = GetPixelShader(device, i, myModelData.myshaderTypeFlags);
-
-				if (shader)
-				{
-					myModelData.myPixelShader = shader;
-#if USEFILEWATHCER
-					ourFileWatcher.UnRegister(myPSFileHandle);
-					myPSFileHandle = ourFileWatcher.RegisterCallback(i, std::bind(&Model::ReloadPixelShader, this, std::placeholders::_1));
-#endif
-				}
-			}
-		}
-		ImGui::EndPopup();
-	}
-
-	ImGui::PopID();
-
-	ImGui::PushID("VS");
-	if (ImGui::Button("Change"))
-	{
-		ImGui::OpenPopup("VS-Popup");
-	}
-	ImGui::SameLine();
-#if USEFILEWATHCER
-	ImGui::Text(("VertexShader: " + myVSFileHandle).c_str());
-#endif
-	if (ImGui::BeginPopup("VS-Popup"))
-	{
-		ImGui::Text("Found files");
-		ImGui::Separator();
-		for (auto& i : aFiles[".hlsl"])
-		{
-			if (ImGui::Selectable(i.c_str()))
-			{
-				ID3D11Device* device;
-				myModelData.myVertexShader->operator ID3D11VertexShader* ()->GetDevice(&device);
-				std::vector<char> _;
-				VertexShader* shader = GetVertexShader(device, i, _, myModelData.myshaderTypeFlags);
-				if (ReloadVertexShader(i))
-				{
-					myModelData.myVertexShader = shader;
-#if USEFILEWATHCER
-					ourFileWatcher.UnRegister(myVSFileHandle);
-					myVSFileHandle = ourFileWatcher.RegisterCallback(i, std::bind(&Model::ReloadVertexShader, this, std::placeholders::_1));
-#endif
-				}
-			}
-		}
-		ImGui::EndPopup();
-	}
-	ImGui::PopID();
 
 	float width = ImGui::GetWindowSize().x / 3;
 	ImVec2 imagesize = ImVec2(width, width);
@@ -309,7 +195,7 @@ void Model::ImGuiNode(std::map<std::string, std::vector<std::string>>& aFiles)
 		ImGui::PushID(imageNames[i]);
 		ImGui::Text(imageNames[i]);
 
-		Tools::ZoomableImGuiImage(myModelData.myTextures[i], imagesize);
+		Tools::ZoomableImGuiImage(myModelData.myTextures[i].GetAsTexture(), imagesize);
 
 		
 		if (ImGui::Button("Change"))
@@ -324,15 +210,7 @@ void Model::ImGuiNode(std::map<std::string, std::vector<std::string>>& aFiles)
 			{
 				if (ImGui::Selectable(f.c_str()))
 				{
-					ID3D11Device* device;
-					myModelData.myTextures[i]->operator ID3D11ShaderResourceView *()->GetDevice(&device);
-					Texture* image = LoadTexture(device, f);
-					if (IsErrorTexture(image))
-					{
-						SYSWARNING("Could not load image: " , f);
-					}
-					myModelData.myTextures[i]->Release();
-					myModelData.myTextures[i] = image;
+					myModelData.myTextures[i] = AssetManager::GetInstance().GetTexture(f);
 				}
 			}
 			ImGui::EndPopup();
@@ -347,22 +225,4 @@ void Model::ImGuiNode(std::map<std::string, std::vector<std::string>>& aFiles)
 float Model::GetGraphicSize()
 {
 	return myGraphicSize;
-}
-
-bool Model::ReloadPixelShader(const std::string& aFilePath)
-{
-	SYSINFO("Reloading: " + aFilePath);
-	ID3D11Device* device;
-	myModelData.myPixelShader->operator ID3D11PixelShader* ()->GetDevice(&device);
-	::ReloadPixelShader(device, aFilePath, myModelData.myshaderTypeFlags);
-	return true;
-}
-
-bool Model::ReloadVertexShader(const std::string& aFilePath)
-{
-	SYSINFO("Reloading: " + aFilePath);
-	ID3D11Device* device;
-	myModelData.myVertexShader->operator ID3D11VertexShader* ()->GetDevice(&device);
-	::ReloadVertexShader(device, aFilePath, myModelData.myshaderTypeFlags);
-	return true;
 }

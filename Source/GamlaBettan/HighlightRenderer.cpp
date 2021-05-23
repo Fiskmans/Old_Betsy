@@ -7,6 +7,7 @@
 #include "TimeHelper.h"
 #include "Camera.h"
 #include "DirectX11Framework.h"
+#include "AssetManager.h"
 
 bool HighlightRenderer::Init(DirectX11Framework* aFramework)
 {
@@ -60,12 +61,7 @@ bool HighlightRenderer::Init(DirectX11Framework* aFramework)
 		}
 	}
 
-	myPixelShader = GetPixelShader(device, "Data/Shaders/FlatColor.hlsl");
-	if (!myPixelShader)
-	{
-		SYSCRASH("Could not compile pixel shader for deferred");
-		return false;
-	}
+	myPixelShader = AssetManager::GetInstance().GetPixelShader("FlatColor.hlsl");
 
 	myCreateTime = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
 	return true;
@@ -81,7 +77,7 @@ void HighlightRenderer::Render(const std::vector<class ModelInstance*>& aModels,
 
 	std::vector<class ModelInstance*> filtered;
 	Model* model = nullptr;
-	Model::CModelData* modelData = nullptr;
+	Model::ModelData* modelData = nullptr;
 
 
 	HRESULT result;
@@ -101,7 +97,7 @@ void HighlightRenderer::Render(const std::vector<class ModelInstance*>& aModels,
 
 	myContext->VSSetConstantBuffers(0, 1, &myFrameBuffer);
 	myContext->PSSetConstantBuffers(0, 1, &myFrameBuffer);
-	myContext->PSSetShader(*myPixelShader, nullptr, 0);
+	myContext->PSSetShader(myPixelShader.GetAsPixelShader(), nullptr, 0);
 	myContext->GSSetShader(nullptr, nullptr, 0);
 
 	ObjectBufferData oData;
@@ -155,15 +151,19 @@ void HighlightRenderer::Render(const std::vector<class ModelInstance*>& aModels,
 
 
 		myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
-		myContext->VSSetShader(*modelData->myVertexShader, nullptr, 0);
+		myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
 
 		myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
-		myContext->PSSetShaderResources(0, 1, *modelData->myTextures[0]);
-		myContext->PSSetShaderResources(1, 1, *modelData->myTextures[1]);
-		myContext->PSSetShaderResources(2, 1, *modelData->myTextures[2]);
-		myContext->VSSetShaderResources(0, 1, *modelData->myTextures[0]);
-		myContext->VSSetShaderResources(1, 1, *modelData->myTextures[1]);
-		myContext->VSSetShaderResources(2, 1, *modelData->myTextures[2]);
+
+		ID3D11ShaderResourceView* resources[3] =
+		{
+			modelData->myTextures[0].GetAsTexture(),
+			modelData->myTextures[1].GetAsTexture(),
+			modelData->myTextures[2].GetAsTexture()
+		};
+
+		myContext->PSSetShaderResources(0, 3, resources);
+		myContext->VSSetShaderResources(0, 3, resources);
 
 		Model::LodLevel* lodlevel = model->GetOptimalLodLevel(aModels[i]->GetPosition().Distance(aCamera->GetPosition()));
 		if (lodlevel)

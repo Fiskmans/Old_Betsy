@@ -10,6 +10,7 @@
 #include "Entity.h";
 #include "AnimationComponent.h"
 #include "PlayerController.h"
+#include "AssetManager.h"
 
 #define NUMBERTEXTOFFSET V2F(0.004f, 0.003f)
 #define TOOLTIPOFFSET V2F(0.004f, 0.00f)
@@ -44,7 +45,7 @@ void Inventory::Init(Entity* aEntity, TextFactory* aTextFactory, SpriteFactory* 
 
 	if (myIconLookup.size() == 0)
 	{
-		PopulateIconLookup("Data/Metrics/ItemIconBindings.json");
+		PopulateIconLookup("data/ItemIconBindings.json");
 	}
 
 	myEntity = aEntity;
@@ -55,11 +56,11 @@ void Inventory::Init(Entity* aEntity, TextFactory* aTextFactory, SpriteFactory* 
 		slot.amountNumber = aTextFactory->CreateText();
 		slot.amountNumber->SetColor(V4F(1.f, 0.5f, 0.f, 1.f));
 
-		slot.tooltip = aTextFactory->CreateToolTip("Data/UI/ToolTipBackground.dds", V2F(10.f, 10.f), "", "Data/Fonts/toolTip.spritefont");
+		slot.tooltip = aTextFactory->CreateToolTip("ui/ToolTipBackground.dds", V2F(10.f, 10.f), "", "toolTip.spritefont");
 		slot.tooltip->SetColor(V4F(1.f, 1.f, 1.f, 1.f));
 	}
 
-	SpriteInstance* toolbarBack = aSpriteFactory->CreateSprite("Data/UI/InventoryBar/inventorybar.dds");
+	SpriteInstance* toolbarBack = aSpriteFactory->CreateSprite("ui/toolbar/background.dds");
 	V2F start = V2F(0.5f, 1.f) - toolbarBack->GetSizeOnScreen() * V2F(0.442f, 0.53f);
 	const V2F cellSize = V2F(toolbarBack->GetSizeOnScreen().x * 0.985f / TOOLBARSIZE, 0.f);
 	for (size_t i = 0; i < TOOLBARSIZE; i++)
@@ -68,7 +69,7 @@ void Inventory::Init(Entity* aEntity, TextFactory* aTextFactory, SpriteFactory* 
 	}
 	myToolbarBounds = CU::AABB2D<float>(V2F(0.5f, 1.f) - toolbarBack->GetSizeOnScreen() * V2F(0.5f, 0.85f), start + toolbarBack->GetSizeOnScreen() * V2F(0.94f, 0.3f));
 
-	SpriteInstance* invnBack = aSpriteFactory->CreateSprite("Data/UI/InventoryBar/Inventory.dds");
+	SpriteInstance* invnBack = aSpriteFactory->CreateSprite("ui/inventory/background.dds");
 	V2F size = invnBack->GetSizeOnScreen();
 	start = V2F(0.5f, 0.5f) - size * V2F(0.45f, 0.2f);
 	myBounds = CU::AABB2D<float>(V2F(0.5f, 0.5f) - size * V2F(0.49f, 0.31f), V2F(0.5f, 0.5f) + size * V2F(0.49f, 0.3f));
@@ -79,12 +80,12 @@ void Inventory::Init(Entity* aEntity, TextFactory* aTextFactory, SpriteFactory* 
 	}
 
 
-	mySlotMarker = aSpriteFactory->CreateSprite("Data/UI/UIButtons/Selected.dds");
+	mySlotMarker = aSpriteFactory->CreateSprite("ui/UIButtons/Selected.dds");
 	mySlotMarker->SetPosition(myToolbarPositions[0]);
 	mySlotMarker->SetDepth(0.05f);
 	mySlotMarker->SetPivot({ 0.5,0.5 });
 
-	myItemTip = aSpriteFactory->CreateSprite("Data/UI/UIButtons/Selected.dds");
+	myItemTip = aSpriteFactory->CreateSprite("ui/UIButtons/Selected.dds");
 	myItemTip->SetPosition(myToolbarPositions[0]);
 	myItemTip->SetDepth(0.05f);
 	myItemTip->SetPivot({ 0.5,0.5 });
@@ -581,7 +582,7 @@ void Inventory::RecieveMessage(const Message& aMessage)
 		if (myIsToggled)
 		{
 			TimeHandler::GetInstance().PauseTime();
-			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle, 0, false, false);
+			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle);
 			myEntity->GetComponent<PlayerController>()->StopMoving();
 		}
 		else
@@ -898,16 +899,8 @@ bool Inventory::Switch(Slot* aSlot, Slot* anotherSlot)
 
 void Inventory::PopulateIconLookup(const std::string& aFilePath)
 {
-	FiskJSON::Object root;
-	try
-	{
-		root.Parse(Tools::ReadWholeFile(aFilePath));
-	}
-	catch (const std::exception& e)
-	{
-		SYSERROR(e.what(), aFilePath);
-		return;
-	}
+	FiskJSON::Object& root = AssetManager::GetInstance().GetJSON(aFilePath).GetAsJSON();
+
 	std::string prefix = "";
 	std::string suffix = "";
 	root["GlobalPrefix"].GetIf(prefix);
@@ -932,16 +925,7 @@ void Inventory::SetToolTip(Slot& aSlot)
 		{
 			std::string name = StringFromItemId(aSlot.item.myItemId);
 
-			FiskJSON::Object file;
-			try
-			{
-				file.Parse(Tools::ReadWholeFile("Data/Metrics/ItemToolTips.json"));
-			}
-			catch (const std::exception& e)
-			{
-				SYSERROR(e.what(), "Data/Metrics/ItemToolTips.json");
-				return;
-			}
+			FiskJSON::Object& file = AssetManager::GetInstance().GetJSON("data/ItemToolTips.json").GetAsJSON();
 
 			std::string content;
 			for (auto& i : file["ToolTips"])

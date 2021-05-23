@@ -14,7 +14,7 @@ struct Day
 
 struct AnimationEventData
 {
-	std::string name;
+	std::string name = "Event name not loaded";
 	std::string fbxPath;
 	float spawnDuration;
 	float loopDuration;
@@ -60,7 +60,7 @@ private:
 	float myTimeModifier = 240.0f;
 	float mySavedTimeModifier;
 	std::unordered_map<int, Day> mySpecialDays;
-	std::unordered_map<int, AnimationEventData> myLoadedAnimationEvents;
+	std::vector<AnimationEventData> myLoadedAnimationEvents;
 	std::vector<Entity*>* myEntityVectorPtr = nullptr;
 	std::vector<Entity*>* myAnimationEntityVectorPtr = nullptr;
 	CommonUtilities::ObjectPool<Entity>* myEntityPool = nullptr;

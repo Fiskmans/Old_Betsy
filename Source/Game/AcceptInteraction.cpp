@@ -4,6 +4,7 @@
 #include "SpriteFactory.h"
 #include "TextFactory.h"
 #include "TextInstance.h"
+#include "AssetManager.h"
 
 AcceptInteraction::AcceptInteraction():
 	myInteractionActive(false)
@@ -76,7 +77,7 @@ void AcceptInteraction::InitializeInteraction(std::string aTextToDisplay, bool a
 			myScene->AddSprite(myCancelButton->GetCurrentSprite());
 		}
 
-		myText = myTextFactory->CreateText("Data/Fonts/MoonviewDialogue.spritefont");
+		myText = AssetManager::GetInstance().GetFont("MoonviewDialogue.spritefont").InstansiateText();
 		myText->SetText(aTextToDisplay);
 		myText->SetPivot({0.5, 0.5});
 		myText->SetPosition({0.5, 0.2});

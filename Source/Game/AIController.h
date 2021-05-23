@@ -44,21 +44,12 @@ public:
 	bool withinRangeOfPlayer = false;
 	bool myTookDamage;
 
-
-	void SetSheepNaked(bool aNaked);
-	bool GetIsNaked();
-	int GetAnimationIndex()
-	{
-		return myAnimationIndex;
-	}
-
 protected:
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
 	virtual void OnKillMe() override;
 
 private:
-	int myAnimationIndex = -1;
 	bool myIsDead = false;
 	std::unordered_map<AIStates, AIBaseState*> myStates;
 	AIStates myCurrentState;

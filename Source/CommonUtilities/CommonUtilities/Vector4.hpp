@@ -45,20 +45,20 @@ namespace CommonUtilities
 		bool IsNormalized() const;
 		bool IsZero() const;
 
-		Vector4<T> RotateX(const double aRad); //Ignores W-axis
-		Vector4<T> RotatedX(const double aRad) const; //Ignores W-axis
-		Vector4<T> RotateAroundPointX(const Vector4<T>& aVector, const double aRad); //Ignores W-axis
-		Vector4<T> RotatedAroundPointX(const Vector4<T>& aVector, const double aRad) const; //Ignores W-axis
+		Vector4<T> RotateX(const double aRad);
+		Vector4<T> RotatedX(const double aRad) const;
+		Vector4<T> RotateAroundPointX(const Vector4<T>& aVector, const double aRad);
+		Vector4<T> RotatedAroundPointX(const Vector4<T>& aVector, const double aRad) const;
 			  
-		Vector4<T> RotateY(const double aRad); //Ignores W-axis
-		Vector4<T> RotatedY(const double aRad) const; //Ignores W-axis
-		Vector4<T> RotateAroundPointY(const Vector4<T>& aVector, const double aRad); //Ignores W-axis
-		Vector4<T> RotatedAroundPointY(const Vector4<T>& aVector, const double aRad) const; //Ignores W-axis
+		Vector4<T> RotateY(const double aRad);
+		Vector4<T> RotatedY(const double aRad) const;
+		Vector4<T> RotateAroundPointY(const Vector4<T>& aVector, const double aRad);
+		Vector4<T> RotatedAroundPointY(const Vector4<T>& aVector, const double aRad) const;
 			  
-		Vector4<T> RotateZ(const double aRad); //Ignores W-axis
-		Vector4<T> RotatedZ(const double aRad) const; //Ignores W-axis
-		Vector4<T> RotateAroundPointZ(const Vector4<T>& aVector, const double aRad); //Ignores W-axis
-		Vector4<T> RotatedAroundPointZ(const Vector4<T>& aVector, const double aRad) const; //Ignores W-axis
+		Vector4<T> RotateZ(const double aRad);
+		Vector4<T> RotatedZ(const double aRad) const;
+		Vector4<T> RotateAroundPointZ(const Vector4<T>& aVector, const double aRad);
+		Vector4<T> RotatedAroundPointZ(const Vector4<T>& aVector, const double aRad) const;
 
 		Vector4<T> Reflected(const Vector4<T>& aNormal) const;
 

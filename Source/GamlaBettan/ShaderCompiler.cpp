@@ -15,531 +15,187 @@
 #include <FileWatcher.h>
 #endif
 
-size_t FileAge(const std::string& aFilepath)
+#define SHADER_VERSION (2)
+
+ShaderCompiler::ShaderCompiler(ID3D11Device* aDevice, const std::string& aBakedFolderPath)
 {
-	struct _stat64i32 s;
-	if (_stat64i32(aFilepath.c_str(),&s) == 0)
+	myDevice = aDevice;
+	myBakedFolderPath = aBakedFolderPath;
+}
+
+Asset* ShaderCompiler::GetPixelShader(const std::string& aBaseFolder, const std::string& aShader, ShaderFlags aFlags)
+{
+	std::vector<char> blob = LoadOrCompileFromFile(aBaseFolder, aShader, "pixelShader", "ps_5_0", aFlags);
+
+	ID3D11PixelShader* shader;
+	HRESULT result = myDevice->CreatePixelShader(blob.data(), blob.size(), nullptr, &shader);
+	if (FAILED(result))
 	{
-		time_t t = _time64(&t); // Now();
-		return t - s.st_mtime;
+		return nullptr;
 	}
-	else
+
+	return new PixelShaderAsset(shader);
+}
+
+Asset* ShaderCompiler::GetVertexShader(const std::string& aBaseFolder, const std::string& aShader, ShaderFlags aFlags)
+{
+	std::vector<char> blob = LoadOrCompileFromFile(aBaseFolder, aShader, "vertexShader", "vs_5_0", aFlags);
+
+	ID3D11VertexShader* shader;
+	HRESULT result = myDevice->CreateVertexShader(blob.data(), blob.size(), nullptr, &shader);
+	if (FAILED(result))
 	{
-		return -1;
+		return nullptr;
 	}
+
+	return new VertexShaderAsset(shader, blob);
 }
 
-std::unordered_map<std::string, PixelShader*>& LoadedPixelShaders()
+Asset* ShaderCompiler::GetGeometryShader(const std::string& aBaseFolder, const std::string& aShader, ShaderFlags aFlags)
 {
-	static std::unordered_map<std::string, PixelShader*> shaders;
-	return shaders;
-}
+	std::vector<char> blob = LoadOrCompileFromFile(aBaseFolder, aShader, "geometryShader", "gs_5_0", aFlags);
 
-std::unordered_map<std::string, VertexShader*>& LoadedVertexShaders()
-{
-	static std::unordered_map<std::string, VertexShader*> shaders;
-	return shaders;
-}
-
-std::unordered_map<std::string, std::vector<char>>& LoadedBlobs()
-{
-	static std::unordered_map<std::string, std::vector<char>> blobs;
-	return blobs;
-}
-#if USEFILEWATHCER
-Tools::FileWatcher ShaderFileWatcher;
-std::unordered_map<std::string, bool> globalIsFileWatched;
-#endif
-
-void ReleaseAllShaders()
-{
-	for (auto& i : LoadedPixelShaders())
+	ID3D11GeometryShader* shader;
+	HRESULT result = myDevice->CreateGeometryShader(blob.data(), blob.size(), nullptr, &shader);
+	if (FAILED(result))
 	{
-		i.second->ReleaseShader();
-		SAFE_DELETE(i.second);
-	} 
-	LoadedPixelShaders().clear();
-	for (auto& i : LoadedVertexShaders())
-	{
-		i.second->ReleaseShader();
-		SAFE_DELETE(i.second);
+		return nullptr;
 	}
-	LoadedVertexShaders().clear();
-	LoadedBlobs().clear();
+
+	return new GeometryShaderAsset(shader);
 }
 
-PixelShader* GetPixelShader(ID3D11Device* aDevice, const std::string& aPath, size_t aFlags)
+void ShaderCompiler::ReloadShader(Asset* aAsset, const std::string& aBaseFolder, const std::string& aShader, ShaderFlags aFlags, const std::string& aFileChanged)
 {
-	std::experimental::filesystem::path BasePath(aPath);
-	std::string binaryPath = aPath.substr(0, aPath.size() - BasePath.extension().string().size()) + ShaderTypes::PostfixFromFlags(aFlags) + "_ps.cso";
-	if (LoadedPixelShaders().count(binaryPath) == 0)
+	SYSINFO("Reloading shader", aFileChanged);
+
+	Asset* newShader;
+	
+	switch (aAsset->myType)
 	{
-		std::fstream csoFile;
-		HRESULT result;
-		std::vector<char> blob;
-
-		csoFile.open(binaryPath, std::ios::binary | std::ios::in | std::ios::ate);
-
-		if (csoFile && FileAge(binaryPath) > FileAge(aPath) && false)
+	case Asset::AssetType::PixelShader:
+	{
+		newShader = GetPixelShader(aBaseFolder, aShader, aFlags);
+		if (newShader)
 		{
-			SYSINFO("Loading pixelshader: " + aPath + " [" + ShaderTypes::PostfixFromFlags(aFlags) + "] From File");
-			std::streamsize binarySize = csoFile.tellg();
-			csoFile.seekg(0, std::ios::beg);
-			blob.resize(binarySize);
-			csoFile.read(blob.data(), binarySize);
+			reinterpret_cast<PixelShaderAsset*>(aAsset)->myShader->Release();
+			reinterpret_cast<PixelShaderAsset*>(aAsset)->myShader = reinterpret_cast<PixelShaderAsset*>(newShader)->myShader;
+			reinterpret_cast<PixelShaderAsset*>(newShader)->myShader = nullptr;
+			delete newShader;
 		}
-		else
+	}
+		break;
+	case Asset::AssetType::VertexShader:
+		newShader = GetPixelShader(aBaseFolder, aShader, aFlags);
+		if (newShader)
 		{
-			UINT flags = 0;
-			flags |= D3DCOMPILE_ENABLE_STRICTNESS;
-			flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
-			flags |= D3DCOMPILE_WARNINGS_ARE_ERRORS;
-#ifdef _DEBUG
-			flags |= D3DCOMPILE_DEBUG;
-#endif // _DEBUG
+			reinterpret_cast<VertexShaderAsset*>(aAsset)->myShader->Release();
+			reinterpret_cast<VertexShaderAsset*>(aAsset)->myShader = reinterpret_cast<VertexShaderAsset*>(newShader)->myShader;
+			reinterpret_cast<VertexShaderAsset*>(aAsset)->myBlob = reinterpret_cast<VertexShaderAsset*>(newShader)->myBlob;
+			reinterpret_cast<VertexShaderAsset*>(newShader)->myShader = nullptr;
+			delete newShader;
+		}
+		break;
+	case Asset::AssetType::GeometryShader:
+		newShader = GetPixelShader(aBaseFolder, aShader, aFlags);
+		if (newShader)
+		{
+			reinterpret_cast<GeometryShaderAsset*>(aAsset)->myShader->Release();
+			reinterpret_cast<GeometryShaderAsset*>(aAsset)->myShader = reinterpret_cast<GeometryShaderAsset*>(newShader)->myShader;
+			reinterpret_cast<GeometryShaderAsset*>(newShader)->myShader = nullptr;
+			delete newShader;
+		}
+		break;
+	default:
+		SYSERROR("Reloadign shader that isn't a shader", aFileChanged);
+		return;
+	}
+}
 
-			ID3DBlob* compiledShader = nullptr;
-			ID3DBlob* errorBlob = nullptr;
+std::vector<char> ShaderCompiler::LoadOrCompileFromFile(const std::string& aBaseFolder, const std::string& aFilePath, const std::string& aEntryPoint, const std::string& aCompiler, ShaderFlags aFlags)
+{
+	static auto versionNumber = SHADER_VERSION;
 
+	std::string binaryPath = myBakedFolderPath + aCompiler + "/" + aFilePath.substr(0, aFilePath.size() - std::filesystem::path(aFilePath).extension().string().size()) + ShaderTypes::PostfixFromFlags(aFlags) + ".cso";;
+	std::string filePath = aBaseFolder + aFilePath;
+
+	if (std::filesystem::exists(binaryPath))
+	{
+		time_t binAge = Tools::FileLastModified(binaryPath);
+		time_t rawAge = Tools::FileLastModified(filePath);
+
+		if (binAge != -1 && rawAge != -1 && binAge > rawAge)
+		{
+			try
 			{
-				std::ifstream s(aPath);
-				if (!s)
+				std::vector<char> binary = Tools::ReadWholeFileBinary(binaryPath);
+				if (binary.size() >= sizeof(versionNumber))
 				{
-					SYSERROR("file could not be opened",aPath);
-					return nullptr;
+					auto cmpResult = memcmp(binary.data(), &versionNumber, sizeof(versionNumber));
+					if (cmpResult == 0)
+					{
+						std::vector<char> blob;
+						size_t size = binary.size() - sizeof(versionNumber);
+						blob.resize(size);
+						memcpy(blob.data(), binary.data() + sizeof(versionNumber), size);
+						return blob;
+					}
 				}
 			}
-
-			SYSINFO("(Re)compiling pixelshader: " + aPath + " [" + ShaderTypes::PostfixFromFlags(aFlags) + "]");
-			result = D3DCompileFromFile((std::wstring(aPath.begin(), aPath.end())).c_str(), ShaderTypes::DefinesFromFlags(aFlags), D3D_COMPILE_STANDARD_FILE_INCLUDE, "pixelShader", "ps_5_0", flags, 0, &compiledShader, &errorBlob);
-			if (SUCCEEDED(result))
+			catch (const std::exception& e)
 			{
-				blob.resize(compiledShader->GetBufferSize());
-				memcpy(blob.data(), compiledShader->GetBufferPointer(), compiledShader->GetBufferSize());
-
-				csoFile.open(binaryPath, std::ios::binary | std::ios::out);
-				csoFile.write(blob.data(), blob.size());
-			}
-			if (compiledShader)
-			{
-				compiledShader->Release();
-			}
-			if (errorBlob)
-			{
-				SYSERROR("Could not compile pixel shader with flags: [" + ShaderTypes::PostfixFromFlags(aFlags) + "]",aPath);
-				SYSERROR((char*)errorBlob->GetBufferPointer(),aPath);
-				errorBlob->Release();
+				SYSERROR("Couldn't open baked shader", binaryPath);
 			}
 		}
-		ID3D11PixelShader* shader;
-		DirectX11Framework::AddMemoryUsage(blob.size(), std::filesystem::path(aPath).filename().string(), "Pixel Shader");
-		result = aDevice->CreatePixelShader(blob.data(), blob.size(), nullptr, &shader);
-		if (FAILED(result))
-		{
-			return nullptr;
-		}
-		LoadedPixelShaders()[binaryPath] = new PixelShader(shader);
-#if USEFILEWATHCER
-		if (!globalIsFileWatched[aPath])
-		{
-			ShaderFileWatcher.RegisterCallback(aPath, std::bind(ReloadPixelShader, aDevice, std::placeholders::_1, aFlags));
-			globalIsFileWatched[aPath] = true;
-		}
-#endif // USEFILEWATHCER
-
-
-#ifndef  _RETAIL
-		LoadedPixelShaders()[binaryPath]->myDebugShaderPath = aPath;
-#endif // ! _RETAIL
-
 	}
-	return LoadedPixelShaders()[binaryPath];
-}
 
-VertexShader* GetVertexShader(ID3D11Device* aDevice, const std::string& aPath, std::vector<char>& aVsBlob, size_t aFlags)
-{
-	std::experimental::filesystem::path BasePath(aPath);
-	std::string binaryPath = aPath.substr(0, aPath.size() - BasePath.extension().string().size()) + ShaderTypes::PostfixFromFlags(aFlags) + "_vs.cso";
+	ID3DBlob* compiledShader = nullptr;
+	ID3DBlob* errorBlob = nullptr;
 
-	if (LoadedVertexShaders().count(binaryPath) == 0)
-	{
-		std::fstream csoFile;
-		HRESULT result;
-		std::vector<char> blob;
 
-		csoFile.open(binaryPath, std::ios::binary | std::ios::in | std::ios::ate);
-
-		if (csoFile && FileAge(binaryPath) > FileAge(aPath) && false)
-		{
-			SYSINFO("Loading vertexshader: " + aPath + " [" + ShaderTypes::PostfixFromFlags(aFlags) + "] From File");
-			std::streamsize binarySize = csoFile.tellg();
-			csoFile.seekg(0, std::ios::beg);
-			blob.resize(binarySize);
-			csoFile.read(blob.data(), binarySize);
-		}
-		else
-		{
-			UINT flags = 0;
-			flags |= D3DCOMPILE_ENABLE_STRICTNESS;
-			flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
-			flags |= D3DCOMPILE_WARNINGS_ARE_ERRORS;
+	const UINT flags =
 #ifdef _DEBUG
-			flags |= D3DCOMPILE_DEBUG;
+		D3DCOMPILE_DEBUG |
 #endif // _DEBUG
+		D3DCOMPILE_ENABLE_STRICTNESS |
+		D3DCOMPILE_OPTIMIZATION_LEVEL3 |
+		D3DCOMPILE_WARNINGS_ARE_ERRORS;
 
-			ID3DBlob* compiledShader = nullptr;
-			ID3DBlob* errorBlob = nullptr;
+	HRESULT result = D3DCompileFromFile(
+		(std::wstring(filePath.begin(), filePath.end())).c_str(),
+		ShaderTypes::DefinesFromFlags(aFlags),
+		D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		aEntryPoint.c_str(),
+		aCompiler.c_str(),
+		0,
+		0,
+		&compiledShader,
+		&errorBlob);
 
-			{
-				std::ifstream s(aPath);
-				if (!s)
-				{
-					SYSERROR("file could not be opened",aPath);
-					return nullptr;
-				}
-			}
-			SYSINFO("(Re)compiling vertexshader: " + aPath + " [" + ShaderTypes::PostfixFromFlags(aFlags) + "]");
-			result = D3DCompileFromFile((std::wstring(aPath.begin(), aPath.end())).c_str(),ShaderTypes::DefinesFromFlags(aFlags), D3D_COMPILE_STANDARD_FILE_INCLUDE, "vertexShader", "vs_5_0", flags, 0, &compiledShader, &errorBlob);
-
-			if (SUCCEEDED(result))
-			{
-				blob.resize(compiledShader->GetBufferSize());
-				memcpy(blob.data(), compiledShader->GetBufferPointer(), compiledShader->GetBufferSize());
-
-				csoFile.open(binaryPath, std::ios::binary | std::ios::out);
-				csoFile.write(blob.data(), blob.size());
-			}
-			if (errorBlob)
-			{
-				SYSERROR((char*)errorBlob->GetBufferPointer(), BasePath.string());
-				SYSERROR("Could not compile pixel shader with flags: [" + ShaderTypes::PostfixFromFlags(aFlags) + "]", BasePath.string());
-				errorBlob->Release();
-			}
-		}
-		ID3D11VertexShader* shader;
-		DirectX11Framework::AddMemoryUsage(blob.size(), std::filesystem::path(aPath).filename().string(), "Vertex Shader");
-		result = aDevice->CreateVertexShader(blob.data(), blob.size(), nullptr, &shader);
-		if (FAILED(result))
-		{
-			const _D3D_SHADER_MACRO* macros = ShaderTypes::DefinesFromFlags(aFlags);
-			SYSERROR("could oh noes ICANHAZ stdio?","");
-			return nullptr;
-		}
-		LoadedBlobs()[binaryPath] = blob;
-		LoadedVertexShaders()[binaryPath] = new VertexShader(shader);
-#if USEFILEWATHCER
-		if (!globalIsFileWatched[aPath])
-		{
-			ShaderFileWatcher.RegisterCallback(aPath, std::bind(ReloadVertexShader, aDevice, std::placeholders::_1, aFlags));
-			globalIsFileWatched[aPath] = true;
-		}
-#endif // USEFILEWATHCER
-#ifndef  _RETAIL
-		LoadedVertexShaders()[binaryPath]->myDebugShaderPath = aPath;
-#endif // ! _RETAIL
-	}
+	std::vector<char> blob;
 
 
-	aVsBlob = LoadedBlobs()[binaryPath];
-	return LoadedVertexShaders()[binaryPath];
-}
-
-void ReloadPixelShader(ID3D11Device* aDevice, const std::string& aPath,size_t aFlags)
-{
-	std::string binaryFile = aPath.substr(0, aPath.length() - std::experimental::filesystem::path(aPath).extension().string().length()) + ShaderTypes::PostfixFromFlags(aFlags) + "_ps.cso";
-
-	if (LoadedPixelShaders().find(binaryFile) != LoadedPixelShaders().end())
+	if (FAILED(result) || errorBlob)
 	{
-		PixelShader* start = LoadedPixelShaders()[binaryFile];
-		LoadedPixelShaders().erase(binaryFile);
-		PixelShader* end = GetPixelShader(aDevice, aPath, aFlags);
-		if (end)
+		SYSERROR("Could not compile " + aEntryPoint + " shader with flags: [" + ShaderTypes::PostfixFromFlags(aFlags) + "]", aFilePath);
+		if (errorBlob)
 		{
-			start->ReleaseShader();
-			start->myShader = end->myShader;
-			LoadedPixelShaders()[binaryFile] = start;
-			delete end;
-		}
-		else
-		{
-			SYSWARNING("Failed to reload",aPath);
-			LoadedPixelShaders()[binaryFile] = start;
+			SYSERROR((char*)errorBlob->GetBufferPointer(), aFilePath);
+			errorBlob->Release();
 		}
 	}
 	else
 	{
-		SYSWARNING("trying to reload shader thats not loaded",aPath);
-	}
-}
+		blob.resize(compiledShader->GetBufferSize());
+		memcpy(blob.data(), compiledShader->GetBufferPointer(), compiledShader->GetBufferSize());
 
-void ReloadVertexShader(ID3D11Device* aDevice, const std::string& aPath, size_t aFlags)
-{
-	std::string binaryFile = aPath.substr(0, aPath.length() - std::experimental::filesystem::path(aPath).extension().string().length()) + ShaderTypes::PostfixFromFlags(aFlags) + "_vs.cso";
+		std::filesystem::create_directories(binaryPath.substr(0, binaryPath.size() - std::filesystem::path(binaryPath).filename().string().size()));
 
-	if (LoadedVertexShaders().find(binaryFile) != LoadedVertexShaders().end())
-	{
-		VertexShader* start = LoadedVertexShaders()[binaryFile];
-		LoadedVertexShaders().erase(binaryFile);
-		std::vector<char> _;
-		VertexShader* end = GetVertexShader(aDevice, aPath, _,aFlags);
-		if (end)
-		{
-			start->ReleaseShader();
-			start->myShader = end->myShader;
-			LoadedVertexShaders()[binaryFile] = start;
-			delete end;
-		}
-		else
-		{
-			SYSWARNING("Failed to reload",aPath);
-			LoadedVertexShaders()[binaryFile] = start;
-		}
-	}
-	else
-	{
-		SYSWARNING("trying to reload shader thats not loaded", binaryFile);
-	}
-}
+		std::ofstream csoFile = std::ofstream(binaryPath, std::ios::binary | std::ios::out);
 
-
-bool LoadPixelShader(ID3D11Device* aDevice, std::string aFilePath, ID3D11PixelShader*& aShaderOutput)
-{
-	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined( DEBUG ) || defined( _DEBUG )
-	flags |= D3DCOMPILE_DEBUG;
-#endif
-	ID3DBlob* shaderBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-
-
-	HRESULT hr = D3DCompileFromFile((std::wstring(aFilePath.begin(), aFilePath.end())).c_str(), ShaderTypes::DefinesFromFlags(0), D3D_COMPILE_STANDARD_FILE_INCLUDE, "pixelShader", "ps_5_0", flags, 0, &shaderBlob, &errorBlob);
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Failed to compile pixel shader", aFilePath);
-		if (errorBlob)
-		{
-			LOGERROR((char*)errorBlob->GetBufferPointer(),"");
-			errorBlob->Release();
-		}
-
-		if (shaderBlob)
-			shaderBlob->Release();
-
-		return false;
+		csoFile.write(reinterpret_cast<const char*>(&versionNumber), sizeof(versionNumber));
+		csoFile.write(blob.data(), blob.size());
 	}
 
-	hr = aDevice->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &aShaderOutput);
-
-	shaderBlob->Release();
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Could not create pixelshader on the graphics card","");
-		return false;
-	}
-
-	return true;
-}
-
-bool LoadGeometryShader(ID3D11Device* aDevice, std::string aFilePath, ID3D11GeometryShader*& aShaderOutput)
-{
-	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined( DEBUG ) || defined( _DEBUG )
-	flags |= D3DCOMPILE_DEBUG;
-#endif
-	ID3DBlob* shaderBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-
-
-	HRESULT hr = D3DCompileFromFile((std::wstring(aFilePath.begin(), aFilePath.end())).c_str(), ShaderTypes::DefinesFromFlags(0), D3D_COMPILE_STANDARD_FILE_INCLUDE, "geometryShader", "gs_5_0", flags, 0, &shaderBlob, &errorBlob);
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Failed to compile pixel shader","");
-		if (errorBlob)
-		{
-			LOGERROR((char*)errorBlob->GetBufferPointer());
-			errorBlob->Release();
-		}
-
-		if (shaderBlob)
-			shaderBlob->Release();
-
-		return false;
-	}
-
-	hr = aDevice->CreateGeometryShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &aShaderOutput);
-
-	shaderBlob->Release();
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Could not create pixelshader on the graphics card","");
-		return false;
-	}
-
-	return true;
-}
-
-bool LoadVertexShader(ID3D11Device* aDevice, std::string aFilePath, ID3D11VertexShader*& aShaderOutput, void* aCompiledOutput, size_t aFlags)
-{
-	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#ifdef _DEBUG 
-	flags |= D3DCOMPILE_DEBUG;
-#endif
-	ID3DBlob** shaderBlob = static_cast<ID3DBlob**>(aCompiledOutput);
-	ID3DBlob* errorBlob = nullptr;
-
-	HRESULT hr = D3DCompileFromFile((std::wstring(aFilePath.begin(), aFilePath.end())).c_str(), ShaderTypes::DefinesFromFlags(aFlags), D3D_COMPILE_STANDARD_FILE_INCLUDE, "vertexShader", "vs_5_0", flags, 0, shaderBlob, &errorBlob);
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Failed to compile Vertex shader","");
-		if (errorBlob)
-		{
-			LOGERROR((char*)errorBlob->GetBufferPointer());
-			errorBlob->Release();
-		}
-
-		if ((*shaderBlob))
-		{
-			(*shaderBlob)->Release();
-		}
-
-		return false;
-	}
-
-	hr = aDevice->CreateVertexShader((*shaderBlob)->GetBufferPointer(), (*shaderBlob)->GetBufferSize(), nullptr, &aShaderOutput);
-
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Could not create vertexshader on the graphics card",aFilePath);
-		return false;
-	}
-
-	return true;
-}
-
-bool CompilePixelShader(ID3D11Device* aDevice, std::string aData, ID3D11PixelShader*& aShaderOutput, size_t aFlags)
-{
-	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#ifdef _DEBUG 
-	flags |= D3DCOMPILE_DEBUG;
-#endif
-	ID3DBlob* shaderBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-
-	HRESULT hr = D3DCompile(aData.c_str(), aData.length(), NULL, ShaderTypes::DefinesFromFlags(aFlags), D3D_COMPILE_STANDARD_FILE_INCLUDE, "pixelShader", "ps_5_0", flags, 0, &shaderBlob, &errorBlob);
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Failed to compile Pixel shader","");
-		if (errorBlob)
-		{
-			LOGERROR((char*)errorBlob->GetBufferPointer());
-			errorBlob->Release();
-		}
-
-		if (shaderBlob)
-			shaderBlob->Release();
-
-		return false;
-	}
-
-	hr = aDevice->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &aShaderOutput);
-
-	shaderBlob->Release();
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Could not create pixelShader on the graphics card","");
-		return false;
-	}
-
-	return true;
-}
-bool CompileGeometryShader(ID3D11Device* aDevice, std::string aData, ID3D11GeometryShader*& aShaderOutput)
-{
-	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#ifdef _DEBUG 
-	flags |= D3DCOMPILE_DEBUG;
-#endif
-	ID3DBlob* shaderBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-
-	HRESULT hr = D3DCompile(aData.c_str(), aData.length(), NULL, ShaderTypes::DefinesFromFlags(0), D3D_COMPILE_STANDARD_FILE_INCLUDE, "geometryShader", "gs_5_0", flags, 0, &shaderBlob, &errorBlob);
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Failed to compile Geometry shader","");
-		if (errorBlob)
-		{
-			LOGERROR((char*)errorBlob->GetBufferPointer());
-			errorBlob->Release();
-		}
-
-		if (shaderBlob)
-			shaderBlob->Release();
-
-		return false;
-	}
-
-	hr = aDevice->CreateGeometryShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &aShaderOutput);
-
-	shaderBlob->Release();
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Could not create pixelShader on the graphics card","");
-		return false;
-	}
-
-	return true;
-}
-bool CompileVertexShader(ID3D11Device* aDevice, std::string aData, ID3D11VertexShader*& aShaderOutput, void* aCompiledOutput, size_t aFlags)
-{
-	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#ifdef _DEBUG 
-	flags |= D3DCOMPILE_DEBUG;
-#endif
-	ID3DBlob** shaderBlob = static_cast<ID3DBlob**>(aCompiledOutput);
-	ID3DBlob* errorBlob = nullptr;
-
-	HRESULT hr = D3DCompile(aData.c_str(), aData.length(), NULL, ShaderTypes::DefinesFromFlags(aFlags), D3D_COMPILE_STANDARD_FILE_INCLUDE, "vertexShader", "vs_5_0", flags, 0, shaderBlob, &errorBlob);
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Failed to compile Vertex shader","");
-		if (errorBlob)
-		{
-			LOGERROR((char*)errorBlob->GetBufferPointer());
-			errorBlob->Release();
-		}
-
-		if (*shaderBlob)
-		{
-			(*shaderBlob)->Release();
-		}
-
-		return false;
-	}
-
-	hr = aDevice->CreateVertexShader((*shaderBlob)->GetBufferPointer(), (*shaderBlob)->GetBufferSize(), nullptr, &aShaderOutput);
-
-	if (FAILED(hr))
-	{
-		SYSERROR("Could not create vertexshader on the graphics card","");
-		return false;
-	}
-
-	return true;
-}
-
-void FlushShaderChanges()
-{
-#if USEFILEWATHCER
-	ShaderFileWatcher.FlushChanges();
-#endif // USEFILEWATHCER
+	return blob;
 }

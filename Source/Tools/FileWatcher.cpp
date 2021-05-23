@@ -28,7 +28,7 @@ namespace Tools
 		//myWorkHorse.detach();
 	}
 
-	FileWatcher::UniqueID FileWatcher::RegisterCallback(std::string aFile, std::function<CallbackFunction> aCallback, bool aCallImmediately)
+	FileWatcher::UniqueID FileWatcher::RegisterCallback(std::string aFile, Tools::CallbackFunction aCallback, bool aCallImmediately)
 	{
 		static std::mutex mutex;
 		std::lock_guard guard(mutex);
@@ -196,16 +196,13 @@ namespace Tools
 
 	bool FileHandle::CheckChanged() const
 	{
-		struct stat result;
-		if (stat(myFileName.c_str(), &result) == 0 /* S_OK */)
+		time_t lastChanged = Tools::FileLastModified(myFileName);
+
+		if (lastChanged != -1 && lastChanged > myFileLastChanged)
 		{
-			time_t mod_time = result.st_mtime;
-			if (mod_time > myFileLastChanged)
-			{
-				*const_cast<time_t*>(&myFileLastChanged) = mod_time;	//const to allow whole object to be used as a key in a std::map, 
-																			//changing time does not affect the hash of it so this is 'safe' (TM)
-				return true;
-			}
+			*const_cast<time_t*>(&myFileLastChanged) = lastChanged;	//const to allow whole object to be used as a key in a std::map, 
+																		//changing time does not affect the hash of it so this is 'safe' (TM)
+			return true;
 		}
 		return false;
 	}

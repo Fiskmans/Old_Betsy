@@ -24,9 +24,9 @@ private:
 	_NODISCARD Particle* LoadParticle(const std::string& aFilePath);
 
 	struct ID3D11Device* myDevice;
-	struct ID3D11GeometryShader* myGeometryShader;
-	class PixelShader* myPixelShader;
-	class VertexShader* myVertexShader;
+	AssetHandle myGeometryShader;
+	AssetHandle myPixelShader;
+	AssetHandle myVertexShader;
 	struct ID3D11InputLayout* myInputLayout;
 
 	std::unordered_map<std::string, Particle*> myParticles;

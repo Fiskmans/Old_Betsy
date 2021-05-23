@@ -10,6 +10,9 @@
 #include "Model.h"
 #include "ShaderFlags.h"
 #include "Intersection.hpp"
+#include <d3dcompiler.h>
+
+#include "AssetManager.h"
 
 struct CameraBuffer
 {
@@ -34,11 +37,31 @@ void DebugDrawer::Init(DirectX11Framework* aFramework)
 		"}\n"
 		;
 
-	if (!CompilePixelShader(device, pixelShaderData, myPixelShader))
+	ID3D11PixelShader* rawPixelShader;
+	ID3D11VertexShader* rawVertexShader;
+
+	Asset* pixelShader;
+	Asset* vertexShader;
+
+	ID3DBlob* rawCompiled;
+	ID3DBlob* errorBlob;
+
+	HRESULT result = D3DCompile(pixelShaderData.c_str(), pixelShaderData.size(), nullptr, nullptr, nullptr, "pixelShader", "ps_5_0", 0, 0, &rawCompiled, &errorBlob);
+
+	if (FAILED(result) || errorBlob)
 	{
-		SYSERROR("Could not compile pixelshader", "debugdrawer");
-		return;
+		SYSCRASH("Failed to compile debugDrawer pixel shader");
+		SAFE_RELEASE(errorBlob);
 	}
+	result = device->CreatePixelShader(rawCompiled->GetBufferPointer(), rawCompiled->GetBufferSize(), nullptr, &rawPixelShader);
+	if (FAILED(result))
+	{
+		SYSCRASH("Failed to create debugDrawer pixel shader");
+	}
+
+	SAFE_RELEASE(rawCompiled);
+
+	pixelShader = new PixelShaderAsset(rawPixelShader);
 
 	std::string vertexShaderData =
 		"cbuffer matrixes : register(b0)\n"
@@ -57,28 +80,44 @@ void DebugDrawer::Init(DirectX11Framework* aFramework)
 		"}\n"
 		;
 
-	ID3DBlob* vertexBlob;
-	if (!CompileVertexShader(device, vertexShaderData, myVertexShader, &vertexBlob))
+	result = D3DCompile(vertexShaderData.c_str(), vertexShaderData.size(), nullptr, nullptr, nullptr, "vertexShader", "vs_5_0", 0, 0, &rawCompiled, &errorBlob);
+
+	if (FAILED(result) || errorBlob)
 	{
-		if (vertexBlob)
-		{
-			vertexBlob->Release();
-		}
-		SYSERROR("Could not Compile vertexshader", "debugdrawer");
-		return;
+		SYSCRASH("Failed to compile debugDrawer pixel shader");
+		SAFE_RELEASE(errorBlob);
 	}
+	result = device->CreateVertexShader(rawCompiled->GetBufferPointer(), rawCompiled->GetBufferSize(), nullptr, &rawVertexShader);
+	if (FAILED(result))
+	{
+		SYSCRASH("Failed to create debugDrawer pixel shader");
+	}
+
+	std::vector<char> blob;
+	blob.resize(rawCompiled->GetBufferSize());
+	memcpy(blob.data(), rawCompiled->GetBufferPointer(), rawCompiled->GetBufferSize());
+
+	vertexShader = new VertexShaderAsset(rawVertexShader,blob);
+
+	AssetManager::GetInstance().AssumeOwnershipOfCustomAsset(pixelShader);
+	AssetManager::GetInstance().AssumeOwnershipOfCustomAsset(vertexShader);
+
+	myPixelShader = AssetHandle(pixelShader);
+	myVertexShader = AssetHandle(vertexShader);
+
 
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
 		{"POSITION" ,0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0}
 	};
 
-	HRESULT result = device->CreateInputLayout(layout, sizeof(layout) / sizeof(layout[0]), vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize(), &myInputLayout);
+	result = device->CreateInputLayout(layout, sizeof(layout) / sizeof(layout[0]), rawCompiled->GetBufferPointer(), rawCompiled->GetBufferSize(), &myInputLayout);
 	if (FAILED(result))
 	{
 		SYSERROR("could not create input layout", "debugdrawer");
 		return;
 	}
+	SAFE_RELEASE(rawCompiled);
 
 	CD3D11_BUFFER_DESC desc;
 	ZeroMemory(&desc, sizeof(desc));
@@ -584,8 +623,8 @@ void DebugDrawer::Render(Camera* aCamera)
 
 
 		context->IASetInputLayout(myInputLayout);
-		context->PSSetShader(myPixelShader, nullptr, 0);
-		context->VSSetShader(myVertexShader, nullptr, 0);
+		context->PSSetShader(myPixelShader.GetAsPixelShader(), nullptr, 0);
+		context->VSSetShader(myVertexShader.GetAsVertexShader(), nullptr, 0);
 		context->GSSetShader(nullptr, nullptr, 0);
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST);
 

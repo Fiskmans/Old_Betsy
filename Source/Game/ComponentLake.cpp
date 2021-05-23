@@ -9,7 +9,6 @@
 
 #include "Mesh.h"
 #include "PlayerController.h"
-#include "AbilityInstance.h"
 #include "Movement3D.h"
 #include "ParticleOnDeath.h"
 #include "ParticleOnHit.h"
@@ -39,7 +38,6 @@ ComponentLake::ComponentLake()
 	SETSIZEOFPOOL(Mesh, 10000);
 	SETSIZEOFPOOL(PlayerController, 5);
 	SETSIZEOFPOOL(Light, 150);
-	SETSIZEOFPOOL(AbilityInstance, 100);
 	SETSIZEOFPOOL(Movement3D, 500);
 	SETSIZEOFPOOL(Homing3D, 100);
 	SETSIZEOFPOOL(ParticlesOnDeath, 500);
@@ -72,9 +70,7 @@ ComponentLake::~ComponentLake()
 	}
 }
 
-// THIS IS TO BE DONE AFTER REGISTER OF COMPONENTS HAS HAPPENED
 void ComponentLake::PrepareObjectsInPools(
-	ModelLoader* aModelLoader,
 	Scene* aScene, 
 	ParticleFactory* aParticleFactory, 
 	AudioManager* aAudioManager, 
@@ -138,7 +134,6 @@ void ComponentLake::RegisterComponents()
 	RegisterComponent<Life>();
 	RegisterComponent<LifeTime>();
 	RegisterComponent<CharacterInstance>();
-	RegisterComponent<AbilityInstance>();
 	RegisterComponent<Growable>();
 	RegisterComponent<GrowthSpot>();
 	RegisterComponent<House>();

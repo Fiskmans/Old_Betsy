@@ -4,16 +4,6 @@
 
 V2F Sprite::ourWindowSize = { 1920.f,1080.f };
 
-Sprite::Sprite()
-{
-}
-
-Sprite::~Sprite()
-{
-	mySpriteData.myTexture->Release();
-	WIPE(mySpriteData);
-}
-
 void Sprite::Init(const SpriteData& aSpriteData)
 {
 	mySpriteData = aSpriteData;

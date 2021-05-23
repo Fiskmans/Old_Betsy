@@ -7,7 +7,6 @@
 #include <imgui.h>
 #include "PostMaster.hpp"
 #include "TextureLoader.h"
-#include "Shaders.h"
 
 struct ParticleFrameBufferData
 {
@@ -130,49 +129,20 @@ void ParticleRenderer::Render(Camera* aCamera,const std::vector<ParticleInstance
 		context->IASetVertexBuffers(0, 1, &particleData.myParticleVertexBuffer, &particleData.myStride, &particleData.myOffset);
 
 		context->VSSetConstantBuffers(1, 1, &myObjectBuffer);
-		context->VSSetShader(*particleData.myVertexShader, nullptr, 0);
+		context->VSSetShader(particleData.myVertexShader.GetAsVertexShader(), nullptr, 0);
 
 		context->GSSetConstantBuffers(1, 1, &myObjectBuffer);
-		context->GSSetShader(particleData.myGeometryShader, nullptr, 0);
+		context->GSSetShader(particleData.myGeometryShader.GetAsGeometryShader(), nullptr, 0);
 
 		context->PSSetConstantBuffers(1, 1, &myObjectBuffer);
-		if (myIsInHastfanMode)
+		ID3D11ShaderResourceView* texture[1] =
 		{
-			context->PSSetShaderResources(0, 1, *myHastFan);
-		}
-		else
-		{
-			context->PSSetShaderResources(0, 1, *particleData.myTexture);
-		}
-		context->PSSetShader(*particleData.myPixelShader, nullptr, 0);
+			particleData.myTexture.GetAsTexture()
+		};
+		context->PSSetShaderResources(0, 1, texture);
+
+		context->PSSetShader(particleData.myPixelShader.GetAsPixelShader(), nullptr, 0);
 
 		context->Draw(count, 0);
 	}
-}
-
-void ParticleRenderer::RecieveMessage(const Message& aMessage)
-{
-	if (aMessage.myMessageType == MessageType::EnableHastfan)
-	{
-		if (!myIsInHastfanMode)
-		{
-			myIsInHastfanMode = true;
-			myHastFan = LoadTexture(myFrameWork->GetDevice(), "Data/Textures/Particles/hastfan.dds");
-			if (IsErrorTexture(myHastFan))
-			{
-				myHastFan = nullptr;
-				myIsInHastfanMode = false;
-			}
-		}
-	}
-}
-
-void ParticleRenderer::SubscribeToMessages()
-{
-	PostMaster::GetInstance()->Subscribe(MessageType::EnableHastfan, this);
-}
-
-void ParticleRenderer::UnsubscribeToMessages()
-{
-	PostMaster::GetInstance()->UnSubscribe(MessageType::EnableHastfan, this);
 }

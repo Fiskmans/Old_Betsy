@@ -27,7 +27,6 @@ public:
 	EnemyFactory* GetEnemyFactory();
 	TimerController* GetTimerController();
 	std::any GetSharedStorage(std::string aKey);
-	ModelLoader* GetModelLoader();
 	Scene* GetScene();
 	ParticleFactory* GetParticleFactory();
 	SpriteFactory* GetSpriteFactory();
@@ -41,7 +40,6 @@ public:
 	void SetTimerController(TimerController* aTimerController);
 	void SetSharedStorage(std::string aKey,std::any aValue);
 
-	void SetModelLoader(ModelLoader* aModelLoader);
 	void SetScene(Scene* aScene);
 	void SetParticleFactory(ParticleFactory* aParticleFactory);
 	void SetSpriteFactory(SpriteFactory* aSpriteFactory);
@@ -56,7 +54,6 @@ private:
 	std::vector<Entity*>* myEnemies = nullptr;
 	SpriteFactory* mySpriteFactory = nullptr;
 	EnemyFactory* myEnemyFactory = nullptr;
-	ModelLoader* myModelLoader = nullptr;
 	Entity* myPlayer = nullptr;
 	Scene* myScene = nullptr;
 };

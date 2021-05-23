@@ -18,13 +18,12 @@
 #include <FiskJSON.h>
 
 
-bool CinematicState::Init(const std::string& aManuscript, ModelLoader* aModelLoader, Scene* aScene, ParticleFactory* aParticleFactory, SpriteFactory* aSpriteFactory)
+bool CinematicState::Init(const std::string& aManuscript, Scene* aScene, ParticleFactory* aParticleFactory, SpriteFactory* aSpriteFactory)
 {
-	myModelLoader = aModelLoader;
 	myScene = aScene;
 	myParticleFactory = aParticleFactory;
 	myCameaSpeed = 800.f;
-	myFadeSprite = aSpriteFactory->CreateSprite("Data/Ui/fadeScreen.dds");
+	myFadeSprite = aSpriteFactory->CreateSprite("engine/fadeScreen.dds");
 	myFadeSprite->SetScale(V2F(1000.f, 1000.f));
 	myFadeSprite->SetColor(V4F(1, 1, 1, 0));
 	myFadeSprite->SetPosition(V2F(0, 0));
@@ -44,7 +43,8 @@ void CinematicState::Update(const float aDeltaTime)
 	{
 		if (i->HasAnimations())
 		{
-			i->StepAnimation(aDeltaTime);
+			ONETIMEWARNING("Cinematic animations are currently broken", "");
+			//i->StepAnimation(aDeltaTime);
 		}
 	}
 	switch (myState)

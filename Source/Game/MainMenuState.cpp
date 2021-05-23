@@ -1,17 +1,13 @@
 #include "pch.h"
 #include "MainMenuState.h"
 #include "GraphicEngine.h"
-#include "VideoState.h"
 #include "DirectX11Framework.h"
 #include "SpriteInstance.h"
 #include "video.h"
 #include <Xinput.h>
 #include "OptionState.h"
 #include "LevelSelectState.h"
-
-#include <rapidjson/document.h>
-#include <rapidjson/filereadstream.h>
-
+#include "AssetManager.h"
 
 template<typename>
 struct array_size;
@@ -70,20 +66,19 @@ void MainMenuState::RecieveMessage(const Message& aMessage)
 	}
 }
 
-bool MainMenuState::Init(InputManager* aInputManager, ModelLoader* aModelLoader, SpriteFactory* aSpritefactory,
+bool MainMenuState::Init(InputManager* aInputManager, SpriteFactory* aSpritefactory,
 	LightLoader* aLightLoader, WindowHandler* aWindowHandler, DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer)
 {
 	myIsMain = true;
 
 	if (!myMousePointer)
 	{
-		myMousePointer = aSpritefactory->CreateSprite("Data/UI/mouse.dds");
+		myMousePointer = aSpritefactory->CreateSprite("ui/mouse.dds");
 	}
 
 	myStateInitData.myFrameWork = aFramework;
 	myStateInitData.myInputManager = aInputManager;
 	myStateInitData.myLightLoader = aLightLoader;
-	myStateInitData.myModelLoader = aModelLoader;
 	myStateInitData.mySpriteFactory = aSpritefactory;
 	myStateInitData.myWindowHandler = aWindowHandler;
 	myStateInitData.myAudioManager = aAudioManager;
@@ -141,10 +136,7 @@ void MainMenuState::Unload()
 
 void MainMenuState::InitLayout(SpriteFactory* aSpritefactory)
 {
-	rapidjson::Document mainMenuDoc;
-
-	FiskJSON::Object root;
-	root.Parse(Tools::ReadWholeFile("Data\\UI\\UIButtons\\MainMenuLayout.json"));
+	FiskJSON::Object& root = AssetManager::GetInstance().GetJSON("menu/MainMenuLayout.json").GetAsJSON();
 
 	std::string imagesPath = root["ImagesPath"].Get<std::string>();
 
@@ -207,30 +199,13 @@ void MainMenuState::InitLayout(SpriteFactory* aSpritefactory)
 		message.myBool = true;
 		Publisher::SendMessages(message);
 	});
-
-	myCreditButton.SetOnPressedFunction([this]() -> void
-	{
-		Message message;
-		message.myMessageType = MessageType::PushState;
-		VideoState* video = new VideoState();
-		if (video->Init(myStateInitData.myModelLoader, myStateInitData.mySpriteFactory, "Data\\Cinematics\\Credits.mp4", false, myStateInitData.myFrameWork->GetContext()) == false)
-		{
-			//TODO: PROPER DELETE OF DATA
-			delete video;
-			return;
-		}
-		video->SetMain(true);
-		message.myData = video;
-		Publisher::SendMessages(message);
-	});
-
 }
 
 GameState* MainMenuState::CreateGameState(const int& aStartLevel)
 {
 	GameState* state = new GameState();
 
-	if (state->Init(myStateInitData.myWindowHandler, myStateInitData.myInputManager, myStateInitData.myModelLoader,
+	if (state->Init(myStateInitData.myWindowHandler, myStateInitData.myInputManager, 
 		myStateInitData.mySpriteFactory, myStateInitData.myLightLoader, myStateInitData.myFrameWork, myStateInitData.myAudioManager, myStateInitData.mySpriteRenderer) == false)
 	{
 		//TODO: PROPER DELETE OF DATA

@@ -100,7 +100,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;$(SolutionDir)Audio\Wwise\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -108,8 +108,8 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <Lib>
-      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib;Wwise_$(Configuration).lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\;$(solutiondiir)libs\Wwise\lib\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
@@ -118,7 +118,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;$(SolutionDir)Audio\Wwise\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -126,8 +126,8 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <Lib>
-      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib;Audio_$(Configuration).lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\;$(solutiondiir)libs\Wwise\lib\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -138,7 +138,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;$(SolutionDir)Audio\Wwise\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PreprocessorDefinitions>_RELEASE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -148,8 +148,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib;Wwise_$(Configuration).lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\;$(solutiondiir)libs\Wwise\lib\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">
@@ -160,7 +160,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;$(SolutionDir)Audio\Wwise\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PreprocessorDefinitions>_RETAIL;NDEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -170,21 +170,30 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_release.lib;Wwise_release.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\;$(solutiondiir)libs\Wwise\lib\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AK\SoundEngine\Common\AkFilePackage.cpp" />
+    <ClCompile Include="AK\SoundEngine\Common\AkFilePackageLUT.cpp" />
+    <ClCompile Include="AK\SoundEngine\Common\AkMultipleFileLocation.cpp" />
+    <ClCompile Include="AK\SoundEngine\Win32\AkDefaultIOHookBlocking.cpp" />
+    <ClCompile Include="AK\SoundEngine\Win32\AkDefaultIOHookDeferred.cpp" />
+    <ClCompile Include="AK\SoundEngine\Win32\stdafx.cpp" />
     <ClCompile Include="AnimationData.cpp" />
+    <ClCompile Include="AnimationLoader.cpp" />
     <ClCompile Include="Animator.cpp" />
     <ClCompile Include="Asset.cpp" />
     <ClCompile Include="AssetImportHelpers.cpp" />
     <ClCompile Include="AssetLoader.cpp" />
     <ClCompile Include="AssetManager.cpp" />
+    <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="CinematicTarget.cpp" />
     <ClCompile Include="DecalFactory.cpp" />
-    <ClCompile Include="FontFactory.cpp" />
     <ClCompile Include="ForEachEnemyWithinRange.cpp" />
+    <ClCompile Include="LevelLoader.cpp" />
+    <ClCompile Include="NavMeshLoader.cpp" />
     <ClCompile Include="NodeCameraOffset.cpp" />
     <ClCompile Include="NodeChangeInteractableMesh.cpp" />
     <ClCompile Include="NodeContinuousSpawner.cpp" />
@@ -294,8 +303,6 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="PathFinder.cpp" />
-    <ClCompile Include="PathFinderData.cpp" />
-    <ClCompile Include="AnimationController.cpp" />
     <ClCompile Include="PlayAnimation.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="DepthRenderer.cpp" />
@@ -337,7 +344,6 @@
     <ClCompile Include="RenderStateManager.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShaderCompiler.cpp" />
-    <ClCompile Include="Shaders.cpp" />
     <ClCompile Include="ShaderTypes.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Spline.cpp" />
@@ -357,20 +363,23 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="WindSystem.cpp" />
+    <ClCompile Include="WwiseFramework.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AnimationController.h" />
     <ClInclude Include="AnimationData.h" />
+    <ClInclude Include="AnimationLoader.h" />
     <ClInclude Include="Animator.h" />
     <ClInclude Include="Asset.h" />
     <ClInclude Include="AssetImportHelpers.h" />
     <ClInclude Include="AssetLoader.h" />
     <ClInclude Include="AssetManager.h" />
+    <ClInclude Include="AudioManager.h" />
     <ClInclude Include="CinematicTarget.h" />
     <ClInclude Include="Decal.h" />
     <ClInclude Include="DecalFactory.h" />
-    <ClInclude Include="FontFactory.h" />
     <ClInclude Include="ForEachEnemyWithinRange.h" />
+    <ClInclude Include="LevelLoader.h" />
+    <ClInclude Include="NavMeshLoader.h" />
     <ClInclude Include="NodeCameraOffset.h" />
     <ClInclude Include="NodeChangeInteractableMesh.h" />
     <ClInclude Include="NodeContinuousSpawner.h" />
@@ -482,7 +491,6 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="PathFinder.h" />
-    <ClInclude Include="PathFinderData.h" />
     <ClInclude Include="NodeSetToIdle.h" />
     <ClInclude Include="PlayAnimation.h" />
     <ClInclude Include="resource.h" />
@@ -531,7 +539,6 @@
     <ClInclude Include="ShaderBuffers.h" />
     <ClInclude Include="ShaderCompiler.h" />
     <ClInclude Include="ShaderFlags.h" />
-    <ClInclude Include="Shaders.h" />
     <ClInclude Include="ShaderTypes.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Spline.h" />
@@ -552,6 +559,8 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="WindSystem.h" />
+    <ClInclude Include="WwiseFramework.h" />
+    <ClInclude Include="Wwise_IDs.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BlueprintUtilities\Include\ax\Math2D.inl" />

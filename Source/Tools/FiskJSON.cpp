@@ -14,7 +14,7 @@ namespace FiskJSON
 	{
 		bool IsWhiteSpace(char aChar)
 		{
-			return !isprint(aChar);
+			return !isprint(aChar) || aChar == ' ';
 		}
 
 		const char* FindStart(const char* aBegin, const char* aEnd)
@@ -49,7 +49,7 @@ namespace FiskJSON
 				char c = *begin;
 				if (scopeStack.empty())
 				{
-					if(IsWhiteSpace(c))
+					if(IsWhiteSpace(c) || c == ',')
 					{
 						break;
 					}
@@ -107,6 +107,59 @@ namespace FiskJSON
 			}
 			return false;
 		}
+
+		const char* EscapeString(const char* aBegin, const char* aEnd)
+		{
+			const char* read = aBegin;
+			char* write = const_cast<char*>(aBegin);
+			while (read != aEnd)
+			{
+				if (*read == '\\')
+				{
+					read++;
+					if (read == aEnd)
+					{
+						throw Invalid_JSON("Invalid escaped character");
+					}
+					switch (*read)
+					{
+					case 'n':
+						*write = '\n';
+						break;
+					case 'r':
+						*write = '\r';
+						break;
+					case 't':
+						*write = '\t';
+						break;
+					case 'b':
+						*write = '\b';
+						break;
+					case 'f':
+						*write = '\f';
+						break;
+					case '\\':
+						*write = '\\';
+						break;
+					case '"':
+						*write = '\"';
+						break;
+					case '\'':
+						*write = '\'';
+						break;
+					default:
+						throw Invalid_JSON("Invalid escaped character");
+					}
+				}
+				else
+				{
+					*write = *read;
+				}
+				read++;
+				write++;
+			}
+			return write;
+		}
 	}
 
 	void Object::Parse(const std::string& aDocument)
@@ -139,7 +192,7 @@ namespace FiskJSON
 			return;
 		}
 
-		if (begin - end < 2)
+		if (end - begin < 2)
 		{
 			throw Invalid_JSON("Parsed object is too small");
 		}
@@ -147,7 +200,7 @@ namespace FiskJSON
 		begin++; // step into brackets
 		end--;
 
-		if ((*end) != (myType == Type::Array) ? ']' : '}')
+		if ((*end) != ((myType == Type::Array) ? ']' : '}'))
 		{
 			throw Invalid_JSON("Object end character wrongly matched");
 		}
@@ -214,7 +267,7 @@ namespace FiskJSON
 				PushChild(obj);
 			}
 
-			const char* commaOrEnd = FiskJson_Help::FindFirstWhitespaceInSameScope(endOfValue, end);
+			const char* commaOrEnd = FiskJson_Help::FindStart(endOfValue, end);
 			if (commaOrEnd == end)
 			{
 				break;
@@ -240,7 +293,7 @@ namespace FiskJSON
 		{
 			return *static_cast<Object*>(nullptr);
 		}
-		auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+		auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
 		return *children[aKey];
 	}
 
@@ -270,7 +323,7 @@ namespace FiskJSON
 
 	bool Object::Has(const std::string& aKey)
 	{
-		auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+		auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
 		return children.count(aKey) != 0;
 	}
 
@@ -285,7 +338,7 @@ namespace FiskJSON
 		{
 			throw Invalid_Object("Trying to add a child to a object that can't have children");
 		}
-		auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+		auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
 		if (children.count(aKey) != 0)
 		{
 			delete children[aKey];
@@ -489,7 +542,7 @@ namespace FiskJSON
 		}
 		if (myType == Type::Object)
 		{
-			auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+			auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
 			for (auto& child : children)
 			{
 				delete child.second;
@@ -500,19 +553,20 @@ namespace FiskJSON
 
 	void Object::ParseAsValue(const char* aBegin, const char* aEnd)
 	{
-		if (aEnd - aBegin > 2 && *aBegin == '"' && *(aEnd - 1) == '"')
+		if (aEnd - aBegin > 1 && *aBegin == '"' && *(aEnd - 1) == '"')
 		{
-			myValue = std::string(aBegin + 1, aEnd - 1);
+
+			myValue = std::string(aBegin + 1, FiskJson_Help::EscapeString(aBegin + 1, aEnd - 1));
 		}
-		else if (aEnd - aBegin > 4 && memcmp(aBegin, "true", 4) == 0)
+		else if (aEnd - aBegin > 3 && memcmp(aBegin, "true", 4) == 0)
 		{
 			myValue = true;
 		}
-		else if (aEnd - aBegin > 5 && memcmp(aBegin, "false", 5) == 0)
+		else if (aEnd - aBegin > 4 && memcmp(aBegin, "false", 5) == 0)
 		{
 			myValue = false;
 		}
-		else if (aEnd - aBegin > 4 && memcmp(aBegin, "null", 4) == 0)
+		else if (aEnd - aBegin > 3 && memcmp(aBegin, "null", 4) == 0)
 		{
 			myValue.reset();
 		}
@@ -550,7 +604,7 @@ namespace FiskJSON
 	{
 		if (this && myType == Type::Object)
 		{
-			auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+			auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
 			return children.begin();
 		}
 		return std::unordered_map<std::string, Object*>::iterator();
@@ -560,7 +614,7 @@ namespace FiskJSON
 	{
 		if (this && myType == Type::Object)
 		{
-			auto children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+			auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
 			return children.end();
 		}
 		return std::unordered_map<std::string, Object*>::iterator();

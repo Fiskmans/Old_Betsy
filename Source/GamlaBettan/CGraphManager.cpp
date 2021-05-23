@@ -238,6 +238,7 @@ CPin::PinType LoadPinData(std::any& aDataToSet, rapidjson::Value& someData, cons
 
 void CGraphManager::LoadTreeFromFile()
 {
+#if 0
 	for (auto& nodeInstance : myNodeInstancesInGraph)
 	{
 		delete nodeInstance;
@@ -341,7 +342,7 @@ void CGraphManager::LoadTreeFromFile()
 
 		}
 	}
-
+#endif
 }
 
 std::vector<int> myFlowsToBeShown;

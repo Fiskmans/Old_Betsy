@@ -28,6 +28,11 @@ Plant* PlantLoader::LoadPlant(const std::string& aPlantFilePath)
 		LOGERROR("Plant Failed to load [" + std::string(e.what()) + "]", aPlantFilePath);
 		return nullptr;
 	}
+	catch (const std::exception& e)
+	{
+		LOGERROR("Plant Failed to load [" + std::string(e.what()) + "]", aPlantFilePath);
+		return nullptr;
+	}
 
 	Plant* p = new Plant();
 	p->myFilePath = aPlantFilePath;

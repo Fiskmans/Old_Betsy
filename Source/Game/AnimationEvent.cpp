@@ -8,7 +8,7 @@
 AnimationEvent::AnimationEvent() :
 	myEventTimer(0.0f),
 	myEntity(nullptr),
-	myFbxPath("Data/Models/Birb/Birb.fbx"),
+	myFbxPath("Birb/Birb.fbx"),
 	myStartDuration(0.0f),
 	myLoopDuration(0.0f),
 	myEndDuration(0.0f)
@@ -71,7 +71,7 @@ void AnimationEvent::StartEvent()
 	myEntity->AddComponent<Mesh>()->Init(myEntity);
 	myEntity->GetComponent<Mesh>()->SetUpModel(myFbxPath);
 	myEntity->AddComponent<AnimationComponent>()->Init(myEntity);
-	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Walking, 0, false, false, false);
+	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Walking);
 	myEventTimer = 0.0f;
 	myEntity->Spawn(myPos);
 	myAnimationEntityVectorPtr->push_back(myEntity);
@@ -81,7 +81,7 @@ void AnimationEvent::StartEvent()
 void AnimationEvent::IdleEvent()
 {
 	//change animation to idle
-	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle, 0, false, false, false);
+	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Idle);
 	myState = AnimationEventState::Loop;
 	myEventTimer = 0.0f;
 }
@@ -89,7 +89,7 @@ void AnimationEvent::IdleEvent()
 void AnimationEvent::EndEvent()
 {
 	//change animation to death
-	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Action, 0, false, false, false);
+	myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Action);
 	myState = AnimationEventState::End;
 	myEventTimer = 0.0f;
 }

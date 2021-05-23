@@ -70,10 +70,8 @@ private:
 	DepthRenderer myShadowRenderer;
 	class DirectX11Framework* myFrameworkPtr;
 	struct ID3D11ShaderResourceView* myBoneTextureView = nullptr;
-	Texture* myPerlinView = nullptr;
-	Texture* myRandomNormalview = nullptr;
-	Texture* myLutTexture1 = nullptr;
-	Texture* myLutTexture2 = nullptr;
+	AssetHandle myPerlinView;
+	AssetHandle	myRandomNormal;
 
 	struct ID3D11Texture2D* myBoneBufferTexture = nullptr;
 

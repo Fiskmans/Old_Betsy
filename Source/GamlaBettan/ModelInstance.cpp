@@ -18,7 +18,7 @@
 
 int ModelInstance::myGlobalEventStatus = 0;
 
-ModelInstance::ModelInstance(AssetHandle& aModel) : myGaphicBoundsModifier(1.f)
+ModelInstance::ModelInstance(const AssetHandle& aModel) : myGaphicBoundsModifier(1.f)
 {
 	static unsigned int ids;
 	myFriendlyName = "[" + std::to_string(ids++) + "] ";
@@ -92,14 +92,7 @@ CommonUtilities::Matrix4x4<float> ModelInstance::GetModelToWorldTransform()
 
 	return toWorld;
 }
-struct Space
-{
-	M44F* matrix;
-	const char* name;
-	bool included = true;
-	bool inversed = false;
-	bool transposed = false;
-};
+
 M44F ModelInstance::GetModelToWorldTransformWithPotentialBoneAttachement(BoneTextureCPUBuffer& aBoneData, std::unordered_map<ModelInstance*, short>& aBoneMapping)
 {
 	if (myIsAttachedToBone)
@@ -108,64 +101,6 @@ M44F ModelInstance::GetModelToWorldTransformWithPotentialBoneAttachement(BoneTex
 		M44F bonedata = aBoneData[aBoneMapping[myAttachedToModel]][myBoneIndex];
 
 		return M44F::Transpose(bonedata) * base;
-		
-#if USEIMGUI
-		DebugDrawer::GetInstance().DrawArrow(V3F(0, 0, 0), V3F(V4F(0, 0, 0, 1) * M44F::Transpose(M44F::Transpose(bonedata) * base)));
-		// used below to get ^^
-
-		M44F offset = (*myAttachedToModel->myAnimator->GetBoneInfo())[myBoneIndex].BoneOffset;
-		static std::array<Space,3> spaces;
-		spaces[0].matrix = &base;
-		spaces[1].matrix = &bonedata;
-		spaces[2].matrix = &offset;
-		spaces[0].name = "base";
-		spaces[1].name = "bonedata";
-		spaces[2].name = "offset";
-		static std::vector<int> order = { 0,1,2 };
-
-		M44F result = M44F::Identity();
-		for (size_t i = 0; i < order.size(); i++)
-		{
-			ImGui::PushID(i);
-			if (i!=0)
-			{
-				ImGui::Separator();
-			}
-			Space& space = spaces[order[i]];
-			ImGui::Text(space.name);
-			if (i != 0)
-			{
-				if (ImGui::Button("^"))
-				{
-					std::swap(order[i], order[i - 1]);
-				}
-			}
-			ImGui::Checkbox("included", &space.included);
-			ImGui::Checkbox("Inversed", &space.inversed);
-			ImGui::Checkbox("Transposed", &space.transposed);
-			if (space.included)
-			{
-				M44F mat = *space.matrix;
-
-				if (space.transposed)
-				{
-					mat = M44F::Transpose(mat);
-				}
-				if (space.inversed)
-				{
-					mat = M44F::GetRealInverse(mat);
-				}
-				result = result *mat;
-			}
-			ImGui::PopID();
-		}
-
-		DebugDrawer::GetInstance().DrawGizmo(V3F(V4F(0, 0, 0, 1) * result), 30, result);
-		DebugDrawer::GetInstance().DrawArrow(V3F(0, 0, 0), V3F(V4F(0, 0, 0, 1) * result));
-
-
-		return result;
-#endif
 	}
 	return GetModelToWorldTransform();
 }
@@ -190,9 +125,9 @@ void ModelInstance::Rotate(const CommonUtilities::Matrix4x4<float>& aRotationMat
 void ModelInstance::SetRotation(CommonUtilities::Vector3<float> aRotation)
 {
 	CommonUtilities::Matrix4x4<float> mat;
-	mat.CreateRotationAroundX(aRotation.x);
-	mat.CreateRotationAroundY(aRotation.y);
-	mat.CreateRotationAroundZ(aRotation.z);
+	mat *= CommonUtilities::Matrix4x4<float>::CreateRotationAroundX(aRotation.x);
+	mat *= CommonUtilities::Matrix4x4<float>::CreateRotationAroundY(aRotation.y);
+	mat *= CommonUtilities::Matrix4x4<float>::CreateRotationAroundZ(aRotation.z);
 
 	myRotation = mat;
 }
@@ -206,12 +141,6 @@ void ModelInstance::SetScale(CommonUtilities::Vector3<float> aScale)
 {
 	myScale = aScale;
 	myGaphicBoundsModifier = MAX(MAX(aScale.x, aScale.y), aScale.z);
-
-	/*CommonUtilities::Matrix4x4<float> mat;
-	mat(1, 1) = aScale.x;
-	mat(2, 2) = aScale.y;
-	mat(3, 3) = aScale.z;
-	myScaleAndRotate *= mat;*/
 }
 
 void ModelInstance::SetShouldBeDrawnThroughWalls(const bool aFlag)
@@ -234,61 +163,9 @@ void ModelInstance::AttachAnimator(Animator* aAnimator)
 	myAnimator = aAnimator;
 }
 
-void ModelInstance::SetAnimation(int aAnimation)
-{
-	if (myAnimator)
-	{
-		if (myAnimator->GetAnimationCount() > aAnimation)
-		{
-			myAnimator->SetState(aAnimation);
-			myAnimator->SetBlend(0.f);
-			myAnimator->SetTime(0.f);
-		}
-		else
-		{
-			SYSWARNING("Trying to play animation that does not exist: [" + std::to_string(aAnimation) + "] max is [" + std::to_string(myAnimator->GetAnimationCount()+1) + "]","")
-		}
-	}
-	else
-	{
-		SYSWARNING("Trying to animate something without an animator",myModel.GetAsModel()->GetModelData()->myFilePath);
-	}
-}
-
-void ModelInstance::StepAnimation(float aDeltaTime)
-{
-	if (myAnimator)
-	{
-		myAnimator->Step(aDeltaTime);
-	}
-	else
-	{
-		SYSERROR("Trying to step animation on model that doesnt have an animator", myModel.GetAsModel()->GetModelData()->myFilePath);
-	}
-}
-
-//TODO RAGDOLL
-
-//void ModelInstance::DetachAnimator()
-//{
-//	std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES> currentStateMatrixes;
-//	myAnimator->BoneTransform(currentStateMatrixes);
-//	myGBPhysXActor->UpdateRagDollMatrices(currentStateMatrixes);
-//	myAnimator = nullptr;
-//}
-
 void ModelInstance::SetGBPhysXCharacter(GBPhysXCharacter* aGBPhysXCharacter)
 {
 	myGBPhysXCharacter = aGBPhysXCharacter;
-}
-
-M44F ModelInstance::GetTransformOfBone(int aIndex)
-{
-	if (!HasAnimations())
-	{
-		return M44F();
-	}
-	return myAnimator->TransformOfBone(aIndex);
 }
 
 bool ModelInstance::HasAnimations()
@@ -338,25 +215,18 @@ const std::string ModelInstance::GetFriendlyName()
 
 void ModelInstance::SetupanimationMatrixes(std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES>& aMatrixes)
 {
-	if (myGBPhysXCharacter == nullptr || myGBPhysXCharacter->GetIsRagDoll() == false)
+	if (myAnimator)
 	{
-		if (myAnimator)
-		{
-			myAnimator->BoneTransform(aMatrixes);
-		}
-		else
-		{
-			static bool onetimeWarning = true;
-			if (onetimeWarning)
-			{
-				SYSWARNING("Model instance with bones tried to animate without an attached controller", myModel.GetAsModel()->GetModelData()->myFilePath);
-				onetimeWarning = false;
-			}
-		}
+		myAnimator->BoneTransform(aMatrixes);
 	}
 	else
 	{
-		myGBPhysXCharacter->UpdateRagDollMatrices(aMatrixes);
+		static bool onetimeWarning = true;
+		if (onetimeWarning)
+		{
+			SYSWARNING("Model instance with bones tried to animate without an attached controller", myModel.GetAsModel()->GetModelData()->myFilePath);
+			onetimeWarning = false;
+		}
 	}
 }
 

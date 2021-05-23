@@ -129,9 +129,6 @@
     <ClInclude Include="DataStructs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VideoState.h">
-      <Filter>States</Filter>
-    </ClInclude>
     <ClInclude Include="Homing3D.h">
       <Filter>Components\Movement</Filter>
     </ClInclude>
@@ -162,13 +159,7 @@
     <ClInclude Include="EntityMessage.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="AbilityInstance.h">
-      <Filter>Components\Gameplay</Filter>
-    </ClInclude>
     <ClInclude Include="CharacterData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AbilityData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParticleOnHit.h">
@@ -208,9 +199,6 @@
       <Filter>Factories</Filter>
     </ClInclude>
     <ClInclude Include="PointLightFactory.h">
-      <Filter>Factories</Filter>
-    </ClInclude>
-    <ClInclude Include="AbilityFactory.h">
       <Filter>Factories</Filter>
     </ClInclude>
     <ClInclude Include="EnemyFactory.h">
@@ -278,9 +266,6 @@
     </ClInclude>
     <ClInclude Include="AIController.h">
       <Filter>Components\Controller</Filter>
-    </ClInclude>
-    <ClInclude Include="Attached.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DialogFactory.h">
       <Filter>Dialog</Filter>
@@ -389,9 +374,6 @@
     <ClCompile Include="GameState.cpp">
       <Filter>States</Filter>
     </ClCompile>
-    <ClCompile Include="VideoState.cpp">
-      <Filter>States</Filter>
-    </ClCompile>
     <ClCompile Include="MainMenuState.cpp">
       <Filter>States</Filter>
     </ClCompile>
@@ -416,13 +398,7 @@
     <ClCompile Include="PlayerController.cpp">
       <Filter>Components\Controller</Filter>
     </ClCompile>
-    <ClCompile Include="AbilityInstance.cpp">
-      <Filter>Components\Gameplay</Filter>
-    </ClCompile>
     <ClCompile Include="CharacterData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AbilityData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParticleOnHit.cpp">
@@ -445,9 +421,6 @@
     </ClCompile>
     <ClCompile Include="ParticleActivatable.cpp">
       <Filter>Components\Particles</Filter>
-    </ClCompile>
-    <ClCompile Include="AbilityFactory.cpp">
-      <Filter>Factories</Filter>
     </ClCompile>
     <ClCompile Include="EnemyFactory.cpp">
       <Filter>Factories</Filter>
@@ -526,9 +499,6 @@
     </ClCompile>
     <ClCompile Include="AIController.cpp">
       <Filter>Components\Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="Attached.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DialogFactory.cpp">
       <Filter>Dialog</Filter>

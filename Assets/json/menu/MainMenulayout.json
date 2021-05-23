@@ -1,0 +1,40 @@
+{
+  "ImagesPath": "mainmenu",
+
+  "GameTitleImage": {
+    "name": "Title.dds",
+    "PosX": 0.0,
+    "PosY": 0.0
+  },
+
+  "StartButton": {
+    "name": "StartGame",
+    "PosX": 0.5,
+    "PosY": 0.35
+  },
+  
+    "OptionsButton": {
+    "name": "Options",
+    "PosX": 0.5,
+    "PosY": 0.45
+  },
+  
+    "LevelSelectButton": {
+    "name": "LevelSelect",
+    "PosX": 0.5,
+    "PosY": 0.312
+  },
+
+  
+  "CreditsButton": {
+    "name": "Credits",
+    "PosX": 0.5,
+    "PosY": 0.45
+  },
+  
+  "ExitButton": {
+    "name": "ExitGame",
+    "PosX": 0.5,
+    "PosY": 0.55
+  }
+}

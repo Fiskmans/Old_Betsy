@@ -48,7 +48,7 @@ void TraderAI::SwitchState(TraderState aState)
 			myStateBeforeTrade = TraderState::Enter;
 			break;
 		case TraderState::Hello:
-			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Action, 0);
+			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Action);
 			myEntity->GetComponent<Audio>()->PostAudioEvent(AudioEvent::Hello);
 			break;
 		case TraderState::Idle:
@@ -60,7 +60,7 @@ void TraderAI::SwitchState(TraderState aState)
 			break;
 		case TraderState::Goodbye:
 			myStateBerforeGoodbye = myCurrentState;
-			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Interact, 0);
+			myEntity->GetComponent<AnimationComponent>()->SetState(AnimationComponent::States::Interact);
 			myEntity->GetComponent<Audio>()->PostAudioEvent(AudioEvent::Goodbye);
 			break;
 		case TraderState::Leaving:

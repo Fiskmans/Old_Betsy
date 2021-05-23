@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "Asset.h"
 
 class HighlightRenderer
 {
@@ -14,7 +15,7 @@ public:
 private:
 	long long myCreateTime = 0;
 	struct ID3D11DeviceContext* myContext = nullptr;
-	class PixelShader* myPixelShader = nullptr;
+	AssetHandle myPixelShader;
 	struct ID3D11Buffer* myFrameBuffer = nullptr;
 	struct ID3D11Buffer* myObjectBuffer = nullptr;
 

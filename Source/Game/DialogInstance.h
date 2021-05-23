@@ -25,7 +25,7 @@ public:
 	DialogInstance();
 	~DialogInstance();
 
-	void Init(DirectX::SpriteFont* aFont, const DialogData* someDialog, const V2F& aBuffer, SpriteInstance* aBackground);
+	void Init(const AssetHandle& aFont, const DialogData* someDialog, const V2F& aBuffer, SpriteInstance* aBackground);
 
 	void Render(DirectX::SpriteBatch* aSpriteBatch) override;
 

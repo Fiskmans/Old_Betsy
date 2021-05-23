@@ -196,16 +196,12 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AbilityData.h" />
-    <ClInclude Include="AbilityFactory.h" />
-    <ClInclude Include="AbilityInstance.h" />
     <ClInclude Include="AcceptInteraction.h" />
     <ClInclude Include="AIBaseState.h" />
     <ClInclude Include="AIPollingStation.h" />
     <ClInclude Include="AlertedState.h" />
     <ClInclude Include="AnimationComponent.h" />
     <ClInclude Include="AnimationEvent.h" />
-    <ClInclude Include="Attached.h" />
     <ClInclude Include="AttackState.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="CameraLookAt.h" />
@@ -284,22 +280,17 @@
     <ClInclude Include="TraderEvent.h" />
     <ClInclude Include="TriggerBoxFactory.h" />
     <ClInclude Include="UIManager.h" />
-    <ClInclude Include="VideoState.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="WaterSource.h" />
     <ClInclude Include="WildPlant.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AbilityData.cpp" />
-    <ClCompile Include="AbilityFactory.cpp" />
-    <ClCompile Include="AbilityInstance.cpp" />
     <ClCompile Include="AcceptInteraction.cpp" />
     <ClCompile Include="AIBaseState.cpp" />
     <ClCompile Include="AIPollingStation.cpp" />
     <ClCompile Include="AlertedState.cpp" />
     <ClCompile Include="AnimationComponent.cpp" />
     <ClCompile Include="AnimationEvent.cpp" />
-    <ClCompile Include="Attached.cpp" />
     <ClCompile Include="AttackState.cpp" />
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="CameraLookAt.cpp" />
@@ -369,7 +360,6 @@
     <ClCompile Include="TraderEvent.cpp" />
     <ClCompile Include="TriggerBoxFactory.cpp" />
     <ClCompile Include="UIManager.cpp" />
-    <ClCompile Include="VideoState.cpp" />
     <ClCompile Include="WaterSource.cpp" />
     <ClCompile Include="WildPlant.cpp" />
   </ItemGroup>
