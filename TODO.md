@@ -26,7 +26,7 @@
   - Quickloading by packing *_DESC structs along with pre-parsed data
 - Remove direct loads and asset handling with an asset manager and asset-handles
   - ~~Textures~~
-  - ~~Models
+  - ~~Models~~
   - ~~Shaders~~
   - ~~Cube Textures~~
   - ~~Animations~~
