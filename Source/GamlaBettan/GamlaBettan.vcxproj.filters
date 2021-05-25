@@ -25,9 +25,6 @@
     <ClCompile Include="Spline.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Skybox.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteFactory.cpp" />
     <ClCompile Include="SpriteInstance.cpp" />
@@ -456,9 +453,6 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="WindowData.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Skybox.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="NameThread.h">

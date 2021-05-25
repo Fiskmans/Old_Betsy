@@ -256,6 +256,14 @@ void AssetManager::AssumeOwnershipOfCustomAsset(Asset* aCustomAsset)
     myCustomAssets.push_back(aCustomAsset);
 }
 
+void AssetManager::ImGui()
+{
+    WindowControl::Window("AssetManager", [this]()
+        {
+            
+        });
+}
+
 AssetHandle AssetManager::GetTextureInternal(const std::string& aPath, bool aFailSilenty)
 {
     if (myCachedTextures.count(aPath) == 0)

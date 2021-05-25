@@ -2,7 +2,6 @@
 #include "Asset.h"
 
 #include "Model.h"
-#include "Skybox.h"
 #include "TextInstance.h"
 
 Asset::Asset(AssetType aType,bool aIsLoaded)
@@ -100,9 +99,9 @@ ModelInstance* AssetHandle::InstansiateModel() const
 	return new ModelInstance(*this);
 }
 
-Skybox* AssetHandle::InstansiateSkybox() const
+ModelInstance* AssetHandle::InstansiateSkybox() const
 {
-	return new Skybox(*this);
+	return new ModelInstance(*this);
 }
 
 TextInstance* AssetHandle::InstansiateText() const

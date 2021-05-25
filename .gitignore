@@ -34,6 +34,7 @@ bld/
 [Bb]in/*.exp
 [Bb]in/*.iobj
 [Bb]in/*.ipdb
+[Bb]in/*.ini
 [Bb]aked/
 [Bb]in/crashdumps/
 [Oo]bj/

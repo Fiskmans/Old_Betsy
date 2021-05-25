@@ -59,7 +59,6 @@
 #include "UIManager.h"
 #include "CharacterData.h"
 #include <WindSystem.h>
-#include "Skybox.h"
 #include "perlin_noise.h"
 
 #if USEIMGUI
@@ -881,7 +880,7 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 	static ModelInstance* modelInstance = nullptr;
 	static Animator* animator = nullptr;
 	static size_t offset;
-	static Skybox* skybox;
+	static ModelInstance* skybox = nullptr;
 	static std::string skyboxPath;
 	bool modelViewerOpen = WindowControl::Window("Model Viewer", [&]()
 		{
@@ -943,7 +942,7 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 							bool selected = (file == skyboxPath);
 							if (ImGui::Selectable(file.c_str(), &selected))
 							{
-								Skybox* newBox = AssetManager::GetInstance().GetSkybox(file).InstansiateSkybox();
+								ModelInstance* newBox = AssetManager::GetInstance().GetSkybox(file).InstansiateSkybox();
 								if (newBox)
 								{
 									myScenePtr->SetSkybox(newBox);

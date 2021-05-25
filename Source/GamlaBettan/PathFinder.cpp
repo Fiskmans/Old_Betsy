@@ -433,7 +433,6 @@ void PathFinder::Imgui()
 								DebugDrawer::GetInstance().DrawLine(LERP(mesh->myVertexCollection[neighboor.myCorners[1]], neighboor.myCenter, 0.1f), LERP(mesh->myVertexCollection[neighboor.myCorners[2]], neighboor.myCenter, 0.1f));
 								DebugDrawer::GetInstance().DrawLine(LERP(mesh->myVertexCollection[neighboor.myCorners[2]], neighboor.myCenter, 0.1f), LERP(mesh->myVertexCollection[neighboor.myCorners[0]], neighboor.myCenter, 0.1f));
 							}
-
 						}
 					}
 				}
@@ -508,7 +507,7 @@ bool PathFinder::FindPath(NavMeshIndexType aStart, NavMeshIndexType aEnd, std::v
 		return true;
 	}
 
-	if (!myNavMesh.IsValid() || !myNavMesh.IsLoaded())
+	if (!myNavMesh.IsValid() || !myNavMesh.IsLoaded() || aStart == -1 || aEnd == -1)
 	{
 		return false;
 	}

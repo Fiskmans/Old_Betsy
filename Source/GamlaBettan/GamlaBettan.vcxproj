@@ -345,7 +345,6 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShaderCompiler.cpp" />
     <ClCompile Include="ShaderTypes.cpp" />
-    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Spline.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteFactory.cpp" />
@@ -540,7 +539,6 @@
     <ClInclude Include="ShaderCompiler.h" />
     <ClInclude Include="ShaderFlags.h" />
     <ClInclude Include="ShaderTypes.h" />
-    <ClInclude Include="Skybox.h" />
     <ClInclude Include="Spline.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteFactory.h" />

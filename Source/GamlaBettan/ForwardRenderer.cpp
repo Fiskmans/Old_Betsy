@@ -9,7 +9,6 @@
 
 #include <Matrix4x4.hpp>
 #include "Camera.h"
-#include "Skybox.h"
 #include "Scene.h"
 #include "Environmentlight.h"
 #include "PointLight.h"
@@ -277,7 +276,7 @@ void ForwardRenderer::SetSkyboxTexture(AssetHandle aTexture)
 	mySkyboxTexture = aTexture;
 }
 
-void ForwardRenderer::SetSkybox(Skybox* aSkyBox)
+void ForwardRenderer::SetSkybox(ModelInstance* aSkyBox)
 {
 	SetSkyboxTexture(aSkyBox->GetModelAsset().GetAsModel()->GetModelData()->myTextures[0]);
 	myskybox = aSkyBox;

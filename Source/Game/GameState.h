@@ -23,7 +23,6 @@
 class NodePollingStation;
 class Scene;
 class AudioManager;
-class Skybox;
 class GBPhysX;
 class SpriteRenderer;
 
@@ -79,7 +78,7 @@ private:
 	ID3D11Device* myDevice;
 
 	Scene* myScene;
-	Skybox* mySkybox;
+	ModelInstance* mySkybox;
 	GameWorld* myGameWorld;
 	CGraphManager myGraphManager;
 	NodePollingStation* myNodePollingStation;

@@ -3,7 +3,6 @@
 
 #include "GraphicEngine.h"
 #include "Scene.h"
-#include "Skybox.h"
 #include "DirectX11Framework.h"
 #include "ForwardRenderer.h"
 #include "SpriteRenderer.h"

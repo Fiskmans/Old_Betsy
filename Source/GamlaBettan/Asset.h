@@ -46,6 +46,7 @@ public:
 	void DecRefCount();
 private:
 	friend class AssetManager;
+	std::string myFileName;
 	Tools::FileWatcher::UniqueID myFileHandle;
 };
 
@@ -67,7 +68,7 @@ public:
 	Asset::AssetType GetType() const;
 
 	ModelInstance* InstansiateModel() const;
-	Skybox* InstansiateSkybox() const;
+	ModelInstance* InstansiateSkybox() const;
 	TextInstance* InstansiateText() const;
 
 	Model* GetAsModel() const;

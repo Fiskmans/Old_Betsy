@@ -9,7 +9,6 @@ class ModelInstance;
 struct ID3D11DeviceContext;
 struct ID3D11Buffer;
 class Camera;
-class Skybox;
 struct Texture;
 class Scene;
 class PointLight;
@@ -26,7 +25,7 @@ public:
 	void Render(std::vector<ModelInstance*>& aModelList, Camera* aCamera, Scene* aScene, std::vector<std::array<PointLight*, NUMBEROFPOINTLIGHTS>>& aLightList, std::unordered_map<ModelInstance*, short>& aBoneMapping, class RenderStateManager& aStateManager,BoneTextureCPUBuffer& aBoneBuffer);
 
 	void SetSkyboxTexture(AssetHandle aTexture);
-	void SetSkybox(Skybox* aSkyBox);
+	void SetSkybox(ModelInstance* aSkyBox);
 
 
 private:
@@ -38,7 +37,7 @@ private:
 	ID3D11Device* myDevice = nullptr;
 	ID3D11Buffer* myFrameBuffer = nullptr;
 	ID3D11Buffer* myObjectBuffer = nullptr;
-	Skybox* myskybox = nullptr;
+	ModelInstance* myskybox = nullptr;
 	AssetHandle mySkyboxTexture;
 	DepthRenderer* myDepthRender = nullptr;
 

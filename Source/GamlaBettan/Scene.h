@@ -14,7 +14,6 @@ class SpriteInstance;
 class Camera;
 struct EnvironmentLight;
 class PointLight;
-class Skybox;
 class ParticleInstance;
 class TextInstance;
 class SlabRay;
@@ -52,7 +51,7 @@ public:
 	bool Contains(ModelInstance* aModel);
 	void RemoveAll();
 	void RefreshAll(float aAmount);
-	void SetSkybox(Skybox* aSkybox);
+	void SetSkybox(ModelInstance* aSkybox);
 
 	ModelInstance* GetInstance(SlabRay* aRay);
 	std::vector<ModelInstance*> GetIntersections(SlabRay* aRay);
@@ -68,7 +67,7 @@ public:
 
 	std::vector<ParticleInstance*> GetParticles();
 
-	Skybox* GetSkybox();
+	ModelInstance* GetSkybox();
 	Camera* GetMainCamera();
 	EnvironmentLight* GetEnvironmentLight();
 	std::vector<PointLight*>& GetPointLights();
@@ -99,7 +98,7 @@ private:
 	std::vector<ParticleInstance*> myParticles;
 	std::vector<TextInstance*> myTexts;
 	Camera* myMainCamera = nullptr;
-	Skybox* mySkybox = nullptr;
+	ModelInstance* mySkybox = nullptr;
 	EnvironmentLight* myEnvironmentLight = nullptr;
 
 };

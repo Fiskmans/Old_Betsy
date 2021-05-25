@@ -45,6 +45,8 @@ public:
 
 	void AssumeOwnershipOfCustomAsset(Asset* aCustomAsset);
 
+	void ImGui();
+
 private:
 
 	AssetHandle GetTextureInternal(const std::string& aPath, bool aFailSilenty);

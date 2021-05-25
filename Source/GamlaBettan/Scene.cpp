@@ -320,8 +320,13 @@ void Scene::RemoveAll()
 	myTexts.clear();
 }
 
-void Scene::SetSkybox(Skybox* aSkybox)
+void Scene::SetSkybox(ModelInstance* aSkybox)
 {
+	if (aSkybox->GetModelAsset().GetType() != ModelAsset::AssetType::SkyBox)
+	{
+		SYSERROR("SetSkybox with non skybox asset","");
+		return;
+	}
 	mySkybox = aSkybox;
 }
 
@@ -367,7 +372,7 @@ std::vector<ParticleInstance*> Scene::GetParticles()
 	return myParticles;
 }
 
-Skybox* Scene::GetSkybox()
+ModelInstance* Scene::GetSkybox()
 {
 	return mySkybox;
 }

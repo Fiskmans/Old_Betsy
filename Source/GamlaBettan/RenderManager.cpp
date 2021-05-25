@@ -3,7 +3,6 @@
 #include "DirectX11Framework.h"
 #include "WindowHandler.h"
 #include "Scene.h"
-#include "Skybox.h"
 #include "PostMaster.hpp"
 #include <d3d11.h>
 #include <imgui.h>
@@ -268,7 +267,7 @@ void RenderManager::Render(Scene* aScene)
 		affectingLights.push_back(aScene->CullPointLights(model));
 	}
 
-	Skybox* skybox = aScene->GetSkybox();
+	ModelInstance* skybox = aScene->GetSkybox();
 	if (skybox)
 	{
 		myForwardRenderer.SetSkybox(skybox);
