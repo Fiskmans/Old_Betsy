@@ -11,7 +11,7 @@
   - Inengine editor?
 - Flip all chiralities and axles to match the default in blender
 - Switch from VS filters to folders
-- SetErrorTexture() move call to better place than modelloader, cause uhm wtf
+- ~~SetErrorTexture() move call to better place than modelloader, cause uhm wtf~~
 - Remove Skybox class, make it a assetType instead
 - Rename All projects and folders to english
 
@@ -25,6 +25,16 @@
   - Asset packing into single Data file
   - Quickloading by packing *_DESC structs along with pre-parsed data
 - Remove direct loads and asset handling with an asset manager and asset-handles
+  - ~~Textures~~
+  - ~~Models
+  - ~~Shaders~~
+  - ~~Cube Textures~~
+  - ~~Animations~~
+  - ~~Data/JSON~~
+  - ~~Fonts~~
+  - ~~Levels~~
+  - ~~Navmeshes~~
+  - Sounds
 - Centralize and standardize Entities so we can reliably select/view entity data
 - Editor tools
   - Play/Pause
