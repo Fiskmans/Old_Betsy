@@ -38,8 +38,8 @@ namespace CommonUtilities
 
 		T Length() const;
 		T LengthSqr() const;
-		T Distance(const Vector4<T>& aVector) const;
-		T DistanceSqr(const Vector4<T>& aVector) const;
+		T DistanceTo(const Vector4<T>& aVector) const;
+		T DistanceToSqr(const Vector4<T>& aVector) const;
 		Vector4<T> GetNormalized() const;
 		void Normalize();
 		bool IsNormalized() const;
@@ -156,7 +156,7 @@ namespace CommonUtilities
 	template<class T>
 	inline Vector4<T> operator/(const Vector4<T> &aVector, const Vector4<T> &anotherVector)
 	{
-		if (anotherVector.x == 0 || anotherVector.y == 0 || anotherVector.z == 0 || anotherVector.y == 0)
+		if (anotherVector.operator==({0,0,0,0}))
 		{
 			SYSERROR("Division by 0 in Vector4!","");
 		}
@@ -188,9 +188,9 @@ namespace CommonUtilities
 	template<class T>
 	inline Vector4<T> operator/=(Vector4<T> &aVector, const Vector4<T> &anotherVector)
 	{
-		if (anotherVector.x == 0 || anotherVector.y == 0 || anotherVector.z == 0 || anotherVector.y == 0)
+		if (anotherVector.operator==({0, 0, 0, 0}))
 		{
-			SYSERROR("Division by 0 in Vector4!","");
+			SYSERROR("Division by 0 in Vector4!", "");
 		}
 		aVector.x /= anotherVector.x;
 		aVector.y /= anotherVector.y;
@@ -234,11 +234,6 @@ namespace CommonUtilities
 	template<class T>
 	inline Vector4<T> operator/(const Vector4<T> &aVector, const T aScalar)
 	{
-		if (aScalar == 0)
-		{
-			SYSERROR("Division by 0 in Vector4!","");
-		}
-
 		double divNum = 1.0 / static_cast<double>(aScalar);
 
 		return Vector4<T>(static_cast<T>(aVector.x * divNum), static_cast<T>(aVector.y * divNum), static_cast<T>(aVector.z * divNum), static_cast<T>(aVector.w * divNum));
@@ -269,11 +264,6 @@ namespace CommonUtilities
 	template<class T>
 	inline Vector4<T> operator/=(Vector4<T> &aVector, const T aScalar)
 	{
-		if (aScalar == 0)
-		{
-			SYSERROR("Division by 0 in Vector4!","");
-		}
-
 		double divNum = 1.0 / static_cast<double>(aScalar);
 
 		aVector.x = static_cast<T>(aVector.x * divNum);
@@ -353,6 +343,26 @@ namespace CommonUtilities
 		return (x == aVector.x && y == aVector.y && z == aVector.z && w == aVector.w);
 	}
 
+	template<>
+	inline bool Vector4<float>::operator==(const Vector4<float>& aVector) const
+	{
+		const float eps = 1e-50;
+		return  abs(x - aVector.x) < eps 
+			&&	abs(y - aVector.y) < eps 
+			&&	abs(z - aVector.z) < eps 
+			&&	abs(w - aVector.w) < eps;
+	}
+
+	template<>
+	inline bool Vector4<double>::operator==(const Vector4<double>& aVector) const
+	{
+		const double eps = 1e-50;
+		return  abs(x - aVector.x) < eps
+			&&	abs(y - aVector.y) < eps
+			&&	abs(z - aVector.z) < eps
+			&&	abs(w - aVector.w) < eps;
+	}
+
 	template<class T>
 	inline bool Vector4<T>::operator!=(const Vector4<T>& aVector) const
 	{
@@ -363,7 +373,7 @@ namespace CommonUtilities
 	template<class T>
 	inline T Vector4<T>::Length() const
 	{
-		return static_cast<T>(sqrt((x * x) + (y * y) + (z * z) + (w * w)));
+		return static_cast<T>(sqrt(LengthSqr()));
 	}
 
 	template<class T>
@@ -373,13 +383,13 @@ namespace CommonUtilities
 	}
 
 	template<class T>
-	inline T Vector4<T>::Distance(const Vector4<T>& aVector) const
+	inline T Vector4<T>::DistanceTo(const Vector4<T>& aVector) const
 	{
 		return ((*this) - aVector).Length();
 	}
 
 	template<class T>
-	inline T Vector4<T>::DistanceSqr(const Vector4<T>& aVector) const
+	inline T Vector4<T>::DistanceToSqr(const Vector4<T>& aVector) const
 	{
 		return ((*this) - aVector).LengthSqr();
 	}

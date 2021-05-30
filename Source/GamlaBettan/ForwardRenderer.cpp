@@ -278,7 +278,7 @@ void ForwardRenderer::SetSkyboxTexture(AssetHandle aTexture)
 
 void ForwardRenderer::SetSkybox(ModelInstance* aSkyBox)
 {
-	SetSkyboxTexture(aSkyBox->GetModelAsset().GetAsModel()->GetModelData()->myTextures[0]);
+	SetSkyboxTexture(aSkyBox->GetModelAsset().GetAsSkybox()->GetModelData()->myTextures[0]);
 	myskybox = aSkyBox;
 }
 

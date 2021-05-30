@@ -23,7 +23,7 @@ ModelInstance::ModelInstance(const AssetHandle& aModel) : myGaphicBoundsModifier
 	static unsigned int ids;
 	myFriendlyName = "[" + std::to_string(ids++) + "] ";
 
-	if (aModel.GetType() != Asset::AssetType::Model)
+	if (aModel.GetType() != Asset::AssetType::Model && aModel.GetType() != Asset::AssetType::SkyBox)
 	{
 		SYSCRASH("Asset was not a model");
 	}

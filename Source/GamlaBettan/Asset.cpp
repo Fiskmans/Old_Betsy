@@ -111,8 +111,14 @@ TextInstance* AssetHandle::InstansiateText() const
 
 Model* AssetHandle::GetAsModel() const
 {
-	if (myAsset->myType != Asset::AssetType::Model) { throw std::exception("GetAsModel() on non model asset"); }
+	if (myAsset->myType != Asset::AssetType::Model && myAsset->myType != Asset::AssetType::SkyBox) { throw std::exception("GetAsModel() on non model asset"); }
 	return reinterpret_cast<ModelAsset*>(myAsset)->myModel;
+}
+
+Model* AssetHandle::GetAsSkybox() const
+{
+	if (myAsset->myType != Asset::AssetType::SkyBox) { throw std::exception("GetAsSkybox() on non Skybox asset"); }
+	return reinterpret_cast<SkyboxAsset*>(myAsset)->mySkybox;
 }
 
 ID3D11ShaderResourceView* AssetHandle::GetAsTexture() const
@@ -187,7 +193,7 @@ ModelAsset::ModelAsset(Model* aModel)
 	myModel = aModel;
 }
 
-SkyboxAsset::SkyboxAsset(Skybox* aSkyBox)
+SkyboxAsset::SkyboxAsset(Model* aSkyBox)
 	: Asset(AssetType::SkyBox)
 {
 	mySkybox = aSkyBox;

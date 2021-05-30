@@ -905,6 +905,6 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 	model->Init(modelData, this, "Skybox.hlsl", "Skybox.hlsl", "", "SkyBox: " + std::string(aFilePath.begin(), aFilePath.end()));
 	model->ApplyLodLevel(level, 0);
 
-	return new ModelAsset(model);
+	return new SkyboxAsset(model);
 }
 

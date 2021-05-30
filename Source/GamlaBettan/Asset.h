@@ -9,7 +9,6 @@
 
 struct ID3D11ShaderResourceView;
 class ModelInstance;
-class Skybox;
 class Model;
 class TextInstance;
 class NavMesh;
@@ -20,6 +19,7 @@ class Asset
 public:
 	enum class AssetType
 	{
+		Invalid,
 		Model,
 		SkyBox,
 		Texture,
@@ -72,6 +72,7 @@ public:
 	TextInstance* InstansiateText() const;
 
 	Model* GetAsModel() const;
+	Model* GetAsSkybox() const;
 	ID3D11ShaderResourceView* GetAsTexture() const;
 
 	ID3D11PixelShader* GetAsPixelShader() const;
@@ -108,9 +109,9 @@ class SkyboxAsset
 	: public Asset
 {
 public:
-	SkyboxAsset(Skybox* aSkyBox);
+	SkyboxAsset(Model* aSkyBox);
 
-	Skybox* mySkybox;
+	Model* mySkybox;
 };
 
 class TextureAsset
