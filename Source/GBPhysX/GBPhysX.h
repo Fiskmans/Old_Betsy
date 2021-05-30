@@ -58,7 +58,7 @@ public:
 	GBPhysXActor();
 	~GBPhysXActor();
 
-	M44F GetTransformMatrix();
+	M44f GetTransformMatrix();
 	V3F GetPosition();
 	void RemoveFromScene();
 	void Release();
@@ -126,7 +126,7 @@ public:
 	void SetLinkToLookAt(std::array<physx::PxArticulationLink*, 64>& aLinkToLookAtArray);
 	
 	void SetDeathMomentBoneTransformations(std::array<CommonUtilities::Matrix4x4<float>, 64> aMatrixes);
-	void SetDeathMomentCharTransform(M44F& aTransform);
+	void SetDeathMomentCharTransform(M44f& aTransform);
 private:
 	physx::PxController* myController = nullptr;
 	physx::PxFilterData* myFilterData = nullptr;
@@ -136,7 +136,7 @@ private:
 	std::vector<GBPhysXHitBox*> myHitBoxes;
 	physx::PxArticulation* myArticulation = nullptr;
 	std::array<CommonUtilities::Matrix4x4<float>, 64> myDeathMomentBoneTransformations;
-	M44F myDeathMomentCharTransform;
+	M44f myDeathMomentCharTransform;
 	std::array<physx::PxArticulationLink*, 64> myLinkToLookAt;
 };
 
@@ -147,7 +147,7 @@ class GBPhysX
 public:
 	~GBPhysX();
 
-	GBPhysXActor* GBCreateDynamicSphere(M44F aMatrixTransform, int aRadius, float aDensity = 10.0f);
+	GBPhysXActor* GBCreateDynamicSphere(M44f aMatrixTransform, int aRadius, float aDensity = 10.0f);
 	GBPhysXActor* GBCreateDynamicBox(V3F aPosition, V3F aSize, V3F aForce, float aDensity);
 	GBPhysXActor* GBCreateStaticCube(V3F aPosition, float aHalfSize);
 	GBPhysXActor* GBCreatePlayerBlockBox(V3F aPosition, V3F aSize, V3F aRotation);
@@ -164,13 +164,13 @@ public:
 	void GBCleanUpPhysics();
 	bool GetGBPhysXActive();
 
-	void GBSetKinematicActorTargetPos(physx::PxRigidActor* aActor, V3F aPosition, M44F aRotation);
+	void GBSetKinematicActorTargetPos(physx::PxRigidActor* aActor, V3F aPosition, M44f aRotation);
 	void GBApplyForceToActor(physx::PxRigidActor* aActor, V3F aForce);
 	void GBResetScene();
 	void RemoveActor(physx::PxRigidActor* aRigidActor);
 	void ReleaseActor(physx::PxRigidActor* aRigidActor);
 
-	GBPhysXActor* CreateStaticTriangleMeshObject(std::string& aFilePath, M44F aTransform);
+	GBPhysXActor* CreateStaticTriangleMeshObject(std::string& aFilePath, M44f aTransform);
 	bool CookStaticTriangleMesh(std::string& aFilePath, const aiScene* aAiScene, aiNode* aAiNode);
 
 	void SetZombieHitBoxData(std::vector<HitBox>& aHitBoxes);

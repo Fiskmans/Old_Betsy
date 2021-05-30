@@ -309,7 +309,7 @@ void DebugDrawer::DrawZ(const V3F& at, const float aSize)
 #endif
 }
 
-void DebugDrawer::DrawX(const V3F& at, const float aSize, const M44F& aSpace)
+void DebugDrawer::DrawX(const V3F& at, const float aSize, const M44f& aSpace)
 {
 #if USEDEBUGLINES
 	DrawLine(at + V3F(0, aSize, aSize), at + V4F(0, -aSize, -aSize, 0) * aSpace);
@@ -317,7 +317,7 @@ void DebugDrawer::DrawX(const V3F& at, const float aSize, const M44F& aSpace)
 #endif
 }
 
-void DebugDrawer::DrawY(const V3F& at, const float aSize, const M44F& aSpace)
+void DebugDrawer::DrawY(const V3F& at, const float aSize, const M44f& aSpace)
 {
 #if USEDEBUGLINES
 	DrawLine(V4F(at, 1), at + V4F(aSize, aSize, 0, 0) * aSpace);
@@ -326,7 +326,7 @@ void DebugDrawer::DrawY(const V3F& at, const float aSize, const M44F& aSpace)
 #endif
 }
 
-void DebugDrawer::DrawZ(const V3F& at, const float aSize, const M44F& aSpace)
+void DebugDrawer::DrawZ(const V3F& at, const float aSize, const M44f& aSpace)
 {
 #if USEDEBUGLINES
 	DrawLine(at + V3F(-aSize, aSize, 0), at + V4F(aSize, aSize, 0, 0) * aSpace);
@@ -347,7 +347,7 @@ void DebugDrawer::DrawGizmo(const V3F& at, const float aSize)
 #endif
 }
 
-void DebugDrawer::DrawGizmo(const V3F& at, const float aSize, const M44F& aSpace)
+void DebugDrawer::DrawGizmo(const V3F& at, const float aSize, const M44f& aSpace)
 {
 #if USEDEBUGLINES
 	SetColor(V4F(1, 0, 0, 1));
@@ -580,7 +580,7 @@ void DebugDrawer::DrawFrustum(const CommonUtilities::PlaneVolume<float>& aFrustu
 #endif
 }
 
-void DebugDrawer::DrawSpace(M44F aSpace, float aScale)
+void DebugDrawer::DrawSpace(M44f aSpace, float aScale)
 {
 #if USEDEBUGLINES
 	DrawGizmo(aSpace.Row(3), aScale, aSpace);

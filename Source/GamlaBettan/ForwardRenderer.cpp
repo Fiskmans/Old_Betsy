@@ -150,7 +150,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 	{
 		const Camera* cam = myDepthRender->GetEnvirontmentCamera();
 		fData.myShadowIntensity = myCloudIntensity;
-		fData.myWorldToShadowCamera = M44F::GetFastInverse(cam->GetTransform());
+		fData.myWorldToShadowCamera = M44f::GetFastInverse(cam->GetTransform());
 		fData.myCameraToShadowProjection = cam->GetProjection(false);
 	}
 	myDepthRender->BindshadowsToSlots(9);

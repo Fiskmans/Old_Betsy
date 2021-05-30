@@ -1116,7 +1116,7 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 			}
 			if (drawSkeletonSpaces)
 			{
-				std::array<M44F, NUMBEROFANIMATIONBONES> spaces;
+				std::array<M44f, NUMBEROFANIMATIONBONES> spaces;
 				auto positions = modelInstance->GetBonePositions();
 				modelInstance->SetupanimationMatrixes(spaces);
 				for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)

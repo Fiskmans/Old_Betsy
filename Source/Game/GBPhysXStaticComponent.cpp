@@ -19,11 +19,11 @@ void GBPhysXStaticComponent::Update(const float aDeltaTime)
 			if (myGBPhysX)
 			{
 
-				M44F mat;
+				M44f mat;
 				V3F rot = myEntity->GetSavedRotationValues();
-				mat = M44F::CreateRotationAroundX(rot.x);
-				mat *= M44F::CreateRotationAroundY(rot.y);
-				mat *= M44F::CreateRotationAroundZ(rot.z);
+				mat = M44f::CreateRotationAroundX(rot.x);
+				mat *= M44f::CreateRotationAroundY(rot.y);
+				mat *= M44f::CreateRotationAroundZ(rot.z);
 
 				mat(4, 1) = myEntity->GetPosition().x;
 				mat(4, 2) = myEntity->GetPosition().y;

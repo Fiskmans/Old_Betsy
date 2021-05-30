@@ -2,7 +2,7 @@
 
 
 
-typedef std::array<M44F, NUMBEROFANIMATIONBONES> AnimationFrame;
+typedef std::array<M44f, NUMBEROFANIMATIONBONES> AnimationFrame;
 typedef std::vector<AnimationFrame> BakedAnimation;
 
 

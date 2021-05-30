@@ -20,7 +20,7 @@ void Animator::BoneTransform(std::array<CommonUtilities::Matrix4x4<float>, NUMBE
 	{
 		for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)
 		{
-			Transforms[i] = M44F::Identity();
+			Transforms[i] = M44f::Identity();
 		}
 		return;
 	}
@@ -73,7 +73,7 @@ void Animator::BoneTransform(std::array<CommonUtilities::Matrix4x4<float>, NUMBE
 	}
 }
 
-M44F Animator::TransormOfBone(size_t aBoneIdex)
+M44f Animator::TransormOfBone(size_t aBoneIdex)
 {
 	std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES> allBones;
 	BoneTransform(allBones);

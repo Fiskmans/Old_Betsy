@@ -47,7 +47,7 @@ public:
 	void Update(float aDt);
 
 	void BoneTransform(std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES>& Transforms);
-	M44F TransormOfBone(size_t aBoneIdex);
+	M44f TransormOfBone(size_t aBoneIdex);
 
 private:
 	static size_t ourTrackIdCounter;

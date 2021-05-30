@@ -25,7 +25,7 @@ public:
 	bool Init(float aFoV, CommonUtilities::Vector2<float> aResolution, float aNear, float aFar, const bool aShouldAdaptToWindowRes);
 	bool Init(CommonUtilities::Vector3<float> aBoundingBox);
 	void SetTransform(CommonUtilities::Vector3<float> aPosition, CommonUtilities::Vector3<float> aRotation);
-	void SetTransform(M44F aTransform);
+	void SetTransform(M44f aTransform);
 	void SetRotation(CommonUtilities::Vector3<float> aRotation);
 	void SetRotation(CommonUtilities::Matrix3x3<float> aRotationMatrix);
 	void SetPosition(CommonUtilities::Vector3<float> aPosition);

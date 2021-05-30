@@ -454,10 +454,10 @@ void RenderManager::SetupBoneTexture(const std::vector<ModelInstance*>& aModelLi
 		}
 		if (model->GetModelAsset().GetAsModel()->ShouldRender() && model->GetModelAsset().GetAsModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones)
 		{
-			std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES>& matrixes = myBoneBuffer[boneIndexOffset];
+			std::array<M44f, NUMBEROFANIMATIONBONES>& matrixes = myBoneBuffer[boneIndexOffset];
 			for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)
 			{
-				matrixes[i] = CommonUtilities::Matrix4x4<float>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+				matrixes[i] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 			}
 			model->SetupanimationMatrixes(matrixes);
 			myBoneOffsetMap[model] = boneIndexOffset;

@@ -32,14 +32,14 @@ struct DefPixelEnvLightBuffer
 	float time = 0;
 	V3F myLightDirection = { 1, 0, 0 };
 	float myCloudIntensity = 0;
-	M44F myToCamera;
-	M44F myToProjection;
+	M44f myToCamera;
+	M44f myToProjection;
 };
 
 struct DefPixelPointLightBuffer
 {
-	M44F myToCamera[6];
-	M44F myToProj[6];
+	M44f myToCamera[6];
+	M44f myToProj[6];
 	V3F LightColor = { 1.f, 1.f, 1.f };
 	float Intensity = 1.f;
 	V3F Position = { 0.f, 0.f, 0.f };
@@ -50,8 +50,8 @@ struct DefPixelPointLightBuffer
 
 struct DefPixelSpotLightBuffer
 {
-	M44F myToCamera;
-	M44F myToProj;
+	M44f myToCamera;
+	M44f myToProj;
 	V3F Position = { 0.f, 0.f, 0.f };
 	float Intensity = 1.f;
 	V3F CameraPosition = { 0.f, 0.f, 0.f };
@@ -60,8 +60,8 @@ struct DefPixelSpotLightBuffer
 
 struct DefDecalBuffer
 {
-	M44F myToCamera;
-	M44F myToProj;
+	M44f myToCamera;
+	M44f myToProj;
 	V4F myCustomData = { 0.f,0.f,0.f,0.f };
 	V3F Position = { 0.f, 0.f, 0.f };
 	float Intensity = 1.f;
@@ -408,7 +408,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 			}
 			myContext->PSSetShaderResources(9, i->myTextures.size(), resource);
 
-			fData.myToCamera = M44F::GetFastInverse(i->myCamera->GetTransform());
+			fData.myToCamera = M44f::GetFastInverse(i->myCamera->GetTransform());
 			fData.myToProj = i->myCamera->GetProjection(false);
 			fData.myLifeTime = now - i->myTimestamp;
 			fData.myCustomData = i->myCustomData;
@@ -520,7 +520,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 
 			for (size_t i = 0; i < 6; i++)
 			{
-				fData.myToCamera[i] = M44F::GetFastInverse(shadowCameras[i]->GetTransform());
+				fData.myToCamera[i] = M44f::GetFastInverse(shadowCameras[i]->GetTransform());
 				fData.myToProj[i] = shadowCameras[i]->GetProjection(false);
 			}
 
@@ -588,7 +588,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 			myContext->PSSetShaderResources(7, 1, perlinResource);
 			//Render Shadows on/to resource 8-14
 
-			fData.myToCamera = M44F::GetFastInverse(i->myCamera->GetTransform());
+			fData.myToCamera = M44f::GetFastInverse(i->myCamera->GetTransform());
 			fData.myToProj = i->myCamera->GetProjection(false);
 
 
@@ -643,7 +643,7 @@ void DeferredRenderer::MapEnvLightBuffer(Scene* aScene)
 	}
 
 	const Camera* cam = myShadowRenderer->GetEnvirontmentCamera();
-	fData.myToCamera = M44F::GetFastInverse(cam->GetTransform());
+	fData.myToCamera = M44f::GetFastInverse(cam->GetTransform());
 	fData.myToProjection = cam->GetProjection(false);
 	fData.time = Tools::GetTotalTime();
 	fData.myCloudIntensity = myCloudIntensity;

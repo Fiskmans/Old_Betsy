@@ -391,19 +391,22 @@ void cleanupPhysics(bool /*interactive*/)
 }
 
 
-physx::PxTransform MatToTransform(const M44F& aMatrix)
+physx::PxTransform MatToTransform(const M44f& aMatrix)
 {
 	float transform[16] = { aMatrix(1,1),aMatrix(1,2),aMatrix(1,3),aMatrix(1,4),aMatrix(2,1),aMatrix(2,2),aMatrix(2,3),aMatrix(2,4),aMatrix(3,1),aMatrix(3,2),aMatrix(3,3),aMatrix(3,4), aMatrix(4,1), aMatrix(4,2),aMatrix(4,3),1.0f };
 	PxMat44 matrix = PxMat44(transform);
 	return PxTransform(matrix);
 }
 
-M44F TransformToMat(PxTransform& aTransform)
+M44f TransformToMat(PxTransform& aTransform)
 {
 	PxMat44 mat = PxMat44(aTransform);
-	M44F returnValue = M44F(mat.column0.x, mat.column1.x, mat.column2.x, mat.column3.x, mat.column0.y, mat.column1.y, mat.column2.y, mat.column3.y, mat.column0.z, mat.column1.z, mat.column2.z, mat.column3.z, mat.column0.w, mat.column1.w, mat.column2.w, mat.column3.w);
+	M44f returnValue = {	mat.column0.x, mat.column1.x, mat.column2.x, mat.column3.x,
+							mat.column0.y, mat.column1.y, mat.column2.y, mat.column3.y,
+							mat.column0.z, mat.column1.z, mat.column2.z, mat.column3.z,
+							mat.column0.w, mat.column1.w, mat.column2.w, mat.column3.w };
 	return returnValue;
-	return M44F::Transpose(returnValue);
+	return M44f::Transpose(returnValue);
 }
 
 PxCapsuleGeometry GetHitboxGeometry(HitBoxType aType)
@@ -483,7 +486,7 @@ PxArticulation* CreateArticulation(PxVec3 aWorldPos, GBPhysXCharacter* aCharacte
 	aCharacter->SetDeathMomentBoneTransformations(boneTransforms);
 
 	//CHARACTER DATA AT TIME OF CREATION FOR TRANSFORMING CHAR TO RIGHT PLACE
-	M44F characterMatrix = aCharacter->GetTransformMatrix();
+	M44f characterMatrix = aCharacter->GetTransformMatrix();
 	characterMatrix[13] -= PlayerHeight;
 	aCharacter->SetDeathMomentCharTransform(characterMatrix);
 
@@ -497,17 +500,12 @@ PxArticulation* CreateArticulation(PxVec3 aWorldPos, GBPhysXCharacter* aCharacte
 	const auto& rootTransform = boneTransforms[1];
 	const auto& rootBoneOffset = aHitboxes[0]->GetHitBox().parentBoneData.BoneOffset;
 
-	M44F rootoffsetInversed = rootBoneOffset;
-	rootoffsetInversed = M44F::GetRealInverse(rootoffsetInversed);
-	M44F rootMatrix = rootTransform * rootoffsetInversed;
+	M44f rootoffsetInversed = rootBoneOffset;
+	rootoffsetInversed = M44f::GetRealInverse(rootoffsetInversed);
+	M44f rootMatrix = rootTransform * rootoffsetInversed;
 
-	M44F rootcuMatrix(rootMatrix(1, 1), rootMatrix(1, 2), rootMatrix(1, 3), rootMatrix(1, 4),
-		rootMatrix(2, 1), rootMatrix(2, 2), rootMatrix(2, 3), rootMatrix(2, 4),
-		rootMatrix(3, 1), rootMatrix(3, 2), rootMatrix(3, 3), rootMatrix(3, 4),
-		rootMatrix(4, 1), rootMatrix(4, 2), rootMatrix(4, 3), rootMatrix(4, 4));
-
-	rootcuMatrix = M44F::Transpose(rootcuMatrix);
-	M44F final = rootcuMatrix;
+	M44f rootcuMatrix = M44f::Transpose(rootMatrix);
+	M44f final = rootcuMatrix;
 
 	PxTransform linkPose = MatToTransform(final);
 
@@ -561,36 +559,26 @@ PxArticulation* CreateArticulation(PxVec3 aWorldPos, GBPhysXCharacter* aCharacte
 		int originID = curr.myOriginNodeIndex;
 
 		PxArticulationLink* parent;
-		M44F transform = boneTransforms[curr.myOriginNodeIndex];
+		M44f transform = boneTransforms[curr.myOriginNodeIndex];
 		auto BoneOffset = curr.parentBoneData.BoneOffset;
 
-		M44F offsetInversed = BoneOffset;
-		offsetInversed = M44F::GetRealInverse(offsetInversed);
-		M44F matrix = transform * offsetInversed;
+		M44f offsetInversed = BoneOffset;
+		offsetInversed = M44f::GetRealInverse(offsetInversed);
+		M44f matrix = transform * offsetInversed;
 
-		M44F cuMatrix(matrix(1, 1), matrix(1, 2), matrix(1, 3), matrix(1, 4),
-			matrix(2, 1), matrix(2, 2), matrix(2, 3), matrix(2, 4),
-			matrix(3, 1), matrix(3, 2), matrix(3, 3), matrix(3, 4),
-			matrix(4, 1), matrix(4, 2), matrix(4, 3), matrix(4, 4));
-
-		cuMatrix = M44F::Transpose(cuMatrix);
-		M44F final = cuMatrix;
+		M44f cuMatrix = M44f::Transpose(matrix);
+		M44f final = cuMatrix;
 
 
 		const auto& childBoneOffset = sortedHitBox.GetHitBox().childBoneData.BoneOffset;
 		const auto& childTrans = boneTransforms[sortedHitBox.GetHitBox().myTargetNodeIndex];
 
-		M44F childOffsetInversed = childBoneOffset;
-		childOffsetInversed = M44F::GetRealInverse(childOffsetInversed);
-		M44F childMatrix = childTrans * childOffsetInversed;
+		M44f childOffsetInversed = childBoneOffset;
+		childOffsetInversed = M44f::GetRealInverse(childOffsetInversed);
+		M44f childMatrix = childTrans * childOffsetInversed;
 
-		M44F childCuMatrix(childMatrix(1, 1), childMatrix(1, 2), childMatrix(1, 3), childMatrix(1, 4),
-			childMatrix(2, 1), childMatrix(2, 2), childMatrix(2, 3), childMatrix(2, 4),
-			childMatrix(3, 1), childMatrix(3, 2), childMatrix(3, 3), childMatrix(3, 4),
-			childMatrix(4, 1), childMatrix(4, 2), childMatrix(4, 3), childMatrix(4, 4));
-
-		childCuMatrix = M44F::Transpose(childCuMatrix);
-		M44F childFinal = childCuMatrix;
+		M44f childCuMatrix = M44f::Transpose(childMatrix);
+		M44f childFinal = childCuMatrix;
 
 		V3F parentPos = V3F(final(4, 1), final(4, 2), final(4, 3));
 		V3F childPos = V3F(childFinal(4, 1), childFinal(4, 2), childFinal(4, 3));
@@ -633,7 +621,7 @@ PxArticulation* CreateArticulation(PxVec3 aWorldPos, GBPhysXCharacter* aCharacte
 		mat(4, 3) = between.z;
 		mat(4, 4) = 1;
 
-		M44F betweenTransform = mat;
+		M44f betweenTransform = mat;
 
 		linkPose = MatToTransform(betweenTransform);
 
@@ -841,7 +829,7 @@ PxArticulation* CreateArticulation(PxVec3 aWorldPos, GBPhysXCharacter* aCharacte
 		if (linkk != nullptr)
 		{
 			auto pose = linkk->getGlobalPose();
-			M44F rotationMat = M44F::CreateRotationAroundZ(-PI * 0.5f);
+			M44f rotationMat = M44f::CreateRotationAroundZ(-PI * 0.5f);
 			auto rotationTrans = MatToTransform(rotationMat);
 			pose = rotationTrans * pose;
 			auto charmat = MatToTransform(characterMatrix);
@@ -871,7 +859,7 @@ GBPhysX::~GBPhysX()
 	SAFE_DELETE(myStaticMeshCooker);
 }
 
-GBPhysXActor* GBPhysX::GBCreateDynamicSphere(M44F aMatrixTransform, int aRadius, float aDensity)
+GBPhysXActor* GBPhysX::GBCreateDynamicSphere(M44f aMatrixTransform, int aRadius, float aDensity)
 {
 	physx::PxRigidDynamic* actor;
 	actor = createDynamic(PxTransform(PxVec3()), PxSphereGeometry(physx::PxReal(aRadius)), PxVec3(0.0f, 0.0f, 0.0f), aDensity);
@@ -934,7 +922,7 @@ GBPhysXActor* GBPhysX::GBCreateStaticCube(V3F aPosition, float aHalfSize)
 
 GBPhysXActor* GBPhysX::GBCreatePlayerBlockBox(V3F aPosition, V3F aSize, V3F aRotation)
 {
-	M44F transform = M44F();
+	M44f transform = M44f();
 	const float degToRad = 57.2957f;
 
 	transform *= transform.CreateRotationAroundX(aRotation.x / degToRad);
@@ -1148,7 +1136,7 @@ bool GBPhysX::GetGBPhysXActive()
 	return myIsActive;
 }
 
-void GBPhysX::GBSetKinematicActorTargetPos(physx::PxRigidActor* aActor, V3F aPosition, M44F aRotation)
+void GBPhysX::GBSetKinematicActorTargetPos(physx::PxRigidActor* aActor, V3F aPosition, M44f aRotation)
 {
 	float bob[16]{ aRotation(1, 1), aRotation(1, 2), aRotation(1, 3), aRotation(1, 4),
 					aRotation(2, 1), aRotation(2, 2), aRotation(2, 3), aRotation(2, 4),
@@ -1196,7 +1184,7 @@ void GBPhysX::ReleaseActor(physx::PxRigidActor* aRigidActor)
 	//aRigidActor->release();
 }
 
-GBPhysXActor* GBPhysX::CreateStaticTriangleMeshObject(std::string& aFilePath, M44F aTransform)
+GBPhysXActor* GBPhysX::CreateStaticTriangleMeshObject(std::string& aFilePath, M44f aTransform)
 {
 	if (myStaticMeshCooker->TriangleMeshExists(aFilePath))
 	{
@@ -1276,11 +1264,13 @@ GBPhysXActor::~GBPhysXActor()
 {
 }
 
-M44F GBPhysXActor::GetTransformMatrix()
+M44f GBPhysXActor::GetTransformMatrix()
 {
 	auto mat = PxMat44(myRigidActor->getGlobalPose());
-	auto mat4 = M44F(mat.column0.x, mat.column0.y, mat.column0.z, mat.column0.w, mat.column1.x, mat.column1.y, mat.column1.z, mat.column1.w, mat.column2.x, mat.column2.y, mat.column2.z, mat.column2.w, mat.column3.x, mat.column3.y, mat.column3.z, mat.column3.w);
-	return mat4;
+	return {	mat.column0.x, mat.column0.y, mat.column0.z, mat.column0.w, 
+				mat.column1.x, mat.column1.y, mat.column1.z, mat.column1.w,
+				mat.column2.x, mat.column2.y, mat.column2.z, mat.column2.w, 
+				mat.column3.x, mat.column3.y, mat.column3.z, mat.column3.w };
 }
 
 V3F GBPhysXActor::GetPosition()
@@ -1318,7 +1308,7 @@ void GBPhysXActor::SetKinematicTargetPos(V3F aPos)
 {
 	if (myIsKinematic)
 	{
-		myGBPhysX->GBSetKinematicActorTargetPos(myRigidActor, aPos, M44F());
+		myGBPhysX->GBSetKinematicActorTargetPos(myRigidActor, aPos, M44f());
 	}
 	else
 	{
@@ -1416,7 +1406,7 @@ void GBPhysXCharacter::SetDeathMomentBoneTransformations(std::array<CommonUtilit
 	myDeathMomentBoneTransformations = aMatrixes;
 }
 
-void GBPhysXCharacter::SetDeathMomentCharTransform(M44F& aTransform)
+void GBPhysXCharacter::SetDeathMomentCharTransform(M44f& aTransform)
 {
 	myDeathMomentCharTransform = aTransform;
 }
@@ -1526,14 +1516,14 @@ void GBPhysXCharacter::CreateHitBoxes()
 
 				if (entity->GetComponent<AnimationComponent>() != nullptr)
 				{
-					std::array<M44F, NUMBEROFANIMATIONBONES> boneTransforms;
+					std::array<M44f, NUMBEROFANIMATIONBONES> boneTransforms;
 					Animator* animator = entity->GetComponent<AnimationComponent>()->GetAnimator();
 					if (animator)
 					{
 						animator->BoneTransform(boneTransforms);
 
 						PxExtendedVec3 extendedPos = myController->getPosition();
-						M44F finalPos;
+						M44f finalPos;
 						V3F worldPos = V3F(extendedPos.x, extendedPos.y, extendedPos.z);
 						finalPos(4, 1) = worldPos.x;
 						finalPos(4, 2) = worldPos.y;
@@ -1555,8 +1545,8 @@ void GBPhysXCharacter::CreateHitBoxes()
 							geom = GetHitboxGeometry(type);
 
 							//auto aTransform = boneTransforms[hitbox.myOriginNodeIndex];
-							auto aTransform = M44F();
-							aTransform = M44F::GetRealInverse(aTransform);
+							auto aTransform = M44f();
+							aTransform = M44f::GetRealInverse(aTransform);
 							float transform[16] = { aTransform(1,1),aTransform(1,2),aTransform(1,3),aTransform(1,4),aTransform(2,1),aTransform(2,2),aTransform(2,3),aTransform(2,4),aTransform(3,1),aTransform(3,2),aTransform(3,3),aTransform(3,4), aTransform(4,1) + worldPos.x, aTransform(4,2) + worldPos.y,aTransform(4,3) + worldPos.z,1.0f };
 							PxMat44 matrix = PxMat44(transform);
 							PxShape* shape = gPhysics->createShape(geom, *gMaterial, true);
@@ -1592,7 +1582,7 @@ void GBPhysXCharacter::UpdateHitBoxes()
 	{
 		if (myController)
 		{
-			std::array<M44F, NUMBEROFANIMATIONBONES> boneTransforms;
+			std::array<M44f, NUMBEROFANIMATIONBONES> boneTransforms;
 			GBPhysXCharacter* character = CAST(GBPhysXCharacter*, myController->getActor()->userData);
 			Entity* entity = character->GetEntity();
 			if (entity)
@@ -1613,25 +1603,15 @@ void GBPhysXCharacter::UpdateHitBoxes()
 						auto& childTrans = boneTransforms[currentHitBox->myTargetNodeIndex];
 						auto& parentTrans = boneTransforms[currentHitBox->myOriginNodeIndex];
 
-						M44F childMatrix = childTrans * currentHitBox->childBoneOffsetInversed;
+						M44f childMatrix = childTrans * currentHitBox->childBoneOffsetInversed;
 
-						M44F childCuMatrix(childMatrix(1, 1), childMatrix(1, 2), childMatrix(1, 3), childMatrix(1, 4),
-							childMatrix(2, 1), childMatrix(2, 2), childMatrix(2, 3), childMatrix(2, 4),
-							childMatrix(3, 1), childMatrix(3, 2), childMatrix(3, 3), childMatrix(3, 4),
-							childMatrix(4, 1), childMatrix(4, 2), childMatrix(4, 3), childMatrix(4, 4));
+						M44f childCuMatrix = M44f::Transpose(childMatrix);
+						M44f& childFinal = childCuMatrix;
 
-						childCuMatrix = M44F::Transpose(childCuMatrix);
-						M44F& childFinal = childCuMatrix;
+						M44f parentMatrix = parentTrans * currentHitBox->parentBoneOffsetInversed;
 
-						M44F parentMatrix = parentTrans * currentHitBox->parentBoneOffsetInversed;
-
-						M44F parentCuMatrix(parentMatrix(1, 1), parentMatrix(1, 2), parentMatrix(1, 3), parentMatrix(1, 4),
-							parentMatrix(2, 1), parentMatrix(2, 2), parentMatrix(2, 3), parentMatrix(2, 4),
-							parentMatrix(3, 1), parentMatrix(3, 2), parentMatrix(3, 3), parentMatrix(3, 4),
-							parentMatrix(4, 1), parentMatrix(4, 2), parentMatrix(4, 3), parentMatrix(4, 4));
-
-						parentCuMatrix = M44F::Transpose(parentCuMatrix);
-						M44F& parentFinal = parentCuMatrix;
+						M44f parentCuMatrix = M44f::Transpose(parentMatrix);
+						M44f& parentFinal = parentCuMatrix;
 
 
 						V3F childWorldPos = { childFinal(4,1), childFinal(4,2), childFinal(4,3) };
@@ -1642,8 +1622,8 @@ void GBPhysXCharacter::UpdateHitBoxes()
 
 
 						entityPos.y -= PlayerHeight;
-						M44F mat = entity->GetRotation();
-						mat *= M44F::CreateRotationAroundY(PI);
+						M44f mat = entity->GetRotation();
+						mat *= M44f::CreateRotationAroundY(PI);
 
 						finalOffset = finalOffset * mat;
 

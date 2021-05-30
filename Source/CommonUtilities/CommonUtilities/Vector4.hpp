@@ -22,7 +22,7 @@ namespace CommonUtilities
 		Vector4<T>(const Vector4<T> &aVector) = default;
 		Vector4<T>(const Vector3<T> &aVector, const T aWValue);
 		Vector4<T>(const Vector2<T> &aVector, const T aZValue, const T aWValue);
-		Vector4<T>(const std::initializer_list<T>& anInitList);
+		Vector4<T>(const std::initializer_list<T>& aInitList);
 		~Vector4<T>() = default;
 
 		T x;
@@ -34,7 +34,7 @@ namespace CommonUtilities
 		bool operator==(const Vector4<T> &aVector) const;
 		bool operator!=(const Vector4<T> &aVector) const;
 		T& operator[](size_t aIndex);
-		T operator[](size_t aIndex) const;
+		const T& operator[](size_t aIndex) const;
 
 		T Length() const;
 		T LengthSqr() const;
@@ -109,42 +109,21 @@ namespace CommonUtilities
 	}
 
 	template<class T>
-	inline Vector4<T>::Vector4(const std::initializer_list<T>& anInitList) :
+	inline Vector4<T>::Vector4(const std::initializer_list<T>& aInitList) :
 		x(T()),
 		y(T()),
 		z(T()),
 		w(T())
 	{
-		switch (anInitList.size())
+
+		assert(aInitList.size() == 4 || aInitList.size() == 1);
+
+		x = *(aInitList.begin() + 0);
+		if (aInitList.size() > 1)
 		{
-		case 0:
-			break;
-
-		case 1:
-			x = *anInitList.begin();
-			break;
-
-		case 2:
-			x = *anInitList.begin();
-			y = *(anInitList.begin() + 1);
-			break;
-
-		case 3:
-			x = *anInitList.begin();
-			y = *(anInitList.begin() + 1);
-			z = *(anInitList.begin() + 2);
-			break;
-
-		case 4:
-			x = *anInitList.begin();
-			y = *(anInitList.begin() + 1);
-			z = *(anInitList.begin() + 2);
-			w = *(anInitList.begin() + 3);
-			break;
-
-		default:
-			SYSERROR("Initializer list for Vector4 is faulty.","")
-
+			y = *(aInitList.begin() + 1);
+			z = *(aInitList.begin() + 2);
+			w = *(aInitList.begin() + 3);
 		}
 	}
 
@@ -338,13 +317,13 @@ namespace CommonUtilities
 		case 3:
 			return w;
 		default:
-			throw - 1;
+			throw std::exception("index out of range");
 		}
 		return x;
 	}
 
 	template<class T>
-	inline T Vector4<T>::operator[](size_t aIndex) const
+	inline const T& Vector4<T>::operator[](size_t aIndex) const
 	{
 		switch (aIndex)
 		{
@@ -357,7 +336,7 @@ namespace CommonUtilities
 		case 3:
 			return w;
 		default:
-			throw - 1;
+			throw std::exception("index out of range");
 		}
 		return x;
 	}

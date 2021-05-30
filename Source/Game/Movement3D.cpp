@@ -203,7 +203,7 @@ void Movement3D::Update(const float aDeltaTime)
 					}
 				}
 
-				M44F newRot = M44F::CreateRotationAroundY(radtorotate);
+				M44f newRot = M44f::CreateRotationAroundY(radtorotate);
 
 				myEntity->SetRotation(curRot * newRot);
 

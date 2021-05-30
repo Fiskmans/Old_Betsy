@@ -51,7 +51,7 @@ void ModelInstance::ResetSpawnTime()
 
 std::array<V4F, NUMBEROFANIMATIONBONES> ModelInstance::GetBonePositions()
 {
-	static std::array<M44F, NUMBEROFANIMATIONBONES> transforms;
+	static std::array<M44f, NUMBEROFANIMATIONBONES> transforms;
 	SetupanimationMatrixes(transforms);
 	static std::array<V4F, NUMBEROFANIMATIONBONES> positions;
 	for (auto& i : positions)
@@ -64,10 +64,10 @@ std::array<V4F, NUMBEROFANIMATIONBONES> ModelInstance::GetBonePositions()
 
 	for (size_t i = 0; i < boneData.size(); i++)
 	{
-		const M44F& finalTrans = transforms[i];
-		const M44F& offset = boneData[i].BoneOffset;
-		M44F total = finalTrans * M44F::GetRealInverse(offset);
-		positions[i] = positions[i] * M44F::Transpose(total);
+		const M44f& finalTrans = transforms[i];
+		const M44f& offset = boneData[i].BoneOffset;
+		M44f total = finalTrans * M44f::GetRealInverse(offset);
+		positions[i] = positions[i] * M44f::Transpose(total);
 		positions[i] = positions[i] * toWorld;
 	}
 
@@ -93,14 +93,14 @@ CommonUtilities::Matrix4x4<float> ModelInstance::GetModelToWorldTransform()
 	return toWorld;
 }
 
-M44F ModelInstance::GetModelToWorldTransformWithPotentialBoneAttachement(BoneTextureCPUBuffer& aBoneData, std::unordered_map<ModelInstance*, short>& aBoneMapping)
+M44f ModelInstance::GetModelToWorldTransformWithPotentialBoneAttachement(BoneTextureCPUBuffer& aBoneData, std::unordered_map<ModelInstance*, short>& aBoneMapping)
 {
 	if (myIsAttachedToBone)
 	{
-		M44F base = myAttachedToModel->GetModelToWorldTransformWithPotentialBoneAttachement(aBoneData,aBoneMapping);
-		M44F bonedata = aBoneData[aBoneMapping[myAttachedToModel]][myBoneIndex];
+		M44f base = myAttachedToModel->GetModelToWorldTransformWithPotentialBoneAttachement(aBoneData,aBoneMapping);
+		M44f bonedata = aBoneData[aBoneMapping[myAttachedToModel]][myBoneIndex];
 
-		return M44F::Transpose(bonedata) * base;
+		return M44f::Transpose(bonedata) * base;
 	}
 	return GetModelToWorldTransform();
 }

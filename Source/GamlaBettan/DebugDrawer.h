@@ -36,11 +36,11 @@ public:
 	void DrawX(const V3F& at, const float aSize);
 	void DrawY(const V3F& at, const float aSize);
 	void DrawZ(const V3F& at, const float aSize);
-	void DrawX(const V3F& at, const float aSize, const M44F& aSpace);
-	void DrawY(const V3F& at, const float aSize, const M44F& aSpace);
-	void DrawZ(const V3F& at, const float aSize, const M44F& aSpace);
+	void DrawX(const V3F& at, const float aSize, const M44f& aSpace);
+	void DrawY(const V3F& at, const float aSize, const M44f& aSpace);
+	void DrawZ(const V3F& at, const float aSize, const M44f& aSpace);
 	void DrawGizmo(const V3F& at, const float aSize);
-	void DrawGizmo(const V3F& at, const float aSize, const M44F& aSpace);
+	void DrawGizmo(const V3F& at, const float aSize, const M44f& aSpace);
 	void DrawBoundingBox(const CommonUtilities::AABB3D<float>& aBoundingBox);
 	void Draw2DBoundingBox(const CommonUtilities::AABB2D<float>& aBoundingBox);
 	void DrawRotatedBoundingBox(const CommonUtilities::AABB3D<float>& aBoundingBox, const CommonUtilities::Matrix4x4<float>& aRotationMatrix);
@@ -48,7 +48,7 @@ public:
 	void DrawSkeleton(ModelInstance* aInstance);
 	void DrawPlane(CommonUtilities::Plane<float> aPlane, float aLineSpacing = 10.f, size_t aSubdevisions = 10);
 	void DrawFrustum(const CommonUtilities::PlaneVolume<float>& aFrustum);
-	void DrawSpace(M44F aSpace, float aScale = 30);
+	void DrawSpace(M44f aSpace, float aScale = 30);
 
 	void Render(class Camera* aCamera);
 private:

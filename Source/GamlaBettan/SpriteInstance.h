@@ -28,8 +28,8 @@ public:
 	void SetSize(V2F aSize);
 	void SetSizeInPixel(V2F aSize);
 
-	const M44F GetTransform() const;
-	const M44F GetPivotTransform() const;
+	const M44f GetTransform() const;
+	const M44f GetPivotTransform() const;
 
 	const V2F GetPosition() const;
 	const V4F& GetColor() const;

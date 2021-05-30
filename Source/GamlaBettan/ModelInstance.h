@@ -22,7 +22,7 @@ public:
 	ModelInstance(const AssetHandle& aModel);
 	AssetHandle& GetModelAsset();
 	CommonUtilities::Matrix4x4<float> GetModelToWorldTransform();
-	M44F GetModelToWorldTransformWithPotentialBoneAttachement(BoneTextureCPUBuffer& aBoneData, std::unordered_map<ModelInstance*, short>& aBoneMapping);
+	M44f GetModelToWorldTransformWithPotentialBoneAttachement(BoneTextureCPUBuffer& aBoneData, std::unordered_map<ModelInstance*, short>& aBoneMapping);
 	void SetPosition(const CommonUtilities::Vector4<float>& aPosition);
 	void Rotate(CommonUtilities::Vector3<float> aRotation);
 	void Rotate(const CommonUtilities::Matrix4x4<float>& aRotationMatrix);

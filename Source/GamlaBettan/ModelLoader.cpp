@@ -311,8 +311,8 @@ void ModelLoader::LoadLoop()
 						{
 							i.parent = current.myModel->myBoneNameLookup[parent->mName.C_Str()];
 						}
-						pos = pos * M44F::GetFastInverse(M44F::Transpose(AiHelpers::ConvertToEngineMatrix44(parent->mTransformation)));
-						//pos = pos * M44F::GetFastInverse(M44F::Transpose(AiHelpers::ConvertToEngineMatrix44(nodeNameLookup[i.myName]->mTransformation)));
+						pos = pos * M44f::GetFastInverse(M44f::Transpose(AiHelpers::ConvertToEngineMatrix44(parent->mTransformation)));
+						//pos = pos * M44f::GetFastInverse(M44f::Transpose(AiHelpers::ConvertToEngineMatrix44(nodeNameLookup[i.myName]->mTransformation)));
 
 						parent = parent->mParent;
 					}

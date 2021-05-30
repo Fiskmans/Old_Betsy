@@ -111,20 +111,19 @@ void SpriteInstance::SetSizeInPixel(V2F aSize)
 
 const CommonUtilities::Matrix4x4<float> SpriteInstance::GetTransform() const
 {
-	return M44F::CreateRotationAroundZ(myRotation) *
-		M44F(myScale.x * myBaseScale.x, 0.f, 0.f, 0.f,
-			0.f, myScale.y * myBaseScale.y, 0.f, 0.f,
-			0.f, 0.f, 1.f, 0.f,
-			(myPosition.x * 2.f - 1.f), -(myPosition.y * 2.f - 1.f), 0.f, 1.f);
+	return M44f::CreateRotationAroundZ(myRotation) *
+		M44f({	myScale.x * myBaseScale.x,	0.f,							0.f, 0.f,
+				0.f,						myScale.y * myBaseScale.y,		0.f, 0.f,
+				0.f,						0.f,							1.f, 0.f,
+				(myPosition.x * 2.f - 1.f), -(myPosition.y * 2.f - 1.f),	0.f, 1.f});
 }
 
-const M44F SpriteInstance::GetPivotTransform() const
+const M44f SpriteInstance::GetPivotTransform() const
 {
-	return
-		M44F(1.f, 0.f, 0.f, 0.f,
-			0.f, 1.f, 0.f, 0.f,
-			0.f, 0.f, 1.f, 0.f,
-			-myPivot.x, myPivot.y, 0.f, 1.f);
+	return { 1.f,		 0.f,		0.f, 0.f,
+			 0.f,		 1.f,		0.f, 0.f,
+			 0.f,		 0.f,		1.f, 0.f,
+			 -myPivot.x, myPivot.y, 0.f, 1.f };
 }
 
 const CommonUtilities::Vector2<float> SpriteInstance::GetPosition() const

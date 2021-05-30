@@ -108,7 +108,7 @@ void Camera::SetTransform(CommonUtilities::Vector3<float> aPosition, CommonUtili
 	SetRotation(aRotation);
 }
 
-void Camera::SetTransform(M44F aTransform)
+void Camera::SetTransform(M44f aTransform)
 {
 	myTransform = aTransform;
 }

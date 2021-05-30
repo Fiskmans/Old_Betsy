@@ -19,7 +19,7 @@ void Animation::GetInterpolation(float aTime, float aWeight, AnimationFrame& aOu
 
     for (size_t i = 0; i < sizeof(aOutSnapshot) / sizeof(float); i++)
     {
-        rawOut[i] += LERP(raw1[i], raw2[i], fraction) * myWeights[i / (sizeof(M44F)/sizeof(float))] * aWeight;
+        rawOut[i] += LERP(raw1[i], raw2[i], fraction) * myWeights[i / (sizeof(M44f)/sizeof(float))] * aWeight;
     }
 }
 
