@@ -129,7 +129,7 @@ ID3D11ShaderResourceView* AssetHandle::GetAsTexture() const
 
 ID3D11PixelShader* AssetHandle::GetAsPixelShader() const
 {
-	if (myAsset->myType != Asset::AssetType::PixelShader) { throw std::exception("GetAsPixxelShader() on non PixelShader asset"); }
+	if (myAsset->myType != Asset::AssetType::PixelShader) { throw std::exception("GetAsPixelShader() on non PixelShader asset"); }
 	return reinterpret_cast<PixelShaderAsset*>(myAsset)->myShader;
 }
 
