@@ -114,7 +114,7 @@ void DebugDrawer::Init(DirectX11Framework* aFramework)
 	result = device->CreateInputLayout(layout, sizeof(layout) / sizeof(layout[0]), rawCompiled->GetBufferPointer(), rawCompiled->GetBufferSize(), &myInputLayout);
 	if (FAILED(result))
 	{
-		SYSERROR("could not create input layout", "debugdrawer");
+		SYSERROR("could not create input layout");
 		return;
 	}
 	SAFE_RELEASE(rawCompiled);
@@ -131,7 +131,7 @@ void DebugDrawer::Init(DirectX11Framework* aFramework)
 	result = device->CreateBuffer(&desc, nullptr, &myVertexBuffer);
 	if (FAILED(result))
 	{
-		SYSERROR("could not create vertex buffer", "debugdrawer");
+		SYSERROR("could not create vertex buffer");
 		return;
 	}
 
@@ -142,7 +142,7 @@ void DebugDrawer::Init(DirectX11Framework* aFramework)
 	result = device->CreateBuffer(&desc, nullptr, &myConstantBuffer);
 	if (FAILED(result))
 	{
-		SYSERROR("could not create constant buffer", "debugdrawer");
+		SYSERROR("could not create constant buffer");
 		return;
 	}
 
@@ -152,7 +152,7 @@ void DebugDrawer::Init(DirectX11Framework* aFramework)
 	result = device->CreateBuffer(&desc, nullptr, &myColorBuffer);
 	if (FAILED(result))
 	{
-		SYSERROR("could not create Color buffer", "debugdrawer");
+		SYSERROR("could not create Color buffer");
 		return;
 	}
 

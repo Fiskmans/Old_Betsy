@@ -36,14 +36,14 @@ bool ParticleRenderer::Init(DirectX11Framework* aFramework)
 	HRESULT result = device->CreateBuffer(&desc, nullptr, &myFrameBuffer);
 	if (FAILED(result))
 	{
-		SYSERROR("Could no oh no.","");
+		SYSERROR("Could no oh no.");
 		return false;
 	}
 	desc.ByteWidth = sizeof(ParticleObjectBufferData);
 	result = device->CreateBuffer(&desc, nullptr, &myObjectBuffer);
 	if (FAILED(result))
 	{
-		SYSERROR("Shit's fucked.","");
+		SYSERROR("Shit's fucked.");
 		return false;
 	}
 
@@ -66,7 +66,7 @@ void ParticleRenderer::Render(Camera* aCamera,const std::vector<ParticleInstance
 	result = context->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 	if (FAILED(result))
 	{
-		SYSERROR("Oh no, partcle ded","");
+		SYSERROR("Oh no, partcle ded");
 		return;
 	}
 
@@ -101,7 +101,7 @@ void ParticleRenderer::Render(Camera* aCamera,const std::vector<ParticleInstance
 		result = context->Map(myObjectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 		if (FAILED(result))
 		{
-			SYSERROR("Oh no, partcle ded","");
+			SYSERROR("Oh no, partcle ded");
 			return;
 		}
 		memcpy(bufferData.pData, &objectBufferData, sizeof(objectBufferData));
@@ -112,7 +112,7 @@ void ParticleRenderer::Render(Camera* aCamera,const std::vector<ParticleInstance
 		result = context->Map(particleData.myParticleVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 		if (FAILED(result))
 		{
-			SYSERROR("Oh no, partcle ded","");
+			SYSERROR("Oh no, partcle ded");
 			return;
 		}
 		const std::vector<Particle::Vertex>& vertexList = instance->GetParticleVertices();

@@ -107,7 +107,7 @@ namespace CommonUtilities
 			break;
 
 		default:
-			SYSERROR("Initializer list for Vector2 is faulty.","")
+			SYSERROR("Initializer list for Vector2 is faulty.")
 		}
 	}
 
@@ -123,7 +123,7 @@ namespace CommonUtilities
 	{
 		if (anotherVector.x == 0 || anotherVector.y == 0)
 		{
-			SYSERROR("Division by 0 in Vector2!","");
+			SYSERROR("Division by 0 in Vector2!");
 		}
 
 		return Vector2<T>(aVector.x / anotherVector.x, aVector.y / anotherVector.y);
@@ -154,7 +154,7 @@ namespace CommonUtilities
 	{
 		if (anotherVector.x == 0 || anotherVector.y == 0)
 		{
-			SYSERROR("Division by 0 in Vector2!","");
+			SYSERROR("Division by 0 in Vector2!");
 		}
 
 		aVector.x /= anotherVector.x;
@@ -195,7 +195,7 @@ namespace CommonUtilities
 	{
 		if (aScalar == 0)
 		{
-			SYSERROR("Division by 0 in Vector2!","");
+			SYSERROR("Division by 0 in Vector2!");
 		}
 
 		return Vector2<T>(aVector.x / aScalar, aVector.y / aScalar);
@@ -226,7 +226,7 @@ namespace CommonUtilities
 	{
 		if (aScalar == 0)
 		{
-			SYSERROR("Division by 0 in Vector2!","");
+			SYSERROR("Division by 0 in Vector2!");
 		}
 
 		aVector.x /= aScalar;
@@ -318,7 +318,7 @@ namespace CommonUtilities
 			return;
 		}
 
-		SYSWARNING("Normalization of zero vector in Vector2!","");
+		SYSWARNING("Normalization of zero vector in Vector2!");
 	}
 
 	template<class T>
@@ -331,7 +331,7 @@ namespace CommonUtilities
 			return (*this) * (T(1) / length);
 		}
 
-		SYSWARNING("Normalization of zero vector in Vector2!",""); 
+		SYSWARNING("Normalization of zero vector in Vector2!"); 
 		return Vector2<T>();
 	}
 

@@ -164,11 +164,11 @@ int Run()
 			long long initTimeDelta = initTime - startTime;
 			if (initTimeDelta > 10000)
 			{
-				SYSERROR("Game took more than 10 seconds to start","");
+				SYSERROR("Game took more than 10 seconds to start");
 			}
 			else if (initTimeDelta > 5000)
 			{
-				SYSWARNING("Game took more than 5 seconds to start","");
+				SYSWARNING("Game took more than 5 seconds to start");
 			}
 #endif // BOOTUPDIAGNOSTIC
 

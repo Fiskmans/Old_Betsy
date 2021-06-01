@@ -753,7 +753,7 @@ PxArticulation* CreateArticulation(PxVec3 aWorldPos, GBPhysXCharacter* aCharacte
 			break;
 
 		default:
-			SYSERROR("CRAZY TARGETNODE in hitboxes create articulation", "");
+			SYSERROR("CRAZY TARGETNODE in hitboxes create articulation");
 			break;
 		}
 
@@ -1312,7 +1312,7 @@ void GBPhysXActor::SetKinematicTargetPos(V3F aPos)
 	}
 	else
 	{
-		SYSERROR("Tried setting kinematic target pos of non kinematic rigid actor", "");
+		SYSERROR("Tried setting kinematic target pos of non kinematic rigid actor");
 	}
 }
 

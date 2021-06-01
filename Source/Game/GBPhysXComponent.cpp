@@ -27,7 +27,7 @@ void GBPhysXComponent::AttachGBPhysXActor(GBPhysXActor* aActor)
 	{
 		myGBPhysXActor->RemoveFromScene();
 		SAFE_DELETE(myGBPhysXActor);
-		SYSERROR("ATTACH CALLED MORE THAN ONCE ON GB PHYSX COMPONENT, DANGER","");
+		SYSERROR("ATTACH CALLED MORE THAN ONCE ON GB PHYSX COMPONENT");
 	}
 	myGBPhysXActor = aActor;
 	myMeshPtr = myEntity->GetComponent<Mesh>();

@@ -20,7 +20,7 @@ bool TextRenderer::Init(DirectX11Framework* aFramework)
 
 	if (!mySpriteBatch)
 	{
-		SYSERROR("Could not create sprite batch in TextRenderer.Init().", "");
+		SYSERROR("Could not create sprite batch in TextRenderer.Init().");
 		return false;
 	}
 

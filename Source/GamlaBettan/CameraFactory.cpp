@@ -15,7 +15,7 @@ bool CCameraFactory::Init(WindowHandler* aWindowHandler, float aNear, float aFar
 {
 	if (!aWindowHandler)
 	{
-		SYSERROR("Camerafactory was passed a nonexisting windowhandler","");
+		SYSERROR("Camerafactory was passed a nonexisting windowhandler");
 		return false;
 	}
 	ourWindowHandler = aWindowHandler;
@@ -28,7 +28,7 @@ Camera* CCameraFactory::CreateCamera(float aFoV, const bool aShouldAdaptToWindow
 {
 	if (!ourWindowHandler)
 	{
-		SYSERROR("Tried to create a camera in a not started factory","");
+		SYSERROR("Tried to create a camera in a not started factory");
 		return nullptr;
 	}
 	Camera* camera = new Camera();
@@ -44,7 +44,7 @@ Camera* CCameraFactory::CreateCamera(float aFoV, const bool aShouldAdaptToWindow
 {
 	if (!ourWindowHandler)
 	{
-		SYSERROR("Tried to create a camera in a not started factory","");
+		SYSERROR("Tried to create a camera in a not started factory");
 		return nullptr;
 	}
 	Camera* camera = new Camera();
@@ -60,7 +60,7 @@ Camera* CCameraFactory::CreateCamera(Camera::CameraType aType)
 {
 	if (!ourWindowHandler)
 	{
-		SYSERROR("Tried to create a camera in a not started factory", "");
+		SYSERROR("Tried to create a camera in a not started factory");
 		return nullptr;
 	}
 	Camera* camera = new Camera();

@@ -166,7 +166,7 @@ bool DirectX11Framework::Init(void* aWindowHandle)
 		result = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, &desc, &mySwapChain, &myDevice, nullptr, &myDeviceContext);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not start requested debug dx device","");
+			SYSERROR("Could not start requested debug dx device");
 		}
 	}
 #endif // _DEBUG
@@ -249,7 +249,7 @@ ID3D11Texture2D* DirectX11Framework::GetBackbufferTexture()
 		result = mySwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&texture);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not get backbuffer from swapchain","");
+			SYSERROR("Could not get backbuffer from swapchain");
 			return nullptr;
 		}
 		return texture;
@@ -259,7 +259,7 @@ ID3D11Texture2D* DirectX11Framework::GetBackbufferTexture()
 	myBackBuffer->GetResource(&backbufferTexture);
 	if (!backbufferTexture)
 	{
-		SYSERROR("Could not get backbuffer texture","");
+		SYSERROR("Could not get backbuffer texture");
 		return nullptr;
 	}
 	return static_cast<ID3D11Texture2D*>(backbufferTexture);
@@ -311,6 +311,9 @@ void DirectX11Framework::Imgui()
 void DirectX11Framework::AddMemoryUsage(size_t aAmount, const std::string& aName, const std::string& aCategory)
 {
 #if TRACKGFXMEM
+	static std::mutex mutex;
+	std::lock_guard guard(mutex);
+
 	memoryUser user;
 	user.aAmount = aAmount;
 	user.myName = aName;

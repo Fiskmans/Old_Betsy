@@ -197,7 +197,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 			result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 			if (FAILED(result))
 			{
-				SYSERROR("Could not map frame buffer", "");
+				SYSERROR("Could not map frame buffer");
 				return aModelList;
 			}
 			fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(aModelList[i]->GetIsUsingSecondaryFov()));
@@ -236,7 +236,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 
 			if (FAILED(result))
 			{
-				SYSERROR("Could not map object buffer", "");
+				SYSERROR("Could not map object buffer");
 				return aModelList;
 			}
 
@@ -276,7 +276,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 			}
 			else
 			{
-				ONETIMEWARNING("Rendered without any loaded lod levels", "");
+				ONETIMEWARNING("Rendered without any loaded lod levels");
 			}
 		}
 	}
@@ -308,7 +308,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 
 			if (FAILED(result))
 			{
-				SYSERROR("Could not map object buffer", "");
+				SYSERROR("Could not map object buffer");
 				return aModelList;
 			}
 
@@ -418,7 +418,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 
 			if (FAILED(result))
 			{
-				SYSERROR("Could not map object buffer", "");
+				SYSERROR("Could not map object buffer");
 			}
 
 			memcpy(bufferData.pData, &fData, sizeof(fData));
@@ -530,7 +530,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 
 			if (FAILED(result))
 			{
-				SYSERROR("Could not map object buffer", "");
+				SYSERROR("Could not map object buffer");
 			}
 
 			memcpy(bufferData.pData, &fData, sizeof(fData));
@@ -597,7 +597,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 
 			if (FAILED(result))
 			{
-				SYSERROR("Could not map object buffer", "");
+				SYSERROR("Could not map object buffer");
 			}
 
 			memcpy(bufferData.pData, &fData, sizeof(fData));
@@ -619,7 +619,7 @@ void DeferredRenderer::MapEnvLightBuffer(Scene* aScene)
 
 	if (FAILED(result))
 	{
-		SYSERROR("Could not map frame buffer", "");
+		SYSERROR("Could not map frame buffer");
 	}
 
 	DefPixelEnvLightBuffer fData;

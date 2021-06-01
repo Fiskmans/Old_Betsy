@@ -158,7 +158,7 @@ namespace CommonUtilities
 	{
 		if (anotherVector.operator==({0,0,0,0}))
 		{
-			SYSERROR("Division by 0 in Vector4!","");
+			SYSERROR("Division by 0 in Vector4!");
 		}
 		return Vector4<T>(aVector.x / anotherVector.x, aVector.y / anotherVector.y, aVector.z / anotherVector.z, aVector.w / anotherVector.w);
 	}
@@ -190,7 +190,7 @@ namespace CommonUtilities
 	{
 		if (anotherVector.operator==({0, 0, 0, 0}))
 		{
-			SYSERROR("Division by 0 in Vector4!", "");
+			SYSERROR("Division by 0 in Vector4!");
 		}
 		aVector.x /= anotherVector.x;
 		aVector.y /= anotherVector.y;
@@ -346,7 +346,7 @@ namespace CommonUtilities
 	template<>
 	inline bool Vector4<float>::operator==(const Vector4<float>& aVector) const
 	{
-		const float eps = 1e-50;
+		const float eps = 1e-10;
 		return  abs(x - aVector.x) < eps 
 			&&	abs(y - aVector.y) < eps 
 			&&	abs(z - aVector.z) < eps 
@@ -356,7 +356,7 @@ namespace CommonUtilities
 	template<>
 	inline bool Vector4<double>::operator==(const Vector4<double>& aVector) const
 	{
-		const double eps = 1e-50;
+		const double eps = 1e-10;
 		return  abs(x - aVector.x) < eps
 			&&	abs(y - aVector.y) < eps
 			&&	abs(z - aVector.z) < eps

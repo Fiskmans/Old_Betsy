@@ -1,12 +1,8 @@
 #include <pch.h>
 #include "Logger.h"
-#include <iostream>
-#include <map>
-#include <fstream>
 #include <chrono>
 #include <ctime>
 #include <time.h>
-#include <Windows.h>
 #include <WinUser.h>
 #include <ShObjIdl.h>
 #if USEIMGUI
@@ -16,32 +12,36 @@
 #ifdef _DEBUG
 #include "../GamlaBettan/DebugTools.h"
 #endif // _DEBUG
-#if USELOGGER
-#include <bitset> 
-#endif
 
 #include <mutex>
 
 namespace Logger
 {
-	LOGGERTYPE Filter = Type::All;
-	LOGGERTYPE Halting = Type::None;
+	LoggerType Filter = Type::All;
+	LoggerType Halting = Type::None;
 
-	std::map<LOGGERTYPE, std::string> FileMapping;
-	std::map<LOGGERTYPE, char> ColorMapping;
+	std::map<LoggerType, std::string> FileMapping;
+	std::map<LoggerType, char> ColorMapping;
 	std::map<std::string, std::ofstream> OpenFiles;
 
-	std::array<std::pair<std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::pair<std::string, int>>>>, char>, sizeof(LOGGERTYPE) * CHAR_BIT> Rapports;
 	float RapportTimeStamp = Tools::GetTotalTime();
 
+	struct LoggerNode
+	{
+		bool myIsOpen;
+		size_t myCount = 0;
+		std::unordered_map<std::string, LoggerNode*> mySubNodes;
+	};
 
-	HWND window = nullptr;
+	std::unordered_map<LoggerType, LoggerNode> Roots;
+
+	HWND window = NULL;
 	ITaskbarList3* pTaskbar = nullptr;
 	HICON errorIcon;
 	HICON warningIcon;
 
 	const char DefaultConsoleColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-	const char* GetSeverity(LOGGERTYPE aType)
+	const char* GetSeverity(LoggerType aType)
 	{
 #if USELOGGER
 		switch (aType)
@@ -68,32 +68,50 @@ namespace Logger
 #endif
 	}
 	std::recursive_mutex outMutex;
-	static std::vector<std::pair<LOGGERTYPE, std::pair< std::string, char>>> ImguiLog;
+	static std::vector<std::pair<LoggerType, std::pair< std::string, char>>> ImguiLog;
 
-	void Rapport(LOGGERTYPE aType, const std::string& aCategory, const std::string& aError, const std::string& aArgument)
+	void Rapport(LoggerType aType, const std::string& aFile, const std::string& aError, const std::vector<std::string>& aArguments)
 	{
 #if USELOGGER
-		for (size_t i = 0; i < sizeof(LOGGERTYPE) * CHAR_BIT; i++)
+		std::string toPrint = aFile + ": " + aError;
+
+		for (size_t i = 0; i < sizeof(LoggerType) * CHAR_BIT; i++)
 		{
 			if (BIT(i) & aType)
 			{
-				auto& list = Rapports[i].first[aCategory][aError];
-				bool exist = false;
-				for (auto& i : list)
+				auto& rootNode = Roots[BIT(i)];
+				++rootNode.myCount;
+
+				if (rootNode.mySubNodes.count(aFile) == 0)
 				{
-					if (i.first == aArgument)
-					{
-						++i.second;
-						exist = true;
-						break;
-					}
+					rootNode.mySubNodes[aFile] = new LoggerNode ();
 				}
-				if (!exist)
+
+				LoggerNode* currentNode = rootNode.mySubNodes[aFile];
+				currentNode->myCount++;
+
+				if (currentNode->mySubNodes.count(aError) == 0)
 				{
-					list.push_back(std::make_pair(aArgument, 1));
+					currentNode->mySubNodes[aError] = new LoggerNode();
+				}
+				currentNode = currentNode->mySubNodes[aError];
+				currentNode->myCount++;
+
+				for (const std::string& i : aArguments)
+				{
+					toPrint += ", " + i;
+
+					if (currentNode->mySubNodes.count(i) == 0)
+					{
+						currentNode->mySubNodes[i] = new LoggerNode();
+					}
+					currentNode = currentNode->mySubNodes[i];
+					currentNode->myCount++;
 				}
 			}
 		}
+
+		Log(aType, toPrint);
 #if USEIMGUI
 		WindowControl::SetOpenState("Errors & Warnings", true);
 		RapportTimeStamp = Tools::GetTotalTime();
@@ -105,10 +123,10 @@ namespace Logger
 	void RapportWindow()
 	{
 #if USELOGGER && USEIMGUI
-		WindowControl::Window("Errors & Warnings", []()
+		WindowControl::Window("Errors & Warnings", [&]()
 			{
 				std::lock_guard lock(outMutex);
-				static const auto ConsoleToImVec4 = [](char input)-> ImVec4
+				static auto ConsoleToImVec4 = [](char input)-> ImVec4
 				{
 					float intens = input & FOREGROUND_INTENSITY ? 1 : 0.5f;
 					return ImVec4
@@ -119,69 +137,77 @@ namespace Logger
 						1
 					);
 				};
-				for (size_t i = 0; i < sizeof(LOGGERTYPE) * CHAR_BIT; i++)
+				std::function<void(LoggerNode* node)> Unpack_internal_help;
+				static auto UnpackNode = [&](LoggerNode* node) -> void 
 				{
-					if (!Rapports[i].first.empty())
+					for (auto& i : node->mySubNodes)
 					{
-						ImVec4 col = ConsoleToImVec4(Rapports[i].second);
-						float now = Tools::GetTotalTime();
-						col.w = 1.f - CLAMP(0, 1, (now - RapportTimeStamp) * 0.3f);
-
-						ImGui::PushStyleColor(ImGuiCol_Text, col);
-						const char* names[] =
+						if (i.second->mySubNodes.empty())
 						{
-							"SystemInfo",
-							"SystemError",
-							"SystemCrash",
-							"SystemWarning",
-							"SystemVerbose",
-							"SystemNetwork",
-							//game
-							"Info",
-							"Warning",
-							"Error",
-							"Verbose"
-						};
-
-						if (ImGui::IsWindowHovered())
-						{
-							RapportTimeStamp = now;
-						}
-						ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);
-						if (ImGui::TreeNode(names[i]))
-						{
-							for (auto& file : Rapports[i].first) //files
+							if (i.second->myCount > 1)
 							{
-								ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);
-								if (ImGui::TreeNode(file.first.c_str()))
-								{
-									for (auto& error : file.second) // errors
-									{
-										ImGui::SetNextItemOpen(false, ImGuiCond_Appearing);
-										if (ImGui::TreeNode(error.first.c_str()))
-										{
-											for (auto& arg : error.second)
-											{
-												if (arg.second > 1)
-												{
-													ImGui::BulletText((arg.first + " (%d)").c_str(), arg.second);
-												}
-												else
-												{
-													ImGui::BulletText(arg.first.c_str());
-												}
-											}
-											ImGui::TreePop();
-										}
-									}
-									ImGui::TreePop();
-								}
+								ImGui::Text("%s (%d)", i.first.c_str(), i.second->myCount);
 							}
-							ImGui::TreePop();
+							else
+							{
+								ImGui::Text("%s", i.first.c_str());
+							}
 						}
+						else
+						{
+							const char* fmt = i.second->myIsOpen ? "%s" : "%s (%d)";
 
-						ImGui::PopStyleColor(1);
+							if (ImGui::TreeNode(i.first.c_str(), fmt, i.first.c_str(), i.second->myCount))
+							{
+								Unpack_internal_help(i.second);
+								i.second->myIsOpen = true;
+								ImGui::TreePop();
+							}
+							else
+							{
+								i.second->myIsOpen = false;
+							}
+						}
 					}
+				};
+				Unpack_internal_help = UnpackNode;
+
+
+				static std::unordered_map<LoggerType, std::string> nameLookup
+				{
+					{SystemInfo,	"SystemInfo"},
+					{SystemError,	"SystemError"},
+					{SystemCrash,	"SystemCrash"},
+					{SystemWarning,	"SystemWarning"},
+					{SystemVerbose,	"SystemVerbose"},
+					{SystemNetwork,	"SystemNetwork"},
+					{Info,			"Info"},
+					{Warning,		"Warning"},
+					{Error,			"Error"},
+					{Verbose,		"Verbose"}
+				};
+
+
+				float now = Tools::GetTotalTime();
+				if (ImGui::IsWindowHovered())
+				{
+					RapportTimeStamp = now;
+				}
+
+				for (auto& root : Roots)
+				{
+					ImVec4 col = ConsoleToImVec4(ColorMapping[root.first]);
+					col.w = 1.f - CLAMP(0, 1, (now - RapportTimeStamp) * 0.3f);
+
+					ImGui::PushStyleColor(ImGuiCol_Text, col);
+
+					ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);
+					if (ImGui::TreeNode(nameLookup[1].c_str()))
+					{
+						UnpackNode(&root.second);
+						ImGui::TreePop();
+					}
+					ImGui::PopStyleColor(1);
 				}
 			}, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus, []()
 			{
@@ -191,7 +217,7 @@ namespace Logger
 #endif // USELOGGER
 	}
 
-	void Log(LOGGERTYPE aType, const std::string& aMessage)
+	void Log(LoggerType aType, const std::string& aMessage)
 	{
 #if USELOGGER
 		std::lock_guard lock(outMutex);
@@ -243,7 +269,7 @@ namespace Logger
 		}
 		else
 		{
-			SYSERROR("Logging using multiple filters is not supported", "");
+			SYSERROR("Logging using multiple filters is not supported");
 		}
 		if ((aType & Filter) != 0)
 		{
@@ -263,45 +289,45 @@ namespace Logger
 #endif
 	}
 
-	void Log(LOGGERTYPE aType, const std::wstring& aMessage)
+	void Log(LoggerType aType, const std::wstring& aMessage)
 	{
 #if USELOGGER
 		std::cout << "wstring are not supported" << std::endl;
 #endif
 	}
-	void SetFilter(LOGGERTYPE aFilter)
+	void SetFilter(LoggerType aFilter)
 	{
 #if USELOGGER
 		if ((aFilter & Halting) != Halting)
 		{
-			SYSERROR("Trying to set logger filter which does not encompass all halting types", "");
+			SYSERROR("Trying to set logger filter which does not encompass all halting types");
 			return;
 		}
 		Filter = aFilter;
 #endif
 	}
 
-	void SetHalting(LOGGERTYPE aFilter)
+	void SetHalting(LoggerType aFilter)
 	{
 #if USELOGGER
 		if ((aFilter & Filter) != aFilter)
 		{
-			SYSERROR("Trying to set logger halting which is not encompassed completely by filter", "");
+			SYSERROR("Trying to set logger halting which is not encompassed completely by filter");
 			return;
 		}
 		Halting = aFilter;
 #endif
 	}
-	void Map(LOGGERTYPE aMessageType, std::string aOutputFile)
+	void Map(LoggerType aMessageType, std::string aOutputFile)
 	{
 #if USELOGGER
 		aOutputFile = "logs/" + aOutputFile + ".log";
-		for (LOGGERTYPE i = 0; i < sizeof(LOGGERTYPE) * CHAR_BIT; i++)
+		for (LoggerType i = 0; i < sizeof(LoggerType) * CHAR_BIT; i++)
 		{
-			LOGGERTYPE bit = aMessageType & (1ULL << i);
+			LoggerType bit = aMessageType & (1ULL << i);
 			if (bit != 0)
 			{
-				LOGGERTYPE messageType = static_cast<Type>(bit);
+				LoggerType messageType = static_cast<Type>(bit);
 
 				if (FileMapping.count(messageType) != 0)
 				{
@@ -327,15 +353,15 @@ namespace Logger
 		}
 #endif
 	}
-	void UnMap(LOGGERTYPE aMessageType)
+	void UnMap(LoggerType aMessageType)
 	{
 #if USELOGGER
-		for (LOGGERTYPE i = 0; i < sizeof(LOGGERTYPE) * CHAR_BIT; i++)
+		for (LoggerType i = 0; i < sizeof(LoggerType) * CHAR_BIT; i++)
 		{
-			LOGGERTYPE bit = aMessageType & (1ULL << i);
+			LoggerType bit = aMessageType & (1ULL << i);
 			if (bit != 0)
 			{
-				LOGGERTYPE messageType = static_cast<Type>(bit);
+				LoggerType messageType = static_cast<Type>(bit);
 
 				if (FileMapping.count(messageType) == 0)
 				{
@@ -359,21 +385,17 @@ namespace Logger
 		}
 #endif
 	}
-	void SetColor(LOGGERTYPE aMessageType, char aColor)
+	void SetColor(LoggerType aMessageType, char aColor)
 	{
 #if USELOGGER
-		for (LOGGERTYPE i = 0; i < sizeof(LOGGERTYPE) * CHAR_BIT; i++)
+		for (LoggerType i = 0; i < sizeof(LoggerType) * CHAR_BIT; i++)
 		{
-			LOGGERTYPE bit = aMessageType & (1ULL << i);
+			LoggerType bit = aMessageType & (1ULL << i);
 			if (bit != 0)
 			{
-				LOGGERTYPE messageType = static_cast<Type>(bit);
+				LoggerType messageType = static_cast<Type>(bit);
 
 				ColorMapping[messageType] = aColor;
-#if USEIMGUI
-				Rapports[i].second = aColor;
-#endif // USEIMGUI
-
 			}
 		}
 #endif
@@ -486,7 +508,7 @@ namespace Logger
 			}
 			ImGui::EndChild();
 			ImGui::NextColumn();
-			ImGui::BeginChild("buttons",ImVec2(150, itemsize * rows));
+			ImGui::BeginChild("buttons", ImVec2(150, itemsize * rows));
 			const char* names[] =
 			{
 				"Sysinfo",
@@ -506,9 +528,9 @@ namespace Logger
 				nullptr,
 				nullptr
 			};
-			//static_assert(sizeof(names) / sizeof(names[0]) > sizeof(LOGGERTYPE)* CHAR_BIT, "Not all loggertypes have names");
+			//static_assert(sizeof(names) / sizeof(names[0]) > sizeof(LoggerType)* CHAR_BIT, "Not all loggertypes have names");
 
-			for (size_t i = 0; i < sizeof(LOGGERTYPE) * CHAR_BIT; i++)
+			for (size_t i = 0; i < sizeof(LoggerType) * CHAR_BIT; i++)
 			{
 				bool buf = !!(BIT(i) & Filter);
 				const char* name = names[i];

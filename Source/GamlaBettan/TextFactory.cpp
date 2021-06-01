@@ -20,7 +20,7 @@ bool TextFactory::Init(SpriteRenderer* aRenderer, SpriteFactory* aSpriteFactory)
 {
 	if (!aRenderer)
 	{
-		SYSERROR("Text factory was not given a sprite renderer!","");
+		SYSERROR("Text factory was not given a sprite renderer!");
 		return false;
 	}
 

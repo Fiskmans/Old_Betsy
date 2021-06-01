@@ -85,7 +85,7 @@ void Scene::AddSprite(SpriteInstance* aSprite)
 		}
 		else
 		{
-			SYSWARNING("Sprite instance added to scene more than once!", "");
+			SYSWARNING("Sprite instance added to scene more than once!");
 		}
 	}
 }
@@ -134,7 +134,7 @@ void Scene::SetMainCamera(Camera* aCamera)
 {
 	if (std::find(myCameras.begin(), myCameras.end(), aCamera) == myCameras.end())
 	{
-		SYSERROR("Trying to set a maincamera that is not in the scene", "");
+		SYSERROR("Trying to set a maincamera that is not in the scene");
 		return;
 	}
 	myMainCamera = aCamera;
@@ -160,7 +160,7 @@ void Scene::RemovePointLight(PointLight* aLight)
 		return;
 	}
 
-	SYSWARNING("Tried to remove invalid point light :c", "");
+	SYSWARNING("Tried to remove invalid point light :c");
 }
 
 void Scene::RemoveFrom(ParticleInstance* aParticle)
@@ -279,7 +279,7 @@ void Scene::RemoveText(TextInstance* aText)
 		}
 	}
 
-	SYSWARNING("Tried to remove invalid text :c", "");
+	SYSWARNING("Tried to remove invalid text :c");
 }
 
 bool Scene::Contains(ParticleInstance* aParticle)
@@ -324,7 +324,7 @@ void Scene::SetSkybox(ModelInstance* aSkybox)
 {
 	if (aSkybox->GetModelAsset().GetType() != ModelAsset::AssetType::SkyBox)
 	{
-		SYSERROR("SetSkybox with non skybox asset","");
+		SYSERROR("SetSkybox with non skybox asset");
 		return;
 	}
 	mySkybox = aSkybox;

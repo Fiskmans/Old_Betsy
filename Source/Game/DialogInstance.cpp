@@ -116,22 +116,22 @@ std::string DialogInstance::GetSlimText() const
 
 void DialogInstance::SetText(const std::wstring& aText)
 {
-	SYSERROR("!!This function is not relevant so it won't do anything!!", "");
+	SYSERROR("!!This function is not relevant so it won't do anything!!");
 }
 
 void DialogInstance::SetText(const std::string& aText)
 {
-	SYSERROR("!!This function is not relevant so it won't do anything!!", "");
+	SYSERROR("!!This function is not relevant so it won't do anything!!");
 }
 
 void DialogInstance::SetTitle(const std::wstring& aTitle)
 {
-	SYSERROR("!!This function is not relevant so it won't do anything!!", "");
+	SYSERROR("!!This function is not relevant so it won't do anything!!");
 }
 
 void DialogInstance::SetTitle(const std::string& aTitle)
 {
-	SYSERROR("!!This function is not relevant so it won't do anything!!", "");
+	SYSERROR("!!This function is not relevant so it won't do anything!!");
 }
 
 V2F DialogInstance::GetTitleSize() const

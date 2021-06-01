@@ -35,7 +35,7 @@ int NodeSetColliderStatus::OnEnter(CNodeInstance* aTriggeringNodeInstance, const
 		}
 		else
 		{
-			SYSERROR("Entity does not have a collider!", "");
+			SYSERROR("Entity does not have a collider!");
 		}
 	}
 

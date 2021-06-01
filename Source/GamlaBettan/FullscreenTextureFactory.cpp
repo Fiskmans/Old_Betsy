@@ -9,7 +9,7 @@ bool FullscreenTextureFactory::Init(DirectX11Framework* aFramework)
 
 	if (!myFramework)
 	{
-		SYSERROR("Fullscreen texture factory got no framework to work on","");
+		SYSERROR("Fullscreen texture factory got no framework to work on");
 	}
 	return !!myFramework;
 }
@@ -38,7 +38,7 @@ FullscreenTexture FullscreenTextureFactory::CreateTexture(CU::Vector2<unsigned i
 	result = myFramework->GetDevice()->CreateTexture2D(&desc, nullptr, &texture);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not create texture in fullscreen texture factory :c","");
+		SYSERROR("Could not create texture in fullscreen texture factory :c");
 		return {};
 	}
 
@@ -49,7 +49,7 @@ FullscreenTexture FullscreenTextureFactory::CreateTexture(CU::Vector2<unsigned i
 	result = myFramework->GetDevice()->CreateShaderResourceView(texture, nullptr, &shaderResource);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not create shader resource in fullscreen texture factory :c","");
+		SYSERROR("Could not create shader resource in fullscreen texture factory :c");
 		return {};
 	}
 
@@ -65,7 +65,7 @@ FullscreenTexture FullscreenTextureFactory::CreateTexture(ID3D11Texture2D* aText
 	result = myFramework->GetDevice()->CreateRenderTargetView(aTexture, nullptr, &renderTarget);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not create render target in fullscreen texture factory :c","");
+		SYSERROR("Could not create render target in fullscreen texture factory :c");
 		return {};
 	}
 
@@ -108,7 +108,7 @@ FullscreenTexture FullscreenTextureFactory::CreateDepth(CU::Vector2<unsigned int
 	result = myFramework->GetDevice()->CreateTexture2D(&desc, nullptr, &texture);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not create texture in fullscreen texture factory :c","");
+		SYSERROR("Could not create texture in fullscreen texture factory :c");
 	}
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsv_desc;
@@ -121,7 +121,7 @@ FullscreenTexture FullscreenTextureFactory::CreateDepth(CU::Vector2<unsigned int
 	result = myFramework->GetDevice()->CreateDepthStencilView(texture, &dsv_desc, &depth);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not create depth stencil in fullscreen texture factory :c","");
+		SYSERROR("Could not create depth stencil in fullscreen texture factory :c");
 	}
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC sr_desc;
@@ -134,7 +134,7 @@ FullscreenTexture FullscreenTextureFactory::CreateDepth(CU::Vector2<unsigned int
 	result = myFramework->GetDevice()->CreateShaderResourceView(texture, &sr_desc, &resourceView);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not create depth stencil in fullscreen texture factory :c","");
+		SYSERROR("Could not create depth stencil in fullscreen texture factory :c");
 	}
 
 	D3D11_VIEWPORT* viewport = new D3D11_VIEWPORT({ 0.f, 0.f, static_cast<float>(aSize.x), static_cast<float>(aSize.y), 0.f, 1.f });
@@ -198,21 +198,21 @@ GBuffer FullscreenTextureFactory::CreateGBuffer(const CU::Vector2<unsigned int>&
 		result = device->CreateTexture2D(&desc,nullptr,&buffer.myTextures[i]);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not Gbuffer.","");
+			SYSERROR("Could not Gbuffer.");
 			return {};
 		}
 
 		result = myFramework->GetDevice()->CreateRenderTargetView(buffer.myTextures[i], nullptr, &buffer.myRenderTargets[i]);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not create Gbuffer render target in fullscreen texture factory :c","");
+			SYSERROR("Could not create Gbuffer render target in fullscreen texture factory :c");
 			return {};
 		}
 
 		result = myFramework->GetDevice()->CreateShaderResourceView(buffer.myTextures[i], nullptr, &buffer.myShaderResources[i]);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not create Gbuffer shader resource in fullscreen texture factory :c","");
+			SYSERROR("Could not create Gbuffer shader resource in fullscreen texture factory :c");
 			return {};
 		}
 	}

@@ -201,7 +201,7 @@ void AnimationComponent::ParseAnimations(const AssetHandle& aAnimations, std::un
 	{
 		if (stateMapping.count(pool.first) == 0)
 		{
-			SYSERROR("Unkown AnimationState", pool.first);
+			SYSERROR("Unkown AnimationState", pool.first, aAnimations.GetJSONFilePath());
 			continue;
 		}
 		if (pool.second->Is<FiskJSON::Array>())
@@ -211,7 +211,7 @@ void AnimationComponent::ParseAnimations(const AssetHandle& aAnimations, std::un
 				std::string path;
 				if (!i->GetIf(path))
 				{
-					SYSERROR("Malformed animations file", "expected string");
+					SYSERROR("Malformed animations file", "expected string", aAnimations.GetJSONFilePath());
 					continue;
 				}
 				AssetHandle handle;
@@ -236,7 +236,7 @@ void AnimationComponent::ParseAnimations(const AssetHandle& aAnimations, std::un
 		}
 		else
 		{
-			SYSERROR("Malformed animations file","Animation pool expected array");
+			SYSERROR("Malformed animations file", "Animation pool expected array", aAnimations.GetJSONFilePath());
 		}
 	}
 

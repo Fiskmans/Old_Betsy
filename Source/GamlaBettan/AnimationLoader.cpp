@@ -138,7 +138,7 @@ namespace Loader
 
         if (aScene->mNumAnimations > 1)
         {
-            SYSWARNING("Scene contains more than one animation only first will be loaded", "");
+            SYSWARNING("Scene contains more than one animation only first will be loaded");
         }
 
         if (aScene->mNumMeshes == 0)
@@ -149,7 +149,7 @@ namespace Loader
 
         if (aScene->mNumMeshes > 1)
         {
-            SYSWARNING("Scene contains more than one mesh only first will be considered", "");
+            SYSWARNING("Scene contains more than one mesh only first will be considered");
         }
 
         const aiAnimation* anim = aScene->mAnimations[0];

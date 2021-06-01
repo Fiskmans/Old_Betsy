@@ -18,7 +18,7 @@ int NodeChangeLevel::OnEnter(CNodeInstance* aTriggeringNodeInstance, const int a
 	bool goToSpecificLevel;
 	if (!aTriggeringNodeInstance->ReadData(1, goToSpecificLevel))
 	{
-		SYSERROR("bool pin broken on NodeChangeLevel","");
+		SYSERROR("bool pin broken on NodeChangeLevel");
 		return -1;
 	}
 
@@ -27,7 +27,7 @@ int NodeChangeLevel::OnEnter(CNodeInstance* aTriggeringNodeInstance, const int a
 		int levelID = 0;
 		if (!aTriggeringNodeInstance->ReadData(2, levelID))
 		{
-			SYSERROR("LEVEL ID Not correct on pin in NodeChangeLevel","");
+			SYSERROR("LEVEL ID Not correct on pin in NodeChangeLevel");
 			return -1;
 		}
 

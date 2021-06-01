@@ -156,7 +156,7 @@ void AIController::RecieveMessage(const Message& aMessage)
 		}
 		else
 		{
-			SYSERROR("AIController wont move", "");
+			SYSERROR("AIController wont move");
 		}
 	}
 	else if (aMessage.myMessageType == MessageType::NewDay)

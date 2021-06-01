@@ -330,7 +330,7 @@ void CGraphManager::LoadTreeFromFile()
 			}
 			else
 			{
-				SYSERROR("could not load node tree", "");
+				SYSERROR("could not load node tree");
 				return;
 			}
 
@@ -629,7 +629,7 @@ void DrawLoggerType(CPin& aPin, CNodeInstance* aNodeInstance)
 	}
 	else
 	{
-		static std::unordered_map<LOGGERTYPE, const char*> names
+		static std::unordered_map<LoggerType, const char*> names
 		{
 			{Logger::Info,"Info"},
 			{Logger::Warning,"Warning"},
@@ -662,9 +662,9 @@ void DrawLoggerType(CPin& aPin, CNodeInstance* aNodeInstance)
 			}
 		}
 		ImGui::SameLine();
-		if (names[static_cast<LOGGERTYPE>(data)])
+		if (names[static_cast<LoggerType>(data)])
 		{
-			ImGui::Text(names[static_cast<LOGGERTYPE>(data)]);
+			ImGui::Text(names[static_cast<LoggerType>(data)]);
 		}
 		else
 		{

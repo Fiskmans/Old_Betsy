@@ -84,7 +84,7 @@ bool ParticleFactory::Init(DirectX11Framework* aFramework)
 	HRESULT result = myDevice->CreateInputLayout(layout, sizeof(layout) / sizeof(layout[0]), myVertexShader.GetVertexShaderblob().data(), myVertexShader.GetVertexShaderblob().size(), &myInputLayout);
 	if (FAILED(result))
 	{
-		SYSERROR("could not create input layout for particle","");
+		SYSERROR("could not create input layout for particle");
 		return false;
 	}
 
@@ -102,7 +102,7 @@ ParticleInstance* ParticleFactory::InstantiateParticle(const std::string& aFileP
 {
 	if (!myDevice)
 	{
-		SYSERROR("Yo wtf, init pls","");
+		SYSERROR("Yo wtf, init pls");
 	}
 
 	Particle* baseParticle = nullptr;
@@ -659,7 +659,7 @@ namespace Constructing
 		HRESULT result = aDevice->CreateBuffer(&desc, nullptr, &buffer);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not create vertex buffer for particles","");
+			SYSERROR("Could not create vertex buffer for particles");
 			return nullptr;
 		}
 		return buffer;

@@ -29,7 +29,7 @@ WindowHandler::~WindowHandler()
 {
 	if (CloseWindow(myWindowHandle) != TRUE)
 	{
-		SYSERROR("Could not close window","");
+		SYSERROR("Could not close window");
 	}
 	Logger::Shutdown();
 }

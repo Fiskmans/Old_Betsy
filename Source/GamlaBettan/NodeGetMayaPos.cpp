@@ -19,7 +19,7 @@ int NodeGetMayaPos::OnEnter(CNodeInstance* aTriggeringNodeInstance, const int aE
 	V3F* pos = aTriggeringNodeInstance->ourPollingStation->GetMayaPos(ID);
 	if (!pos)
 	{
-		SYSERROR("Maya position with ID:" + std::to_string(ID) + " not found!", "");
+		SYSERROR("Maya position with not found!", std::to_string(ID));
 		return -1;
 	}
 

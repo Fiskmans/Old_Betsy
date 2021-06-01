@@ -296,7 +296,7 @@ AssetHandle AssetManager::GetJSONInternal(const std::string& aPath)
         }
         catch (const std::exception& e)
         {
-            SYSERROR("Failed to load json", aPath + " : " + e.what());
+            SYSERROR("Failed to load json", aPath, e.what());
 
             delete obj;
         }

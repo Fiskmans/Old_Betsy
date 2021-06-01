@@ -25,21 +25,21 @@ bool SpriteRenderer::Init(DirectX11Framework* aFramework)
 {
 	if (!aFramework)
 	{
-		SYSERROR("Framework was nullptr in Init SpriteRenderer","");
+		SYSERROR("Framework was nullptr in Init SpriteRenderer");
 		return false;
 	}
 
 	myContext = aFramework->GetContext();
 	if (!myContext)
 	{
-		SYSERROR("Framework's context was nullptr in Init SpriteRenderer","");
+		SYSERROR("Framework's context was nullptr in Init SpriteRenderer");
 		return false;
 	}
 
 	ID3D11Device* device = aFramework->GetDevice();
 	if (!device)
 	{
-		SYSERROR("Framework's device was nullptr in Init SpriteRenderer","");
+		SYSERROR("Framework's device was nullptr in Init SpriteRenderer");
 		return false;
 	}
 	HRESULT result;
@@ -53,7 +53,7 @@ bool SpriteRenderer::Init(DirectX11Framework* aFramework)
 
 	if (FAILED(result))
 	{
-		SYSERROR("Failed to create buffer in Init SpriteRenderer","");
+		SYSERROR("Failed to create buffer in Init SpriteRenderer");
 		return false;
 	}
 
@@ -145,7 +145,7 @@ void SpriteRenderer::Render(/*const Camera* aCamera,*/ const std::vector<SpriteI
 		result = myContext->Map(myObjectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 		if (FAILED(result))
 		{
-			SYSERROR("myContext->Map failed in Render SpriteRenderer","");
+			SYSERROR("myContext->Map failed in Render SpriteRenderer");
 			return;
 		}
 

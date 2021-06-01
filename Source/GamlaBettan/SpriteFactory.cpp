@@ -58,15 +58,11 @@ Sprite* SpriteFactory::GetSprite(const std::string& aDDSPath, const bool aIsMovi
 			SYSERROR("Failed to load sprite in SpriteFactory.GetSprite()", aDDSPath);
 			return nullptr;
 		}
+		mySprites[aDDSPath] = newSprite;
 		return newSprite;
 	}
-	else
-	{
-		return mySprites[aDDSPath];
-	}
 
-	SYSERROR("Oh no wat?", "");
-	return nullptr;
+	return mySprites[aDDSPath];
 }
 
 Sprite* SpriteFactory::LoadSprite(const std::string& aDDSPath, const bool aIsMovie)

@@ -9,28 +9,28 @@ bool RenderStateManager::Init(DirectX11Framework* aFramework)
 
 	if (!myContext)
 	{
-		SYSERROR("RenderStateManager was not given a context. :c","");
+		SYSERROR("RenderStateManager was not given a context. :c");
 		return false;
 	}
 
 	if (!CreateBlendStates(aFramework->GetDevice()))
 	{
-		SYSERROR("Could not create blend states!","");
+		SYSERROR("Could not create blend states!");
 		return false;
 	}
 	if (!CreateDepthStencilStates(aFramework->GetDevice()))
 	{
-		SYSERROR("Could not create depth stencil states!","");
+		SYSERROR("Could not create depth stencil states!");
 		return false;
 	}
 	if (!CreateRasterizerStates(aFramework->GetDevice()))
 	{
-		SYSERROR("Could not create rasterizer states!","");
+		SYSERROR("Could not create rasterizer states!");
 		return false;
 	}
 	if (!CreateSamplerStates(aFramework->GetDevice()))
 	{
-		SYSERROR("Could not create sampler states!","");
+		SYSERROR("Could not create sampler states!");
 		return false;
 	}
 
@@ -95,14 +95,14 @@ bool RenderStateManager::CreateBlendStates(ID3D11Device* aDevice)
 	result = aDevice->CreateBlendState(&alphaDesc, &myBlendStates[ENUM_CAST(BlendState::AlphaBlend)]);
 	if (FAILED(result))
 	{
-		SYSERROR("Failed to create alpha blend state.","");
+		SYSERROR("Failed to create alpha blend state.");
 		return false;
 	}
 
 	result = aDevice->CreateBlendState(&addDesc, &myBlendStates[ENUM_CAST(BlendState::AdditativeBlend)]);
 	if (FAILED(result))
 	{
-		SYSERROR("Failed to create additative blend state.","");
+		SYSERROR("Failed to create additative blend state.");
 		return false;
 	}
 
@@ -127,7 +127,7 @@ bool RenderStateManager::CreateDepthStencilStates(ID3D11Device* aDevice)
 		result = aDevice->CreateDepthStencilState(&desc, &myDepthStencilStates[ENUM_CAST(DepthStencilState::ReadOnly)]);
 		if (FAILED(result))
 		{
-			SYSERROR("Failed to create depth stencil state.","");
+			SYSERROR("Failed to create depth stencil state.");
 			return false;
 		}
 	}
@@ -143,7 +143,7 @@ bool RenderStateManager::CreateDepthStencilStates(ID3D11Device* aDevice)
 		result = aDevice->CreateDepthStencilState(&desc, &myDepthStencilStates[ENUM_CAST(DepthStencilState::Default)]);
 		if (FAILED(result))
 		{
-			SYSERROR("Failed to create depth stencil state.","");
+			SYSERROR("Failed to create depth stencil state.");
 			return false;
 		}
 	}
@@ -159,7 +159,7 @@ bool RenderStateManager::CreateDepthStencilStates(ID3D11Device* aDevice)
 		result = aDevice->CreateDepthStencilState(&desc, &myDepthStencilStates[ENUM_CAST(DepthStencilState::OnlyCovered)]);
 		if (FAILED(result))
 		{
-			SYSERROR("Failed to create depth stencil state.","");
+			SYSERROR("Failed to create depth stencil state.");
 			return false;
 		}
 	}
@@ -179,7 +179,7 @@ bool RenderStateManager::CreateRasterizerStates(ID3D11Device* aDevice)
 	result = aDevice->CreateRasterizerState(&desc, &myRasterizerStates[ENUM_CAST(RasterizerState::Wireframe)]);
 	if (FAILED(result))
 	{
-		SYSERROR("Failed to create rasterizer wireframe state.","");
+		SYSERROR("Failed to create rasterizer wireframe state.");
 		return false;
 	}
 
@@ -190,7 +190,7 @@ bool RenderStateManager::CreateRasterizerStates(ID3D11Device* aDevice)
 	result = aDevice->CreateRasterizerState(&desc, &myRasterizerStates[ENUM_CAST(RasterizerState::NoBackfaceCulling)]);
 	if (FAILED(result))
 	{
-		SYSERROR("Failed to create rasterizer noBackfaceCulling state.","");
+		SYSERROR("Failed to create rasterizer noBackfaceCulling state.");
 		return false;
 	}
 
@@ -202,7 +202,7 @@ bool RenderStateManager::CreateRasterizerStates(ID3D11Device* aDevice)
 	result = aDevice->CreateRasterizerState(&desc, &myRasterizerStates[ENUM_CAST(RasterizerState::CullFrontFacing)]);
 	if (FAILED(result))
 	{
-		SYSERROR("Failed to create rasterizer frontFaceculling state.","");
+		SYSERROR("Failed to create rasterizer frontFaceculling state.");
 		return false;
 	}
 
@@ -227,7 +227,7 @@ bool RenderStateManager::CreateSamplerStates(ID3D11Device* aDevice)
 	result = aDevice->CreateSamplerState(&desc, &mySamplerStates[ENUM_CAST(SamplerState::Point)]);
 	if (FAILED(result))
 	{
-		SYSERROR("Failed to create point sampler state.","");
+		SYSERROR("Failed to create point sampler state.");
 		return false;
 	}
 
@@ -237,7 +237,7 @@ bool RenderStateManager::CreateSamplerStates(ID3D11Device* aDevice)
 	result = aDevice->CreateSamplerState(&desc, &mySamplerStates[ENUM_CAST(SamplerState::Trilinear)]);
 	if (FAILED(result))
 	{
-		SYSERROR("Failed to create point sampler state.","");
+		SYSERROR("Failed to create point sampler state.");
 		return false;
 	}
 

@@ -26,9 +26,9 @@ namespace Logger_Local
 	}
 }
 #define SYSCRASH(text)				Logger::Log(Logger::Type::SystemCrash,text);
-#define SYSERROR(error, arg)		Logger::Rapport(Logger::Type::SystemError,Logger_Local::DirtySubstring(__FILE__),error,arg); Logger::Log(Logger::Type::SystemError,std::string("[" + std::string(Logger_Local::DirtySubstring(__FILE__)) + ": " STRINGVALUE(__LINE__) "]") + error + arg);
+#define SYSERROR(error, ...)		Logger::Rapport(Logger::Type::SystemError,Logger_Local::DirtySubstring(__FILE__), error, {__VA_ARGS__});
 #define SYSINFO(text)				Logger::Log(Logger::Type::SystemInfo,text);
-#define SYSWARNING(warning, arg)	Logger::Rapport(Logger::Type::SystemWarning,Logger_Local::DirtySubstring(__FILE__),warning,arg); Logger::Log(Logger::Type::SystemWarning,warning + std::string(" ") + arg);
+#define SYSWARNING(warning, ...)	Logger::Rapport(Logger::Type::SystemWarning,Logger_Local::DirtySubstring(__FILE__), warning, {__VA_ARGS__});
 #define SYSVERBOSE(text)			Logger::Log(Logger::Type::SystemVerbose,text);
 #define SYSNETWORK(text)			Logger::Log(Logger::Type::SystemNetwork,text);
 
@@ -41,14 +41,14 @@ namespace Logger_Local
 
 const size_t COUNTERSTART = __COUNTER__;
 #define INCREMENT (__COUNTER__ - COUNTERSTART - 1)
-#define LOGGERTYPE unsigned short
+typedef unsigned short LoggerType;
 
 #pragma warning(push)
 #pragma warning(disable: 4369 4309)
 
 namespace Logger
 {
-	enum Type : LOGGERTYPE
+	enum Type : LoggerType
 	{
 		///types
 		//system
@@ -67,8 +67,8 @@ namespace Logger
 
 		///filters
 		//global
-		None			= LOGGERTYPE(0),
-		All				= ~LOGGERTYPE(0),
+		None			= LoggerType(0),
+		All				= ~LoggerType(0),
 
 		//severity
 		AnyInfo			= SystemInfo | Info,
@@ -83,14 +83,14 @@ namespace Logger
 		AllGame			= AnyGame | Verbose,
 		AllSystem		= AnySystem | SystemVerbose
 	};
-	void Rapport(LOGGERTYPE aType, const std::string& aCategory, const std::string& aError, const std::string& aArgument);
-	void Log(LOGGERTYPE aType, const std::string& aMessage);
-	void Log(LOGGERTYPE aType, const std::wstring& aMessage);
-	void SetFilter(LOGGERTYPE aFilter);
-	void SetHalting(LOGGERTYPE aFilter);
-	void Map(LOGGERTYPE aMessageType, std::string aOutputFile);
-	void UnMap(LOGGERTYPE aMessageType);
-	void SetColor(LOGGERTYPE aMessageType, char aColor);
+	void Rapport(LoggerType aType, const std::string& aFile, const std::string& aError, const std::vector<std::string>& aArguments);
+	void Log(LoggerType aType, const std::string& aMessage);
+	void Log(LoggerType aType, const std::wstring& aMessage);
+	void SetFilter(LoggerType aFilter);
+	void SetHalting(LoggerType aFilter);
+	void Map(LoggerType aMessageType, std::string aOutputFile);
+	void UnMap(LoggerType aMessageType);
+	void SetColor(LoggerType aMessageType, char aColor);
 	void ImGuiLog();
 	void RapportWindow();
 
@@ -99,6 +99,6 @@ namespace Logger
 	void Shutdown();
 }
 #ifndef __INTELLISENSE__
-static_assert(INCREMENT < sizeof(LOGGERTYPE) * CHAR_BIT - 1, "Ran out of bits for logger types");
+static_assert(INCREMENT < sizeof(LoggerType) * CHAR_BIT - 1, "Ran out of bits for logger types");
 #endif // !__INTELLISENSE__
 #pragma warning(pop)

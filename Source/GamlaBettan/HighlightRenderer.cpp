@@ -115,7 +115,7 @@ void HighlightRenderer::Render(const std::vector<class ModelInstance*>& aModels,
 		result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not map frame buffer", "");
+			SYSERROR("Could not map frame buffer");
 			return;
 		}
 		memcpy(bufferData.pData, &fData, sizeof(fData));
@@ -137,7 +137,7 @@ void HighlightRenderer::Render(const std::vector<class ModelInstance*>& aModels,
 
 		if (FAILED(result))
 		{
-			SYSERROR("Could not map object buffer","");
+			SYSERROR("Could not map object buffer");
 			return;
 		}
 

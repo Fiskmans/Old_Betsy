@@ -39,19 +39,12 @@ struct Vertex
 	float u, v;
 };
 
-
-bool does_file_exist(std::string fileName)
-{
-	std::ifstream infile(fileName);
-	return infile.good();
-}
-
 bool LoadVerticies(aiMesh* fbxMesh, char** aVertexBuffer, size_t* aVertexCount, size_t aFlags, std::unordered_map<std::string, unsigned int>& aBoneIndexMap, std::vector<BoneInfo>& aBoneInfo)
 {
 	SYSVERBOSE("Loading model with flags: " + ShaderTypes::PostfixFromFlags(aFlags));
 	if (!(fbxMesh->HasPositions() && fbxMesh->HasTextureCoords(0) && fbxMesh->HasNormals() && fbxMesh->HasTangentsAndBitangents()))
 	{
-		SYSERROR("Model does not have all required data", "");
+		SYSERROR("Model does not have all required data");
 		return false;
 	}
 
@@ -209,7 +202,7 @@ class CompareVertexCountInverse
 public:
 	bool operator()(const LodToLoad& a, const LodToLoad& b)
 	{
-		SYSERROR("This should not be called until the FPS", "");
+		SYSERROR("This should not be called until the FPS");
 		return false;
 	}
 };
@@ -448,7 +441,7 @@ void ModelLoader::LoadLoop()
 			}
 			else
 			{
-				SYSERROR("Skipping model loading due to lack of memory", "");
+				SYSERROR("Skipping model loading due to lack of memory");
 				continue;
 			}
 #endif // !_RETAIL
@@ -494,7 +487,7 @@ void ModelLoader::LoadLoop()
 
 		const aiScene* scene = NULL;
 
-		if (!does_file_exist(package.myFilePath))
+		if (!Tools::FileExists(package.myFilePath))
 		{
 			SYSERROR("File not found", package.myFilePath);
 			continue;
@@ -665,30 +658,33 @@ void ModelLoader::LoadLoop()
 
 		for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; i++)
 		{
-			if (std::string(scene->mRootNode->mChildren[i]->mName.C_Str()).substr(0, 4) == std::string("lod1"))
+			aiNode* child = scene->mRootNode->mChildren[i];
+			std::string name = child->mName.C_Str();
+
+			if (name.substr(0, 4) == std::string("lod1"))
 			{
 				LodToLoad lod;
-				lod.myNode = scene->mRootNode->mChildren[i];
+				lod.myNode = child;
 				lod.myModel = package.myModel;
 				lod.myScene = scene;
 				lod.myLevel = 0;
 				lodQueue.push(lod);
 				++lodCount;
 			}
-			else if (std::string(scene->mRootNode->mChildren[i]->mName.C_Str()).substr(0, 4) == std::string("lod2"))
+			else if (name.substr(0, 4) == std::string("lod2"))
 			{
 				LodToLoad lod;
-				lod.myNode = scene->mRootNode->mChildren[i];
+				lod.myNode = child;
 				lod.myModel = package.myModel;
 				lod.myScene = scene;
 				lod.myLevel = 1;
 				lodQueue.push(lod);
 				++lodCount;
 			}
-			else if (std::string(scene->mRootNode->mChildren[i]->mName.C_Str()).substr(0, 4) == std::string("lod3"))
+			else if (name.substr(0, 4) == std::string("lod3"))
 			{
 				LodToLoad lod;
-				lod.myNode = scene->mRootNode->mChildren[i];
+				lod.myNode = child;
 				lod.myModel = package.myModel;
 				lod.myScene = scene;
 				lod.myLevel = 2;
@@ -697,7 +693,20 @@ void ModelLoader::LoadLoop()
 			}
 			else
 			{
-				SYSWARNING("lod name not recognized", scene->mRootNode->mChildren[i]->mName.C_Str());
+				std::set < std::string> commonTrash = 
+				{
+					"Camera",
+					"Light"
+				};
+
+				if (commonTrash.count(name) == 0)
+				{
+					SYSWARNING("lod name not recognized", name);
+				}
+				else if(myWarnAboutTrash)
+				{
+					SYSWARNING("uneccesary data detected: " + name, package.myFilePath);
+				}
 			}
 		}
 		if (lodCount == 0)
@@ -803,7 +812,7 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 		result = myDevice->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, &vertexBuffer);
 		if (FAILED(result))
 		{
-			SYSERROR("could not create vertex buffer for Skybox", "");
+			SYSERROR("could not create vertex buffer for Skybox");
 			return nullptr;
 		}
 
@@ -839,7 +848,7 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 		result = myDevice->CreateBuffer(&indexBufferDescription, &indexSubresourceData, &indexBuffer);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not create index buffer for Skybox", "");
+			SYSERROR("Could not create index buffer for Skybox");
 			return nullptr;
 		}
 

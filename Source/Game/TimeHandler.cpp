@@ -192,7 +192,8 @@ void TimeHandler::LoadSpecialDaysFromFile()
 		{
 			Event* event = nullptr;
 			int specificID;
-			switch ((*inEvent)["typeofevent"].Get<int>())
+			int type = (*inEvent)["typeofevent"].Get<int>();
+			switch (type)
 			{
 			case 0:
 				specificID = (*inEvent)["specificID"].Get<int>();
@@ -216,7 +217,7 @@ void TimeHandler::LoadSpecialDaysFromFile()
 				//event = new DialogueEvent();
 				break;
 			default:
-				SYSERROR("Error in specialdays json, an event has unused typeofevent id", "error in json");
+				SYSERROR("Error in specialdays json, an event has unused typeofevent id", std::to_string(static_cast<int>(type)));
 				break;
 			}
 
@@ -226,7 +227,7 @@ void TimeHandler::LoadSpecialDaysFromFile()
 			}
 			else
 			{
-				SYSERROR("Error in LoadSpecialDaysFromFile, created event is null", "BIG ERROR");
+				SYSERROR("Error in LoadSpecialDaysFromFile, created event is null");
 			}
 		}
 

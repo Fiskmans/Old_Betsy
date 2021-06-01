@@ -60,6 +60,7 @@ public:
 
 private:
 	ID3D11Device* myDevice;
+	bool myWarnAboutTrash = false;
 
 	void PrepareModel(Model* aModel, const std::string& aPath);
 

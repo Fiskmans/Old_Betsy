@@ -407,7 +407,7 @@ void RenderManager::AddExtraSpriteToRender(SpriteInstance* aSprite)
 		return;
 	}
 
-	SYSWARNING("Tried to add null sprite to render list", "");
+	SYSWARNING("Tried to add null sprite to render list");
 }
 
 void RenderManager::SubscribeToMessages()
@@ -522,7 +522,7 @@ bool RenderManager::CreateTextures(const unsigned int aWidth, const unsigned int
 	ID3D11Texture2D* backBufferTexture = myFrameworkPtr->GetBackbufferTexture();
 	if (!backBufferTexture)
 	{
-		SYSERROR("Could not get back buffer texture", "");
+		SYSERROR("Could not get back buffer texture");
 		return false;
 	}
 
@@ -565,7 +565,7 @@ bool RenderManager::CreateTextures(const unsigned int aWidth, const unsigned int
 	{
 		if (!i)
 		{
-			SYSERROR("Could not initialize all fullscreen textures", "");
+			SYSERROR("Could not initialize all fullscreen textures");
 			return false;
 		}
 	}
@@ -600,7 +600,7 @@ bool RenderManager::CreateTextures(const unsigned int aWidth, const unsigned int
 	HRESULT result = device->CreateTexture2D(&desc, nullptr, &myBoneBufferTexture);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not create bone buffer texture", "");
+		SYSERROR("Could not create bone buffer texture");
 		return false;
 	}
 
@@ -608,7 +608,7 @@ bool RenderManager::CreateTextures(const unsigned int aWidth, const unsigned int
 	result = device->CreateShaderResourceView(myBoneBufferTexture, nullptr, &myBoneTextureView);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not create bone shader resource view", "");
+		SYSERROR("Could not create bone shader resource view");
 		return false;
 	}
 
@@ -637,7 +637,7 @@ void RenderManager::Resize(const unsigned int aWidth, const unsigned int aHeight
 			result = chain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
 			if (FAILED(result))
 			{
-				SYSERROR("Could not resize swap chain buffer.", "");
+				SYSERROR("Could not resize swap chain buffer.");
 			}
 		}
 

@@ -107,7 +107,7 @@ inline T* ComponentLake::RetrieveComponent()
 
 	if (!component)
 	{
-		SYSERROR("Out of components if this is too low increase the limit in ComponentLake.cpp", std::string(typeid(T).name() + 6) + " : " + std::to_string(myComponentPoolSize[typeid(T).name()]));
+		SYSERROR("Out of components if this is too low increase the limit in ComponentLake.cpp", std::string(typeid(T).name() + 6), std::to_string(myComponentPoolSize[typeid(T).name()]));
 	}
 
 #if TRACKCOMPONENTUSAGE

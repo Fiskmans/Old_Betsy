@@ -215,7 +215,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 		result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not map frame buffer", "");
+			SYSERROR("Could not map frame buffer");
 			return;
 		}
 		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(modelsAndLightsList[i].first->GetIsUsingSecondaryFov()));
@@ -242,7 +242,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 		result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not map frame buffer", "");
+			SYSERROR("Could not map frame buffer");
 			return;
 		}
 		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(modelsToDrawAgain[i]->first->GetIsUsingSecondaryFov()));
@@ -261,7 +261,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 		result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not map frame buffer", "");
+			SYSERROR("Could not map frame buffer");
 			return;
 		}
 		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(modelsToDrawAgain[i]->first->GetIsUsingSecondaryFov()));
@@ -340,7 +340,7 @@ inline void ForwardRenderer::RenderModel(ModelInstance* aModelInstance, std::arr
 
 	if (FAILED(result))
 	{
-		SYSERROR("Could not map object buffer","");
+		SYSERROR("Could not map object buffer");
 		return;
 	}
 

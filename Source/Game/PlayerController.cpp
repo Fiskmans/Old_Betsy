@@ -71,7 +71,7 @@ PlayerController::~PlayerController()
 void PlayerController::Init(Entity* aEntity)
 {
 	myEntity = aEntity;
-	SYSERROR("Playercontroller Inited with Init with no inventoryPtr, inventory wont scale", "");
+	SYSERROR("Playercontroller Inited with Init with no inventoryPtr, inventory wont scale");
 }
 
 void PlayerController::InternalInit(GBPhysX* aGBPhysX)

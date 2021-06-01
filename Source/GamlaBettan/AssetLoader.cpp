@@ -54,13 +54,13 @@ void AssetLoader::LoadAssetsFromMemory(const char* aData, size_t aDataSize)
 		const AssetFileHeader* header = reinterpret_cast<const AssetFileHeader*>(aData);
 		if (header->AssetLoaderVersion > ASSETLOADERVERSION)
 		{
-			SYSERROR("Assetfile is not compatible with this version of the loader","");
+			SYSERROR("Assetfile is not compatible with this version of the loader");
 			return;
 		}
 		if (header->AssetLoaderVersion < ASSETLOADERVERSION)
 		{
-			SYSWARNING("Assetfile was created using an older version of the assetloader using legacyloader", "");
-			SYSERROR("LegacyLoader has not been implemented yet recreate the asset using the correct vesrion", "");
+			SYSWARNING("Assetfile was created using an older version of the assetloader using legacyloader");
+			SYSERROR("LegacyLoader has not been implemented yet recreate the asset using the correct version");
 			return;
 		}
 
@@ -74,7 +74,7 @@ void AssetLoader::LoadAssetsFromMemory(const char* aData, size_t aDataSize)
 		}
 		else
 		{
-			SYSERROR("Asset File is corrupt", "");
+			SYSERROR("Asset File is corrupt");
 			return;
 		}
 
@@ -88,7 +88,7 @@ void AssetLoader::LoadAssetsFromMemory(const char* aData, size_t aDataSize)
 			}														
 			else													
 			{														
-				SYSERROR("Asset File is corrupt", "");				
+				SYSERROR("Asset File is corrupt");				
 				return;												
 			}
 		}
@@ -96,7 +96,7 @@ void AssetLoader::LoadAssetsFromMemory(const char* aData, size_t aDataSize)
 	}
 	else
 	{
-		SYSERROR("Asset file is not large enough to contain a common header","");
+		SYSERROR("Asset file is not large enough to contain a common header");
 	}
 }
 
@@ -110,7 +110,7 @@ size_t AssetLoader::LoadAssetFromMemory(const char* aData, size_t aDataSize)
 	}
 	else
 	{
-		SYSERROR("Asset File is corrupt", "");
+		SYSERROR("Asset File is corrupt");
 	}
 
 	return sizeof(CommonAssetHeader) + read;

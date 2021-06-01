@@ -411,7 +411,7 @@ namespace CommonUtilities
 			return myData[aRow - 1][aColumn - 1];
 		}
 
-		SYSERROR("Matrix3x3 index out of range.","");
+		SYSERROR("Matrix3x3 index out of range.");
 		return myData[0][0];
 	}
 
@@ -423,7 +423,7 @@ namespace CommonUtilities
 			return myData[aRow - 1][aColumn - 1];
 		}
 
-		SYSERROR("Matrix3x3 index out of range.","");
+		SYSERROR("Matrix3x3 index out of range.");
 		return myData[0][0];
 	}
 
@@ -432,7 +432,7 @@ namespace CommonUtilities
 	{
 		if (anIndex < 0 || anIndex >= 9)
 		{
-			SYSERROR("Matrix3x3 index out of range.","");
+			SYSERROR("Matrix3x3 index out of range.");
 		}
 		return myElements[anIndex];
 	}
@@ -442,7 +442,7 @@ namespace CommonUtilities
 	{
 		if (anIndex < 0 || anIndex >= 9)
 		{
-			SYSERROR("Matrix3x3 index out of range.","");
+			SYSERROR("Matrix3x3 index out of range.");
 		}
 		return myElements[anIndex];
 	}

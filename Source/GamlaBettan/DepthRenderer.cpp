@@ -115,7 +115,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	tex->Release();
 	if (FAILED(result))
 	{
-		SYSERROR("Could not shadow depth resource view", "");
+		SYSERROR("Could not shadow depth resource view");
 		return false;
 	}
 
@@ -123,7 +123,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	texEnvironment->Release();
 	if (FAILED(result))
 	{
-		SYSERROR("Could not shadow depth resource view", "");
+		SYSERROR("Could not shadow depth resource view");
 		return false;
 	}
 
@@ -152,7 +152,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	result = device->CreateTexture2D(&desc2, nullptr, &tex2_1x6);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not shadow depth target texture", "");
+		SYSERROR("Could not shadow depth target texture");
 		return false;
 	}
 
@@ -164,7 +164,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	result = device->CreateTexture2D(&desc2, nullptr, &tex2_1x1);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not shadow depth target texture", "");
+		SYSERROR("Could not shadow depth target texture");
 		return false;
 	}
 
@@ -324,7 +324,7 @@ void DepthRenderer::RenderEnvironmentDepth(EnvironmentLight* aLight, Scene* aSce
 {
 	if (!aLight)
 	{
-		ONETIMEWARNING("Rendering without an envinronmentlight", "");
+		ONETIMEWARNING("Rendering without an envinronmentlight");
 		return;
 	}
 	myContext->ClearDepthStencilView(myDepth1x1, D3D11_CLEAR_DEPTH, 1.f, 0);
@@ -387,7 +387,7 @@ ID3D11ShaderResourceView* DepthRenderer::RenderDecalDepth(Decal* aDecal, Scene* 
 	result = myDevice->CreateTexture2D(&tdesc, nullptr, &tex);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not shadow depth texture", "");
+		SYSERROR("Could not shadow depth texture");
 		return nullptr;
 	}
 
@@ -400,7 +400,7 @@ ID3D11ShaderResourceView* DepthRenderer::RenderDecalDepth(Decal* aDecal, Scene* 
 	result = myDevice->CreateDepthStencilView(tex, &dsvDesc, &depth);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not shadow depth view", "");
+		SYSERROR("Could not shadow depth view");
 		return nullptr;
 	}
 
@@ -413,7 +413,7 @@ ID3D11ShaderResourceView* DepthRenderer::RenderDecalDepth(Decal* aDecal, Scene* 
 	result = myDevice->CreateShaderResourceView(tex, &srvDesc, &view);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not shadow depth resource view", "");
+		SYSERROR("Could not shadow depth resource view");
 		return nullptr;
 	}
 
@@ -465,7 +465,7 @@ void DepthRenderer::Render(Camera* aCamera, const std::vector<ModelInstance*>& a
 	result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not map frame buffer", "");
+		SYSERROR("Could not map frame buffer");
 		return;
 	}
 	memcpy(bufferData.pData, &fData, sizeof(fData));
@@ -514,7 +514,7 @@ void DepthRenderer::Render(Camera* aCamera, const std::vector<ModelInstance*>& a
 
 			if (FAILED(result))
 			{
-				SYSERROR("Could not map object buffer", "");
+				SYSERROR("Could not map object buffer");
 				return;
 			}
 
@@ -553,7 +553,7 @@ void DepthRenderer::Render(Camera* aCamera, const std::vector<ModelInstance*>& a
 			}
 			else
 			{
-				ONETIMEWARNING("Rendered without any loaded lod levels", "");
+				ONETIMEWARNING("Rendered without any loaded lod levels");
 			}
 		}
 	}

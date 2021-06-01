@@ -122,7 +122,7 @@ void Model::ApplyLodLevel(LodLevel* aLodLevel, size_t aLevel, float aSize)
 	}
 	else
 	{
-		SYSERROR("Trying to add a lodlevel to a model beyond the capacity (" + std::to_string(aLevel) + ")", myFilePath);
+		SYSERROR("Trying to add a lodlevel to a model beyond capacity", std::to_string(aLevel), myFilePath);
 	}
 }
 

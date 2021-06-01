@@ -124,6 +124,9 @@ PixelOutput pixelShader(VertexToPixel input)
 	float3 albedo = resource2.Sample(defaultSampler, input.myUV).rgb;
 	float3 normal = resource3.Sample(defaultSampler, input.myUV).rgb;
 
+    returnValue.myColor = float4(albedo, 1);
+    return returnValue;
+
 	float2 camUV = camProjection.xy;
 	camUV *= 0.5;
 	camUV += float2(0.5, 0.5);
@@ -148,8 +151,6 @@ PixelOutput pixelShader(VertexToPixel input)
     {
         delta -= threshhold;
         delta *= (1 - threshhold);
-        //returnValue.myColor = float4(1, 0, 0, 1) * delta;
-        //return returnValue;
         fuzzyOcclusion = lerp(fuzzyOcclusion,0, delta);
     }
 	fuzzyOcclusion /= 64;
@@ -162,8 +163,6 @@ PixelOutput pixelShader(VertexToPixel input)
 	if (intensity < 0)
 		intensity = 0;
 
-    //returnValue.myColor = float4(time,0,0, 1);
-    //return returnValue;
 
 	float4 color = float4(albedo, 1) * float4(environmentLightColor.rgb, 1) * enviromentLightIntensity;
 	color.a = 1;

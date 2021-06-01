@@ -235,7 +235,7 @@ bool FoodCellar::AddTradeItemToArea(const ItemId& aItemIDType, TradeArea aToTrad
 		firstItemPos = myStorageTradeItemsTopLeftPos;
 		break;
 	default:
-		SYSERROR("TRYING TO ADD TRADE ITEM TO NONEXISTANT UI AREA", "ERROR");
+		SYSERROR("TRYING TO ADD TRADE ITEM TO NONEXISTANT UI AREA", std::to_string(static_cast<int>(aToTradeArea)));
 		currentVectorPtr = &myPlayerTradeItems;
 		break;
 	}
@@ -388,7 +388,7 @@ bool FoodCellar::RemoveTradeItemFromArea(const ItemId& aItemIDType, TradeArea aT
 		currentVectorPtr = &myStorageTradeItems;
 		break;
 	default:
-		SYSERROR("TRYING TO REMOVE TRADEITEM FROM NONEXISTANT UI AREA", "ERROR");
+		SYSERROR("TRYING TO REMOVE TRADEITEM FROM NONEXISTANT UI AREA",std::to_string(static_cast<int>(aTradeArea)));
 		currentVectorPtr = &myPlayerTradeItems;
 		break;
 	}

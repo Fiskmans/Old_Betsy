@@ -159,7 +159,7 @@ void GBPhysXKinematicComponent::AddGBPhysXCharacter(GBPhysX* aGBPhysX, const V3F
 		myGBPhysXCharacter->RemoveFromScene();
 		myGBPhysXCharacter->Release();
 		SAFE_DELETE(myGBPhysXCharacter);
-		SYSERROR("ADD GB PHYSXCHARACTER CALLED MORE THAN ONCE ON GB PHYSXKINEMATIC CONTROLLER", "");
+		SYSERROR("ADD GB PHYSXCHARACTER CALLED MORE THAN ONCE ON GB PHYSXKINEMATIC CONTROLLER");
 	}
 
 	myGBPhysXCharacter = aGBPhysX->GBCreateCapsuleController(aPosition, aRotation, aHeight, aRadius, aIsPlayer);

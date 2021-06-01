@@ -124,7 +124,7 @@ namespace CommonUtilities
 			break;
 
 		default:
-			SYSERROR("Initializer list for Vector3 is faulty.","")
+			SYSERROR("Initializer list for Vector3 is faulty.")
 
 		}
 	}
@@ -157,7 +157,7 @@ namespace CommonUtilities
 	{
 		if (anotherVector.x == 0 || anotherVector.y == 0 || anotherVector.z == 0)
 		{
-			SYSERROR("Division by 0 in Vector3!","");
+			SYSERROR("Division by 0 in Vector3!");
 		}
 		return Vector3<T>(aVector.x / anotherVector.x, aVector.y / anotherVector.y, aVector.z / anotherVector.z);
 	}
@@ -228,7 +228,7 @@ namespace CommonUtilities
 	{
 		if (aScalar == 0)
 		{
-			SYSERROR("Division by 0 in Vector3!","");
+			SYSERROR("Division by 0 in Vector3!");
 		}
 		double divNum = 1.0 / static_cast<double>(aScalar);
 
@@ -261,7 +261,7 @@ namespace CommonUtilities
 	{
 		if (aScalar == 0)
 		{
-			SYSERROR("Division by 0 in Vector3!","");
+			SYSERROR("Division by 0 in Vector3!");
 		}
 
 		double divNum = 1.0 / static_cast<double>(aScalar);
@@ -550,7 +550,7 @@ namespace CommonUtilities
 	{
 		if (index > 3 || index < 0)
 		{
-			SYSERROR("Index out of range!","");
+			SYSERROR("Index out of range!");
 		}
 
 		return (*(begin() + index));
@@ -561,7 +561,7 @@ namespace CommonUtilities
 	{
 		if (index > 3 || index < 0)
 		{
-			SYSERROR("Index out of range!","");
+			SYSERROR("Index out of range!");
 		}
 
 		return (*(begin() + index));

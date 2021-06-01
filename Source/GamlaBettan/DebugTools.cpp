@@ -165,13 +165,13 @@ void DebugTools::UpdateGizmo()
 
 void DebugTools::Setup(Scene* aScene)
 {
-	gizmoParts[0] = AssetManager::GetInstance().GetModel("Develop/x.fbx").InstansiateModel();
-	gizmoParts[1] = AssetManager::GetInstance().GetModel("Develop/y.fbx").InstansiateModel();
-	gizmoParts[2] = AssetManager::GetInstance().GetModel("Develop/z.fbx").InstansiateModel();
+	gizmoParts[0] = AssetManager::GetInstance().GetModel("engine/x.fbx").InstansiateModel();
+	gizmoParts[1] = AssetManager::GetInstance().GetModel("engine/y.fbx").InstansiateModel();
+	gizmoParts[2] = AssetManager::GetInstance().GetModel("engine/z.fbx").InstansiateModel();
 
-	gizmoParts[3] = AssetManager::GetInstance().GetModel("Develop/xy.fbx").InstansiateModel();
-	gizmoParts[4] = AssetManager::GetInstance().GetModel("Develop/xz.fbx").InstansiateModel();
-	gizmoParts[5] = AssetManager::GetInstance().GetModel("Develop/yz.fbx").InstansiateModel();
+	gizmoParts[3] = AssetManager::GetInstance().GetModel("engine/xy.fbx").InstansiateModel();
+	gizmoParts[4] = AssetManager::GetInstance().GetModel("engine/xz.fbx").InstansiateModel();
+	gizmoParts[5] = AssetManager::GetInstance().GetModel("engine/yz.fbx").InstansiateModel();
 
 	myScene = aScene;
 }

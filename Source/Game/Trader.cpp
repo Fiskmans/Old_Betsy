@@ -445,7 +445,7 @@ void Trader::GenerateInventory(float aTradeValue, char aDay)
 		}
 		else
 		{
-			SYSERROR("Trader tried to add " + StringFromItemId(itemType) + " but it has no trade value", " is bad mkay");
+			SYSERROR("Trader tried to add item without trade value", StringFromItemId(itemType));
 		}
 
 	}
@@ -631,7 +631,7 @@ bool Trader::AddTradeItemToArea(const ItemId& aItemIDType, TradeArea aToTradeAre
 		firstItemPos = myTraderTradeItemsTopLeftPos;
 		break;
 	default:
-		SYSERROR("TRYING TO ADD TRADE ITEM TO NONEXISTANT UI AREA", "ERROR");
+		SYSERROR("TRYING TO ADD TRADE ITEM TO NONEXISTANT UI AREA");
 		currentVectorPtr = &myPlayerTradeItems;
 		break;
 	}
@@ -762,7 +762,7 @@ bool Trader::AddTradeItemToArea(const ItemId& aItemIDType, TradeArea aToTradeAre
 			}
 			break;
 		default:
-			SYSERROR("AddTradeItemToArea error, from area is wrong", "trade critical error");
+			SYSERROR("AddTradeItemToArea error, from area is wrong");
 			break;
 		}
 		EvaluateTrade();
@@ -790,7 +790,7 @@ bool Trader::RemoveTradeItemFromArea(const ItemId& aItemIDType, TradeArea aTrade
 		currentVectorPtr = &myTraderTradeItems;
 		break;
 	default:
-		SYSERROR("TRYING TO REMOVE TRADEITEM FROM NONEXISTANT UI AREA", "ERROR");
+		SYSERROR("TRYING TO REMOVE TRADEITEM FROM NONEXISTANT UI AREA");
 		currentVectorPtr = &myPlayerTradeItems;
 		break;
 	}

@@ -177,10 +177,10 @@ std::vector<char> ShaderCompiler::LoadOrCompileFromFile(const std::string& aBase
 
 	if (FAILED(result) || errorBlob)
 	{
-		SYSERROR("Could not compile " + aEntryPoint + " shader with flags: [" + ShaderTypes::PostfixFromFlags(aFlags) + "]", aFilePath);
+		SYSERROR("Could not compile shader", aEntryPoint, ShaderTypes::PostfixFromFlags(aFlags), aFilePath);
 		if (errorBlob)
 		{
-			SYSERROR((char*)errorBlob->GetBufferPointer(), aFilePath);
+			SYSERROR((char*)errorBlob->GetBufferPointer(), aEntryPoint, ShaderTypes::PostfixFromFlags(aFlags), aFilePath);
 			errorBlob->Release();
 		}
 	}

@@ -55,7 +55,7 @@ void AnimationEvent::Update(float aDeltaTime)
 			}
 			break;
 		default:
-			SYSERROR("Animation Event with wrong event state", "BAD");
+			SYSERROR("Animation Event with wrong event state", std::to_string(static_cast<int>(myState)));
 			break;
 		}
 	}
