@@ -7,7 +7,6 @@
 #include "Model.h"
 #include "DebugDrawer.h"
 #include "Sphere.hpp"
-#include "EnemyFactory.h"
 #include "Life.h"
 #include "GBPhysX.h"
 #include "Intersection.hpp"

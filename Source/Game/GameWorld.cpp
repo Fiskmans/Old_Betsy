@@ -36,7 +36,6 @@
 
 #include "ParticleActivatable.h"
 
-#include "EnemyFactory.h"
 #include "StaticObjectFactory.h"
 #include "DynamicObjectFactory.h"
 #include "DestructibleFactory.h"
@@ -88,7 +87,6 @@
 
 #include "DirectXTK\Inc\SpriteBatch.h"
 #include "DirectX11Framework.h"
-#include "NodeChangeInteractableMesh.h"
 
 #include "AssetManager.h"
 
@@ -100,7 +98,6 @@ GameWorld::GameWorld() :
 	myObjectTree(nullptr),
 	myScenePtr(nullptr),
 	myParticleFactory(nullptr),
-	myEnemyFactory(nullptr),
 	myStaticObjectFactory(nullptr),
 	myDynamicObjectFactory(nullptr),
 	myDestructibleFactory(nullptr),
@@ -110,7 +107,6 @@ GameWorld::GameWorld() :
 	myUIManager(nullptr),
 	myTextFactory(nullptr),
 	myCharacterData(nullptr),
-	myNodePollingstationPtr(nullptr),
 	myGBPhysXColliderFactory(nullptr),
 	myDialogFactory(nullptr),
 #if USEIMGUI
@@ -154,10 +150,8 @@ GameWorld::~GameWorld()
 	myScenePtr = nullptr;
 	myMainCameraPtr = nullptr;
 	myGBPhysXPtr = nullptr;
-	myNodePollingstationPtr = nullptr;
 
 	SAFE_DELETE(myObjectTree);
-	SAFE_DELETE(myEnemyFactory);
 	SAFE_DELETE(myStaticObjectFactory);
 	SAFE_DELETE(myDynamicObjectFactory);
 	SAFE_DELETE(myDestructibleFactory);
@@ -190,7 +184,6 @@ void GameWorld::SystemLoad(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX
 	myAnimations.reserve(ENTITY_POOL_SIZE);
 
 	myParticleFactory = new ParticleFactory;
-	myEnemyFactory = new EnemyFactory;
 	myStaticObjectFactory = new StaticObjectFactory;
 	myDynamicObjectFactory = new DynamicObjectFactory;
 	myDestructibleFactory = new DestructibleFactory;
@@ -217,7 +210,6 @@ void GameWorld::SystemLoad(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX
 	ComponentLake::GetInstance().RegisterComponents();
 	ComponentLake::GetInstance().PrepareObjectsInPools(aScene, myParticleFactory, aAudioManager, aLightLoader, &myEntitys, &myEntityPool, aSpriteFactory);
 
-	myEnemyFactory->Init(myAIPollingStation, myObjectTree, &myEnemies, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID, myCharacterData, myGBPhysXPtr);
 	myStaticObjectFactory->Init(myGBPhysXPtr, myObjectTree, &myEntitys, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID, myUIManager);
 	myDynamicObjectFactory->Init(myGBPhysXPtr, myObjectTree, &myEntitys, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID);
 	myDestructibleFactory->Init(myObjectTree, &myEntitys, &myEntityPool, &ComponentLake::GetInstance(), &myEntityID, myCharacterData);
@@ -229,13 +221,11 @@ void GameWorld::SystemLoad(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX
 	FoodCellar::PopulateCalorieLookup();
 	GrowthSpot::PopulateSeeds();
 
-	NodeChangeInteractableMesh::SetGBPhysX(myGBPhysXPtr);
-
 	TimeHandler::GetInstance().SetEntityVectors(&myAnimations, &myEnemies, &myEntityPool);
 	TimeHandler::GetInstance().Init();
 }
 
-void GameWorld::Init(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, Camera* aCamera, NodePollingStation* aNodePollingStation, SpotLightFactory* aSpotlightFactory)
+void GameWorld::Init(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, Camera* aCamera, SpotLightFactory* aSpotlightFactory)
 {
 	myMainCameraPtr = aCamera;
 	myScenePtr = aScene;
@@ -261,11 +251,6 @@ void GameWorld::Init(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Fram
 
 	myUsingFreeCamera = false;
 
-	myNodePollingstationPtr = aNodePollingStation;
-	myNodePollingstationPtr->SetEnemyVector(&myEnemies);
-	myNodePollingstationPtr->SetEnemyFactory(myEnemyFactory);
-	myEnemyFactory->SetPollingStation(myNodePollingstationPtr);
-
 	//River Entity init
 	myRiverAudioEntity = myEntityPool.Retrieve();
 	myRiverAudioEntity->Init(EntityType::None, myEntityID++);
@@ -279,10 +264,6 @@ void GameWorld::Init(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Fram
 	myUIManager->Init(myPlayer, *myScenePtr, *aSpriteFactory, *myTextFactory, aCamera);
 
 	myCinEditor.Init(aScene, myParticleFactory, aSpriteFactory);
-
-	Entity* loadEnemy = myEnemyFactory->CreateEnemy("", 1, V3F(0, -10000, 0), V3F(), V3F(), -1, 0, -1, true);
-	myEntitys.push_back(loadEnemy);
-	loadEnemy->SetIsAlive(false);
 }
 
 void GameWorld::SetupPlayerAndCamera(CommonUtilities::Vector3<float> aSpawnPos)
@@ -290,7 +271,6 @@ void GameWorld::SetupPlayerAndCamera(CommonUtilities::Vector3<float> aSpawnPos)
 	myPlayer = myEntityPool.Retrieve();
 	myPlayer->Init(EntityType::Player, myEntityID++);
 	myEntitys.push_back(myPlayer);
-	myNodePollingstationPtr->SetPlayer(myPlayer);
 	myAIPollingStation->SetPlayer(myPlayer);
 
 	myCamera = myEntityPool.Retrieve();
@@ -397,8 +377,6 @@ void GameWorld::ClearWorld(bool isShouldDeleteplayer)
 			}
 		}
 	}
-
-	myEnemyFactory->ClearQueue();
 }
 
 void GameWorld::SpawnPlayer()
@@ -786,8 +764,6 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 	PerlinNoise noise;
 	float now = Tools::GetTotalTime();
 	WindSystem::GetInstance().SetBaseWind(V3F((noise.noise(now * 2, now * PI, 5) - 0.5) * 10000, 0, (noise.noise(now * 2, now * PI, 10) - 0.5) * 10000));
-
-	myEnemyFactory->SpawnQueued(aDeltatime);
 
 	CalculateRiverEmitterPos();
 
@@ -1401,32 +1377,6 @@ void GameWorld::UpdateDirectionalLight(float aDeltatime)
 
 void GameWorld::RespawnTrader()
 {
-	if (myTrader == nullptr)
-	{
-		//V3F spawnPos = V3F(1600.0f, 200.0f, 2600.0f);
-		//den nedre som är ingame nu fastnar i skogen (ld ska fixa)
-		V3F spawnPos = V3F(739.0f, 200.0f, 3589.0f);
-		//V3F targetPos = V3F(0.0f, 0.0f, 0.0f);
-		V3F targetPos = V3F(685.0f, 0.0f, 1205.0f);
-
-		myTrader = myEnemyFactory->CreateEnemy("Data\Models\CH_Trader_01\CH_Trader_01.fbx", 3, spawnPos, V3F(), V3F(1.0f, 1.0f, 1.0f), -1, 0, -1, true);
-		myTrader->GetComponent<GBPhysXKinematicComponent>()->SetUpdateMovement(true);
-		myTrader->AddComponent<Trader>()->Init(myTrader);
-		myTrader->GetComponent<Trader>()->SetPlayerInventory(myPlayer->GetComponent<Inventory>());
-		myTrader->GetComponent<Trader>()->PrepareUI(myScenePtr, mySpriteFactory, myTextFactory);
-		spawnPos.y = 0;
-		myTrader->GetComponent<TraderAI>()->SetDespawnPosition(spawnPos);
-		myTrader->GetComponent<TraderAI>()->SetTargetPosition(targetPos);
-		myTrader->GetComponent<TraderAI>()->SetTargetEntity(myPlayer);
-		myTrader->GetComponent<TraderAI>()->SwitchState(TraderState::Enter);
-
-	}
-	else
-	{
-		myTrader->SetPosition(V3F());
-	}
-	//myTrader->GetComponent<AI>()->ResetState();
-
 	Message message;
 	message.myMessageType = MessageType::SendUIGameMessage;
 	message.myText = "The trader has arrived!";

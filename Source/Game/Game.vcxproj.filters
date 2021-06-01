@@ -201,9 +201,6 @@
     <ClInclude Include="PointLightFactory.h">
       <Filter>Factories</Filter>
     </ClInclude>
-    <ClInclude Include="EnemyFactory.h">
-      <Filter>Factories</Filter>
-    </ClInclude>
     <ClInclude Include="GameWorld.h">
       <Filter>Game</Filter>
     </ClInclude>
@@ -421,9 +418,6 @@
     </ClCompile>
     <ClCompile Include="ParticleActivatable.cpp">
       <Filter>Components\Particles</Filter>
-    </ClCompile>
-    <ClCompile Include="EnemyFactory.cpp">
-      <Filter>Factories</Filter>
     </ClCompile>
     <ClCompile Include="DestructibleFactory.cpp">
       <Filter>Factories</Filter>

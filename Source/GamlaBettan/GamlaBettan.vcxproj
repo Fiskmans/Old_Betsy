@@ -191,47 +191,16 @@
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="CinematicTarget.cpp" />
     <ClCompile Include="DecalFactory.cpp" />
-    <ClCompile Include="ForEachEnemyWithinRange.cpp" />
     <ClCompile Include="LevelLoader.cpp" />
     <ClCompile Include="NavMeshLoader.cpp" />
-    <ClCompile Include="NodeCameraOffset.cpp" />
-    <ClCompile Include="NodeChangeInteractableMesh.cpp" />
-    <ClCompile Include="NodeContinuousSpawner.cpp" />
-    <ClCompile Include="NodeDayOver.cpp" />
-    <ClCompile Include="NodeDialogOver.cpp" />
-    <ClCompile Include="NodeDialogue.cpp" />
-    <ClCompile Include="NodeGetInteractable.cpp" />
-    <ClCompile Include="NodeGetMayaPos.cpp" />
-    <ClCompile Include="NodeInteractWith.cpp" />
-    <ClCompile Include="NodeLoadLevel.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="NodeMoveInteractable.cpp" />
-    <ClCompile Include="NodeOnButtonHit.cpp" />
-    <ClCompile Include="NodeSetColliderStatus.cpp" />
-    <ClCompile Include="NodeSetObjectRotation.cpp" />
-    <ClCompile Include="NodeEnemySpawner.cpp" />
-    <ClCompile Include="NodeSpawnAbility.cpp" />
-    <ClCompile Include="NodeUnloadLevel.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="NodeWithinAttackRange.cpp" />
-    <ClCompile Include="NodeWithinRangeOfSeekingFriends.cpp" />
-    <ClCompile Include="NodeAttackTarget.cpp" />
     <ClCompile Include="BlueprintUtilities\Source\ax\Builders.cpp" />
     <ClCompile Include="BlueprintUtilities\Source\ax\Drawing.cpp" />
     <ClCompile Include="BlueprintUtilities\Source\ax\Widgets.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraFactory.cpp" />
     <ClCompile Include="CameraPan.cpp" />
-    <ClCompile Include="CGraphManager.cpp" />
     <ClCompile Include="CinematicEvent.cpp" />
     <ClCompile Include="CinematicPath.cpp" />
-    <ClCompile Include="CNodeInstance.cpp" />
-    <ClCompile Include="CNodeType_Partial_definition.cpp" />
-    <ClCompile Include="CNodeType_Partial_registry.cpp" />
     <ClCompile Include="DebugDrawer.cpp" />
     <ClCompile Include="DebugTools.cpp" />
     <ClCompile Include="DeferredRenderer.cpp" />
@@ -245,59 +214,7 @@
     <ClCompile Include="GBuffer.cpp" />
     <ClCompile Include="HighlightRenderer.cpp" />
     <ClCompile Include="MoveObject.cpp" />
-    <ClCompile Include="NodeChangeLevel.cpp" />
-    <ClCompile Include="NodeGetPlayerID.cpp" />
-    <ClCompile Include="NodeGreater.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="NodeIf.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="NodeMergeVec3.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="NodeGetPlayerPosition.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
     <ClCompile Include="GraphicEngine.cpp" />
-    <ClCompile Include="NodeOnTrigger.cpp" />
-    <ClCompile Include="NodeRetrieve.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="NodeSeekTarget.cpp" />
-    <ClCompile Include="NodeSetTarget.cpp" />
-    <ClCompile Include="NodeSetTargetPosition.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="NodeSetToidle.cpp" />
-    <ClCompile Include="NodeSpawnEnemy.cpp" />
-    <ClCompile Include="NodeSplitVec3.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="NodeNot.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="NodeStartCinematic.cpp" />
-    <ClCompile Include="NodeStopTimer.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="NodeStore.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="NodeTimer.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
     <ClCompile Include="ParticleBurst.cpp">
       <SubType>
       </SubType>
@@ -315,28 +232,6 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelInstance.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
-    <ClCompile Include="NodeAbs.cpp" />
-    <ClCompile Include="NodeAtan.cpp" />
-    <ClCompile Include="NodeCeil.cpp" />
-    <ClCompile Include="NodeCNodeTypeMathAdd.cpp" />
-    <ClCompile Include="NodeCNodeTypePrint.cpp" />
-    <ClCompile Include="NodeCNodeTypeStart.cpp" />
-    <ClCompile Include="NodeCos.cpp" />
-    <ClCompile Include="NodeDataTypes.cpp" />
-    <ClCompile Include="NodeFloor.cpp" />
-    <ClCompile Include="NodeForeach.cpp" />
-    <ClCompile Include="NodeGetObjectPos.cpp" />
-    <ClCompile Include="NodeLengthSqr.cpp" />
-    <ClCompile Include="NodeLerp.cpp" />
-    <ClCompile Include="NodeMouseInWorld.cpp" />
-    <ClCompile Include="NodeMul.cpp" />
-    <ClCompile Include="NodePollingStation.cpp" />
-    <ClCompile Include="NodeSetObjectPosition.cpp" />
-    <ClCompile Include="NodeSetObjectScale.cpp" />
-    <ClCompile Include="NodeSin.cpp" />
-    <ClCompile Include="NodeSub.cpp" />
-    <ClCompile Include="NodeToDegrees.cpp" />
-    <ClCompile Include="NodeToRadians.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleFactory.cpp" />
     <ClCompile Include="ParticleInstance.cpp" />
@@ -357,10 +252,6 @@
     <ClCompile Include="video.cpp" />
     <ClCompile Include="videoplayer.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
-    <ClCompile Include="NodeWithinRange.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
     <ClCompile Include="WindSystem.cpp" />
     <ClCompile Include="WwiseFramework.cpp" />
   </ItemGroup>
@@ -376,37 +267,8 @@
     <ClInclude Include="CinematicTarget.h" />
     <ClInclude Include="Decal.h" />
     <ClInclude Include="DecalFactory.h" />
-    <ClInclude Include="ForEachEnemyWithinRange.h" />
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="NavMeshLoader.h" />
-    <ClInclude Include="NodeCameraOffset.h" />
-    <ClInclude Include="NodeChangeInteractableMesh.h" />
-    <ClInclude Include="NodeContinuousSpawner.h" />
-    <ClInclude Include="NodeDayOver.h" />
-    <ClInclude Include="NodeDialogOver.h" />
-    <ClInclude Include="NodeDialogue.h" />
-    <ClInclude Include="NodeDisplayText.h" />
-    <ClInclude Include="NodeGetInteractable.h" />
-    <ClInclude Include="NodeGetMayaPos.h" />
-    <ClInclude Include="NodeInteractWith.h" />
-    <ClInclude Include="NodeLoadLevel.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="NodeMoveInteractable.h" />
-    <ClInclude Include="NodeOnButtonHit.h" />
-    <ClInclude Include="NodePlayAnimation.h" />
-    <ClInclude Include="NodeSetColliderStatus.h" />
-    <ClInclude Include="NodeSetObjectRotation.h" />
-    <ClInclude Include="NodeEnemySpawner.h" />
-    <ClInclude Include="NodeSpawnAbility.h" />
-    <ClInclude Include="NodeUnloadLevel.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="NodeWithinAttackRange.h" />
-    <ClInclude Include="NodeWithinRangeOfSeekingFriends.h" />
-    <ClInclude Include="NodeAttackTarget.h" />
     <ClInclude Include="BlueprintUtilities\Include\ax\Builders.h" />
     <ClInclude Include="BlueprintUtilities\Include\ax\Drawing.h" />
     <ClInclude Include="BlueprintUtilities\Include\ax\Math2D.h" />
@@ -414,11 +276,8 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraFactory.h" />
     <ClInclude Include="CameraPan.h" />
-    <ClInclude Include="CGraphManager.h" />
     <ClInclude Include="CinematicEvent.h" />
     <ClInclude Include="CinematicPath.h" />
-    <ClInclude Include="CNodeInstance.h" />
-    <ClInclude Include="CNodeType.h" />
     <ClInclude Include="DebugDrawer.h" />
     <ClInclude Include="DebugTools.h" />
     <ClInclude Include="DeferredRenderer.h" />
@@ -432,65 +291,13 @@
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="HighlightRenderer.h" />
     <ClInclude Include="MoveObject.h" />
-    <ClInclude Include="NodeChangeLevel.h" />
-    <ClInclude Include="NodeGetPlayerID.h" />
-    <ClInclude Include="NodeGreater.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="NodeIf.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="NodeMergeVec3.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="NodeGetPlayerPosition.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
     <ClInclude Include="GraphicEngine.h" />
     <ClCompile Include="ParticleRenderer.cpp" />
-    <ClInclude Include="NodeOnTrigger.h" />
-    <ClInclude Include="NodeRetrieve.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="NodeSeekTarget.h" />
-    <ClInclude Include="NodeSetTarget.h" />
-    <ClInclude Include="NodeSetTargetPosition.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="NodeSpawnEnemy.h" />
-    <ClInclude Include="NodeSplitVec3.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="NodeNot.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="NodeStartCinematic.h" />
-    <ClInclude Include="NodeStopTimer.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="NodeStore.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="NodeTimer.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
     <ClInclude Include="ParticleBurst.h">
       <SubType>
       </SubType>
     </ClInclude>
     <ClInclude Include="PathFinder.h" />
-    <ClInclude Include="NodeSetToIdle.h" />
     <ClInclude Include="PlayAnimation.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="DepthRenderer.h" />
@@ -505,28 +312,6 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelInstance.h" />
     <ClInclude Include="ModelLoader.h" />
-    <ClInclude Include="NodeAbs.h" />
-    <ClInclude Include="NodeAtan.h" />
-    <ClInclude Include="NodeCeil.h" />
-    <ClInclude Include="NodeCNodeTypeMathAdd.h" />
-    <ClInclude Include="NodeCNodeTypePrint.h" />
-    <ClInclude Include="NodeCNodeTypeStart.h" />
-    <ClInclude Include="NodeCos.h" />
-    <ClInclude Include="NodeDataTypes.h" />
-    <ClInclude Include="NodeFloor.h" />
-    <ClInclude Include="NodeForeach.h" />
-    <ClInclude Include="NodeGetObjectPos.h" />
-    <ClInclude Include="NodeLengthSqr.h" />
-    <ClInclude Include="NodeLerp.h" />
-    <ClInclude Include="NodeMouseInWorld.h" />
-    <ClInclude Include="NodeMul.h" />
-    <ClInclude Include="NodePollingStation.h" />
-    <ClInclude Include="NodeSetObjectPosition.h" />
-    <ClInclude Include="NodeSetObjectScale.h" />
-    <ClInclude Include="NodeSin.h" />
-    <ClInclude Include="NodeSub.h" />
-    <ClInclude Include="NodeToDegrees.h" />
-    <ClInclude Include="NodeToRadians.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleFactory.h" />
     <ClInclude Include="ParticleInstance.h" />
@@ -552,10 +337,6 @@
     <ClInclude Include="videoplayer.h" />
     <ClInclude Include="WindowData.h" />
     <ClInclude Include="WindowHandler.h" />
-    <ClInclude Include="NodeWithinRange.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
     <ClInclude Include="WindSystem.h" />
     <ClInclude Include="WwiseFramework.h" />
     <ClInclude Include="Wwise_IDs.h" />

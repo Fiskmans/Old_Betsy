@@ -8,7 +8,6 @@
 #include <MetricValue.h>
 #include <Macros.h>
 #include <array>
-#include "CGraphManager.h"
 #include "TimerController.h"
 #include "SpotLightFactory.h"
 #include "DecalFactory.h"
@@ -80,7 +79,6 @@ private:
 	Scene* myScene;
 	ModelInstance* mySkybox;
 	GameWorld* myGameWorld;
-	CGraphManager myGraphManager;
 	NodePollingStation* myNodePollingStation;
 	TimerController myTimerController;
 	GBPhysX* myGBPhysX;

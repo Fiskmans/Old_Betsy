@@ -308,6 +308,7 @@ void UIManager::RecieveMessage(const Message& aMessage)
 	{
 		myCurrentLevel = aMessage.myIntValue;
 	}
+	break;
 
 	case MessageType::LookingAtInteractable:
 	{

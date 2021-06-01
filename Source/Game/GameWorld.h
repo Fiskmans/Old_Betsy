@@ -7,7 +7,6 @@
 #include "Publisher.hpp"
 #include "ObjectPool.hpp"
 #include "ObjectPoolSizes.h"
-#include <NodePollingStation.h>
 #include "AIPollingStation.h"
 #include "CinematicEditor.h"
 
@@ -26,7 +25,6 @@ class ModelLoader;
 class SpriteFactory;
 class SpriteInstance;
 class SpriteRenderer;
-class EnemyFactory;
 class StaticObjectFactory;
 class DynamicObjectFactory;
 class DestructibleFactory;
@@ -55,7 +53,7 @@ public:
 	GameWorld();
 	~GameWorld();
 
-	void Init(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, Camera* aCamera,NodePollingStation* aNodePollingStation, SpotLightFactory* aSpotlightFactory);
+	void Init(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, Camera* aCamera, SpotLightFactory* aSpotlightFactory);
 	void SystemLoad(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, SpriteRenderer* aSpriteRenderer, LightLoader* aLightLoader);
 	void Update(CommonUtilities::InputHandler& aInputHandler, float aDeltatime);
 	void UpdateDirectionalLight(float aDeltatime);
@@ -83,7 +81,6 @@ private:
 #endif // USEIMGUI
 
 	CinematicEditor myCinEditor;
-	NodePollingStation* myNodePollingstationPtr;
 	AIPollingStation* myAIPollingStation;
 	void SpawnPlayer();
 	void TriggerEvent(const Message& anEvent);
@@ -119,7 +116,6 @@ private:
 	Entity* myRiverAudioEntity;
 	Entity* myRiverMeshEntity = nullptr;
 
-	EnemyFactory* myEnemyFactory;
 	StaticObjectFactory* myStaticObjectFactory;
 	DynamicObjectFactory* myDynamicObjectFactory;
 	DestructibleFactory* myDestructibleFactory;

@@ -221,7 +221,6 @@
     <ClInclude Include="EmilsEnums.h" />
     <ClInclude Include="AIController.h" />
     <ClInclude Include="DataStructs.h" />
-    <ClInclude Include="EnemyFactory.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityMessage.h" />
     <ClInclude Include="Enums.h" />
@@ -307,7 +306,6 @@
     <ClCompile Include="DialogFactory.cpp" />
     <ClCompile Include="DialogInstance.cpp" />
     <ClCompile Include="DynamicObjectFactory.cpp" />
-    <ClCompile Include="EnemyFactory.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="FireWeapon.cpp" />
