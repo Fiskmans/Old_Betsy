@@ -35,6 +35,7 @@
   - ~~Levels~~
   - ~~Navmeshes~~
   - Sounds
+  - Sprites
 - Centralize and standardize Entities so we can reliably select/view entity data
 - Editor tools
   - Play/Pause
