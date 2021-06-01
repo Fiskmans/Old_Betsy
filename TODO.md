@@ -2,8 +2,8 @@
 
 ## Refurbish
 - Yeet the levelloader system all the way to the depths where it belongs
-- Remove the script system/node editor
-  - It didn't live up to any expectations and didn't work all that well, better to remove it completely and build a new system from scratch
+- ~~Remove the script system/node editor~~
+  - ~~It didn't live up to any expectations and didn't work all that well, better to remove it completely and build a new system from scratch~~
 - ~~Make FiskJSON even remotely readable~~
 - Remove or isolate Moonview Mountain from the engine
 - Figure out preinstalled depencies/SDK's and list them on the main readme file
@@ -47,3 +47,5 @@
 - ~~clean up matrix and vector operators to reduce copy operations~~
 - Quickly and quitely hide and murder the pch hack
 - Add animations back to modelviewer, maybe its own editor?
+- Write a new script system + editor
+- Update imgui version
