@@ -2,7 +2,9 @@
 #include "GBPhysXKinematicComponent.h"
 #include "AnimationComponent.h"
 #include "GBPhysX.h"
-#include "DebugDrawer.h"
+
+#include "Game\Mesh.h"
+
 #ifdef _DEBUG
 #include "Entity.h"
 #endif // _DEBUG

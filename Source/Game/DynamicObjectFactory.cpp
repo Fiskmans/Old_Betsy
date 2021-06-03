@@ -2,13 +2,13 @@
 #include "DynamicObjectFactory.h"
 #include "Entity.h"
 #include "DataStructs.h"
-#include "ObjectPool.hpp"
 #include "ComponentLake.h"
 #include "Mesh.h"
 #include "Collision.h"
 #include "GBPhysX.h"
 #include "GBPhysXComponent.h"
 #include "Random.h"
+#include "Game\LifeTime.h"
 
 DynamicObjectFactory::DynamicObjectFactory() :
 	myOctree(nullptr),

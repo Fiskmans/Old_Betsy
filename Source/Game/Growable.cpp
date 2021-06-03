@@ -4,6 +4,7 @@
 #include "GrowthSpot.h"
 #include "GBPhysXStaticComponent.h"
 #include <Random.h>
+#include "Game\Mesh.h"
 
 Growable::~Growable()
 {

@@ -1,6 +1,5 @@
 #pragma once
-#include <Singleton.hpp>
-#include <Vector3.hpp>
+#include "CommonUtilities\Singleton.hpp"
 #include <Grid.h>
 
 class WindSystem : public CommonUtilities::Singleton<WindSystem>

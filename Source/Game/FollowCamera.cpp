@@ -1,16 +1,11 @@
 #include "pch.h"
 #include "FollowCamera.h"
 #include "Entity.h"
-#include "Matrix.hpp"
 #include "Scene.h"
 #include "Camera.h"
 
 #include "DebugDrawer.h"
 #include "perlin_noise.h"
-
-#if USEIMGUI
-#include <imgui.h>
-#endif // !USEIMGUI
 
 
 FollowCamera::FollowCamera() :

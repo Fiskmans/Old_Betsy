@@ -1,9 +1,5 @@
 #include "pch.h"
 #include "FadeScreen.h"
-
-#if USEIMGUI
-#include <imgui.h>
-#endif // USEIMGUI
 #include "SpriteInstance.h"
 
 

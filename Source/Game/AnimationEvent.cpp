@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "AnimationComponent.h"
 #include "ComponentLake.h"
+#include "Game\Mesh.h"
 
 AnimationEvent::AnimationEvent() :
 	myEventTimer(0.0f),

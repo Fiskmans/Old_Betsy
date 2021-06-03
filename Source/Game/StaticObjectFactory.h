@@ -1,8 +1,6 @@
 #pragma once
 #include "Observer.hpp"
 #include "Publisher.hpp"
-#include "Vector3.hpp"
-#include <vector>
 #include "ObjectPoolSizes.h"
 #include "Spline.h"
 #include "UIManager.h"

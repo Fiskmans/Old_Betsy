@@ -1,5 +1,5 @@
 #pragma once
-#include "Vector3.hpp"
+
 class Camera;
 struct ID3D11ShaderResourceView;
 

@@ -1,9 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "Publisher.hpp"
-#include <Vector3.hpp>
-#include <set>
-//#include <imgui.h>
+#include "CommonUtilities\Ray.hpp"
 
 class Entity;
 enum class EntityType;
@@ -27,7 +25,7 @@ public:
 
 	void OnCollide(Collision* aCollitionComponent);
 	void OnCollide(Entity* aCollidingEntity, bool aColliderIsFriendly, int aDamageValue);
-	void Collide(CU::Ray<float>& aRay);
+	void Collide(CommonUtilities::Ray<float>& aRay);
 	
 	void SetIsFriendly(bool aIsFriendly);
 	void SetCollisionRadius(float aRadius);

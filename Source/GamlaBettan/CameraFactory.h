@@ -1,7 +1,8 @@
 #pragma once
-class Camera;
-class WindowHandler;
 
+#include "GamlaBettan\Camera.h"
+
+class WindowHandler;
 
 class CCameraFactory
 {

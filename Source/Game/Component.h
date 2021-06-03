@@ -2,17 +2,17 @@
 
 #include <typeindex>
 #include "EntityMessage.h"
+#include "Game\Item.h"
+#include "Game\Entity.h"
 
-struct ImGuiNodePackage;
-class Entity;
 enum class EntityType;
 
 class ComponentLake;
 
 class Component
 {
-	friend class Entity;
-	friend class ComponentLake;
+	friend Entity;
+	friend ComponentLake;
 public:
 	Component();
 	virtual ~Component();

@@ -4,7 +4,6 @@
 #include "ModelInstance.h"
 #include <bitset>
 #include <SlabRay.h>
-#include <AABB3D.hpp>
 #include <Octree.h>
 
 #include "AssetManager.h"

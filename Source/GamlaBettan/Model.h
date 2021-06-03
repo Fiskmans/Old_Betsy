@@ -6,15 +6,11 @@
 #include <dxgiformat.h> // DXGI_FORMAT enum
 #pragma warning(pop)
 
-#include <FileWatcher.h>
-#include <vector>
-#include <AABB3D.hpp>
-
-#include "Macros.h"
 #include <MetricValue.h>
 
 #include "AnimationData.h"
-#include "Asset.h"
+
+#include "CommonUtilities/AABB3D.hpp"
 
 struct ID3D11Buffer;
 struct ID3D11PixelShader;

@@ -1,9 +1,6 @@
 #pragma once
 #include "Observer.hpp"
-#include "Vector3.hpp"
-#include <vector>
 #include "ObjectPoolSizes.h"
-#include <imgui.h>
 
 namespace CommonUtilities
 {

@@ -5,6 +5,7 @@
 #include "PlantLoader.h"
 #include "AnimationComponent.h"
 #include "DataStructs.h"
+#include "Game\Audio.h"
 
 WildPlant::WildPlant()
 {
@@ -26,7 +27,7 @@ void WildPlant::Init(Entity* aEntity)
 	SetPlantTypeID(mySeedIds[randomIndex]);
 
 	auto plantInstance = PlantLoader::GetInstance().GetPlant(mySeedMap[myPlantTypeID]);
-	myPlantModelName = plantInstance->myBasePlant->myStages.back().myModelPath;
+	myPlantModelName = ""; // plantInstance->myBasePlant->myStages.back().myModelPath;
 
 	SAFE_DELETE(plantInstance);
 }

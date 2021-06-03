@@ -1,12 +1,12 @@
 #pragma once
 #include "Component.h"
-#include "Observer.hpp"
-#include "AABB2D.h"
+
+#include "Game\Item.h"
+#include "Tools\Observer.hpp"
 
 #define INVENTORYSIZE 30
 #define TOOLBARSIZE 10
 
-class Item;
 class Scene;
 class TextFactory;
 class SpriteFactory;

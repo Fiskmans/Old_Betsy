@@ -1,12 +1,11 @@
 #pragma once
-#include <vector>
 #include "PointLight.h"
 #include "FullscreenRenderer.h"
 #include <Observer.hpp>
-#include <unordered_map>
 #include "SpotLight.h"
 #include "GBuffer.h"
 #include "ShaderFlags.h"
+#include "GamlaBettan\Decal.h"
 
 class Scene;
 class RenderStateManager;
@@ -20,9 +19,9 @@ public:
 	DeferredRenderer() = default;
 	~DeferredRenderer() = default;
 
-	bool Init(class DirectX11Framework* aFramework,AssetHandle aPerlinHandle, DepthRenderer* aShadowRenderer);
+	bool Init(DirectX11Framework* aFramework,AssetHandle aPerlinHandle, DepthRenderer* aShadowRenderer);
 
-	std::vector<class ModelInstance*> GenerateGBuffer(class Camera* aCamera, std::vector<class ModelInstance*>& aModelList, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<class Decal*>& aDecals, GBuffer* aGBuffer,GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer, Scene* aScene,FullscreenTexture* aDepth,BoneTextureCPUBuffer& aBoneTextureBuffer);
+	std::vector<ModelInstance*> GenerateGBuffer(Camera* aCamera, std::vector<ModelInstance*>& aModelList, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer,GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer, Scene* aScene,FullscreenTexture* aDepth,BoneTextureCPUBuffer& aBoneTextureBuffer);
 
 	void Render(FullscreenRenderer& aFullscreenRenderer, std::vector<PointLight*>& aPointLightList, std::vector<SpotLight*>& aSpotLightList, Scene* aScene, RenderStateManager* aRenderStateManager, std::unordered_map<ModelInstance*, short>& aBoneMapping);
 

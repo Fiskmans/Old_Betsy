@@ -7,9 +7,6 @@
 #include <Xinput.h>
 #include "GameState.h"
 
-#include <rapidjson/document.h>
-#include <rapidjson/filereadstream.h>
-
 
 template<typename>
 struct array_size;
@@ -154,46 +151,5 @@ GameState* LevelSelectState::CreateGameState(const int& aStartLevel)
 
 void LevelSelectState::InitLayout(SpriteFactory* aSpritefactory)
 {
-	rapidjson::Document levelDoc;
-
-#pragma warning(suppress : 4996)
-	FILE* fp = fopen("Data\\Textures\\Gui\\LevelSelectlayout.json", "rb");
-	char readBuffer[4096];
-	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-	levelDoc.ParseStream(is);
-	fclose(fp);
-
-	std::string imagesPath = levelDoc["ImagesPath"].GetString();
-
-	myBackButton.Init(imagesPath, levelDoc["BackButton"]["name"].GetString(), { levelDoc["BackButton"]["PosX"].GetFloat(),  levelDoc["BackButton"]["PosY"].GetFloat() }, V2F(0.545f, 1.f), aSpritefactory);
-
-	for (int i = 0; i < myLevelButtons.size(); ++i)
-	{
-		myLevelButtons[i].Init(imagesPath, levelDoc["LevelButtons"][i]["Name"].GetString(), { levelDoc["LevelButtons"][i]["PosX"].GetFloat(),  levelDoc["LevelButtons"][i]["PosY"].GetFloat() }, V2F(0.53f, 0.59f), aSpritefactory);
-	}
-
-	myBackButton.SetOnPressedFunction([this]
-	{
-		Message message;
-		message.myMessageType = MessageType::PopState;
-		message.myBool = false;
-		Publisher::SendMessages(message);
-	});
-
-	for (int i = 0; i < myLevelButtons.size(); ++i)
-	{
-		myLevelButtons[i].SetOnPressedFunction([this, i]
-		{
-			Message message;
-			message.myMessageType = MessageType::PopState;
-			message.myBool = false;
-			Publisher::SendMessages(message);
-
-			message.myMessageType = MessageType::PushState;
-			message.myData = CreateGameState(i);
-
-			Publisher::SendMessages(message);
-		});
-	}
-
+	SYSERROR("Level select no longer works");
 }

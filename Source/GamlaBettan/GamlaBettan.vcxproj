@@ -100,7 +100,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -118,7 +118,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -138,7 +138,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PreprocessorDefinitions>_RELEASE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -160,7 +160,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Solutiondir)Tools\;$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;$(Solutiondir)CommonUtilities\CommonUtilities\;$(solutiondir)IMGui\imgui_ne\NodeEditor\Include\;$(solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(SolutionDir)Precompiled\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Logger.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PreprocessorDefinitions>_RETAIL;NDEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -186,16 +186,12 @@
     <ClCompile Include="Animator.cpp" />
     <ClCompile Include="Asset.cpp" />
     <ClCompile Include="AssetImportHelpers.cpp" />
-    <ClCompile Include="AssetLoader.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="CinematicTarget.cpp" />
     <ClCompile Include="DecalFactory.cpp" />
     <ClCompile Include="LevelLoader.cpp" />
     <ClCompile Include="NavMeshLoader.cpp" />
-    <ClCompile Include="BlueprintUtilities\Source\ax\Builders.cpp" />
-    <ClCompile Include="BlueprintUtilities\Source\ax\Drawing.cpp" />
-    <ClCompile Include="BlueprintUtilities\Source\ax\Widgets.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraFactory.cpp" />
     <ClCompile Include="CameraPan.cpp" />
@@ -261,7 +257,6 @@
     <ClInclude Include="Animator.h" />
     <ClInclude Include="Asset.h" />
     <ClInclude Include="AssetImportHelpers.h" />
-    <ClInclude Include="AssetLoader.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="CinematicTarget.h" />
@@ -269,10 +264,6 @@
     <ClInclude Include="DecalFactory.h" />
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="NavMeshLoader.h" />
-    <ClInclude Include="BlueprintUtilities\Include\ax\Builders.h" />
-    <ClInclude Include="BlueprintUtilities\Include\ax\Drawing.h" />
-    <ClInclude Include="BlueprintUtilities\Include\ax\Math2D.h" />
-    <ClInclude Include="BlueprintUtilities\Include\ax\Widgets.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraFactory.h" />
     <ClInclude Include="CameraPan.h" />
@@ -340,9 +331,6 @@
     <ClInclude Include="WindSystem.h" />
     <ClInclude Include="WwiseFramework.h" />
     <ClInclude Include="Wwise_IDs.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="BlueprintUtilities\Include\ax\Math2D.inl" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GamlaBettan.rc" />

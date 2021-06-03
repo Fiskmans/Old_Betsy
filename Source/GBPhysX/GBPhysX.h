@@ -1,8 +1,6 @@
 #pragma once
-#include <Vector3.hpp>
-#include <Matrix4x4.hpp>
-#include <vector>
 #include "AnimationData.h"
+#include "GamlaBettan\AssImp\scene.h"
 
 namespace physx
 {
@@ -22,14 +20,14 @@ namespace GBPhysXFilters
 	enum CollisionFilter : UINT32
 	{
 		None = 0,
-		Player = 1,
-		Enemy = 2,
-		Bullet = 4,
-		EnvironmentStatic = 8,
-		EnvironmentMoveBlock = 16,
-		EnvironmentDynamic = 32,
-		EnemyHitBox = 64,
-		NavMesh = 128,
+		Player = 1 << 0,
+		Enemy = 1 << 1,
+		Bullet = 1 << 2,
+		EnvironmentStatic = 1 << 3,
+		EnvironmentMoveBlock = 1 << 4,
+		EnvironmentDynamic = 1 << 5,
+		EnemyHitBox = 1 << 6,
+		NavMesh = 1 << 7,
 		All = ~0U
 	};
 }
@@ -183,6 +181,7 @@ private:
 
 	void SetGBPhysXActive(bool aActive);
 	bool myIsActive = false;
+	float myDeltaTime = 0;
 	StaticMeshCooker* myStaticMeshCooker;
 	std::vector<HitBox> myZombieHitBoxes;
 };

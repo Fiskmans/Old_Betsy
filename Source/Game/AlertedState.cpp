@@ -4,6 +4,7 @@
 #include "AIPollingStation.h"
 #include "AIController.h"
 #include "Audio.h"
+#include "Game\Entity.h"
 
 AlertedState::AlertedState(Entity* aParentEntity, AIPollingStation* aPollingStation)
 {

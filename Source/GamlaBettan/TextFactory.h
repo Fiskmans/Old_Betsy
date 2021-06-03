@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-#include "Vector.hpp"
 #include "Observer.hpp"
 
 class TextInstance;

@@ -1,5 +1,8 @@
 #include "pch.h"
+
 #include "AssetManager.h"
+
+#include "ModelLoader.h"
 #include "TextureLoader.h"
 #include "LevelLoader.h"
 #include "NavMeshLoader.h"

@@ -1,10 +1,8 @@
 #include "pch.h"
 #include "ParticleRenderer.h"
 #include <d3d11.h>
-#include <Matrix4x4.hpp>
 #include "Camera.h"
 #include "DirectX11Framework.h"
-#include <imgui.h>
 #include "PostMaster.hpp"
 #include "TextureLoader.h"
 

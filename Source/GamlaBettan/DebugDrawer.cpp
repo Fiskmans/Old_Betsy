@@ -1,15 +1,14 @@
 #include "pch.h"
 #include "DebugDrawer.h"
-#include <d3d11.h>
 #include "DirectX11Framework.h"
-#include <Matrix4x4.hpp>
 #include "ModelLoader.h"
 #include "Camera.h"
 #include "ShaderCompiler.h"
 #include "ModelInstance.h"
 #include "Model.h"
 #include "ShaderFlags.h"
-#include "Intersection.hpp"
+#include "CommonUtilities\Intersection.hpp"
+
 #include <d3dcompiler.h>
 
 #include "AssetManager.h"

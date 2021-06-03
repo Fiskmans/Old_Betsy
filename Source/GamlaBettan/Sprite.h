@@ -1,6 +1,5 @@
 #pragma once
 #include <d3dcommon.h>
-#include "Vector2.hpp"
 #include "Observer.hpp"
 
 struct ID3D11Buffer;

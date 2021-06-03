@@ -1,5 +1,7 @@
 #pragma once
 #include "Component.h"
+#include "GBPhysX\GBPhysX.h"
+
 class GrowthSpot : public Component, public Observer, public Publisher
 {
 public:

@@ -1,9 +1,8 @@
 // Launcher.cpp : Defines the entry point for the application.
 
 #include <pch.h>
-#include <Windows.h>
 #include <DbgHelp.h>
-#include <ScreenGrab.h>
+#include "DirectXTK\Inc\ScreenGrab.h"
 
 int Run();
 

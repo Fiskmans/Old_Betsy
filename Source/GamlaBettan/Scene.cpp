@@ -3,23 +3,15 @@
 #include "Camera.h"
 #include "ModelInstance.h"
 #include "PointLight.h"
-#include <Intersection.hpp>
-#include "DebugTools.h"
-#include "DebugDrawer.h"
 #include "ParticleInstance.h"
-#include <Sphere.hpp>
 #include <SlabRay.h>
-#include <Ray.hpp>
-#include <Intersection.hpp>
+#include "CommonUtilities\Ray.hpp"
+#include "CommonUtilities\Intersection.hpp"
 #include "WindSystem.h"
-#include <Sphere.hpp>
+#include "CommonUtilities\Sphere.hpp"
 #include "SpriteInstance.h"
 #include "ProgressBar.h"
 #include "TextInstance.h"
-
-#if USEIMGUI
-#include <imgui.h>
-#endif
 
 Scene::~Scene()
 {

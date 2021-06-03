@@ -1,19 +1,10 @@
 #include <pch.h>
 #include "Logger.h"
-#include <chrono>
-#include <ctime>
-#include <time.h>
 #include <WinUser.h>
 #include <ShObjIdl.h>
-#if USEIMGUI
-#include <imgui.h>
-#include <WindowControl.h>
-#endif
 #ifdef _DEBUG
 #include "../GamlaBettan/DebugTools.h"
 #endif // _DEBUG
-
-#include <mutex>
 
 namespace Logger
 {

@@ -1,9 +1,6 @@
 #pragma once
-#include <unordered_map>
+#include "CommonUtilities\Singleton.hpp"
 
-#include "Singleton.hpp"
-
-#include "Asset.h"
 #include "ShaderFlags.h"
 #include "TextureLoader.h"
 #include "ShaderCompiler.h"

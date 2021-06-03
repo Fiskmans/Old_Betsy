@@ -1,7 +1,6 @@
 #pragma once
 #include "CinematicEvent.h"
-#include <string>
-#include <Vector3.hpp>
+
 class ParticleInstance;
 class Scene;
 

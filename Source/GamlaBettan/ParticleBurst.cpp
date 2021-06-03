@@ -3,13 +3,6 @@
 #include "ParticleInstance.h"
 #include "Scene.h"
 #include "ParticleFactory.h"
-#include "FiskJSON.h"
-#if USEIMGUI
-#include <imgui.h>
-#endif
-#ifdef _DEBUG
-#include "DebugTools.h"
-#endif
 
 void ParticleBurst::Update(float aTime)
 {

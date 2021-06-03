@@ -10,14 +10,8 @@
 #include "AssetManager.h"
 
 #if USEIMGUI
-#include <imgui.h>
 #include "Scene.h"
 #include "Camera.h"
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
-#endif
-#ifdef _DEBUG
-#include "DebugTools.h"
 #endif
 
 #pragma region ParticleSaveVersionHandling

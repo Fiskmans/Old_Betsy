@@ -5,6 +5,7 @@
 #include "TextFactory.h"
 #include "TextInstance.h"
 #include "AssetManager.h"
+#include "GamlaBettan\Scene.h"
 
 AcceptInteraction::AcceptInteraction():
 	myInteractionActive(false)

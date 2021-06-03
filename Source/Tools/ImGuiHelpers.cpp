@@ -6,6 +6,8 @@
 #include "FullscreenTexture.h"
 #include "FullscreenTextureFactory.h"
 #include "Sprite.h"
+#include "GamlaBettan\Camera.h"
+#include "GamlaBettan\PathFinder.h"
 
 namespace Tools
 {

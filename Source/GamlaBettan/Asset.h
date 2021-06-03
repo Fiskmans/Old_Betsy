@@ -1,7 +1,5 @@
 #pragma once
 
-#include <atomic>
-
 #include "ShaderFlags.h"
 #include "SpriteFontInclude.h"
 #include "LevelLoader.h"

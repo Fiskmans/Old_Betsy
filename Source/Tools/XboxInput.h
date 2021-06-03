@@ -1,7 +1,5 @@
 #pragma once
-#include "..//CommonUtilities/CommonUtilities/Vector2.hpp"
 
-#include <windows.h>
 #include <Xinput.h>
 
 //#pragma comment(lib, "XInput.lib")
@@ -28,8 +26,8 @@ namespace CommonUtilities
 		void Update();
 		bool CheckIfInDeadZone();
 		// Controll Checking
-		Vector2<float> GetRightStick_Pos();
-		Vector2<float> GetLeftStick_Pos();
+		V2F GetRightStick_Pos();
+		V2F GetLeftStick_Pos();
 		bool LeftStickInDeadzone();
 		bool RightStickInDeadzone();
 

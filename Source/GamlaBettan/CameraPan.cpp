@@ -1,11 +1,6 @@
 #include "pch.h"
 #include "CameraPan.h"
 #include "Camera.h"
-#include "FiskJSON.h"
-#include "DebugDrawer.h"
-#if USEIMGUI
-#include <imgui.h>
-#endif
 
 CameraPan::CameraPan(V3F aStart, V3F aEnd) : myPath(aEnd)
 {

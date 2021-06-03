@@ -4,7 +4,6 @@
 #include "ComponentLake.h"
 
 #if USEIMGUI
-#include <imgui.h>
 #include "ImGuiPackage.h"
 #endif // !_RETAIL
 

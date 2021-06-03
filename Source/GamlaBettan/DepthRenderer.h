@@ -3,7 +3,10 @@
 class DirectX11Framework;
 class PixelShader;
 class SpotLight;
+class PointLight;
+class EnvironmentLight;
 struct Decal;
+
 class DepthRenderer
 {
 public:

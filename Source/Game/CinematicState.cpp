@@ -14,8 +14,7 @@
 #include <MoveObject.h>
 #include <PlayAnimation.h>
 
-
-#include <FiskJSON.h>
+#include "GamlaBettan\ModelInstance.h"
 
 
 bool CinematicState::Init(const std::string& aManuscript, Scene* aScene, ParticleFactory* aParticleFactory, SpriteFactory* aSpriteFactory)

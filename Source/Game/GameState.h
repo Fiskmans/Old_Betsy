@@ -1,23 +1,13 @@
 #pragma once
 #include "GameWorld.h"
-#include <string>
-#include <map>
 #include <Spline.h>
 #include "Publisher.hpp"
 #include "BaseState.h"
 #include <MetricValue.h>
-#include <Macros.h>
-#include <array>
 #include "TimerController.h"
 #include "SpotLightFactory.h"
 #include "DecalFactory.h"
 #include "DataStructs.h"
-#include <unordered_set>
-#include "../TClient/TClient.h"
-
-#if USEFILEWATHCER
-#include <FileWatcher.h>
-#endif // !_RETAIL
 
 class NodePollingStation;
 class Scene;

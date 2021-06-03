@@ -1,9 +1,5 @@
 #pragma once
 
-#include "AABB3D.hpp"
-#include <vector>
-#include <queue>
-
 class SlabRay;
 class Collision;
 class Entity;

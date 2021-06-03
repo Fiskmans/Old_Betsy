@@ -145,8 +145,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)GBPhysX\;$(SolutionDir)Tools\;$(SolutionDir)CommonUtilities\CommonUtilities\;$(SolutionDir)GBPhysX\foundation\;$(SolutionDir)GBPhysX\source\physxextensions\src;$(SolutionDir)GBPhysX\include\;$(SolutionDir)GBPhysX\source\foundation\include;$(SolutionDir)GBPhysX\source\geomutils\include;$(SolutionDir)GBPhysX\source\geomutils\src;$(SolutionDir)GBPhysX\source\geomutils\src\contact;$(SolutionDir)GBPhysX\source\geomutils\src\common;$(SolutionDir)GBPhysX\source\geomutils\src\convex;$(SolutionDir)GBPhysX\source\geomutils\src\distance;$(SolutionDir)GBPhysX\source\geomutils\src\sweep;$(SolutionDir)GBPhysX\source\geomutils\src\gjk;$(SolutionDir)GBPhysX\source\geomutils\src\intersection;$(SolutionDir)GBPhysX\source\geomutils\src\mesh;$(SolutionDir)GBPhysX\source\geomutils\src\hf;$(SolutionDir)GBPhysX\source\geomutils\src\pcm;$(SolutionDir)GBPhysX\source\geomutils\src\ccd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)include/;$(ProjectDir)source/foundation/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,8 +161,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)GBPhysX\;$(SolutionDir)Tools\;$(SolutionDir)CommonUtilities\CommonUtilities\;$(SolutionDir)GBPhysX\foundation\;$(SolutionDir)GBPhysX\source\physxextensions\src;$(SolutionDir)GBPhysX\include\;$(SolutionDir)GBPhysX\source\foundation\include;$(SolutionDir)GBPhysX\source\geomutils\include;$(SolutionDir)GBPhysX\source\geomutils\src;$(SolutionDir)GBPhysX\source\geomutils\src\contact;$(SolutionDir)GBPhysX\source\geomutils\src\common;$(SolutionDir)GBPhysX\source\geomutils\src\convex;$(SolutionDir)GBPhysX\source\geomutils\src\distance;$(SolutionDir)GBPhysX\source\geomutils\src\sweep;$(SolutionDir)GBPhysX\source\geomutils\src\gjk;$(SolutionDir)GBPhysX\source\geomutils\src\intersection;$(SolutionDir)GBPhysX\source\geomutils\src\mesh;$(SolutionDir)GBPhysX\source\geomutils\src\hf;$(SolutionDir)GBPhysX\source\geomutils\src\pcm;$(SolutionDir)GBPhysX\source\geomutils\src\ccd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)include/;$(ProjectDir)source/foundation/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -227,8 +227,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)GBPhysX\;$(SolutionDir)Tools\;$(SolutionDir)CommonUtilities\CommonUtilities\;$(SolutionDir)GBPhysX\foundation\;$(SolutionDir)GBPhysX\source\physxextensions\src;$(SolutionDir)GBPhysX\include\;$(SolutionDir)GBPhysX\source\foundation\include;$(SolutionDir)GBPhysX\source\geomutils\include;$(SolutionDir)GBPhysX\source\geomutils\src;$(SolutionDir)GBPhysX\source\geomutils\src\contact;$(SolutionDir)GBPhysX\source\geomutils\src\common;$(SolutionDir)GBPhysX\source\geomutils\src\convex;$(SolutionDir)GBPhysX\source\geomutils\src\distance;$(SolutionDir)GBPhysX\source\geomutils\src\sweep;$(SolutionDir)GBPhysX\source\geomutils\src\gjk;$(SolutionDir)GBPhysX\source\geomutils\src\intersection;$(SolutionDir)GBPhysX\source\geomutils\src\mesh;$(SolutionDir)GBPhysX\source\geomutils\src\hf;$(SolutionDir)GBPhysX\source\geomutils\src\pcm;$(SolutionDir)GBPhysX\source\geomutils\src\ccd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)include/;$(ProjectDir)source/foundation/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -255,9 +255,6 @@
     <ClCompile Include="GBPhysXSimulationFilterCallback.cpp" />
     <ClCompile Include="SnippetUtils.cpp" />
     <ClCompile Include="StaticMeshCooker.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

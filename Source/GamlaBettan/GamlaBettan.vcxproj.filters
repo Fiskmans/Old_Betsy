@@ -113,16 +113,6 @@
     <ClCompile Include="Environmentlight.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
-    <ClCompile Include="CGraphManager.cpp" />
-    <ClCompile Include="BlueprintUtilities\Source\ax\Builders.cpp">
-      <Filter>BlueprintUtilities</Filter>
-    </ClCompile>
-    <ClCompile Include="BlueprintUtilities\Source\ax\Drawing.cpp">
-      <Filter>BlueprintUtilities</Filter>
-    </ClCompile>
-    <ClCompile Include="BlueprintUtilities\Source\ax\Widgets.cpp">
-      <Filter>BlueprintUtilities</Filter>
-    </ClCompile>
     <ClCompile Include="CGraphManager.cpp">
       <Filter>Script</Filter>
     </ClCompile>
@@ -175,9 +165,6 @@
     </ClCompile>
     <ClCompile Include="DecalFactory.cpp" />
     <ClCompile Include="SpriteFontInclude.cpp" />
-    <ClCompile Include="AssetLoader.cpp">
-      <Filter>Loaders</Filter>
-    </ClCompile>
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Asset.cpp" />
     <ClCompile Include="AudioManager.cpp">
@@ -355,19 +342,6 @@
       <Filter>Models</Filter>
     </ClInclude>
     <ClInclude Include="ShaderBuffers.h" />
-    <ClInclude Include="CGraphManager.h" />
-    <ClInclude Include="BlueprintUtilities\Include\ax\Drawing.h">
-      <Filter>BlueprintUtilities</Filter>
-    </ClInclude>
-    <ClInclude Include="BlueprintUtilities\Include\ax\Math2D.h">
-      <Filter>BlueprintUtilities</Filter>
-    </ClInclude>
-    <ClInclude Include="BlueprintUtilities\Include\ax\Widgets.h">
-      <Filter>BlueprintUtilities</Filter>
-    </ClInclude>
-    <ClInclude Include="BlueprintUtilities\Include\ax\Builders.h">
-      <Filter>BlueprintUtilities</Filter>
-    </ClInclude>
     <ClInclude Include="CGraphManager.h">
       <Filter>Script</Filter>
     </ClInclude>
@@ -420,9 +394,6 @@
     <ClInclude Include="DecalFactory.h" />
     <ClInclude Include="SpriteFontInclude.h">
       <Filter>Text</Filter>
-    </ClInclude>
-    <ClInclude Include="AssetLoader.h">
-      <Filter>Loaders</Filter>
     </ClInclude>
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Asset.h" />
@@ -503,9 +474,6 @@
     <Filter Include="Models">
       <UniqueIdentifier>{6f918c4d-192b-4e66-97e8-e6181c37e1b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="BlueprintUtilities">
-      <UniqueIdentifier>{a527ce0a-5272-45f6-b046-966699f29bd2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Script">
       <UniqueIdentifier>{91bac902-4b8d-4a33-934f-5352e7d9f1a2}</UniqueIdentifier>
     </Filter>
@@ -530,11 +498,6 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{97ccdb02-eb23-4d5b-a7f5-897e10f814d1}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="BlueprintUtilities\Include\ax\Math2D.inl">
-      <Filter>BlueprintUtilities</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GamlaBettan.rc" />

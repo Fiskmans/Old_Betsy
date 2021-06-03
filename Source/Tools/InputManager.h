@@ -1,9 +1,7 @@
 #pragma once
 #include "Publisher.hpp"
-#include "Vector2.hpp"
-#include "Secret.h"
-#include <vector>
 #include "Observer.hpp"
+#include "Secret.h"
 
 namespace CommonUtilities
 {

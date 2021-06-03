@@ -9,7 +9,6 @@
 #include "AssetManager.h"
 
 #if USEIMGUI
-#include <imgui.h>
 #include <ImGuiHelpers.h>
 #endif // !_RETAIL
 

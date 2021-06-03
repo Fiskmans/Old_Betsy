@@ -1,9 +1,7 @@
 #pragma once
-#include "Singleton.hpp"
-#include <unordered_map>
+#include "CommonUtilities\Singleton.hpp"
 #include "Event.h"
-#include <array>
-#include "ObjectPool.hpp"
+#include "CommonUtilities\ObjectPool.hpp"
 
 class Entity;
 

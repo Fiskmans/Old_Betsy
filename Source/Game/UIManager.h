@@ -1,8 +1,6 @@
 #pragma once
 #include "Observer.hpp"
-#include "Vector2.hpp"
 #include "Publisher.hpp"
-#include <vector>
 #include "ProgressBar.h"
 #include "Button.h"
 #include "FoodCellar.h"

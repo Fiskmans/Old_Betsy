@@ -1,8 +1,5 @@
 #pragma once
-#include <string>
-#include <unordered_map>
 #include "Observer.hpp"
-#include "Vector2.hpp"
 
 class SpriteInstance;
 class Sprite;

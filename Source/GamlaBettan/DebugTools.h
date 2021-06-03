@@ -1,12 +1,7 @@
 #pragma once
 #ifdef _DEBUG
-#include "ModelLoader.h"
-#include <PlaneVolume.hpp>
-#include <map>
-#include <vector>
-#include <string>
-#include <set>
-#include "../Game/ImGuiPackage.h"
+
+#include "CommonUtilities\PlaneVolume.hpp"
 
 class LightLoader;
 class SlabRay;

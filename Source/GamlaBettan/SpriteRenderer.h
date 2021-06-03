@@ -1,7 +1,4 @@
 #pragma once
-#include "Matrix.hpp"
-#include <vector>
-#include "Vector.hpp"
 
 class DirectX11Framework;
 class SpriteInstance;

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "WindowControl.h"
-#include <imgui.h>
+#include <Tools\imgui\imgui.h>
 
 std::unordered_map<std::string, bool> WindowControl::myOpenWindows;
 void WindowControl::DrawWindowControl()

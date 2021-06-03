@@ -19,48 +19,41 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CommonUtilities\Console.cpp" />
-    <ClCompile Include="CommonUtilities\EventSystem.cpp" />
-    <ClCompile Include="CommonUtilities\Timer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="CommonUtilities\AABB3D.hpp" />
-    <ClInclude Include="CommonUtilities\BinaryTree.hpp" />
-    <ClInclude Include="CommonUtilities\BinaryTreeNode.hpp" />
-    <ClInclude Include="CommonUtilities\Console.hpp" />
-    <ClInclude Include="CommonUtilities\DoublyLinkedList.hpp" />
-    <ClInclude Include="CommonUtilities\DoublyLinkedListNode.hpp" />
-    <ClInclude Include="CommonUtilities\EventSystem.hpp" />
-    <ClInclude Include="CommonUtilities\EventSystemTypes.hpp" />
-    <ClInclude Include="CommonUtilities\Heap.hpp" />
-    <ClInclude Include="CommonUtilities\Intersection.hpp" />
-    <ClInclude Include="CommonUtilities\ObjectPool.hpp" />
-    <ClInclude Include="CommonUtilities\ObjectPoolComplex.hpp" />
-    <ClInclude Include="CommonUtilities\PrototypeFactory.hpp" />
-    <ClInclude Include="CommonUtilities\GrowingArray.hpp" />
-    <ClInclude Include="CommonUtilities\Line.hpp" />
-    <ClInclude Include="CommonUtilities\LineVolume.hpp" />
-    <ClInclude Include="CommonUtilities\Matrix.hpp" />
-    <ClInclude Include="CommonUtilities\Matrix3x3.hpp" />
-    <ClInclude Include="CommonUtilities\Matrix4x4.hpp" />
-    <ClInclude Include="CommonUtilities\NonCopyable.hpp" />
-    <ClInclude Include="CommonUtilities\Singleton.hpp" />
-    <ClInclude Include="CommonUtilities\StateStackEnum.hpp" />
+    <ClInclude Include="AABB2D.h" />
+    <ClInclude Include="AABB3D.hpp" />
+    <ClInclude Include="BinaryTree.hpp" />
+    <ClInclude Include="BinaryTreeNode.hpp" />
+    <ClInclude Include="CommonMath.hpp" />
+    <ClInclude Include="DoublyLinkedList.hpp" />
+    <ClInclude Include="DoublyLinkedListNode.hpp" />
+    <ClInclude Include="EventSystemTypes.hpp" />
+    <ClInclude Include="GrowingArray.hpp" />
+    <ClInclude Include="Heap.hpp" />
+    <ClInclude Include="Intersection.hpp" />
+    <ClInclude Include="Line.hpp" />
+    <ClInclude Include="LineVolume.hpp" />
+    <ClInclude Include="Matrix.hpp" />
+    <ClInclude Include="Matrix3x3.hpp" />
+    <ClInclude Include="Matrix4x4.hpp" />
+    <ClInclude Include="NonCopyable.hpp" />
+    <ClInclude Include="ObjectPool.hpp" />
+    <ClInclude Include="ObjectPoolComplex.hpp" />
+    <ClInclude Include="Plane.hpp" />
+    <ClInclude Include="PlaneVolume.hpp" />
+    <ClInclude Include="PrototypeFactory.hpp" />
+    <ClInclude Include="Queue.hpp" />
+    <ClInclude Include="Ray.hpp" />
+    <ClInclude Include="Singleton.hpp" />
+    <ClInclude Include="Sort.hpp" />
+    <ClInclude Include="Sphere.hpp" />
     <ClInclude Include="Src\NonCopyably.hpp" />
-    <ClInclude Include="CommonUtilities\Plane.hpp" />
-    <ClInclude Include="CommonUtilities\PlaneVolume.hpp" />
-    <ClInclude Include="CommonUtilities\Queue.hpp" />
-    <ClInclude Include="CommonUtilities\Ray.hpp" />
-    <ClInclude Include="CommonUtilities\Sort.hpp" />
-    <ClInclude Include="CommonUtilities\Sphere.hpp" />
-    <ClInclude Include="CommonUtilities\Stack.hpp" />
-    <ClInclude Include="CommonUtilities\StaticArray.hpp" />
-    <ClInclude Include="CommonUtilities\Timer.hpp" />
-    <ClInclude Include="CommonUtilities\Vector.hpp" />
-    <ClInclude Include="CommonUtilities\Vector2.hpp" />
-    <ClInclude Include="CommonUtilities\Vector3.hpp" />
-    <ClInclude Include="CommonUtilities\Vector4.hpp" />
-    <ClInclude Include="CommonUtilities\VectorOnStack.hpp" />
+    <ClInclude Include="Stack.hpp" />
+    <ClInclude Include="StateStackEnum.hpp" />
+    <ClInclude Include="StaticArray.hpp" />
+    <ClInclude Include="Vector.hpp" />
+    <ClInclude Include="Vector2.hpp" />
+    <ClInclude Include="Vector3.hpp" />
+    <ClInclude Include="Vector4.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

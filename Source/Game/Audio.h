@@ -3,7 +3,6 @@
 #include "Component.h"
 #include <vector>
 #include <array>
-#include <Vector3.hpp>
 #include "Observer.hpp"
 
 class AudioManager;

@@ -1,8 +1,6 @@
 #pragma once
 #include "Component.h"
 #include <MetricValue.h>
-#include "Macros.h"
-#include <Vector3.hpp>
 
 class PointLight;
 class Scene;

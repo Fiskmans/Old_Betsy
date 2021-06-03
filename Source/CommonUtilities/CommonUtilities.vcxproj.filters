@@ -15,126 +15,109 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CommonUtilities\Console.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonUtilities\EventSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonUtilities\Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Src\NonCopyably.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\AABB3D.hpp">
+    <ClInclude Include="CommonMath.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\BinaryTree.hpp">
+    <ClInclude Include="AABB2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\BinaryTreeNode.hpp">
+    <ClInclude Include="AABB3D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Console.hpp">
+    <ClInclude Include="BinaryTree.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\DoublyLinkedList.hpp">
+    <ClInclude Include="BinaryTreeNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\DoublyLinkedListNode.hpp">
+    <ClInclude Include="Vector.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\EventSystem.hpp">
+    <ClInclude Include="Vector2.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\EventSystemTypes.hpp">
+    <ClInclude Include="Vector3.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\GrowingArray.hpp">
+    <ClInclude Include="Vector4.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Heap.hpp">
+    <ClInclude Include="DoublyLinkedList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Intersection.hpp">
+    <ClInclude Include="DoublyLinkedListNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Line.hpp">
+    <ClInclude Include="EventSystemTypes.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\LineVolume.hpp">
+    <ClInclude Include="GrowingArray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Matrix.hpp">
+    <ClInclude Include="Heap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Matrix3x3.hpp">
+    <ClInclude Include="Intersection.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Matrix4x4.hpp">
+    <ClInclude Include="Line.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\NonCopyable.hpp">
+    <ClInclude Include="LineVolume.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\ObjectPool.hpp">
+    <ClInclude Include="Matrix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Plane.hpp">
+    <ClInclude Include="Matrix3x3.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\PlaneVolume.hpp">
+    <ClInclude Include="Matrix4x4.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\PrototypeFactory.hpp">
+    <ClInclude Include="NonCopyable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Queue.hpp">
+    <ClInclude Include="ObjectPool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Ray.hpp">
+    <ClInclude Include="ObjectPoolComplex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Sort.hpp">
+    <ClInclude Include="Plane.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Sphere.hpp">
+    <ClInclude Include="PlaneVolume.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Stack.hpp">
+    <ClInclude Include="PrototypeFactory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\StaticArray.hpp">
+    <ClInclude Include="Queue.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Timer.hpp">
+    <ClInclude Include="Ray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Vector.hpp">
+    <ClInclude Include="Singleton.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Vector2.hpp">
+    <ClInclude Include="Sort.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Vector3.hpp">
+    <ClInclude Include="Sphere.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\Vector4.hpp">
+    <ClInclude Include="Stack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\VectorOnStack.hpp">
+    <ClInclude Include="StateStackEnum.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtilities\StateStackEnum.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonUtilities\Singleton.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonUtilities\ObjectPoolComplex.hpp">
+    <ClInclude Include="StaticArray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,9 +1,7 @@
 #pragma once
-#include <Matrix3x3.hpp>
-#include <Matrix4x4.hpp>
-#include <Vector2.hpp>
-#include <PlaneVolume.hpp>
-#include "Observer.hpp"
+
+#include "Tools/Observer.hpp"
+#include "CommonUtilities/PlaneVolume.hpp"
 
 namespace CommonUtilities
 {

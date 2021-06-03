@@ -1,9 +1,5 @@
 #pragma once
 #include "Particle.h"
-#include <Vector3.hpp>
-#include <vector>
-#include <Matrix4x4.hpp>
-
 
 class ParticleInstance
 {

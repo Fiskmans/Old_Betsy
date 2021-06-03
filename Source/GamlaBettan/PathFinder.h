@@ -1,9 +1,10 @@
 #pragma once
-#include <Singleton.hpp>
-#include <string>
-#include <SlabRay.h>
-#include <Grid.h>
-#include "NavMeshLoader.h"
+#include "CommonUtilities\Singleton.hpp"
+
+#include "GamlaBettan\NavMeshLoader.h"
+
+#include "Tools\SlabRay.h"
+#include "Tools\Grid.h"
 
 
 class PathFinder : public CommonUtilities::Singleton<PathFinder>

@@ -1,9 +1,5 @@
 #pragma once
-#include <functional>
-#include "Vector4.hpp"
-#include "Vector2.hpp"
 #include "Observer.hpp"
-#include <array>
 
 class SpriteFactory;
 class SpriteInstance;

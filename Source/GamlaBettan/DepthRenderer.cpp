@@ -13,6 +13,8 @@
 #include "Environmentlight.h"
 #include "RenderManager.h"
 #include "AssetManager.h"
+#include "GamlaBettan\Scene.h"
+#include "GamlaBettan\ModelInstance.h"
 
 DepthRenderer::~DepthRenderer()
 {

@@ -1,23 +1,9 @@
 #include "pch.h"
 #include "PathFinder.h"
-#include "DebugDrawer.h"
-#include <set>
-#include <unordered_set>
-#include <queue>
 
+#include "CommonUtilities\Intersection.hpp"
 
-#include <fstream>
-#include <sstream>
-#include <functional>
-
-#include "Intersection.hpp"
-
-#if USEIMGUI
-#include <imgui.h>
-#include "WindowControl.h"
-#endif
-
-#include "NavMeshLoader.h"
+#include "GamlaBettan\NavMeshLoader.h"
 
 PathFinder::PathFinder() :
 	myIsDisabled(false),

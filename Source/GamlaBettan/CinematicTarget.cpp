@@ -1,10 +1,8 @@
 #include "pch.h"
 #include "CinematicTarget.h"
 #include "ModelInstance.h"
-#include "Model.h"
-#ifdef _DEBUG
-#include "imgui.h"
-#endif
+#include "GamlaBettan/Model.h"
+#include "GamlaBettan/Scene.h"
 
 ModelInstance* CinematicTarget::Get()
 {

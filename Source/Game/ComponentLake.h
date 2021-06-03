@@ -1,15 +1,14 @@
 #pragma once
 
+#include "CommonUtilities\ObjectPool.hpp"
+#include "CommonUtilities\Singleton.hpp"
+
 #define MAX_GAMEOBJECT 1000
 
 
 template<class T>
 struct ComponentCount { size_t Count = MAX_GAMEOBJECT; };
 
-#include <typeindex>
-#include "ObjectPool.hpp"
-#include "Singleton.hpp"
-#include <unordered_map>
 
 class ModelLoader;
 class Scene;

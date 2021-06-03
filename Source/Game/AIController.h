@@ -1,9 +1,7 @@
 #pragma once
 #include "Component.h"
 
-#include "Macros.h"
 #include "Publisher.hpp"
-#include "Vector3.hpp"
 
 class AIBaseState;
 class AIPollingStation;

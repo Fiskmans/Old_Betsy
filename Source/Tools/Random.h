@@ -1,5 +1,4 @@
 #pragma once
-#include <Vector.hpp>
 namespace Tools
 {
 	float RandomNormalized();

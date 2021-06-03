@@ -1,8 +1,10 @@
 #include <pch.h>
 #include "Button.h"
-#include "..\\GamlaBettan\SpriteInstance.h"
-#include "..\\GamlaBettan\SpriteFactory.h"
+#include "GamlaBettan\Scene.h"
+#include "GamlaBettan\SpriteInstance.h"
+#include "GamlaBettan\SpriteFactory.h"
 #include "PostMaster.hpp"
+
 SpriteFactory* Button::ourSpriteFactoryPtr = nullptr;
 
 Button::Button()

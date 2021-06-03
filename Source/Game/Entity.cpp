@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Entity.h"
-#include "Vector.hpp"
 #include "Component.h"
 #include "Macros.h"
 #include "Random.h"
@@ -9,14 +8,6 @@
 #include "Growable.h"
 #include "GrowthSpot.h"
 #include "House.h"
-
-#if USEIMGUI
-#include <imgui.h>
-#include "ImGuiPackage.h"
-#endif // !_RETAIL
-#include <chrono>
-
-
 
 Entity::Entity() :
 	myIsAlive(false),

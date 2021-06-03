@@ -1,7 +1,4 @@
 #pragma once
-#include <string>
-#include "Vector2.hpp"
-#include "Vector4.hpp"
 
 class FontData;
 

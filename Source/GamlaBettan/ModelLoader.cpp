@@ -11,8 +11,6 @@
 #include "Scene.h"
 #include "Macros.h"
 #include "NameThread.h"
-#include <Vector4.hpp>
-#include <Vector3.hpp>
 #include "TextureLoader.h"
 #include <queue>
 #include <stack>

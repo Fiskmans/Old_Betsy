@@ -1,6 +1,5 @@
 #pragma once
 #include "CinematicEvent.h"
-#include <Vector3.hpp>
 #include "CinematicPath.h"
 #include "CinematicTarget.h"
 class ModelInstance;

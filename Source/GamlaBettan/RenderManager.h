@@ -15,7 +15,12 @@
 #include "GBuffer.h"
 #include "TextRenderer.h"
 
+#include "GamlaBettan\DirectX11Framework.h"
+#include "GamlaBettan\WindowHandler.h"
+#include "GamlaBettan\Scene.h"
+
 class SpriteRenderer;
+struct ID3D11ShaderResourceView;
 
 class RenderManager : public Observer
 {
@@ -23,13 +28,13 @@ public:
 	RenderManager();
 	~RenderManager() = default;
 
-	bool Init(class DirectX11Framework* aFramework, class WindowHandler* aWindowHandler);
+	bool Init(DirectX11Framework* aFramework, WindowHandler* aWindowHandler);
 	bool Release();
 
 	void BeginFrame(float aClearColor[4]);
 	void EndFrame();
 
-	void Render(class Scene* aScene);
+	void Render(Scene* aScene);
 	void RenderMovie(const std::vector<SpriteInstance*>& aSpriteList);
 	void RenderSprites(const std::vector<SpriteInstance*>& aSpriteList, const bool aShouldRenderExtraSprites = false);
 	void RenderText(const std::vector<TextInstance*>& aTextList);
@@ -68,8 +73,8 @@ private:
 	TextRenderer myTextRenderer;
 	HighlightRenderer myHighlightRenderer;
 	DepthRenderer myShadowRenderer;
-	class DirectX11Framework* myFrameworkPtr;
-	struct ID3D11ShaderResourceView* myBoneTextureView = nullptr;
+	DirectX11Framework* myFrameworkPtr;
+	ID3D11ShaderResourceView* myBoneTextureView = nullptr;
 	AssetHandle myPerlinView;
 	AssetHandle	myRandomNormal;
 

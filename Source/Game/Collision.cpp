@@ -1,15 +1,14 @@
 #include "pch.h"
 #include "Collision.h"
 #include "Entity.h"
-#include "AABB3D.hpp"
 #include "Audio.h"
 #include "Mesh.h"
 #include "Model.h"
 #include "DebugDrawer.h"
-#include "Sphere.hpp"
+#include "CommonUtilities\Sphere.hpp"
 #include "Life.h"
 #include "GBPhysX.h"
-#include "Intersection.hpp"
+#include "CommonUtilities\Intersection.hpp"
 #include "GBPhysXComponent.h"
 
 

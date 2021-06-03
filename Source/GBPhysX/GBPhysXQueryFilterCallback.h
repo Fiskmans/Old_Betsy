@@ -1,8 +1,8 @@
 #pragma once
-#include "PxQueryFiltering.h"
-#include "PxShape.h"
-#include "PxRigidActor.h"
-#include "include/characterkinematic/PxController.h"
+#include "GBPhysX\include\PxQueryFiltering.h"
+#include "GBPhysX\include\PxShape.h"
+#include "GBPhysX\include\PxRigidActor.h"
+#include "GBPhysX\include\characterkinematic\PxController.h"
 using namespace physx;
 
 class GBPhysXQueryFilterCallback : public PxQueryFilterCallback

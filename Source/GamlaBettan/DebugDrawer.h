@@ -1,15 +1,10 @@
 #pragma once
-#include <Singleton.hpp>
-#include <Vector3.hpp>
-#include <Vector4.hpp>
-#include <vector>
-#include "Macros.h"
-#include <Sphere.hpp>
-#include <AABB3D.hpp>
-#include <AABB2D.h>
-#include "Matrix4x4.hpp"
-#include <Plane.hpp>
-#include <PlaneVolume.hpp>
+
+#include "CommonUtilities/Singleton.hpp"
+#include "CommonUtilities/AABB3D.hpp"
+#include "CommonUtilities/AABB2D.h"
+#include "CommonUtilities/Plane.hpp"
+#include "CommonUtilities/PlaneVolume.hpp"
 
 class DirectX11Framework;
 struct ID3D11Buffer;

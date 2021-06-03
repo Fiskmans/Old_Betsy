@@ -1,13 +1,7 @@
 #include "pch.h"
 #include "MoveObject.h"
-#if USEIMGUI
-#include <imgui.h>
-#ifdef _DEBUG
-#include "DebugTools.h"
-#endif // _DEBUG
-#endif // USEIMGUI
 #include "ModelInstance.h"
-#include "Ray.hpp"
+#include "CommonUtilities\Ray.hpp"
 #include "SlabRay.h"
 #include "Scene.h"
 #include "Model.h"

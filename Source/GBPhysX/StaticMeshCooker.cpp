@@ -2,15 +2,11 @@
 #pragma warning(push, 1)
 #pragma warning(disable : 26495)
 #include "StaticMeshCooker.h"
-#include "PxPhysicsAPI.h"
+#include "GBPhysX\Include\PxPhysicsAPI.h"
 #include "GBPhysXLibraryDependencies.h"
-#include "PxFoundation.h"
+#include "GBPhysX\Include\PxFoundation.h"
 #pragma warning(pop)
-#include <stack>
 #include "AssetImportHelpers.h"
-#include <fstream>
-
-#include "FiskJSON.h"
 
 #define PHYSICS_MESH_FOLDER "Assets/Physics"
 #define FILEDATA_JSON "Assets/Physics/FileData.json"

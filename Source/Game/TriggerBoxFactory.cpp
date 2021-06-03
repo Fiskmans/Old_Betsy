@@ -2,7 +2,7 @@
 #include "TriggerBoxFactory.h"
 #include "Entity.h"
 #include "DataStructs.h"
-#include "ObjectPool.hpp"
+#include "CommonUtilities\ObjectPool.hpp"
 #include "ComponentLake.h"
 #include "Collision.h"
 

@@ -1,12 +1,6 @@
 #include "pch.h"
 #include "RenderManager.h"
-#include "DirectX11Framework.h"
-#include "WindowHandler.h"
-#include "Scene.h"
 #include "PostMaster.hpp"
-#include <d3d11.h>
-#include <imgui.h>
-#include "DebugDrawer.h"
 #include "Camera.h"
 
 #include "ParticleFactory.h"
@@ -15,11 +9,6 @@
 #include "Model.h"
 
 #include "AssetManager.h"
-
-
-#if USEIMGUI
-#include <ImGuiHelpers.h>
-#endif
 
 float RenderManager::ourTotalTime = 0.f;
 

@@ -1,13 +1,6 @@
 #include "pch.h"
 #include "InputHandler.h"
 #include <Windowsx.h>
-#include <windows.h>
-#include <map>
-#include <vector>
-
-#if USEIMGUI
-#include <imgui.h>
-#endif
 
 namespace CommonUtilities
 {

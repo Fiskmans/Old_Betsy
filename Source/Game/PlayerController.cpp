@@ -4,7 +4,7 @@
 #include "Camera.h"
 #include "Movement3D.h"
 #include "SlabRay.h"
-#include "AABB3D.hpp"
+#include "CommonUtilities\AABB3D.hpp"
 #include "Octree.h"
 #include "Life.h"
 #include "Audio.h"
@@ -22,7 +22,7 @@
 #include "AIController.h"
 #include "TraderAI.h"
 #include "Trader.h"
-#include "Plane.hpp"
+#include "CommonUtilities\Plane.hpp"
 #include "Growable.h"
 #include "PlantLoader.h"
 #include "WaterSource.h"
@@ -33,17 +33,7 @@
 #include "ParticleActivatable.h"
 
 #include <PathFinder.h>
-#if _DEBUG
-#include <DebugTools.h>
-#include <DebugDrawer.h>
-#endif // _DEBUG
 
-
-#pragma warning(push, 1)
-#pragma warning(disable : 26451 26812)
-#include <rapidjson/document.h>
-#include <rapidjson/filereadstream.h>
-#pragma warning(pop)
 
 #define MARKERUPTIME .5f
 

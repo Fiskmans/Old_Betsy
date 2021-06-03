@@ -1,15 +1,6 @@
 #pragma once
-#include <vector>
 #include "ComponentLake.h"
-//
-#include <array>
-#include "Vector.hpp"
-#include "Matrix4x4.hpp"
-#include "EmilsEnums.h"
-#if USEIMGUI
-#include <map>
-#include "ImGuiPackage.h"
-#endif // !_RETAIL
+
 #include "EntityMessage.h"
 #include "Enums.h"
 #include "Component.h"
@@ -43,7 +34,7 @@ public:
 
 	void SetEntityType(EntityType aEntityType);
 	void Spawn();
-	void Spawn(const CommonUtilities::Vector3<float>& aPosition); //Rotation?
+	void Spawn(const V3F& aPosition); //Rotation?
 	void Update(const float aDeltaTime);
 
 	void SendEntityMessage(EntityMessage aMessage, void* someData = nullptr);
@@ -51,7 +42,7 @@ public:
 
 	template<class T>
 	T* AddComponent();
-	
+
 	template<class T>
 	void RemoveComponent();
 	void RemoveAllComponents();
@@ -61,16 +52,16 @@ public:
 
 	void DisableAll();
 	void EnableAll();
-	
+
 	void Dispose();
-	
-	void SetSpawnPos(CommonUtilities::Vector3<float> aSpawnPos);
+
+	void SetSpawnPos(V3F aSpawnPos);
 
 	bool GetIsAlive();
 	bool GetShouldBeRemoved();
 	void SetIsAlive(const bool aIsAlive);
 	void Kill();
-	
+
 	V3F GetForward();
 	V3F GetBack();
 	V3F GetUp();
@@ -81,18 +72,18 @@ public:
 	bool GetIsMoving();
 	void SetIsMoving(const bool aIsMoving);
 
-	CommonUtilities::Vector3<float> GetPosition();
-	void SetPosition(CommonUtilities::Vector3<float> aPosition);
+	V3F GetPosition();
+	void SetPosition(V3F aPosition);
 
 	CommonUtilities::Matrix4x4<float> GetRotation();
-	void SetRotation(CommonUtilities::Vector3<float> aRotation);
+	void SetRotation(V3F aRotation);
 	void SetRotation(CommonUtilities::Matrix4x4<float> aRotationMatrix);
 
-	void SetSavedRotationValues(CommonUtilities::Vector3<float> aRot);
-	CommonUtilities::Vector3<float> GetSavedRotationValues();
+	void SetSavedRotationValues(V3F aRot);
+	V3F GetSavedRotationValues();
 
-	CommonUtilities::Vector3<float> GetScale();
-	void SetScale(CommonUtilities::Vector3<float> aScale);
+	V3F GetScale();
+	void SetScale(V3F aScale);
 
 	EntityType GetEntityType();
 	int GetEntityID();
@@ -110,7 +101,7 @@ public:
 
 	void AddActivity();
 	void FinishActivity();
-	
+
 	void SetSpawnTime(long long aTime);
 	long long GetSpawnTime();
 
@@ -124,8 +115,8 @@ private:
 	std::unordered_map<std::type_index, Component*> myComponents;
 	CommonUtilities::Matrix4x4<float> myRotationMatrix;
 
-	CommonUtilities::Vector3<float> myPosition;
-	CommonUtilities::Vector3<float> myScale;
+	V3F myPosition;
+	V3F myScale;
 
 	EntityType myEntityType;
 	int myDestructibleType;
@@ -140,8 +131,8 @@ private:
 
 	long long mySpawnTime;
 
-	CommonUtilities::Vector3<float> mySpawnPos;
-	CommonUtilities::Vector3<float> mySavedRotationValues;
+	V3F mySpawnPos;
+	V3F mySavedRotationValues;
 };
 
 

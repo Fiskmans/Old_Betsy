@@ -1,6 +1,4 @@
 #pragma once
-#include "Vector4.hpp"
-#include <array>
 #include "Macros.h"
 
 class GBuffer

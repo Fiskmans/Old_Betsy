@@ -4,16 +4,11 @@
 #include "ShaderFlags.h"
 #include "Animator.h"
 #include "TimeHelper.h"
-//#pragma push_macro(MIN)
-//#pragma push_macro(MAX)
 
 #include <GBPhysX.h>
-//#pragma pop_macro(MIN)
-//#pragma pop_macro(MAX)
 
 #if USEIMGUI
 #include "Camera.h"
-#include <imgui.h>
 #endif // !_RETAIL
 
 int ModelInstance::myGlobalEventStatus = 0;

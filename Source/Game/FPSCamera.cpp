@@ -1,17 +1,11 @@
 #include "pch.h"
 #include "FPSCamera.h"
 #include "Entity.h"
-#include "Matrix.hpp"
 #include "Scene.h"
 #include "Camera.h"
 #include "Mesh.h"
 
-#include "DebugDrawer.h"
 #include "perlin_noise.h"
-
-#if USEIMGUI
-#include <imgui.h>
-#endif // !USEIMGUI
 
 
 FPSCamera::FPSCamera() :

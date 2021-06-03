@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <functional>
 
-#include <Matrix4x4.hpp>
 #include "Camera.h"
 #include "Scene.h"
 #include "Environmentlight.h"

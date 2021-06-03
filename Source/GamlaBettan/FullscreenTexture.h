@@ -1,5 +1,4 @@
 #pragma once
-#include <Vector4.hpp>
 
 class FullscreenTexture
 {

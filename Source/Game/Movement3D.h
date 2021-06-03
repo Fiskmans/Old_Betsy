@@ -1,6 +1,5 @@
 #pragma once
 #include "Component.h"
-#include "Vector.hpp"
 #include "Publisher.hpp"
 
 class ModelInstance;

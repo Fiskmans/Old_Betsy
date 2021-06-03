@@ -1,5 +1,4 @@
 #pragma once
-#include "Vector3.hpp"
 #include "Collision.h"
 
 class IntersectionRecord

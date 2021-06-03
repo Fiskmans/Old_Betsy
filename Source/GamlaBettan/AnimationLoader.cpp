@@ -2,9 +2,11 @@
 #include "AnimationLoader.h"
 
 #include "assimp\cimport.h"
-#include "assimp/Importer.hpp"
-#include "assimp/postprocess.h"
+#include "assimp\Importer.hpp"
+#include "assimp\postprocess.h"
 #include "MathFunc.h"
+
+#include "GamlaBettan\AssetImportHelpers.h"
 
 void Animation::GetInterpolation(float aTime, float aWeight, AnimationFrame& aOutSnapshot)
 {

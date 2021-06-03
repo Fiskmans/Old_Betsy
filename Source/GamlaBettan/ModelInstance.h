@@ -1,16 +1,5 @@
 #pragma once
-#include <Matrix3x3.hpp>
-#include <Matrix4x4.hpp>
-#include <Vector3.hpp>
-#include <Vector4.hpp>
-#include <Sphere.hpp>
-#include "Asset.h"
-
-#if USEIMGUI
-#include <map>
-#include <vector>
-#include <string>
-#endif
+#include "CommonUtilities/Sphere.hpp"
 
 class Camera;
 class Animator;

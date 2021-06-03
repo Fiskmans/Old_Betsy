@@ -6,10 +6,7 @@
 #include "GBPhysXKinematicComponent.h"
 #include "AnimationComponent.h"
 #include "Audio.h"
-
-#include <iostream>
-//#include "DebugDrawer.h"
-
+#include "GamlaBettan\PathFinder.h"
 
 SeekTargetState::SeekTargetState(Entity* aEntity, AIPollingStation* aPollingStation) :
 	myEntity(aEntity),

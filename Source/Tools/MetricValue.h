@@ -7,8 +7,8 @@
 #include <sstream>
 #include <vector>
 #include <unordered_map>
-#include <imgui.h>
-#include <Vector3.hpp>
+
+#include "Tools\imgui\imgui.h"
 
 class SerializableMetricValue;
 
@@ -30,10 +30,6 @@ private:
 	static std::vector<std::pair<std::string, SerializableMetricValue*>> myListeners;
 	static std::unordered_map<std::string, std::string> myLoadedMetrics;
 };
-
-
-
-
 
 class SerializableMetricValue
 {

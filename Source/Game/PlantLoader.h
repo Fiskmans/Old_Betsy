@@ -1,5 +1,7 @@
 #pragma once
-#include <Singleton.hpp>
+#include "CommonUtilities\Singleton.hpp"
+#include "Game\Item.h"
+
 #ifdef __INTELLISENSE__
 #include <pch.h>
 #endif

@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "Asset.h"
 
-#include "Model.h"
+#include "ModelInstance.h"
 #include "TextInstance.h"
+#include "GamlaBettan\NavMeshLoader.h"
 
 Asset::Asset(AssetType aType,bool aIsLoaded)
 {

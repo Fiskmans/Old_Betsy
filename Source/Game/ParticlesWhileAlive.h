@@ -1,7 +1,5 @@
 #pragma once
 #include "Component.h"
-#include <Vector3.hpp>
-#include <vector>
 
 class ParticleFactory;
 class Scene;

@@ -1,6 +1,5 @@
 #pragma once
 #include "AIBaseState.h"
-#include "Vector3.hpp"
 
 class AIPollingStation;
 

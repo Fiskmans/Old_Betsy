@@ -15,14 +15,12 @@
 #include "Life.h"
 #include "FollowCamera.h"
 
-#include "..//CommonUtilities/Vector3.hpp"
 #include <ModelLoader.h>
 #include <Scene.h>
 #include "Octree.h"
 #include "IntersectionRecord.h"
 
 #include "ComponentLake.h"
-#include "Sphere.hpp"
 #include "DebugDrawer.h"
 #include "Random.h"
 #include <DebugTools.h>
@@ -60,15 +58,14 @@
 #include <WindSystem.h>
 #include "perlin_noise.h"
 
+#include "GamlaBettan\PathFinder.h"
+
 #if USEIMGUI
-#include <imgui.h>
-#include <WindowControl.h>
 #include <ModelLoader.h>
 #include <LightLoader.h>
 #endif 
 
 #include <Environmentlight.h>
-#include <Intersection.hpp>
 #include "ParticleInstance.h"
 #include <SpotLight.h>
 #include <SpotLightFactory.h>

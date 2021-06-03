@@ -1,7 +1,5 @@
 #pragma once
-#include "Vector.hpp"
 #include "Observer.hpp"
-#include "Matrix.hpp"
 
 class Sprite;
 class Scene;

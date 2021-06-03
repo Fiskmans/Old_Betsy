@@ -2,7 +2,7 @@
 #include "StaticObjectFactory.h"
 #include "Entity.h"
 #include "DataStructs.h"
-#include "ObjectPool.hpp"
+#include "CommonUtilities\ObjectPool.hpp"
 #include "ComponentLake.h"
 #include "Mesh.h"
 #include "Collision.h"
@@ -14,6 +14,7 @@
 #include "WaterSource.h"
 #include "AnimationComponent.h"
 #include "ChickenCoop.h"
+#include "Game\Audio.h"
 
 StaticObjectFactory::StaticObjectFactory() :
 	myOctree(nullptr),

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "FullscreenTexture.h"
-#include "Vector2.hpp"
-#include <dxgiformat.h>
 #include "GBuffer.h"
 
 class DirectX11Framework;

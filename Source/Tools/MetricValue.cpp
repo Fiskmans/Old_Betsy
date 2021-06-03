@@ -1,13 +1,7 @@
 #include <pch.h>
+#include "MetricValue.h"
 
 #if !BAKEVALUES
-
-
-#include "MetricValue.h"
-#include <fstream>
-#include <imgui.h>
-#include "../GamlaBettan/WindowControl.h"
-
 
 std::vector<std::pair<std::string, SerializableMetricValue*>> MetricHandler::myListeners;
 std::unordered_map<std::string, std::string> MetricHandler::myLoadedMetrics;

@@ -1,15 +1,5 @@
 #include "pch.h"
 #include "CinematicEvent.h"
-#include "DebugDrawer.h"
-#include "FiskJSON.h"
-#if USEIMGUI
-#include <imgui.h>
-#include "PathFinder.h"
-#endif
-#ifdef _DEBUG
-#include "DebugTools.h"
-#include "Camera.h"
-#endif
 
 void CinematicEvent::SetTiming(float aStart, float aDuration)
 {

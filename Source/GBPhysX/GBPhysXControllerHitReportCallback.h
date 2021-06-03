@@ -1,5 +1,5 @@
 #pragma once
-#include "characterkinematic/PxController.h"
+#include "GBPhysX\include\characterkinematic\PxController.h"
 
 using namespace physx;
 class GBPhysXControllerHitReportCallback : public PxUserControllerHitReport

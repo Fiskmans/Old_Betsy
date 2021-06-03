@@ -11,6 +11,7 @@
 #include "AnimationComponent.h"
 #include "PlayerController.h"
 #include "AssetManager.h"
+#include "GamlaBettan\Scene.h"
 
 #define NUMBERTEXTOFFSET V2F(0.004f, 0.003f)
 #define TOOLTIPOFFSET V2F(0.004f, 0.00f)

@@ -1,6 +1,4 @@
 #pragma once
-#include "imgui.h"
-#include "Vector.hpp"
 
 class FullscreenRenderer;
 class FullscreenTextureFactory;

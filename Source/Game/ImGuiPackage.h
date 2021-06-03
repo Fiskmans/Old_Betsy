@@ -3,8 +3,7 @@
 #include <map>
 #include <string>
 #include <vector>
-//#include <Spline.h>
-#include <Vector3.hpp>
+
 class Camera;
 
 struct ImGuiNodePackage

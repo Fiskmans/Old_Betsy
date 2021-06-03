@@ -6,20 +6,14 @@
 #include <shellapi.h>
 
 #if USEIMGUI
-#include <SvnIntegration.h>
-#include <future>
-#include <imgui.h>
-#include <imgui_impl_dx11.h>
-#include <imgui_impl_win32.h>
-#include <WindowControl.h>
+#include "Tools\imgui\backend\imgui_impl_dx11.h"
+#include "Tools\imgui\backend\imgui_impl_win32.h"
 #endif // !_RETAIL
 
 #include "AudioManager.h"
 
 
 #include <GraphicEngine.h>
-#include <MemoryChunk.h>
-#define TOTALMEMORYSIZE (1ULL<<28)
 
 
 
@@ -68,26 +62,6 @@ int Run()
 #if USELOGGER
 		AllocConsole();
 #endif
-
-#if USEIMGUI
-
-		char pendingFiles[2048];
-		*pendingFiles = '\0';
-		bool pendingSvn = false;
-		std::future<bool> pendingSvnResult;// = std::async(SvnIntegration::CheckForUpdates, pendingFiles, 2048);
-
-		char svnLogg[8192];
-		svnLogg[0] = '\0';
-		//std::async(SvnIntegration::LogMessages,svnLogg,8192);
-
-#endif // !_RETAIL
-
-#if USEMEMORYCONTROL
-	//Setup memory manegement
-		MemoryChunk* chunk = new MemoryChunk(TOTALMEMORYSIZE);
-		Allocator* allocator = new NewFromMemoryBlock(chunk);
-		Memory::SetGlobalAllocator(allocator);
-#endif // USEMEMORYCONTROL
 
 
 		{
@@ -177,12 +151,6 @@ int Run()
 			{
 				{
 					PERFORMANCETAG("Main loop");
-#if USEIMGUI
-					if (pendingSvnResult.valid() && pendingSvnResult.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
-					{
-						pendingSvn = pendingSvnResult.get();
-					}
-#endif // !_RETAIL
 
 #ifdef _RETAIL
 					while (ShowCursor(FALSE) >= 0)
@@ -209,21 +177,6 @@ int Run()
 					ImGui::NewFrame();
 
 					WindowControl::DrawWindowControl();
-
-					if (pendingSvn)
-					{
-						ImGui::SetNextWindowPos(ImVec2(1100, 20), ImGuiCond_Appearing);
-						if (ImGui::Begin("New update available! (V)owo(V)", &pendingSvn, ImGuiWindowFlags_NoResize))
-						{
-							if (ImGui::Button("Update"))
-							{
-								SvnIntegration::Update();
-								pendingSvn = false;
-							}
-							ImGui::Text(pendingFiles);
-						}
-						ImGui::End();
-					}
 #if USELOGGER
 					WindowControl::Window("Console log", []()
 						{
@@ -289,79 +242,12 @@ int Run()
 							ImGui::PlotLines(("FPS " + (std::to_string(fps).substr(0, 4))).c_str(), fpsTracker, trackerSize, 0, nullptr, 0, 60);
 							ImGui::Text("Time per frame: %.1f milliseconds", float(delta) / 1000.f);
 
-#if USEMEMORYCONTROLS
-							static long long MemAvailability = chunk->GetAvailability();
-							long long newAvailability = chunk->GetAvailability();
-							long long memoryDelta = newAvailability - MemAvailability;
-
-							static float MemTracker[trackerSize] = { static_cast<float>(TOTALMEMORYSIZE - newAvailability) / static_cast<float>(TOTALMEMORYSIZE) };
-							MemTracker[trackerSize - 1] = static_cast<float>(TOTALMEMORYSIZE - newAvailability) / static_cast<float>(TOTALMEMORYSIZE);
-							memmove(MemTracker, MemTracker + 1, sizeof(float) * (trackerSize - 1));
-							ImGui::PlotLines("", MemTracker, trackerSize, 0, nullptr, 0.f, 1.f);
-							ImGui::SameLine();
-							ImGui::TextColored(ImVec4(1.f, 1.0f - MemTracker[trackerSize - 2], 1.0f - MemTracker[trackerSize - 2], 1), "Memory %.2f%s", MemTracker[trackerSize - 2] * 100.f, "%");
-
-							ImGui::TextColored(ImVec4(static_cast<float>(memoryDelta <= 0), static_cast<float>(memoryDelta >= 0), static_cast<float>(memoryDelta == 0), 1), "Available Memory: %dmb", static_cast<int>(newAvailability / (1ULL << 20)));
-							ImGui::Text("Memory Fragmentation: %d chunks", chunk->GetFragmentation());
-							if (ImGui::Button("Defragment memory"))
-							{
-								chunk->DeFragment();
-							}
-							MemAvailability = newAvailability;
-#endif
-							if (ImGui::TreeNode("Svn"))
-							{
-								if (ImGui::Button("Check for updates"))
-								{
-									if (!SvnIntegration::IsSupported())
-									{
-										ImGui::OpenPopup("SvnNotSupportedPopup");
-									}
-									pendingSvnResult = std::async(SvnIntegration::CheckForUpdates, pendingFiles, sizeof(pendingFiles) / sizeof(pendingFiles[0]));
-								}
-
-								if (ImGui::TreeNode("Log messages"))
-								{
-									ImGui::Text(svnLogg);
-									ImGui::TreePop();
-								}
-
-								ImGui::TreePop();
-							}
 
 							if (ImGui::TreeNode("Info"))
 							{
 								ImGui::Text("Size of pointLightuffer: " STRINGVALUE(NUMBEROFPOINTLIGHTS));
 
 								ImGui::TreePop();
-							}
-							if (ImGui::BeginPopupModal("SvnNotSupportedPopup"))
-							{
-								ImGui::Text("Svn integration is not supported on this machine (yet). Install svn command line tools to enable.");
-								if (ImGui::Button("Help"))
-								{
-									ImGui::OpenPopup("SvnInstallHelp");
-								}
-								ImGui::SameLine();
-								if (ImGui::Button("Close"))
-								{
-									ImGui::CloseCurrentPopup();
-								}
-
-								if (ImGui::BeginPopupModal("SvnInstallHelp"))
-								{
-									ImGui::BulletText("Navigate to '/SharedInstallers' in the project folder");
-									ImGui::BulletText("Run the 'TortoiseSVN...' and go through the installer");
-									ImGui::BulletText("When you get to the custom setup step, make sure that\n'command line client tools' is selected to install");
-									ImGui::BulletText("Reboot");
-									if (ImGui::Button("Close"))
-									{
-										ImGui::CloseCurrentPopup();
-									}
-
-									ImGui::EndPopup();
-								}
-								ImGui::EndPopup();
 							}
 						});
 

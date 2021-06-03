@@ -1,8 +1,5 @@
 #include <pch.h>
 #include "DeferredRenderer.h"
-#include <Matrix4x4.hpp>
-#include <Vector4.hpp>
-#include <d3d11.h>
 #include "Model.h"
 #include "ModelInstance.h"
 #include "ShaderCompiler.h"
@@ -13,7 +10,7 @@
 #include "Environmentlight.h"
 #include "RenderStateManager.h"
 #include "TextureLoader.h"
-#include <Intersection.hpp>
+#include "CommonUtilities\Intersection.hpp"
 #include "ShaderBuffers.h"
 #include "TimeHelper.h"
 #include "FullscreenTexture.h"
@@ -23,6 +20,7 @@
 #include "RenderManager.h"
 #include "FoldNumbers.h"
 #include "AssetManager.h"
+#include "GamlaBettan\Scene.h"
 
 struct DefPixelEnvLightBuffer
 {
@@ -145,7 +143,7 @@ bool DeferredRenderer::Init(DirectX11Framework* aFramework, AssetHandle aPerlinH
 	return true;
 }
 
-std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, std::vector<class ModelInstance*>& aModelList, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<class Decal*>& aDecals, GBuffer* aGBuffer, GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer, Scene* aScene, FullscreenTexture* aDepth, BoneTextureCPUBuffer& aBoneTextureBuffer)
+std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, std::vector<class ModelInstance*>& aModelList, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer, GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer, Scene* aScene, FullscreenTexture* aDepth, BoneTextureCPUBuffer& aBoneTextureBuffer)
 {
 
 	std::vector<class ModelInstance*> filtered;

@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "ParticleInstance.h"
-#include <algorithm>
 #include <Random.h>
-#include <imgui.h>
 #include "WindSystem.h"
 
 void ParticleInstance::Init(Particle* aParticle)

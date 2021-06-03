@@ -6,6 +6,8 @@
 #include "Random.h"
 #include "PlantLoader.h"
 #include "AssetManager.h"
+#include "Game\Mesh.h"
+#include "Game\Audio.h"
 
 
 const char* DryFilePath = "G_Soil_Dry/G_Soil_Dry.fbx";

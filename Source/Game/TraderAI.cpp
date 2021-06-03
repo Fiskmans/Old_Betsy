@@ -3,6 +3,8 @@
 #include "AnimationComponent.h"
 #include "TimeHandler.h"
 #include "GBPhysXKinematicComponent.h"
+#include "Game\Audio.h"
+#include "GamlaBettan\PathFinder.h"
 
 
 TraderAI::TraderAI() :

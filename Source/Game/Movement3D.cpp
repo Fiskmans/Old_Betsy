@@ -1,9 +1,8 @@
 #include "pch.h"
 #include "Movement3D.h"
-#include "Entity.h"
 #include "Audio.h"
-#include "DebugDrawer.h"
 #include <PathFinder.h>
+#include "GamlaBettan\ModelInstance.h"
 
 #define MARKERDURATION 0.5f
 

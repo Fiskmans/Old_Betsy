@@ -1,20 +1,15 @@
 #include <pch.h>
 
-#pragma warning(push, 1)
-#pragma warning(disable : 26495)
 #include "GBPhysX.h"
 #include "SnippetUtils.h"
-#include "PxPhysicsAPI.h"
-#include "PxRigidActor.h"
-#include "Matrix4x4.hpp"
-#include <array>
+#include "include\PxPhysicsAPI.h"
+#include "include\PxRigidActor.h"
 #include "GBPhysXLibraryDependencies.h"
 #include "GBPhysXQueryFilterCallback.h"
 #include "GBPhysXSimulationEventCallback.h"
 #include "GBPhysXSimulationFilterCallback.h"
 #include "GBPhysXControllerHitReportCallback.h"
 #include "StaticMeshCooker.h"
-#pragma warning(pop)
 #include "Entity.h"
 #include "AnimationComponent.h"
 #include "Animator.h"
@@ -299,7 +294,7 @@ void initPhysics(bool interactive)
 	}
 
 	gPvd = PxCreatePvd(*gFoundation);
-	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(LOCAL_HOST, 5425, 10);
+	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
 	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
 	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
@@ -1120,7 +1115,14 @@ void GBPhysX::GBInitPhysics(bool aInteractive)
 
 void GBPhysX::GBStepPhysics(float aDeltaTime)
 {
-	stepPhysics(aDeltaTime);
+	const float StepSize = 0.016f;
+
+	myDeltaTime += aDeltaTime;
+	while (myDeltaTime >= StepSize)
+	{
+		myDeltaTime -= StepSize;
+		stepPhysics(StepSize);
+	}
 }
 
 void GBPhysX::GBCleanUpPhysics()

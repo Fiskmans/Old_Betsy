@@ -1,9 +1,6 @@
 #include "pch.h"
 #include "Camera.h"
-#include <PlaneVolume.hpp>
-#include <Vector3.hpp>
-#include <imgui.h>
-#include "Macros.h"
+#include "CommonUtilities\PlaneVolume.hpp"
 
 Camera::Camera() :
 	myFarPlane(0.f),

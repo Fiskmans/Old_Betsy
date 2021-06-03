@@ -1,8 +1,6 @@
 #pragma once
-#include "Vector3.hpp"
-#include "Vector4.hpp"
-#include "Plane.hpp"
-#include "Ray.hpp"
+#include "CommonUtilities\Plane.hpp"
+#include "CommonUtilities\Ray.hpp"
 
 class SlabRay
 {

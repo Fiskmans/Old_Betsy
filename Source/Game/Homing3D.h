@@ -1,6 +1,5 @@
 #pragma once
 #include "Component.h"
-#include "Vector.hpp"
 
 class Homing3D : public Component
 {

@@ -5,21 +5,20 @@
 #include "DebugDrawer.h"
 #include "Random.h"
 
-#include <PathFinder.h>
+#include "GamlaBettan\PathFinder.h"
 
-#include "AIBaseState.h"
-#include "IdleState.h"
-#include "AlertedState.h"
-#include "SeekTargetState.h"
-#include "AttackState.h"
-#include "SpawningState.h"
-#include "AIPollingStation.h"
+#include "Game/AIBaseState.h"
+#include "Game/IdleState.h"
+#include "Game/AlertedState.h"
+#include "Game/SeekTargetState.h"
+#include "Game/AttackState.h"
+#include "Game/SpawningState.h"
+#include "Game/AIPollingStation.h"
+#include "Game/GBPhysXKinematicComponent.h"
+#include "Game/AnimationComponent.h"
+#include "Game/Audio.h"
 
-#include "GBPhysXKinematicComponent.h"
-#include "AnimationComponent.h"
-#include "Audio.h"
-
-#include "Sphere.hpp"
+#include "CommonUtilities\Sphere.hpp"
 
 AIController::AIController() :
 	myCurrentState(AIStates::Idle),

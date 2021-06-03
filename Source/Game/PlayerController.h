@@ -1,9 +1,8 @@
 #pragma once
 #include "Component.h"
-#include "Vector.hpp"
 #include "Observer.hpp"
 #include "Publisher.hpp"
-#include "Plane.hpp"
+#include "CommonUtilities\Plane.hpp"
 
 class Entity;
 class Camera;

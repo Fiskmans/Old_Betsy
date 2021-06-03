@@ -3,7 +3,6 @@
 #include "Observer.hpp"
 #include "Component.h"
 #include "AIPollingStation.h"
-#include "Vector3.hpp"
 
 enum class TraderState
 {

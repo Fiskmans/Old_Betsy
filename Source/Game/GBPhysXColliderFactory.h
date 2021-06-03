@@ -1,6 +1,5 @@
 #pragma once
 #include "Observer.hpp"
-#include "Vector3.hpp"
 #include "GBPhysX.h"
 
 class GBPhysXColliderFactory : public Observer

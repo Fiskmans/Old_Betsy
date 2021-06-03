@@ -1,10 +1,5 @@
 #pragma once
-#include <Vector4.hpp>
-#include <Vector2.hpp>
-#include <d3dcommon.h>
-#include "Asset.h"
 
-typedef D3D_PRIMITIVE_TOPOLOGY D3D11_PRIMITIVE_TOPOLOGY;
 
 namespace LegacyParticleTypes
 {

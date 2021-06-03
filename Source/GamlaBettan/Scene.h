@@ -1,13 +1,7 @@
 #pragma once
-#include <vector>
-#include <array>
-#include "Macros.h"
 
-namespace CommonUtilities
-{
-	template<class T>
-	class Sphere;
-}
+#include "CommonUtilities\Sphere.hpp"
+
 
 class ModelInstance;
 class SpriteInstance;
