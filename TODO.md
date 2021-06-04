@@ -51,3 +51,4 @@
 - Write a new script system + editor
 - ~~Update imgui version~~
 - Rewrite statestack as a singleton instead of passing cryptic messages to activate it
+- Go green (typedefs instead of defines)
