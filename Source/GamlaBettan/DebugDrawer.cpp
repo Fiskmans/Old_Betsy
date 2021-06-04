@@ -440,13 +440,13 @@ void DebugDrawer::DrawRotatedBoundingBox(const CommonUtilities::AABB3D<float>& a
 void DebugDrawer::Draw2DBoundingBox(const CommonUtilities::AABB2D<float>& aBoundingBox)
 {
 #if USEDEBUGLINES && USEIMGUI
-	V2F iii = V2F(aBoundingBox.Min()) * V2F(1920.f, 1080.f);
-	V2F aaa = V2F(aBoundingBox.Max()) * V2F(1920.f, 1080.f);
+	V2f iii = V2f(aBoundingBox.Min()) * V2f(1920.f, 1080.f);
+	V2f aaa = V2f(aBoundingBox.Max()) * V2f(1920.f, 1080.f);
 
-	V2F iaa = V2F(iii.x, aaa.y);
-	V2F aia = V2F(aaa.x, iii.y);
-	V2F iia = V2F(iii.x, iii.y);
-	V2F aai = V2F(aaa.x, aaa.y);
+	V2f iaa = V2f(iii.x, aaa.y);
+	V2f aia = V2f(aaa.x, iii.y);
+	V2f iia = V2f(iii.x, iii.y);
+	V2f aai = V2f(aaa.x, aaa.y);
 
 	auto color = IM_COL32(myColor.x * 225, myColor.y * 225, myColor.z * 225, myColor.w * 225);
 
@@ -617,7 +617,7 @@ void DebugDrawer::Render(Camera* aCamera)
 		}
 		CameraBuffer* buff = reinterpret_cast<CameraBuffer*>(bufferData.pData);
 		buff->myToCamera = CommonUtilities::Matrix4x4<float>::Transpose(CommonUtilities::Matrix4x4<float>::GetFastInverse(aCamera->GetTransform()));
-		buff->myToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(false));
+		buff->myToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
 		context->Unmap(myConstantBuffer, 0);
 
 

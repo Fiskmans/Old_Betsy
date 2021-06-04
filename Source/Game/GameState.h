@@ -1,13 +1,10 @@
 #pragma once
 #include "GameWorld.h"
 #include <Spline.h>
-#include "Publisher.hpp"
 #include "BaseState.h"
-#include <MetricValue.h>
 #include "TimerController.h"
 #include "SpotLightFactory.h"
 #include "DecalFactory.h"
-#include "DataStructs.h"
 
 class NodePollingStation;
 class Scene;
@@ -15,14 +12,14 @@ class AudioManager;
 class GBPhysX;
 class SpriteRenderer;
 
-class GameState : public BaseState,public Publisher,public Observer
+class GameState : public BaseState, public Observer
 {
 public:
 
 	GameState(bool aShouldDeleteOnPop = true);
 	~GameState();
 	virtual void Update(const float aDeltaTime) override;
-	bool Init(WindowHandler* aWindowHandler, InputManager* aInputManager, SpriteFactory* aSpritefactory, LightLoader* aLightLoader, DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);
+	bool Init(InputManager* aInputManager, SpriteFactory* aSpritefactory, LightLoader* aLightLoader, DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);
 	virtual void Render(CGraphicsEngine* aGraphicsEngine) override;
 
 	void LoadLevel(const int& aLevel);
@@ -41,7 +38,7 @@ private:
 
 	void UnloadCurrentLevel();
 	void UnloadLevel(std::string aFilepath);
-	void CreateWorld(WindowHandler* aWindowHandler, DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);
+	void CreateWorld(DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);
 	void NextLevel();
 	void WinGame();
 
@@ -58,7 +55,6 @@ private:
 	SpriteFactory* mySpriteFactory;
 	LightLoader* myLightLoader;
 	AudioManager* myAudioManager;
-	WindowHandler* myWindowHandler;
 	SpotLightFactory mySpotlightFactory;
 	DecalFactory myDecalFactory;
 
@@ -72,10 +68,6 @@ private:
 	NodePollingStation* myNodePollingStation;
 	TimerController myTimerController;
 	GBPhysX* myGBPhysX;
-
-#if DONETWORK
-	NetworkClient myClient;
-#endif
 
 	V3F myLatestCheckpointPos;
 

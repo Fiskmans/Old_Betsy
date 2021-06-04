@@ -12,31 +12,31 @@ public:
 
 	Sprite* GetSprite();
 
-	void SetPosition(const CommonUtilities::Vector2<float>& aPosition);
+	void SetPosition(const V2f& aPosition);
 	void SetPosition(float aPositionX, float aPositionY);
-	void SetScale(const CommonUtilities::Vector2<float>& aScale);
+	void SetScale(const V2f& aScale);
 	void Rotate(const float aRotation);
 	void SetRotation(const float aRotation);
-	void SetPivot(const CommonUtilities::Vector2<float>& aPivot);
-	void SetColor(const CommonUtilities::Vector4<float>& aColor);
-	void SetUVMinMax(const CommonUtilities::Vector2<float>& aMin, const CommonUtilities::Vector2<float>& aMax);
-	void SetUVMinMaxInTexels(const CommonUtilities::Vector2<float>& aMin, const CommonUtilities::Vector2<float>& aMax);
-	void SetUVMinMax(const CommonUtilities::Vector4<float>& aMinMax);
+	void SetPivot(const V2f& aPivot);
+	void SetColor(const V4F& aColor);
+	void SetUVMinMax(const V2f& aMin, const V2f& aMax);
+	void SetUVMinMaxInTexels(const V2f& aMin, const V2f& aMax);
+	void SetUVMinMax(const V4F& aMinMax);
 	void SetDepth(float aDepth);
-	void SetSize(V2F aSize);
-	void SetSizeInPixel(V2F aSize);
+	void SetSize(V2f aSize);
+	void SetSizeInPixel(V2f aSize);
 
 	const M44f GetTransform() const;
 	const M44f GetPivotTransform() const;
 
-	const V2F GetPosition() const;
+	const V2f GetPosition() const;
 	const V4F& GetColor() const;
-	const V2F GetScale() const;
-	const V2F& GetPivot() const;
+	const V2f GetScale() const;
+	const V2f& GetPivot() const;
 	const V4F& GetUVMinMax() const;
-	const V2F GetImageSize() const;
-	const V2F GetSizeWithScale() const;
-	const V2F GetSizeOnScreen() const;
+	const V2f GetImageSize() const;
+	const V2f GetSizeWithScale() const;
+	const V2f GetSizeOnScreen() const;
 	const float GetDepth() const;
 
 	void AddToScene();
@@ -52,11 +52,11 @@ private:
 	Sprite* mySprite;
 
 	V4F myColor;
-	V2F myPivot;
+	V2f myPivot;
 
 	V4F myUVMinMax;
 
-	V2F myPosition;
+	V2f myPosition;
 
 	bool myIsListening;
 	bool myIsAddedToScene;
@@ -64,6 +64,6 @@ private:
 	float myRotation;
 	float myDepth;
 
-	V2F myScale;
-	V2F myBaseScale;
+	V2f myScale;
+	V2f myBaseScale;
 };

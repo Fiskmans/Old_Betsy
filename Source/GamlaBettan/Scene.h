@@ -10,7 +10,6 @@ struct EnvironmentLight;
 class PointLight;
 class ParticleInstance;
 class TextInstance;
-class SlabRay;
 class ProgressBar;
 struct SpotLight;
 struct Decal;
@@ -26,7 +25,6 @@ public:
 	void AddToScene(SpotLight* aSpotLight);
 	void AddToScene(Decal* aDecal);
 	void AddSprite(SpriteInstance* aSprite);
-	void AddProgressBar(ProgressBar* aBar);
 	void AddText(TextInstance* aText);
 	void AddInstance(Camera* aCamera);
 	void AddInstance(ParticleInstance* aParticle);
@@ -39,7 +37,6 @@ public:
 	void RemoveFrom(SpotLight* aDecal);
 	void RemoveFrom(Decal* aSpotLight);
 	void RemoveSprite(SpriteInstance* aSprite);
-	void RemoveProgressBar(ProgressBar* aBar);
 	void RemoveText(TextInstance* aText);
 	bool Contains(ParticleInstance* aParticle);
 	bool Contains(ModelInstance* aModel);
@@ -47,8 +44,8 @@ public:
 	void RefreshAll(float aAmount);
 	void SetSkybox(ModelInstance* aSkybox);
 
-	ModelInstance* GetInstance(SlabRay* aRay);
-	std::vector<ModelInstance*> GetIntersections(SlabRay* aRay);
+	ModelInstance* GetInstance(const FRay& aRay);
+	std::vector<ModelInstance*> GetIntersections(const FRay& aRay);
 
 #if USEIMGUI
 	enum class StashOp

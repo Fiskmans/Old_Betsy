@@ -3,12 +3,12 @@
 
 float operator""_m(long double aMeterValue)
 {
-	return aMeterValue * globalMeterScaleFactor;
+	return static_cast<float>(aMeterValue * globalMeterScaleFactor);
 }
 
 float operator""_cm(long double aCentiMeterValue)
 {
-	return aCentiMeterValue;
+	return static_cast<float>(aCentiMeterValue);
 }
 
 float operator""_m(size_t aMeterValue)

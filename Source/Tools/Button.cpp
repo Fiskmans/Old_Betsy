@@ -7,7 +7,14 @@
 
 SpriteFactory* Button::ourSpriteFactoryPtr = nullptr;
 
-Button::Button()
+Button::Button() 
+	: Observer(
+		{
+			MessageType::InputLeftMouseHit,
+			MessageType::InputLeftMouseReleased,
+			MessageType::InputMouseMoved,
+			MessageType::ResizeWindow
+		})
 {
 	myState = ButtonState::Normal;
 	myOnPressed = nullptr;
@@ -24,18 +31,6 @@ Button::Button()
 
 Button::~Button()
 {
-	Unsubscribe();
-
-	//for (int i = 0; i < mySprites.size(); ++i)
-	//{
-	//	if (mySprites[i])
-	//	{
-	//		mySprites[i] = nullptr;
-	//	}
-	//}
-	//SAFE_DELETE(mySprites[ButtonState::Active]);
-	//SAFE_DELETE(mySprites[ButtonState::Inactive]);
-	//SAFE_DELETE(mySprites[ButtonState::Pressed]);
 }
 
 void Button::SetOnPressedFunction(const std::function<void(void)> aOnPressed)
@@ -72,9 +67,7 @@ void Button::SetActive()
 	}
 	myState = ButtonState::Hover;
 	
-	Message message;
-	message.myMessageType = MessageType::MenuButtonActive;
-	PostMaster::GetInstance()->SendMessages(message);
+	PostMaster::GetInstance().SendMessages(MessageType::MenuButtonActive);
 }
 
 void Button::SetPressed()
@@ -89,9 +82,7 @@ void Button::SetPressed()
 	}
 	myState = ButtonState::Pressed;
 
-	Message message;
-	message.myMessageType = MessageType::MenuButtonHit;
-	PostMaster::GetInstance()->SendMessages(message);
+	PostMaster::GetInstance().SendMessages(MessageType::MenuButtonHit);
 }
 
 void Button::SetToNormal()
@@ -114,8 +105,6 @@ void Button::ActuallyEnable()
 		myScenePtr->RemoveSprite(mySprites[CAST(int, ButtonState::Disabled)]);
 		myScenePtr->AddSprite(mySprites[CAST(int, ButtonState::Normal)]);
 		myIsListeningToClick = true;
-		SubscribeToMessage(MessageType::InputLeftMouseHit);
-		SubscribeToMessage(MessageType::InputMouseMoved);
 		myState = ButtonState::Normal;
 	}
 }
@@ -127,17 +116,15 @@ void Button::ActuallyDisable()
 		myScenePtr->RemoveSprite(mySprites[CAST(int, myState)]);
 		myScenePtr->AddSprite(mySprites[CAST(int, ButtonState::Disabled)]);
 		myIsListeningToClick = false;
-		UnSubscribeToMessage(MessageType::InputLeftMouseHit);
-		UnSubscribeToMessage(MessageType::InputMouseMoved);
 		myState = ButtonState::Disabled;
 	}
 }
 
-bool Button::CheckHover(float aMouseX, float aMouseY)
+bool Button::CheckHover(const V2f& aPosition)
 {
-	if (aMouseX >= myBounds.x && aMouseX <= myBounds.z)
+	if (aPosition.x >= myBounds.x && aPosition.x <= myBounds.z)
 	{
-		if (aMouseY >= myBounds.y && aMouseY <= myBounds.w)
+		if (aPosition.y >= myBounds.y && aPosition.y <= myBounds.w)
 		{
 			return true;
 		}
@@ -146,59 +133,55 @@ bool Button::CheckHover(float aMouseX, float aMouseY)
 }
 
 bool Button::Init(const std::string& aNormalPath, const std::string& aHoveredPath, const std::string& aPressedPath, const std::string& aDisabledPath, const CommonUtilities::Vector2<float>& aPosition,
-	const V2F& aHitBoxSize, SpriteFactory* aSpriteFactory)
+	const V2f& aHitBoxSize, SpriteFactory* aSpriteFactory)
 {
 	myPosition = aPosition;
 	myState = ButtonState::Normal;
 
 	mySprites[ButtonState::Normal] = aSpriteFactory->CreateSprite(aNormalPath);
-	mySprites[ButtonState::Normal]->SetPivot(V2F(0.5f, 0.5f));
+	mySprites[ButtonState::Normal]->SetPivot(V2f(0.5f, 0.5f));
 	mySprites[ButtonState::Normal]->SetPosition(myPosition);
 
 	mySprites[ButtonState::Hover] = aSpriteFactory->CreateSprite(aHoveredPath);
-	mySprites[ButtonState::Hover]->SetPivot(V2F(0.5f, 0.5f));
+	mySprites[ButtonState::Hover]->SetPivot(V2f(0.5f, 0.5f));
 	mySprites[ButtonState::Hover]->SetPosition(myPosition);
 
 	mySprites[ButtonState::Pressed] = aSpriteFactory->CreateSprite(aPressedPath);
-	mySprites[ButtonState::Pressed]->SetPivot(V2F(0.5f, 0.5f));
+	mySprites[ButtonState::Pressed]->SetPivot(V2f(0.5f, 0.5f));
 	mySprites[ButtonState::Pressed]->SetPosition(myPosition);
 
 	mySprites[ButtonState::Disabled] = aSpriteFactory->CreateSprite(aDisabledPath);
-	mySprites[ButtonState::Disabled]->SetPivot(V2F(0.5f, 0.5f));
+	mySprites[ButtonState::Disabled]->SetPivot(V2f(0.5f, 0.5f));
 	mySprites[ButtonState::Disabled]->SetPosition(myPosition);
 
 	mySize = aHitBoxSize;
 
 	SetupBounds();
 
-	Subscribe();
-
 	return true;
 }
 
 bool Button::Init(const std::string& aFolderPath, const std::string& aButtonName, const CommonUtilities::Vector2<float>& aPosition,
-	const V2F& aHitBoxSize, SpriteFactory* aSpriteFactory)
+	const V2f& aHitBoxSize, SpriteFactory* aSpriteFactory)
 {
 	myPosition = aPosition;
 
 	std::string path = aFolderPath + "\\" + aButtonName;
 	mySprites[ButtonState::Normal] = aSpriteFactory->CreateSprite(path + " button off.dds");
-	mySprites[ButtonState::Normal]->SetPivot(V2F(0.5f, 0.5f));
+	mySprites[ButtonState::Normal]->SetPivot(V2f(0.5f, 0.5f));
 	mySprites[ButtonState::Normal]->SetPosition(myPosition);
 
 	mySprites[ButtonState::Hover] = aSpriteFactory->CreateSprite(path + " button hover.dds");
-	mySprites[ButtonState::Hover]->SetPivot(V2F(0.5f, 0.5f));
+	mySprites[ButtonState::Hover]->SetPivot(V2f(0.5f, 0.5f));
 	mySprites[ButtonState::Hover]->SetPosition(myPosition);
 
 	mySprites[ButtonState::Pressed] = aSpriteFactory->CreateSprite(path + " button on.dds");
-	mySprites[ButtonState::Pressed]->SetPivot(V2F(0.5f, 0.5f));
+	mySprites[ButtonState::Pressed]->SetPivot(V2f(0.5f, 0.5f));
 	mySprites[ButtonState::Pressed]->SetPosition(myPosition);
 
 	mySize = aHitBoxSize;
 
 	SetupBounds();
-
-	Subscribe();
 
 	return true;
 }
@@ -227,13 +210,19 @@ void Button::RecieveMessage(const Message& aMessage)
 	{
 		if (IsPressed() == false)
 		{
-			if (CheckHover(aMessage.myFloatValue, aMessage.myFloatValue2) == true && !IsActive())
+			if (CheckHover(*reinterpret_cast<const V2f*>(aMessage.myData)))
 			{
-				SetActive();
+				if (!IsActive())
+				{
+					SetActive();
+				}
 			}
-			else if (!CheckHover(aMessage.myFloatValue, aMessage.myFloatValue2))
+			else
 			{
-				SetToNormal();
+				if (IsActive())
+				{
+					SetToNormal();
+				}
 			}
 		}
 
@@ -257,42 +246,14 @@ void Button::RecieveMessage(const Message& aMessage)
 	}
 	else if (aMessage.myMessageType == MessageType::WindowResize)
 	{
-		myScreenSize = V2F(CAST(float, aMessage.myIntValue), CAST(float, aMessage.myIntValue2));
+		const V2ui& source = *reinterpret_cast<const V2ui*>(aMessage.myData);
+		myScreenSize = 
+			V2f{ 
+				static_cast<float>(source.x), 
+				static_cast<float>(source.y) 
+			};
 		SetupBounds();
 
-	}
-}
-
-void Button::Subscribe()
-{
-	if (!myIsListening)
-	{
-		SubscribeToMessage(MessageType::InputLeftMouseReleased);
-		SubscribeToMessage(MessageType::WindowResize);
-		if (!myIsListeningToClick)
-		{
-			myIsListeningToClick = true;
-			SubscribeToMessage(MessageType::InputMouseMoved);
-			SubscribeToMessage(MessageType::InputLeftMouseHit);
-		}
-		myIsListening = true;
-	}
-}
-
-void Button::Unsubscribe()
-{
-	if (myIsListening)
-	{
-		UnSubscribeToMessage(MessageType::InputLeftMouseReleased);
-		UnSubscribeToMessage(MessageType::WindowResize);
-
-		if (myIsListeningToClick)
-		{
-			myIsListeningToClick = false;
-			UnSubscribeToMessage(MessageType::InputMouseMoved);
-			UnSubscribeToMessage(MessageType::InputLeftMouseHit);
-		}
-		myIsListening = false;
 	}
 }
 

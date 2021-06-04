@@ -55,11 +55,14 @@ RenderManager::RenderManager() :
 	myShouldRenderWireFrame(false),
 #endif // USEIMGUI
 	myStateManerger(RenderStateManager()),
-	myStartedAt(0)
+	myStartedAt(0),
+	Observer({
+			MessageType::WindowResize
+		})
 {
 }
 
-bool RenderManager::Init(DirectX11Framework* aFramework, WindowHandler* aWindowHandler)
+bool RenderManager::Init(DirectX11Framework* aFramework)
 {
 	if (!myStateManerger.Init(aFramework))
 	{
@@ -107,8 +110,7 @@ bool RenderManager::Init(DirectX11Framework* aFramework, WindowHandler* aWindowH
 	DebugDrawer::GetInstance().Init(aFramework);
 	DebugDrawer::GetInstance().SetColor(V4F(0.8f, 0.2f, 0.2f, 1.f));
 	myFrameworkPtr = aFramework;
-	myScreenSize = { aWindowHandler->GetWidth(), aWindowHandler->GetHeight() };
-	if (!CreateTextures(aWindowHandler->GetWidth(), aWindowHandler->GetHeight()))
+	if (!CreateTextures(WindowHandler::GetInstance().GetSize()))
 	{
 		return false;
 	}
@@ -399,22 +401,12 @@ void RenderManager::AddExtraSpriteToRender(SpriteInstance* aSprite)
 	SYSWARNING("Tried to add null sprite to render list");
 }
 
-void RenderManager::SubscribeToMessages()
-{
-	PostMaster::GetInstance()->Subscribe(MessageType::WindowResize, this);
-}
-
-void RenderManager::UnsubscribeToMessages()
-{
-	PostMaster::GetInstance()->UnSubscribe(MessageType::WindowResize, this);
-}
-
 void RenderManager::RecieveMessage(const Message& aMessage)
 {
 	switch (aMessage.myMessageType)
 	{
 	case MessageType::WindowResize:
-		Resize(aMessage.myIntValue, aMessage.myIntValue2);
+		Resize(*reinterpret_cast<const V2ui*>(aMessage.myData));
 		break;
 	default:
 		break;
@@ -506,7 +498,7 @@ void RenderManager::RenderSelection(const std::vector<ModelInstance*>& aModelsTo
 	myStateManerger.SetBlendState(RenderStateManager::BlendState::Disable);
 }
 
-bool RenderManager::CreateTextures(const unsigned int aWidth, const unsigned int aHeight)
+bool RenderManager::CreateTextures(const V2ui& aSize)
 {
 	ID3D11Texture2D* backBufferTexture = myFrameworkPtr->GetBackbufferTexture();
 	if (!backBufferTexture)
@@ -516,39 +508,39 @@ bool RenderManager::CreateTextures(const unsigned int aWidth, const unsigned int
 	}
 
 	myTextures[static_cast<int>(Textures::BackBuffer)] = myFullscreenFactory.CreateTexture(backBufferTexture);
-	myTextures[static_cast<int>(Textures::IntermediateDepth)] = myFullscreenFactory.CreateDepth({ aWidth, aHeight },"Main Depth");
+	myTextures[static_cast<int>(Textures::IntermediateDepth)] = myFullscreenFactory.CreateDepth({ aSize.x, aSize.y }, "Main Depth");
 
-	myTextures[static_cast<int>(Textures::IntermediateTexture)] = myFullscreenFactory.CreateTexture({ aWidth, aHeight }, DXGI_FORMAT_R8G8B8A8_UNORM,"Intermediate texture");
-	myTextures[static_cast<int>(Textures::HalfSize)] = myFullscreenFactory.CreateTexture({ aWidth / 2U, aHeight / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM,"bloom 1/2 size");
-	myTextures[static_cast<int>(Textures::QuaterSize)] = myFullscreenFactory.CreateTexture({ aWidth / 4U, aHeight / 4U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/4 size");
-	myTextures[static_cast<int>(Textures::HalfQuaterSize)] = myFullscreenFactory.CreateTexture({ aWidth / 8U, aHeight / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/8 size");
+	myTextures[static_cast<int>(Textures::IntermediateTexture)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "Intermediate texture");
+	myTextures[static_cast<int>(Textures::HalfSize)] = myFullscreenFactory.CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/2 size");
+	myTextures[static_cast<int>(Textures::QuaterSize)] = myFullscreenFactory.CreateTexture({ aSize.x / 4U, aSize.y / 4U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/4 size");
+	myTextures[static_cast<int>(Textures::HalfQuaterSize)] = myFullscreenFactory.CreateTexture({ aSize.x / 8U, aSize.y / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/8 size");
 
-	myTextures[static_cast<int>(Textures::SSAOBuffer)] = myFullscreenFactory.CreateTexture({ aWidth, aHeight }, DXGI_FORMAT_R8_UNORM,"SSAO buffer");
-	myTextures[static_cast<int>(Textures::BackFaceBuffer)] = myFullscreenFactory.CreateTexture({ aWidth, aHeight }, DXGI_FORMAT_R8G8B8A8_UNORM,"Backface buffer");
+	myTextures[static_cast<int>(Textures::SSAOBuffer)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8_UNORM, "SSAO buffer");
+	myTextures[static_cast<int>(Textures::BackFaceBuffer)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "Backface buffer");
 
 #if ENABLEBLOOM
-	myTextures[static_cast<int>(Textures::Guassian1)] = myFullscreenFactory.CreateTexture({ aWidth / 8U, aHeight / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom guassian 1");
-	myTextures[static_cast<int>(Textures::Guassian2)] = myFullscreenFactory.CreateTexture({ aWidth / 8U, aHeight / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom guassian 2");
+	myTextures[static_cast<int>(Textures::Guassian1)] = myFullscreenFactory.CreateTexture({ aSize.x / 8U, aSize.y / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom guassian 1");
+	myTextures[static_cast<int>(Textures::Guassian2)] = myFullscreenFactory.CreateTexture({ aSize.x / 8U, aSize.y / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom guassian 2");
 
-	myTextures[static_cast<int>(Textures::Luminance)] = myFullscreenFactory.CreateTexture({ aWidth, aHeight }, DXGI_FORMAT_R8G8B8A8_UNORM, "luminance");
+	myTextures[static_cast<int>(Textures::Luminance)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "luminance");
 #endif
 
-	myTextures[static_cast<int>(Textures::SelectionScaleDown1)] = myFullscreenFactory.CreateTexture({ aWidth / 2U, aHeight / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 1/2");
-	myTextures[static_cast<int>(Textures::SelectionScaleDown2)] = myFullscreenFactory.CreateTexture({ aWidth / 4U, aHeight / 4U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 1/4");
+	myTextures[static_cast<int>(Textures::SelectionScaleDown1)] = myFullscreenFactory.CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 1/2");
+	myTextures[static_cast<int>(Textures::SelectionScaleDown2)] = myFullscreenFactory.CreateTexture({ aSize.x / 4U, aSize.y / 4U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 1/4");
 
-	myTextures[static_cast<int>(Textures::Selection)] = myFullscreenFactory.CreateTexture({ aWidth / 2U, aHeight / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection");
-	myTextures[static_cast<int>(Textures::SelEdgesHalf)] = myFullscreenFactory.CreateTexture({ aWidth / 2U, aHeight / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection edges half");
-	myTextures[static_cast<int>(Textures::SelEdges)] = myFullscreenFactory.CreateTexture({ aWidth / 2U, aHeight / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection edges all");
-	myTextures[static_cast<int>(Textures::Selection2)] = myFullscreenFactory.CreateTexture({ aWidth, aHeight }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 2");
+	myTextures[static_cast<int>(Textures::Selection)] = myFullscreenFactory.CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection");
+	myTextures[static_cast<int>(Textures::SelEdgesHalf)] = myFullscreenFactory.CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection edges half");
+	myTextures[static_cast<int>(Textures::SelEdges)] = myFullscreenFactory.CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection edges all");
+	myTextures[static_cast<int>(Textures::Selection2)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 2");
 
-	myTextures[static_cast<int>(Textures::Edges)] = myFullscreenFactory.CreateTexture({ aWidth, aHeight }, DXGI_FORMAT_R8_UNORM, "Edges");
-	myTextures[static_cast<int>(Textures::AAHorizontal)] = myFullscreenFactory.CreateTexture({ aWidth, aHeight }, DXGI_FORMAT_R8G8B8A8_UNORM, "AA horisontal");
+	myTextures[static_cast<int>(Textures::Edges)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8_UNORM, "Edges");
+	myTextures[static_cast<int>(Textures::AAHorizontal)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "AA horisontal");
 
-	myTextures[static_cast<int>(Textures::LUT)] = myFullscreenFactory.CreateTexture({ aWidth, aHeight }, DXGI_FORMAT_R8G8B8A8_UNORM, "LUT buffer");
+	myTextures[static_cast<int>(Textures::LUT)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "LUT buffer");
 
 	myRandomNormal = AssetManager::GetInstance().GetTexture("engine/SSAONormal.dds");
-	myGBuffer = myFullscreenFactory.CreateGBuffer({ aWidth,aHeight }, "main gBuffer");
-	myBufferGBuffer = myFullscreenFactory.CreateGBuffer({ aWidth,aHeight }, "secondary GBuffer");
+	myGBuffer = myFullscreenFactory.CreateGBuffer({ aSize.x,aSize.y }, "main gBuffer");
+	myBufferGBuffer = myFullscreenFactory.CreateGBuffer({ aSize.x,aSize.y }, "secondary GBuffer");
 
 	for (auto& i : myTextures)
 	{
@@ -583,7 +575,7 @@ bool RenderManager::CreateTextures(const unsigned int aWidth, const unsigned int
 
 	static_assert(sizeof(BoneTextureCPUBuffer) == (width * height * bytesPerPixel) && "Something got missmatched");
 
-	DirectX11Framework::AddMemoryUsage(static_cast<size_t>(sizeof(BoneTextureCPUBuffer) * DirectX11Framework::FormatToSizeLookup[desc.Format]), "Bone Texture", "Engine Texture");
+	DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(sizeof(BoneTextureCPUBuffer) * DirectX11Framework::FormatToSizeLookup[desc.Format]), "Bone Texture", "Engine Texture");
 
 
 	HRESULT result = device->CreateTexture2D(&desc, nullptr, &myBoneBufferTexture);
@@ -604,39 +596,34 @@ bool RenderManager::CreateTextures(const unsigned int aWidth, const unsigned int
 	return true;
 }
 
-void RenderManager::Resize(const unsigned int aWidth, const unsigned int aHeight)
+void RenderManager::Resize(const V2ui& aSize)
 {
-	if (myScreenSize.x != aWidth || myScreenSize.y != aHeight)
+	myFrameworkPtr->GetContext()->OMSetRenderTargets(0, nullptr, nullptr);
+
+	for (auto& tex : myTextures)
 	{
-		myFrameworkPtr->GetContext()->OMSetRenderTargets(0, nullptr, nullptr);
-
-		for (auto& tex : myTextures)
-		{
-			tex.Release();
-		}
-		myGBuffer.Release();
-		myBufferGBuffer.Release();
-		ClearScreendumpTexture();
-
-
-		HRESULT result;
-		IDXGISwapChain* chain = myFrameworkPtr->GetSwapChain();
-		if (chain)
-		{
-			result = chain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
-			if (FAILED(result))
-			{
-				SYSERROR("Could not resize swap chain buffer.");
-			}
-		}
-
-		CreateTextures(aWidth, aHeight);
-		myTextures[static_cast<int>(Textures::BackBuffer)].SetAsActiveTarget();
-
-		SetScreendumpTexture(myFrameworkPtr->GetContext(), myFrameworkPtr->GetBackbufferTexture());
-
-		myScreenSize = { aWidth,  aHeight };
+		tex.Release();
 	}
+	myGBuffer.Release();
+	myBufferGBuffer.Release();
+	ClearScreendumpTexture();
+
+
+	HRESULT result;
+	IDXGISwapChain* chain = myFrameworkPtr->GetSwapChain();
+	if (chain)
+	{
+		result = chain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+		if (FAILED(result))
+		{
+			SYSERROR("Could not resize swap chain buffer.");
+		}
+	}
+
+	CreateTextures(aSize);
+	myTextures[static_cast<int>(Textures::BackBuffer)].SetAsActiveTarget();
+
+	SetScreendumpTexture(myFrameworkPtr->GetContext(), myFrameworkPtr->GetBackbufferTexture());
 }
 
 void RenderManager::FullscreenPass(std::vector<Textures> aSources, Textures aTarget, FullscreenRenderer::Shader aShader)

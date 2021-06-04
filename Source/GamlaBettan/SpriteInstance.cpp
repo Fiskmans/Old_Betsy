@@ -1,17 +1,18 @@
 #include "pch.h"
 #include "SpriteInstance.h"
 #include "Sprite.h"
+#include "WindowHandler.h"
 
 
 SpriteInstance::SpriteInstance(Sprite* aSprite)
 {
 	mySprite = aSprite;
 
-	myPivot = CU::Vector2<float>(0.0f, 0.0f);
+	myPivot = V2f(0.0f, 0.0f);
 
-	myColor = CU::Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
+	myColor = V4F(1.0f, 1.0f, 1.0f, 1.0f);
 
-	myUVMinMax = CU::Vector4<float>(0.f, 0.f, 1.f, 1.f);
+	myUVMinMax = V4F(0.f, 0.f, 1.f, 1.f);
 
 	SetScale({ 1.f, 1.f });
 
@@ -21,7 +22,10 @@ SpriteInstance::SpriteInstance(Sprite* aSprite)
 
 	myScale = { 1.f, 1.f };
 
-	myBaseScale = V2F(aSprite->GetSpriteData().mySize.x / Sprite::ourWindowSize.x, aSprite->GetSpriteData().mySize.y / Sprite::ourWindowSize.y) * 2.f;
+	V2ui windowSize = WindowHandler::GetInstance().GetSize();
+	myBaseScale = V2f(
+		aSprite->GetSpriteData().mySize.x / static_cast<float>(windowSize.x),
+		aSprite->GetSpriteData().mySize.y / static_cast<float>(windowSize.y)) * 2.f;
 
 	myDepth = 0.f;
 }
@@ -36,17 +40,17 @@ Sprite* SpriteInstance::GetSprite()
 	return mySprite;
 }
 
-void SpriteInstance::SetPosition(const CommonUtilities::Vector2<float>& aPosition)
+void SpriteInstance::SetPosition(const V2f& aPosition)
 {
 	myPosition = aPosition;
 }
 
 void SpriteInstance::SetPosition(float aPositionX, float aPositionY)
 {
-	SetPosition(V2F(aPositionX, aPositionY));
+	SetPosition(V2f(aPositionX, aPositionY));
 }
 
-void SpriteInstance::SetScale(const CommonUtilities::Vector2<float>& aScale)
+void SpriteInstance::SetScale(const V2f& aScale)
 {
 	myScale = aScale;
 }
@@ -61,7 +65,7 @@ void SpriteInstance::SetRotation(const float aRotation)
 	myRotation = aRotation;
 }
 
-void SpriteInstance::SetPivot(const CommonUtilities::Vector2<float>& aPivot)
+void SpriteInstance::SetPivot(const V2f& aPivot)
 {
 	myPivot = aPivot;
 }
@@ -71,7 +75,7 @@ void SpriteInstance::SetColor(const CommonUtilities::Vector4<float>& aColor)
 	myColor = aColor;
 }
 
-void SpriteInstance::SetUVMinMax(const CommonUtilities::Vector2<float>& aMin, const CommonUtilities::Vector2<float>& aMax)
+void SpriteInstance::SetUVMinMax(const V2f& aMin, const V2f& aMax)
 {
 	myUVMinMax.x = aMin.x;
 	myUVMinMax.y = aMin.y;
@@ -80,18 +84,20 @@ void SpriteInstance::SetUVMinMax(const CommonUtilities::Vector2<float>& aMin, co
 	myUVMinMax.w = aMax.y;
 }
 
-void SpriteInstance::SetUVMinMaxInTexels(const CommonUtilities::Vector2<float>& aMin, const CommonUtilities::Vector2<float>& aMax)
+void SpriteInstance::SetUVMinMaxInTexels(const V2f& aMin, const V2f& aMax)
 {
-	myUVMinMax.x = aMin.x / (myBaseScale.x * Sprite::ourWindowSize.x) * 2;
-	myUVMinMax.y = aMin.y / (myBaseScale.y * Sprite::ourWindowSize.y) * 2;
+	V2ui windowSize = WindowHandler::GetInstance().GetSize();
 
-	myUVMinMax.z = aMax.x / (myBaseScale.x * Sprite::ourWindowSize.x) * 2;
-	myUVMinMax.w = aMax.y / (myBaseScale.y * Sprite::ourWindowSize.y) * 2;
+	myUVMinMax.x = aMin.x / (myBaseScale.x * static_cast<float>(windowSize.x)) * 2;
+	myUVMinMax.y = aMin.y / (myBaseScale.y * static_cast<float>(windowSize.y)) * 2;
+
+	myUVMinMax.z = aMax.x / (myBaseScale.x * static_cast<float>(windowSize.x)) * 2;
+	myUVMinMax.w = aMax.y / (myBaseScale.y * static_cast<float>(windowSize.y)) * 2;
 }
 
 void SpriteInstance::SetUVMinMax(const CommonUtilities::Vector4<float>& aMinMax)
 {
-	SetUVMinMax(V2F(aMinMax.x, aMinMax.y), V2F(aMinMax.z, aMinMax.w));
+	SetUVMinMax(V2f(aMinMax.x, aMinMax.y), V2f(aMinMax.z, aMinMax.w));
 }
 
 void SpriteInstance::SetDepth(float aDepth)
@@ -99,23 +105,24 @@ void SpriteInstance::SetDepth(float aDepth)
 	myDepth = aDepth;
 }
 
-void SpriteInstance::SetSize(V2F aSize)
+void SpriteInstance::SetSize(V2f aSize)
 {
 	myScale = aSize / myBaseScale * 2.f;
 }
 
-void SpriteInstance::SetSizeInPixel(V2F aSize)
+void SpriteInstance::SetSizeInPixel(V2f aSize)
 {
-	myScale = (aSize / Sprite::ourWindowSize) / myBaseScale * 2.f;
+	V2ui windowSize = WindowHandler::GetInstance().GetSize();
+	myScale = (aSize / static_cast<V2f>(windowSize)) / myBaseScale * 2.f;
 }
 
 const CommonUtilities::Matrix4x4<float> SpriteInstance::GetTransform() const
 {
 	return M44f::CreateRotationAroundZ(myRotation) *
-		M44f({	myScale.x * myBaseScale.x,	0.f,							0.f, 0.f,
+		M44f({ myScale.x * myBaseScale.x,	0.f,							0.f, 0.f,
 				0.f,						myScale.y * myBaseScale.y,		0.f, 0.f,
 				0.f,						0.f,							1.f, 0.f,
-				(myPosition.x * 2.f - 1.f), -(myPosition.y * 2.f - 1.f),	0.f, 1.f});
+				(myPosition.x * 2.f - 1.f), -(myPosition.y * 2.f - 1.f),	0.f, 1.f });
 }
 
 const M44f SpriteInstance::GetPivotTransform() const
@@ -126,7 +133,7 @@ const M44f SpriteInstance::GetPivotTransform() const
 			 -myPivot.x, myPivot.y, 0.f, 1.f };
 }
 
-const CommonUtilities::Vector2<float> SpriteInstance::GetPosition() const
+const V2f SpriteInstance::GetPosition() const
 {
 	return myPosition;
 }
@@ -136,12 +143,12 @@ const CommonUtilities::Vector4<float>& SpriteInstance::GetColor() const
 	return myColor;
 }
 
-const CommonUtilities::Vector2<float> SpriteInstance::GetScale() const
+const V2f SpriteInstance::GetScale() const
 {
 	return myScale;
 }
 
-const CommonUtilities::Vector2<float>& SpriteInstance::GetPivot() const
+const V2f& SpriteInstance::GetPivot() const
 {
 	return myPivot;
 }
@@ -151,19 +158,19 @@ const CommonUtilities::Vector4<float>& SpriteInstance::GetUVMinMax() const
 	return myUVMinMax;
 }
 
-const CommonUtilities::Vector2<float> SpriteInstance::GetImageSize() const
+const V2f SpriteInstance::GetImageSize() const
 {
 	return { CAST(float, mySprite->GetSpriteData().mySize.x), CAST(float, mySprite->GetSpriteData().mySize.y) };
 }
 
-const CommonUtilities::Vector2<float> SpriteInstance::GetSizeWithScale() const
+const V2f SpriteInstance::GetSizeWithScale() const
 {
 	return { CAST(float, mySprite->GetSpriteData().mySize.x) * GetScale().x, CAST(float, mySprite->GetSpriteData().mySize.y) * GetScale().y };
 }
 
-const CommonUtilities::Vector2<float> SpriteInstance::GetSizeOnScreen() const
+const V2f SpriteInstance::GetSizeOnScreen() const
 {
-	return GetSizeWithScale() / Sprite::ourWindowSize;
+	return GetSizeWithScale() / static_cast<V2f>(WindowHandler::GetInstance().GetSize());
 }
 
 const float SpriteInstance::GetDepth() const
@@ -193,8 +200,9 @@ void SpriteInstance::ImGui()
 	ImGui::Text("Sprite");
 
 
+	V2ui windowSize = WindowHandler::GetInstance().GetSize();
 	const float imScale = 0.4f;
-	ImVec2 imageSize = ImVec2(imScale * myBaseScale.x * Sprite::ourWindowSize.x, imScale * myBaseScale.y * Sprite::ourWindowSize.y);
+	ImVec2 imageSize = ImVec2(imScale * myBaseScale.x * windowSize.x, imScale * myBaseScale.y * windowSize.y);
 	float windWidth = ImGui::GetWindowWidth();
 	if (imageSize.x > windWidth)
 	{
@@ -204,7 +212,7 @@ void SpriteInstance::ImGui()
 	ImVec2 cursorpos = ImGui::GetCursorScreenPos();
 	ImVec2 iopos = ImVec2(ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
 	Tools::ZoomableImGuiImage(mySprite->GetSpriteData().myTexture.GetAsTexture(), imageSize);
-	V2F mpInImage = V2F((iopos.x - cursorpos.x) / imageSize.x, (iopos.y - cursorpos.y) / imageSize.y);
+	V2f mpInImage = V2f((iopos.x - cursorpos.x) / imageSize.x, (iopos.y - cursorpos.y) / imageSize.y);
 
 	bool mouseInside = mpInImage.x > 0.f && mpInImage.x < 1.f && mpInImage.y > 0.f && mpInImage.y < 1.f;
 

@@ -14,7 +14,7 @@ SpotLight* SpotLightFactory::LoadSpotlight(const std::string& aTexturePath, floa
 	light->myCamera = CCameraFactory::CreateCamera(aFOV,false,20.f,aRange);
 	light->myCamera->Rotate(aRotation);
 	light->myCamera->SetPosition(aPosition);
-	light->myCamera->SetResolution(V2F(128, 128));
+	light->myCamera->SetResolution(V2ui(128, 128));
 	light->myRange = aRange;
 	light->myIntensity = aIntensity;
 	light->myTexture = AssetManager::GetInstance().GetTexture(aTexturePath);
@@ -26,7 +26,7 @@ SpotLight* SpotLightFactory::LoadSpotlight(const std::string& aTexturePath, floa
 	SpotLight* light = new SpotLight();
 	light->myCamera = CCameraFactory::CreateCamera(aFOV, false, 20.f, aRange);
 	light->myCamera->SetTransform(aCameraToCopyFrom->GetTransform());
-	light->myCamera->SetResolution(V2F(128, 128));
+	light->myCamera->SetResolution(V2ui(128, 128));
 	light->myRange = aRange;
 	light->myIntensity = aIntensity;
 	light->myTexture = AssetManager::GetInstance().GetTexture(aTexturePath);

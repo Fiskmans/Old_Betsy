@@ -14,12 +14,17 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam
 
 CommonUtilities::InputHandler WindowHandler::myInputHandler;
 DirectX11Framework* WindowHandler::myFrameWork = nullptr;
-Window::WindowData WindowHandler::myWindowData;
 
 WindowHandler::WindowHandler() :
 	myWindowHandle(NULL),
 	myTaskbarButtonCreatedMessageId(0),
-	myWindowStyle(0)
+	myWindowStyle(0),
+	Observer({
+			MessageType::ResizeWindow,
+			MessageType::SuperTinyWindow,
+			MessageType::WindowSmallerThanAMouse,
+			MessageType::PleaseResetTheWindowThanks
+		})
 {
 }
 
@@ -31,23 +36,6 @@ WindowHandler::~WindowHandler()
 		SYSERROR("Could not close window");
 	}
 	Logger::Shutdown();
-}
-
-void WindowHandler::SubscribeToMessages()
-{
-	PostMaster::GetInstance()->Subscribe(MessageType::ResizeWindow,this);
-	PostMaster::GetInstance()->Subscribe(MessageType::SuperTinyWindow, this);
-	PostMaster::GetInstance()->Subscribe(MessageType::WindowSmallerThanAMouse, this);
-	PostMaster::GetInstance()->Subscribe(MessageType::PleaseResetTheWindowThanks, this);
-
-}
-
-void WindowHandler::UnSubscrideToMessages()
-{
-	PostMaster::GetInstance()->UnSubscribe(MessageType::ResizeWindow, this);
-	PostMaster::GetInstance()->Subscribe(MessageType::SuperTinyWindow, this);
-	PostMaster::GetInstance()->Subscribe(MessageType::WindowSmallerThanAMouse, this);
-	PostMaster::GetInstance()->Subscribe(MessageType::PleaseResetTheWindowThanks, this);
 }
 
 LRESULT CALLBACK WindowHandler::WinProc(_In_ HWND aHWND, _In_ UINT aUMsg, _In_ WPARAM aWParam, _In_ LPARAM aLParam)
@@ -77,20 +65,21 @@ LRESULT CALLBACK WindowHandler::WinProc(_In_ HWND aHWND, _In_ UINT aUMsg, _In_ W
 
 	if (aUMsg == WM_CREATE)
 	{
+		assert(!windowHandler);
 		CREATESTRUCT* createStruct = reinterpret_cast<CREATESTRUCT*>(aLParam);
 		windowHandler = reinterpret_cast<WindowHandler*>(createStruct->lpCreateParams);
 	}
 	else if (myFrameWork && aUMsg == WM_SIZE)
 	{
+		assert(windowHandler);
+
 		myFrameWork->Resize(aHWND);
 
 		RECT rect;
 		GetWindowRect(static_cast<HWND>(aHWND), &rect);
 
-		myWindowData.myX = CAST(unsigned short, rect.left);
-		myWindowData.myY = CAST(unsigned short, rect.top);
-		myWindowData.myWidth = CAST(unsigned short, rect.right - rect.left);
-		myWindowData.myHeight = CAST(unsigned short, rect.bottom - rect.top);
+		windowHandler->mySize.x = rect.right - rect.left;
+		windowHandler->mySize.y = rect.bottom - rect.top;
 	}
 
 #if USEIMGUI
@@ -103,16 +92,6 @@ LRESULT CALLBACK WindowHandler::WinProc(_In_ HWND aHWND, _In_ UINT aUMsg, _In_ W
 
 	myInputHandler.UpdateEvents(aUMsg, aWParam, aLParam); 
 
-#ifdef _DEBUG
-#if ESCAPEQUITSGAME
-	if (myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key_Escape))
-	{
-		PostQuitMessage(0);
-		return 0;
-	}
-#endif
-#endif // DEBUG
-
 	if (!hwndIsSet)
 	{
 		myInputHandler.SetWindowHandle(aHWND);
@@ -121,41 +100,38 @@ LRESULT CALLBACK WindowHandler::WinProc(_In_ HWND aHWND, _In_ UINT aUMsg, _In_ W
 	return DefWindowProc(aHWND, aUMsg, aWParam, aLParam);
 }
 
-bool WindowHandler::Init(Window::WindowData aWindowData, DirectX11Framework* aFramework)
+bool WindowHandler::OpenWindow()
 {
-	if (aFramework)
-	{
-		WNDCLASSW windowClass = {};
-		windowClass.style = CS_VREDRAW | CS_HREDRAW | CS_OWNDC;
-		windowClass.lpfnWndProc = WindowHandler::WinProc;
-		windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-		windowClass.lpszClassName = L"Gamla Bettan";
-		RegisterClassW(&windowClass);
-		myWindowStyle = WS_POPUP | WS_VISIBLE;
+	return OpenWindow({
+			static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN)),
+			static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN))
+		});
+}
 
-#if USEFULLSCREEN
-		myWindowStyle |= WS_MAXIMIZE | WS_OVERLAPPED;
-		aWindowData.myX = 0;
-		aWindowData.myY = 0;
-		aWindowData.myWidth = CAST(unsigned short, GetSystemMetrics(SM_CXSCREEN));
-		aWindowData.myHeight = CAST(unsigned short,  GetSystemMetrics(SM_CYSCREEN));
-#else
-		myWindowStyle |= WS_OVERLAPPEDWINDOW;
-#endif
-		Sprite::ourWindowSize = V2F(aWindowData.myWidth, aWindowData.myHeight);
+bool WindowHandler::OpenWindow(V2ui aSize)
+{
+	assert(!myWindowHandle);
 
-		myWindowHandle = CreateWindowW(L"Gamla Bettan", L"MoonView Mountain", myWindowStyle,
-										aWindowData.myX, aWindowData.myY, aWindowData.myWidth, aWindowData.myHeight, 
-										nullptr, nullptr, nullptr, this);
+	mySize = aSize;
 
-		myTaskbarButtonCreatedMessageId = RegisterWindowMessage(L"TaskbarButtonCreated");
+	WNDCLASSW windowClass = {};
+	windowClass.style = CS_VREDRAW | CS_HREDRAW | CS_OWNDC;
+	windowClass.lpfnWndProc = WindowHandler::WinProc;
+	windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	windowClass.lpszClassName = L"Gamla Bettan";
+	RegisterClassW(&windowClass);
+	myWindowStyle = WS_POPUP | WS_VISIBLE;
 
-		ChangeWindowMessageFilterEx(myWindowHandle, myTaskbarButtonCreatedMessageId, MSGFLT_ALLOW, NULL);
-	}
+	myWindowStyle |= WS_MAXIMIZE | WS_OVERLAPPED;
 
+	myWindowHandle = CreateWindowW(L"Gamla Bettan", L"MoonView Mountain", myWindowStyle,
+									0 , 0, mySize.x, mySize.y,
+									nullptr, nullptr, nullptr, this);
 
-	myWindowData = aWindowData;
-	myFrameWork = aFramework;
+	myTaskbarButtonCreatedMessageId = RegisterWindowMessage(L"TaskbarButtonCreated");
+
+	ChangeWindowMessageFilterEx(myWindowHandle, myTaskbarButtonCreatedMessageId, MSGFLT_ALLOW, NULL);
+
 	return true;
 }
 
@@ -169,14 +145,9 @@ CommonUtilities::InputHandler& WindowHandler::GetInputHandler()
 	return myInputHandler;
 }
 
-unsigned short WindowHandler::GetWidth()
+V2ui WindowHandler::GetSize()
 {
-	return myWindowData.myWidth;
-}
-
-unsigned short WindowHandler::GetHeight()
-{
-	return myWindowData.myHeight;
+	return mySize;
 }
 
 void WindowHandler::RecieveMessage(const Message& aMessage)
@@ -184,7 +155,10 @@ void WindowHandler::RecieveMessage(const Message& aMessage)
 	switch (aMessage.myMessageType)
 	{
 	case MessageType::ResizeWindow:
-		SetWindowPos(myWindowHandle, 0, 0, 0, aMessage.myIntValue, aMessage.myIntValue2, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+	{
+		const V2ui& data = *reinterpret_cast<const V2ui*>(aMessage.myData);
+		SetWindowPos(myWindowHandle, 0, 0, 0, data.x, data.y, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+	}
 		break;
 	case MessageType::SuperTinyWindow:
 		SetWindowPos(myWindowHandle, 0, 0, 0, 256, 144, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);

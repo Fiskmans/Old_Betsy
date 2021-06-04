@@ -15,15 +15,12 @@ public:
 	bool Init(DirectX11Framework* aFramework);
 
 	SpriteInstance* CreateSprite(const std::string& aDDSPath);
-	SpriteInstance* CreateVideoSprite();
-
 
 private:
-	Sprite* GetSprite(const std::string& aDDSPath, const bool aIsMovie);
-	Sprite* LoadSprite(const std::string& aDDSPath, const bool aIsMovie);
+	Sprite* GetSprite(const std::string& aDDSPath);
+	Sprite* LoadSprite(const std::string& aDDSPath);
 
 	ID3D11Device* myDevice;
 	std::unordered_map<std::string, Sprite*> mySprites;
 	const std::string myTriangleName = "EngineTriangle";
-	const std::string myVideoSpritePath = "Data\\Textures\\video.dds";
 };

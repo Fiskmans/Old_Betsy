@@ -40,7 +40,7 @@ void ParticleInstance::Update(const float aDeltaTime, const V3F& aCameraPosition
 				Tools::RandomRange(myBoundsMin, myBoundsMax),
 					vel,		
 					particleData.myCustomizable.myStart.myParticleColor,
-					V2F(particleData.myCustomizable.myStart.mySize, particleData.myCustomizable.myStart.mySize)
+					V2f(particleData.myCustomizable.myStart.mySize, particleData.myCustomizable.myStart.mySize)
 				));
 			myTime -= particleInterval;
 
@@ -68,14 +68,14 @@ void ParticleInstance::Update(const float aDeltaTime, const V3F& aCameraPosition
 		float size = LERP(particleData.myCustomizable.myStart.mySize, particleData.myCustomizable.myEnd.mySize, part);
 
 		myParticleVertices[index].myColor = LERP(particleData.myCustomizable.myStart.myParticleColor, particleData.myCustomizable.myEnd.myParticleColor, part);
-		myParticleVertices[index].mySize = V2F(size, size);
+		myParticleVertices[index].mySize = V2f(size, size);
 		myParticleVertices[index].myDistanceToCamera = V3F(myParticleVertices[index].myPosition).DistanceSqr(aCameraPosition);
 
 		if (particleData.myCustomizable.myFlipBook.myPages > 0)
 		{
 			float timePerFrame = particleData.myCustomizable.myFlipBook.myTime / particleData.myCustomizable.myFlipBook.myPages;
 
-			V2F frameSize = { 1.f / particleData.myCustomizable.myFlipBook.mySizeX, 1.f / particleData.myCustomizable.myFlipBook.mySizeY };
+			V2f frameSize = { 1.f / particleData.myCustomizable.myFlipBook.mySizeX, 1.f / particleData.myCustomizable.myFlipBook.mySizeY };
 
 			for (int i = 0; i <= particleData.myCustomizable.myFlipBook.myPages; ++i)
 			{

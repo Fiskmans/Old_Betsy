@@ -4,22 +4,24 @@
 #include "../GamlaBettan/InputHandler.h"
 #include "Message.hpp"
 #include "XboxInput.h"
-#include "PauseState.h"
-#ifdef _DEBUG
-#include "../GamlaBettan/DebugTools.h"
-#endif // _DEBUG
 #include "Sprite.h"
 
 
 InputManager::InputManager()
+	: Observer({
+			MessageType::InputPauseHit,
+			MessageType::InputUnPauseHit,
+			MessageType::GameActive,
+			MessageType::GameNotActive,
+			MessageType::CurrentLevel,
+			MessageType::WeaponRecoil
+		})
 {
 	myInputHandler = nullptr;
 
 	myIsPaused = false;
 	myMouseIsMoving = false;
 	myGameExists = false;
-
-	myLevel = 0;
 
 	myCurrentMousePosition = { 0 };
 
@@ -31,172 +33,158 @@ InputManager::InputManager()
 InputManager::~InputManager()
 {
 	myInputHandler = nullptr;
-
-	UnSubscribeToMessage(MessageType::InputPauseHit);
-	UnSubscribeToMessage(MessageType::InputUnPauseHit);
-	UnSubscribeToMessage(MessageType::GameActive);
-	UnSubscribeToMessage(MessageType::GameNotActive);
-	UnSubscribeToMessage(MessageType::CurrentLevel);
-	UnSubscribeToMessage(MessageType::WeaponRecoil);
 }
 
 void InputManager::Init(CommonUtilities::InputHandler* aInputHandler)
 {
 	myInputHandler = aInputHandler;
-
-	SubscribeToMessage(MessageType::InputPauseHit);
-	SubscribeToMessage(MessageType::InputUnPauseHit);
-	SubscribeToMessage(MessageType::GameActive);
-	SubscribeToMessage(MessageType::GameNotActive);
-	SubscribeToMessage(MessageType::CurrentLevel);
-	SubscribeToMessage(MessageType::WeaponRecoil);
 }
 
 void InputManager::Update()
 {
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_1))
 	{
-		Publisher::SendMessages(MessageType::InputEquipmentSlot1Hit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputEquipmentSlot1Hit);
 	}
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_2))
 	{
-		Publisher::SendMessages(MessageType::InputEquipmentSlot2Hit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputEquipmentSlot2Hit);
 	}
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_3))
 	{
-		Publisher::SendMessages(MessageType::InputEquipmentSlot3Hit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputEquipmentSlot3Hit);
 	}
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_4))
 	{
-		Publisher::SendMessages(MessageType::InputEquipmentSlot4Hit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputEquipmentSlot4Hit);
 	}
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_5))
 	{
-		Publisher::SendMessages(MessageType::InputEquipmentSlot5Hit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputEquipmentSlot5Hit);
 	}
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_6))
 	{
-		Publisher::SendMessages(MessageType::InputEquipmentSlot6Hit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputEquipmentSlot6Hit);
 	}
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_7))
 	{
-		Publisher::SendMessages(MessageType::InputEquipmentSlot7Hit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputEquipmentSlot7Hit);
 	}
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_8))
 	{
-		Publisher::SendMessages(MessageType::InputEquipmentSlot8Hit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputEquipmentSlot8Hit);
 	}
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_9))
 	{
-		Publisher::SendMessages(MessageType::InputEquipmentSlot9Hit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputEquipmentSlot9Hit);
 	}
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_0))
 	{
-		Publisher::SendMessages(MessageType::InputEquipmentSlot10Hit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputEquipmentSlot10Hit);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_W))
 	{
-		Publisher::SendMessages(MessageType::InputUpHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputUpHit);
 	}
 	if (myInputHandler->IsKeyDown(myInputHandler->Key_W))
 	{
-		Publisher::SendMessages(MessageType::InputUpIsDown);
+		PostMaster::GetInstance().SendMessages(MessageType::InputUpIsDown);
 	}
 	if (myInputHandler->IsKeyReleased(myInputHandler->Key_W))
 	{
-		Publisher::SendMessages(MessageType::InputUpReleased);
+		PostMaster::GetInstance().SendMessages(MessageType::InputUpReleased);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_S))
 	{
-		Publisher::SendMessages(MessageType::InputDownHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputDownHit);
 	}
 	if (myInputHandler->IsKeyDown(myInputHandler->Key_S))
 	{
-		Publisher::SendMessages(MessageType::InputDownIsDown);
+		PostMaster::GetInstance().SendMessages(MessageType::InputDownIsDown);
 	}
 	if (myInputHandler->IsKeyReleased(myInputHandler->Key_S))
 	{
-		Publisher::SendMessages(MessageType::InputDownReleased);
+		PostMaster::GetInstance().SendMessages(MessageType::InputDownReleased);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_A))
 	{
-		Publisher::SendMessages(MessageType::InputLeftHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputLeftHit);
 	}
 	if (myInputHandler->IsKeyDown(myInputHandler->Key_A))
 	{
-		Publisher::SendMessages(MessageType::InputLeftIsDown);
+		PostMaster::GetInstance().SendMessages(MessageType::InputLeftIsDown);
 	}
 	if (myInputHandler->IsKeyReleased(myInputHandler->Key_A))
 	{
-		Publisher::SendMessages(MessageType::InputLeftReleased);
+		PostMaster::GetInstance().SendMessages(MessageType::InputLeftReleased);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_D))
 	{
-		Publisher::SendMessages(MessageType::InputRightHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputRightHit);
 	}
 	if (myInputHandler->IsKeyDown(myInputHandler->Key_D))
 	{
-		Publisher::SendMessages(MessageType::InputRightIsDown);
+		PostMaster::GetInstance().SendMessages(MessageType::InputRightIsDown);
 	}
 	if (myInputHandler->IsKeyReleased(myInputHandler->Key_D))
 	{
-		Publisher::SendMessages(MessageType::InputRightReleased);
+		PostMaster::GetInstance().SendMessages(MessageType::InputRightReleased);
 	}
 
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_Space))
 	{
-		Publisher::SendMessages(MessageType::InputJumpHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputJumpHit);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_Down))
 	{
-		Publisher::SendMessages(MessageType::InputDownHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputDownHit);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_Left))
 	{
-		Publisher::SendMessages(MessageType::InputLeftHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputLeftHit);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_Right))
 	{
-		Publisher::SendMessages(MessageType::InputRightHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputRightHit);
 	}
 
 
 	if (myInputHandler->IsKeyReleased(myInputHandler->Key_Up))
 	{
-		Publisher::SendMessages(MessageType::InputUpReleased);
+		PostMaster::GetInstance().SendMessages(MessageType::InputUpReleased);
 	}
 
 	if (myInputHandler->IsKeyReleased(myInputHandler->Key_Down))
 	{
-		Publisher::SendMessages(MessageType::InputDownReleased);
+		PostMaster::GetInstance().SendMessages(MessageType::InputDownReleased);
 	}
 
 	if (myInputHandler->IsKeyReleased(myInputHandler->Key_Left))
 	{
-		Publisher::SendMessages(MessageType::InputLeftReleased);
+		PostMaster::GetInstance().SendMessages(MessageType::InputLeftReleased);
 	}
 
 	if (myInputHandler->IsKeyReleased(myInputHandler->Key_Right))
 	{
-		Publisher::SendMessages(MessageType::InputRightReleased);
+		PostMaster::GetInstance().SendMessages(MessageType::InputRightReleased);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_R))
 	{
-		Publisher::SendMessages(MessageType::InputReload);
+		PostMaster::GetInstance().SendMessages(MessageType::InputReload);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_Escape))
 	{
-		Publisher::SendMessages(MessageType::InputEscHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputEscHit);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_C))
@@ -205,32 +193,32 @@ void InputManager::Update()
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_Space))
 	{
-		Publisher::SendMessages(MessageType::InputJumpHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputJumpHit);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_Shift))
 	{
-		Publisher::SendMessages(MessageType::InputRunHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputRunHit);
 	}
 
 	if (myInputHandler->IsKeyReleased(myInputHandler->Key_Shift))
 	{
-		Publisher::SendMessages(MessageType::InputRunReleased);
+		PostMaster::GetInstance().SendMessages(MessageType::InputRunReleased);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_Control))
 	{
-		Publisher::SendMessages(MessageType::InputCrouchHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputCrouchHit);
 	}
 
 	if (myInputHandler->IsKeyReleased(myInputHandler->Key_Control))
 	{
-		Publisher::SendMessages(MessageType::InputCrouchReleased);
+		PostMaster::GetInstance().SendMessages(MessageType::InputCrouchReleased);
 	}
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_Enter) || GetAsyncKeyState(VK_RETURN))
 	{
-		Publisher::SendMessages(MessageType::InputAccept);
+		PostMaster::GetInstance().SendMessages(MessageType::InputAccept);
 	}
 
 	/*if (myInputHandler->IsMouseHit(myInputHandler->Mouse_Left))
@@ -240,32 +228,9 @@ void InputManager::Update()
 
 	if (myInputHandler->IsKeyHit(myInputHandler->Key_I))
 	{
-		SendMessages(MessageType::InputToggleInventory);
+		PostMaster::GetInstance().SendMessages(MessageType::InputToggleInventory);
 	}
 
-	if (myInputHandler->IsKeyHit(CU::InputHandler::Key_Escape))
-	{
-		if (myGameExists)
-		{
-			Message msg;
-
-			if (myIsPaused)
-			{
-				msg.myMessageType = MessageType::PopState;
-				msg.myBool = false;
-				Publisher::SendMessages(MessageType::InputUnPauseHit);
-			}
-			else
-			{
-				msg.myData = new PauseState;
-				static_cast<PauseState*>(msg.myData)->Init();
-				msg.myMessageType = MessageType::PushState;
-				Publisher::SendMessages(MessageType::InputPauseHit);
-			}
-
-			PostMaster::GetInstance()->SendMessages(msg);
-		}
-	}
 
 	for (char i = 'A'; i < 'Z'; i++)
 	{
@@ -285,12 +250,12 @@ void InputManager::Update()
 		myCurrentMousePosition.x = static_cast<float>(myInputHandler->GetMouseNomalizedX());
 		myCurrentMousePosition.y = static_cast<float>(myInputHandler->GetMouseNomalizedY());
 
+		V2f data{
+			myInputHandler->GetMouseNomalizedX(),
+			myInputHandler->GetMouseNomalizedY()
+		};
 
-		Message message;
-		message.myFloatValue = static_cast<float>(myInputHandler->GetMouseNomalizedX());
-		message.myFloatValue2 = static_cast<float>(myInputHandler->GetMouseNomalizedY());
-		message.myMessageType = MessageType::InputMouseMoved;
-		Publisher::SendMessages(message);
+		PostMaster::GetInstance().SendMessages(MessageType::InputMouseMoved, &data);
 
 		myMouseIsMoving = true;
 	}
@@ -300,63 +265,63 @@ void InputManager::Update()
 
 		Message message;
 		message.myMessageType = MessageType::InputMouseStopedMoving;
-		Publisher::SendMessages(message);
+		PostMaster::GetInstance().SendMessages(message);
 	}
 
 
 	if (myInputHandler->IsMouseHit(myInputHandler->Mouse_Left))
 	{
-		Message message;
-		message.myMessageType = MessageType::InputLeftMouseHit;
-		message.myFloatValue = static_cast<float>(myInputHandler->GetMousePosition().x) / Sprite::ourWindowSize.x;
-		message.myFloatValue2 = static_cast<float>(myInputHandler->GetMousePosition().y) / Sprite::ourWindowSize.y;
+		V2f data{
+			myInputHandler->GetMouseNomalizedX(),
+			myInputHandler->GetMouseNomalizedY()
+		};
 
-		Publisher::SendMessages(message);
+		PostMaster::GetInstance().SendMessages(MessageType::InputLeftMouseHit, &data);
 	}
 
 	if (myInputHandler->IsMouseDown(myInputHandler->Mouse_Left))
 	{
-		Message message;
-		message.myMessageType = MessageType::InputLeftMouseDown;
-		message.myFloatValue = static_cast<float>(myInputHandler->GetMousePosition().x) / Sprite::ourWindowSize.x;
-		message.myFloatValue2 = static_cast<float>(myInputHandler->GetMousePosition().y) / Sprite::ourWindowSize.y;
+		V2f data{
+			myInputHandler->GetMouseNomalizedX(),
+			myInputHandler->GetMouseNomalizedY()
+		};
 
-		Publisher::SendMessages(message);
+		PostMaster::GetInstance().SendMessages(MessageType::InputLeftMouseDown, &data);
 	}
 
 	if (myInputHandler->IsMouseReleased(myInputHandler->Mouse_Left))
 	{
-		Message message;
-		message.myMessageType = MessageType::InputLeftMouseReleased;
-		message.myFloatValue = static_cast<float>(myInputHandler->GetMousePosition().x) / Sprite::ourWindowSize.x;
-		message.myFloatValue2 = static_cast<float>(myInputHandler->GetMousePosition().y) / Sprite::ourWindowSize.y;
+		V2f data{
+			myInputHandler->GetMouseNomalizedX(),
+			myInputHandler->GetMouseNomalizedY()
+		};
 
-		Publisher::SendMessages(message);
+		PostMaster::GetInstance().SendMessages(MessageType::InputLeftMouseReleased, &data);
 	}
 
 	if (myInputHandler->IsMouseHit(myInputHandler->Mouse_Right))
 	{
-		Publisher::SendMessages(MessageType::InputRightMouseHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputRightMouseHit);
 	}
 
 	if (myInputHandler->IsMouseDown(myInputHandler->Mouse_Right))
 	{
-		//Publisher::SendMessages(MessageType::InputRightMouseDown);
+		//PostMaster::GetInstance().SendMessages(MessageType::InputRightMouseDown);
 	}
 
 	if (myInputHandler->IsMouseReleased(myInputHandler->Mouse_Right))
 	{
-		Publisher::SendMessages(MessageType::InputRightMouseReleased);
+		PostMaster::GetInstance().SendMessages(MessageType::InputRightMouseReleased);
 	}
 
 	if (myInputHandler->IsMouseHit(myInputHandler->Mouse_Middle))
 	{
-		Publisher::SendMessages(MessageType::InputMiddleMouseHit);
+		PostMaster::GetInstance().SendMessages(MessageType::InputMiddleMouseHit);
 	}
 
 	if (myInputHandler->IsMouseDown(myInputHandler->Mouse_Middle))
 	{
-		Publisher::SendMessages(MessageType::InputMiddleMouseDown);
+		PostMaster::GetInstance().SendMessages(MessageType::InputMiddleMouseDown);
 	}
 
 	short vel = myInputHandler->GetWheelVelNormalized();
@@ -364,26 +329,9 @@ void InputManager::Update()
 	{
 		for (size_t i = 0; i < std::abs(vel); i++)
 		{
-			Publisher::SendMessages(vel < 0 ? MessageType::InputScrollDown : MessageType::InputScrollUp);
+			PostMaster::GetInstance().SendMessages(vel < 0 ? MessageType::InputScrollDown : MessageType::InputScrollUp);
 		}
 	}
-
-#ifndef _RETAIL
-	if (myInputHandler->IsKeyHit(myInputHandler->Key_F2))
-	{
-		const int assetGym = 1;
-		static int lastLvl = 0;
-
-		Message mess;
-		mess.myMessageType = MessageType::ChangeLevel;
-		mess.myIntValue = (myLevel == assetGym ? lastLvl : assetGym);
-
-		lastLvl = myLevel;
-
-		Publisher::SendMessages(mess);
-
-	}
-#endif // !_RETAIL
 
 	myInputHandler->FinalizeUpdate();
 }
@@ -425,17 +373,6 @@ void InputManager::RecieveMessage(const Message& aMessage)
 
 	case MessageType::GameNotActive:
 		myGameExists = myIsPaused;
-		break;
-
-	case MessageType::CurrentLevel:
-		myLevel = aMessage.myIntValue;
-		break;
-
-	case MessageType::WeaponRecoil:
-		Point recoilOffset = myInputHandler->GetMousePosition();
-		recoilOffset.y += aMessage.myIntValue;
-		recoilOffset.x += aMessage.myIntValue2;
-		myInputHandler->SetMousePosition(recoilOffset.x, recoilOffset.y);
 		break;
 
 	default:

@@ -1,7 +1,4 @@
 #pragma once
-#include <array>
-#include "Observer.hpp"
-#include "Publisher.hpp"
 
 typedef unsigned __int64 AudioObjectID;
 typedef unsigned long AudioEventID;
@@ -24,7 +21,7 @@ struct TimedAudioEvent
 class GameObject;
 class WwiseFramework;
 
-class AudioManager : public Observer, public Publisher
+class AudioManager : public Observer
 {
 public:
 	AudioManager();
@@ -57,13 +54,9 @@ public:
 	void UpdateObjectTransform(const LMVector& aPosition, const LMVector& aForward, const LMVector& aTop, const int& aObjectID);
 
 private:
-
-	void SubscribeToMyMessages();
-	void UnSubscribeToMyMessages();
-
 	WwiseFramework* myWwiseFramework;
 
-	float myMasterVolume;
+	int myMasterVolume;
 	
 	AudioObjectID myListenerID;
 	AudioObjectID my2DMasterObjectID;

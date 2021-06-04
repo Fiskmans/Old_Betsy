@@ -49,7 +49,7 @@ Decal* DecalFactory::LoadDecal(const std::string& aDecalPath, V3F aRotation, V3F
 		decal->myCamera = CCameraFactory::CreateCamera(fov, false, 20.f, range);
 		decal->myCamera->Rotate(TORAD(aRotation));
 		decal->myCamera->SetPosition(aPosition);
-		decal->myCamera->SetResolution(V2F(128, 128));
+		decal->myCamera->SetResolution(V2ui(128, 128));
 		decal->myRange = range;
 		decal->myTimestamp = Tools::GetTotalTime();
 		decal->myPixelShader = AssetManager::GetInstance().GetPixelShader(shaderFilePath);
@@ -75,7 +75,7 @@ Decal* DecalFactory::LoadDecal(const std::string& aDecalPath, Camera* aCameraToC
 		Decal* decal = new Decal();
 		decal->myCamera = CCameraFactory::CreateCamera(fov, false, 20.f, range);
 		decal->myCamera->SetTransform(aCameraToCopyFrom->GetTransform());
-		decal->myCamera->SetResolution(V2F(128, 128));
+		decal->myCamera->SetResolution(V2ui(128, 128));
 		decal->myRange = range;
 		std::string textureFilePath;
 		if (root["Texture"].GetIf(textureFilePath))

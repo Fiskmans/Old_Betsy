@@ -4,9 +4,6 @@
 #include <math.h>
 #include "../../Tools/FastSqrt.h"
 
-#define CU CommonUtilities
-#define V2F CommonUtilities::Vector2<float>
-
 namespace CommonUtilities
 {
 	template<class T>
@@ -21,6 +18,10 @@ namespace CommonUtilities
 		Vector2<T>();
 		Vector2<T>(const T aXValue, const T aYValue);
 		Vector2<T>(const Vector2<T>& aVector) = default;
+
+		template<class OtherT>
+		Vector2<T>(const Vector2<OtherT>& aVector);
+
 		Vector2<T>(const Vector3<T>& aVector);
 		Vector2<T>(const Vector4<T>& aVector);
 		Vector2<T>(const std::initializer_list<T>& anInitList);
@@ -67,10 +68,18 @@ namespace CommonUtilities
 	}
 
 	template<class T>
-	inline Vector2<T>::Vector2(const T aXValue, const T aYValue)
-		:x(aXValue),
+	inline Vector2<T>::Vector2(const T aXValue, const T aYValue) : 
+		x(aXValue),
 		y(aYValue)
 	{
+	}
+	template<class T>
+	template<class OtherT>
+	inline Vector2<T>::Vector2(const Vector2 <OtherT>& aVector) :
+		x(static_cast<T>(aVector.x)),
+		y(static_cast<T>(aVector.y))
+	{
+		
 	}
 
 	template<class T>
@@ -429,3 +438,7 @@ namespace CommonUtilities
 	}
 }
 
+typedef CommonUtilities::Vector2<float> V2f;
+typedef CommonUtilities::Vector2<double> V2d;
+typedef CommonUtilities::Vector2<int> V2i;
+typedef CommonUtilities::Vector2<unsigned int> V2ui;

@@ -150,7 +150,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 		const Camera* cam = myDepthRender->GetEnvirontmentCamera();
 		fData.myShadowIntensity = myCloudIntensity;
 		fData.myWorldToShadowCamera = M44f::GetFastInverse(cam->GetTransform());
-		fData.myCameraToShadowProjection = cam->GetProjection(false);
+		fData.myCameraToShadowProjection = cam->GetProjection();
 	}
 	myDepthRender->BindshadowsToSlots(9);
 
@@ -217,7 +217,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 			SYSERROR("Could not map frame buffer");
 			return;
 		}
-		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(modelsAndLightsList[i].first->GetIsUsingSecondaryFov()));
+		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
 		memcpy(bufferData.pData, &fData, sizeof(fData));
 		myContext->Unmap(myFrameBuffer, 0);
 
@@ -244,7 +244,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 			SYSERROR("Could not map frame buffer");
 			return;
 		}
-		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(modelsToDrawAgain[i]->first->GetIsUsingSecondaryFov()));
+		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
 		memcpy(bufferData.pData, &fData, sizeof(fData));
 		myContext->Unmap(myFrameBuffer, 0);
 		RenderModel(modelsToDrawAgain[i]->first, modelsToDrawAgain[i]->second, aBoneMapping, bufferData, aCamera, aBoneBuffer);
@@ -263,7 +263,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 			SYSERROR("Could not map frame buffer");
 			return;
 		}
-		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(modelsToDrawAgain[i]->first->GetIsUsingSecondaryFov()));
+		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
 		memcpy(bufferData.pData, &fData, sizeof(fData));
 		myContext->Unmap(myFrameBuffer, 0);
 		RenderModel(modelsToDrawAgain[i]->first, modelsToDrawAgain[i]->second, aBoneMapping, bufferData, aCamera, aBoneBuffer);

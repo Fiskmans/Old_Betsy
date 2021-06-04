@@ -15,8 +15,8 @@ public:
 	bool Init(SpriteRenderer* aRenderer, SpriteFactory* aSpriteFactory);
 
 	TextInstance* CreateText();
-	TextInstance* CreateToolTip(class SpriteInstance* aBackground, const V2F& aBuffer, const std::string& someText = "", const std::string& aFontPath = "default.spritefont");
-	TextInstance* CreateToolTip(const std::string& aBackgroundPath, const V2F& aBuffer, const std::string& someText, const std::string& aFontPath);
+	TextInstance* CreateToolTip(class SpriteInstance* aBackground, const V2f& aBuffer, const std::string& someText = "", const std::string& aFontPath = "default.spritefont");
+	TextInstance* CreateToolTip(const std::string& aBackgroundPath, const V2f& aBuffer, const std::string& someText, const std::string& aFontPath);
 
 
 private:

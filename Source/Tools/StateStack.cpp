@@ -2,32 +2,31 @@
 #include <pch.h>
 #include "StateStack.h"
 #include "BaseState.h"
-#include "PostMaster.hpp"
 
 void* StateStack::ourCurrentStateIdentifier = nullptr;
 
 StateStack::StateStack()
+	: Observer({
+			MessageType::PopState,
+			MessageType::PushState
+		})
 {
-	myStates = new std::vector<BaseState*>();
-	myStates->reserve(10);
 	myShouldPopMajorAtEndOfFrame = false;
 }
 
 void StateStack::Init()
 {
-	SubscribeToMessage(MessageType::PopState);
-	SubscribeToMessage(MessageType::PushState);
 }
 
 void StateStack::Update(const float aDeltaTime, int aStateToUpdateDeph)
 {
 	--aStateToUpdateDeph;
-	if (myStates->size() > 0)
+	if (myStates.size() > 0)
 	{
-		int stateToUpdateIndex = static_cast<int>(myStates->size()) + aStateToUpdateDeph;
+		int stateToUpdateIndex = static_cast<int>(myStates.size()) + aStateToUpdateDeph;
 		if (stateToUpdateIndex >= 0)
 		{			
-			BaseState* state = myStates->at(myStates->size() + aStateToUpdateDeph);
+			BaseState* state = myStates.at(myStates.size() + aStateToUpdateDeph);
 			if (state->IsUpdateThroughEnabled() == true)
 			{
 				Update(aDeltaTime, aStateToUpdateDeph);
@@ -48,12 +47,12 @@ void StateStack::Update(const float aDeltaTime, int aStateToUpdateDeph)
 void StateStack::Render(int aStateToRenderDeph, CGraphicsEngine* aGraphicsEngine)
 {
 	--aStateToRenderDeph;
-	if (myStates->size() > 0)
+	if (myStates.size() > 0)
 	{
-		int stateToUpdateIndex = static_cast<int>(myStates->size()) + aStateToRenderDeph;
+		int stateToUpdateIndex = static_cast<int>(myStates.size()) + aStateToRenderDeph;
 		if (stateToUpdateIndex >= 0)
 		{
-			BaseState* state = myStates->at(myStates->size() + aStateToRenderDeph);
+			BaseState* state = myStates.at(myStates.size() + aStateToRenderDeph);
 			if (state->IsDrawThroughEnabled() == true)
 			{
 				Render(aStateToRenderDeph, aGraphicsEngine);
@@ -66,7 +65,7 @@ void StateStack::Render(int aStateToRenderDeph, CGraphicsEngine* aGraphicsEngine
 
 bool StateStack::IsEmpty()
 {
-	if (myStates->size() > 0)
+	if (myStates.size() > 0)
 	{
 		return false;
 	}
@@ -76,12 +75,12 @@ bool StateStack::IsEmpty()
 void StateStack::ActivateStates(int aActivationDepth)
 {
 	--aActivationDepth;
-	if (myStates->size() > 0)
+	if (myStates.size() > 0)
 	{
-		int stateToUpdateIndex = static_cast<int>(myStates->size()) + aActivationDepth;
+		int stateToUpdateIndex = static_cast<int>(myStates.size()) + aActivationDepth;
 		if (stateToUpdateIndex >= 0)
 		{
-			BaseState* state = myStates->at(myStates->size() + aActivationDepth);
+			BaseState* state = myStates.at(myStates.size() + aActivationDepth);
 			if (state->IsUpdateThroughEnabled() == true)
 			{
 				ActivateStates(aActivationDepth);
@@ -96,21 +95,21 @@ void StateStack::RecieveMessage(const Message& aMessage)
 	StateMessage message;
 	if (aMessage.myMessageType == MessageType::PopState)
 	{
-		if (aMessage.myBool == false)
+		if ( *reinterpret_cast<const bool*>(aMessage.myData))
 		{
-			message.myCommand = eCommands::ePopMinor;
+			message.myCommand = eCommands::ePopMajor;
 			myMessageQueue.emplace(message);
 		}
 		else
 		{
-			message.myCommand = eCommands::ePopMajor;
+			message.myCommand = eCommands::ePopMinor;
 			myMessageQueue.emplace(message);
 		}
 	}
 	else if (aMessage.myMessageType == MessageType::PushState)
 	{
 		message.myCommand = eCommands::ePush;
-		message.myState = CAST(BaseState*, aMessage.myData);
+		message.myState = const_cast<BaseState*>(reinterpret_cast<const BaseState*>(aMessage.myData));
 		myMessageQueue.emplace(message);
 	}
 }
@@ -136,15 +135,8 @@ void StateStack::HandleMessages()
 		{
 			if (myMessageQueue.front().myState != nullptr)
 			{
-				if (myMessageQueue.front().myState->IsUpdateThroughEnabled() == false)
-				{
-					for (size_t i = 0; i < myStates->size(); i++)
-					{
-						(*myStates)[i]->Deactivate();
-					}
-				}
-				myStates->push_back(myMessageQueue.front().myState);
-				myStates->back()->Activate();
+				myStates.push_back(myMessageQueue.front().myState);
+				myStates.back()->Activate();
 			}
 			break;
 		}
@@ -155,7 +147,7 @@ void StateStack::HandleMessages()
 
 void StateStack::PopMajor()
 {
-	bool isMain = myStates->back()->IsMain();
+	bool isMain = myStates.back()->IsMain();
 
 	Pop();
 	if (isMain == true)
@@ -169,9 +161,9 @@ void StateStack::PopMajor()
 }
 void StateStack::PopMinor()
 {
-	if (myStates->size() > 0)
+	if (myStates.size() > 0)
 	{
-		if (myStates->back()->IsMain() == false)
+		if (myStates.back()->IsMain() == false)
 		{
 			Pop();
 		}
@@ -179,27 +171,23 @@ void StateStack::PopMinor()
 }
 void StateStack::Pop()
 {
-	myStates->back()->Deactivate();
-	myStates->back()->Unload();
+	myStates.back()->Deactivate();
+	myStates.back()->Unload();
 
-	if (myStates->back()->myShouldDeleteOnPop)
+	if (myStates.back()->myShouldDeleteOnPop)
 	{
-		delete myStates->back();
+		delete myStates.back();
 	}
 
-	myStates->back() = nullptr;
-	myStates->pop_back();
+	myStates.back() = nullptr;
+	myStates.pop_back();
 }
 
 StateStack::~StateStack()
 {
-	UnSubscribeToMessage(MessageType::PopState);
-	UnSubscribeToMessage(MessageType::PushState);
-	while (myStates->size() > 0)
+	while (myStates.size() > 0)
 	{
 		Pop();
 	}
 
-	delete myStates;
-	myStates = nullptr;
 }

@@ -2,21 +2,25 @@
 #include "Observer.hpp"
 #include "PostMaster.hpp"
 
-Observer::Observer()
-{
-}
 
+Observer::Observer(const std::vector<MessageType>& aTypes)
+	: myTypes(aTypes)
+{
+	PostMaster& pm = PostMaster::GetInstance();
+	for (const MessageType& type : myTypes)
+	{
+		pm.Subscribe(this, type);
+	}
+}
 
 Observer::~Observer()
 {
-}
-
-void Observer::SubscribeToMessage(MessageType aMessageType)
-{
-	PostMaster::GetInstance()->Subscribe(aMessageType, this);
-}
-
-void Observer::UnSubscribeToMessage(MessageType aMessageType)
-{
-	PostMaster::GetInstance()->UnSubscribe(aMessageType, this);
+	PostMaster& pm = PostMaster::GetInstance();
+	for (const MessageType& type : myTypes)
+	{
+		if (!pm.UnSubscribe(this, type))
+		{
+			SYSERROR("Observer not subscribed to event it should be");
+		}
+	}
 }

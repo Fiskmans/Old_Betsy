@@ -14,7 +14,7 @@ public:
 	struct SpriteData
 	{
 		AssetHandle myTexture;
-		CommonUtilities::Vector2<unsigned int> mySize = { 0, 0 };
+		V2ui mySize = { 0, 0 };
 		std::string myFilePath;
 	};
 
@@ -22,7 +22,6 @@ public:
 	SpriteData& GetSpriteData();
 	const SpriteData& GetSpriteData() const;
 
-	static V2F ourWindowSize;
 private:
 	SpriteData mySpriteData;
 	

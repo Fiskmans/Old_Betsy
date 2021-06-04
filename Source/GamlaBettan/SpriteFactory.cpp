@@ -38,21 +38,16 @@ bool SpriteFactory::Init(DirectX11Framework* aFramework)
 
 SpriteInstance* SpriteFactory::CreateSprite(const std::string& aDDSPath)
 {
-	SpriteInstance* newSpriteInstance = new SpriteInstance(GetSprite(aDDSPath, false));
+	SpriteInstance* newSpriteInstance = new SpriteInstance(GetSprite(aDDSPath));
 	return newSpriteInstance;
 }
 
-SpriteInstance* SpriteFactory::CreateVideoSprite()
-{
-	SpriteInstance* newSpriteInstance = new SpriteInstance(GetSprite(myVideoSpritePath, true));
-	return newSpriteInstance;
-}
 
-Sprite* SpriteFactory::GetSprite(const std::string& aDDSPath, const bool aIsMovie)
+Sprite* SpriteFactory::GetSprite(const std::string& aDDSPath)
 {
 	if (mySprites.find(aDDSPath) == mySprites.end())
 	{
-		Sprite* newSprite = LoadSprite(aDDSPath, aIsMovie);
+		Sprite* newSprite = LoadSprite(aDDSPath);
 		if (!newSprite)
 		{
 			SYSERROR("Failed to load sprite in SpriteFactory.GetSprite()", aDDSPath);
@@ -65,7 +60,7 @@ Sprite* SpriteFactory::GetSprite(const std::string& aDDSPath, const bool aIsMovi
 	return mySprites[aDDSPath];
 }
 
-Sprite* SpriteFactory::LoadSprite(const std::string& aDDSPath, const bool aIsMovie)
+Sprite* SpriteFactory::LoadSprite(const std::string& aDDSPath)
 {
 	HRESULT result;
 
@@ -73,29 +68,21 @@ Sprite* SpriteFactory::LoadSprite(const std::string& aDDSPath, const bool aIsMov
 	AssetHandle texture = AssetManager::GetInstance().GetTexture(aDDSPath);
 	UINT ddsWidth = 0;
 	UINT ddsHeight = 0;
-	if (aIsMovie)
-	{
-		ddsWidth = Sprite::ourWindowSize.x;
-		ddsHeight = Sprite::ourWindowSize.y;
-	}
-	else
-	{
-		ID3D11Resource* resource;
-		texture.GetAsTexture()->GetResource(&resource);
+	ID3D11Resource* resource;
+	texture.GetAsTexture()->GetResource(&resource);
 
-		ID3D11Texture2D* tex2d;
-		resource->QueryInterface(&tex2d);
-		if (tex2d)
-		{
-			D3D11_TEXTURE2D_DESC desc;
-			tex2d->GetDesc(&desc);
-			ddsWidth = desc.Width;
-			ddsHeight = desc.Height;
-			tex2d->Release();
-		}
-
-		resource->Release();
+	ID3D11Texture2D* tex2d;
+	resource->QueryInterface(&tex2d);
+	if (tex2d)
+	{
+		D3D11_TEXTURE2D_DESC desc;
+		tex2d->GetDesc(&desc);
+		ddsWidth = desc.Width;
+		ddsHeight = desc.Height;
+		tex2d->Release();
 	}
+
+	resource->Release();
 
 
 	Sprite* newSprite = new Sprite();

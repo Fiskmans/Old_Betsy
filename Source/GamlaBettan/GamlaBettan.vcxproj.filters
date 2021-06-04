@@ -28,9 +28,6 @@
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteFactory.cpp" />
     <ClCompile Include="SpriteInstance.cpp" />
-    <ClCompile Include="video.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
     <ClCompile Include="videoplayer.cpp">
       <Filter>Video</Filter>
     </ClCompile>
@@ -113,28 +110,15 @@
     <ClCompile Include="Environmentlight.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
-    <ClCompile Include="CGraphManager.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="CameraPan.cpp">
-      <Filter>Cinematic</Filter>
-    </ClCompile>
-    <ClCompile Include="CinematicEvent.cpp">
-      <Filter>Cinematic</Filter>
-    </ClCompile>
     <ClCompile Include="AssetImportHelpers.cpp">
       <Filter>Models</Filter>
     </ClCompile>
     <ClCompile Include="GBuffer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleBurst.cpp">
-      <Filter>Cinematic</Filter>
-    </ClCompile>
     <ClCompile Include="SpriteRenderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="FadeScreen.cpp" />
     <ClCompile Include="WindSystem.cpp" />
     <ClCompile Include="TextRenderer.cpp">
       <Filter>Renderers</Filter>
@@ -142,20 +126,8 @@
     <ClCompile Include="PathFinder.cpp">
       <Filter>Path finding</Filter>
     </ClCompile>
-    <ClCompile Include="CinematicPath.cpp">
-      <Filter>Cinematic</Filter>
-    </ClCompile>
     <ClCompile Include="PointLight.cpp">
       <Filter>Lights</Filter>
-    </ClCompile>
-    <ClCompile Include="MoveObject.cpp">
-      <Filter>Cinematics</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayAnimation.cpp">
-      <Filter>Cinematics</Filter>
-    </ClCompile>
-    <ClCompile Include="CinematicTarget.cpp">
-      <Filter>Cinematics</Filter>
     </ClCompile>
     <ClCompile Include="HighlightRenderer.cpp">
       <Filter>Renderers</Filter>
@@ -241,9 +213,6 @@
     <ClInclude Include="Spline.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="WindowData.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="NameThread.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -253,9 +222,6 @@
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteFactory.h" />
     <ClInclude Include="SpriteInstance.h" />
-    <ClInclude Include="video.h">
-      <Filter>Video</Filter>
-    </ClInclude>
     <ClInclude Include="videoplayer.h">
       <Filter>Video</Filter>
     </ClInclude>
@@ -342,28 +308,15 @@
       <Filter>Models</Filter>
     </ClInclude>
     <ClInclude Include="ShaderBuffers.h" />
-    <ClInclude Include="CGraphManager.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CameraPan.h">
-      <Filter>Cinematic</Filter>
-    </ClInclude>
-    <ClInclude Include="CinematicEvent.h">
-      <Filter>Cinematic</Filter>
-    </ClInclude>
     <ClInclude Include="AssetImportHelpers.h">
       <Filter>Models</Filter>
     </ClInclude>
     <ClInclude Include="GBuffer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleBurst.h">
-      <Filter>Cinematic</Filter>
-    </ClInclude>
     <ClInclude Include="SpriteRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
-    <ClInclude Include="FadeScreen.h" />
     <ClInclude Include="WindSystem.h" />
     <ClInclude Include="TextRenderer.h">
       <Filter>Renderers</Filter>
@@ -371,19 +324,7 @@
     <ClInclude Include="PathFinder.h">
       <Filter>Path finding</Filter>
     </ClInclude>
-    <ClInclude Include="CinematicPath.h">
-      <Filter>Cinematic</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h" />
-    <ClInclude Include="MoveObject.h">
-      <Filter>Cinematics</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayAnimation.h">
-      <Filter>Cinematics</Filter>
-    </ClInclude>
-    <ClInclude Include="CinematicTarget.h">
-      <Filter>Cinematics</Filter>
-    </ClInclude>
     <ClInclude Include="HighlightRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
@@ -477,14 +418,8 @@
     <Filter Include="Script">
       <UniqueIdentifier>{91bac902-4b8d-4a33-934f-5352e7d9f1a2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Cinematic">
-      <UniqueIdentifier>{2ff7d40b-883c-461c-a45d-19a1de6ce911}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Path finding">
       <UniqueIdentifier>{21ee1966-1da9-4b2e-939e-9a66d9101c90}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Cinematics">
-      <UniqueIdentifier>{b5884aa0-7d42-422a-a261-5c0998f9957a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Loaders">
       <UniqueIdentifier>{8992d15b-50c6-4ae6-8e0e-50ae349df2f6}</UniqueIdentifier>

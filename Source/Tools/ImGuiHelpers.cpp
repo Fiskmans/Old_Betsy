@@ -77,7 +77,11 @@ namespace Tools
 	{
 		if (ImguiHelperGlobals::globalTextureUsage == ImguiHelperGlobals::globalTextureStack.size())
 		{
-			ImguiHelperGlobals::globalTextureStack.push_back(ImguiHelperGlobals::globalTextureFactory->CreateTexture(CommonUtilities::Vector2<unsigned int>(Sprite::ourWindowSize.x, Sprite::ourWindowSize.y),DXGI_FORMAT_R8G8B8A8_UNORM,"Imgui debug texture"));
+			ImguiHelperGlobals::globalTextureStack.push_back(
+				ImguiHelperGlobals::globalTextureFactory->CreateTexture(
+					V2ui(960,540),
+					DXGI_FORMAT_R8G8B8A8_UNORM,
+					"Imgui debug texture"));
 		}
 		return ImguiHelperGlobals::globalTextureStack[ImguiHelperGlobals::globalTextureUsage++];
 	}
@@ -92,24 +96,24 @@ namespace Tools
 			UINT                        ScissorRectsCount, ViewportsCount;
 			D3D11_RECT                  ScissorRects[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 			D3D11_VIEWPORT              Viewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
-			ID3D11RasterizerState* RS;
-			ID3D11BlendState* BlendState;
+			ID3D11RasterizerState*		RS;
+			ID3D11BlendState*			BlendState;
 			FLOAT                       BlendFactor[4];
 			UINT                        SampleMask;
 			UINT                        StencilRef;
-			ID3D11DepthStencilState* DepthStencilState;
-			ID3D11ShaderResourceView* PSShaderResource;
-			ID3D11SamplerState* PSSampler;
-			ID3D11PixelShader* PS;
-			ID3D11VertexShader* VS;
-			ID3D11GeometryShader* GS;
+			ID3D11DepthStencilState*	DepthStencilState;
+			ID3D11ShaderResourceView*	PSShaderResource;
+			ID3D11SamplerState*			PSSampler;
+			ID3D11PixelShader*			PS;
+			ID3D11VertexShader*			VS;
+			ID3D11GeometryShader*		GS;
 			UINT                        PSInstancesCount, VSInstancesCount, GSInstancesCount;
-			ID3D11ClassInstance* PSInstances[256], * VSInstances[256], * GSInstances[256];   // 256 is max according to PSSetShader documentation
+			ID3D11ClassInstance*		PSInstances[256], * VSInstances[256], * GSInstances[256];   // 256 is max according to PSSetShader documentation
 			D3D11_PRIMITIVE_TOPOLOGY    PrimitiveTopology;
-			ID3D11Buffer* IndexBuffer, * VertexBuffer, * VSConstantBuffer;
+			ID3D11Buffer*				IndexBuffer, * VertexBuffer, * VSConstantBuffer;
 			UINT                        IndexBufferOffset, VertexBufferStride, VertexBufferOffset;
 			DXGI_FORMAT                 IndexBufferFormat;
-			ID3D11InputLayout* InputLayout;
+			ID3D11InputLayout*			InputLayout;
 		};
 		BACKUP_DX11_STATE old;
 		old.ScissorRectsCount = old.ViewportsCount = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;

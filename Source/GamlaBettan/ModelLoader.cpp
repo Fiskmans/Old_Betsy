@@ -375,7 +375,7 @@ void ModelLoader::LoadLoop()
 			WIPE(vertexSubresourceData);
 			vertexSubresourceData.pSysMem = verticies;
 
-			DirectX11Framework::AddMemoryUsage(vertexBufferDescription.ByteWidth,std::filesystem::path(current.myModel->GetModelData()->myFilePath).filename().string(),"Model Vertex Buffer");
+			DirectX11Framework::AddGraphicsMemoryUsage(vertexBufferDescription.ByteWidth,std::filesystem::path(current.myModel->GetModelData()->myFilePath).filename().string(),"Model Vertex Buffer");
 
 			HRESULT result = myDevice->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, &vertexBuffer);
 			if (FAILED(result))
@@ -408,7 +408,7 @@ void ModelLoader::LoadLoop()
 			ZeroMemory(&indexSubresourceData, sizeof(indexSubresourceData));
 			indexSubresourceData.pSysMem = indexes;
 
-			DirectX11Framework::AddMemoryUsage(indexBufferDescription.ByteWidth, std::filesystem::path(current.myModel->GetModelData()->myFilePath).filename().string(), "Model Index Buffer");
+			DirectX11Framework::AddGraphicsMemoryUsage(indexBufferDescription.ByteWidth, std::filesystem::path(current.myModel->GetModelData()->myFilePath).filename().string(), "Model Index Buffer");
 
 
 			result = myDevice->CreateBuffer(&indexBufferDescription, &indexSubresourceData, &indexBuffer);
@@ -806,7 +806,7 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 		ZeroMemory(&vertexSubresourceData, sizeof(vertexSubresourceData));
 		vertexSubresourceData.pSysMem = verticies;
 
-		DirectX11Framework::AddMemoryUsage(vertexBufferDescription.ByteWidth, "SkyBox", "Model Vertex Buffer");
+		DirectX11Framework::AddGraphicsMemoryUsage(vertexBufferDescription.ByteWidth, "SkyBox", "Model Vertex Buffer");
 		result = myDevice->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, &vertexBuffer);
 		if (FAILED(result))
 		{
@@ -842,7 +842,7 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 		ZeroMemory(&indexSubresourceData, sizeof(indexSubresourceData));
 		indexSubresourceData.pSysMem = indexes;
 
-		DirectX11Framework::AddMemoryUsage(indexBufferDescription.ByteWidth, "SkyBox", "Model Index Buffer");
+		DirectX11Framework::AddGraphicsMemoryUsage(indexBufferDescription.ByteWidth, "SkyBox", "Model Index Buffer");
 		result = myDevice->CreateBuffer(&indexBufferDescription, &indexSubresourceData, &indexBuffer);
 		if (FAILED(result))
 		{

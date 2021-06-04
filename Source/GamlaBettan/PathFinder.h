@@ -3,7 +3,6 @@
 
 #include "GamlaBettan\NavMeshLoader.h"
 
-#include "Tools\SlabRay.h"
 #include "Tools\Grid.h"
 
 
@@ -14,7 +13,7 @@ public:
 	~PathFinder();
 	void SetNavMesh(const AssetHandle& aNavMesh);
 	void DrawDebug();
-	V3F FindPoint(SlabRay aRay);
+	V3F FindPoint(const FRay& aRay);
 	std::vector<V3F> FindPath(V3F aFrom, V3F aTo);
 	V3F Floorify(V3F aPoint);
 
@@ -23,7 +22,7 @@ public:
 	bool IntersectionWithWalls(V3F aStart, V3F aEnd);
 
 private:
-	NavMeshIndexType FindNode(SlabRay aRay);
+	NavMeshIndexType FindNode(FRay aRay);
 	bool FindPath(NavMeshIndexType aStart, NavMeshIndexType aEnd, std::vector<NavMeshIndexType>& aOutPath);
 	void OptimizePath(V3F aStart, V3F aEnd, const std::vector<NavMeshIndexType>& aNodesToPass, std::vector<V3F>& aOutPath);
 

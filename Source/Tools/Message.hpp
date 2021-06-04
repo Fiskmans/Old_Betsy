@@ -92,7 +92,6 @@ enum class MessageType
 	//PLAYER
 	InventoryToggled,
 	PlayerDying,
-	PlayerDied,
 	SetPlayerMaxHP,
 	SetPlayerHP,
 	PlayerWalking,
@@ -198,8 +197,26 @@ enum class MessageType
 	WinGameAndAlsoLife,
 	RequestUISetupPtrs,
 	StoredCalories,
+
 	count
 };
+
+namespace MessageStructs
+{
+	struct UpdateTimeData
+	{
+		float myDayPercent;
+		int myHour;
+		int myDay;
+	};
+
+	struct LevelLoaded
+	{
+		int myWorldAxisSize;
+		int myLevelIndex;
+		V3F myPlayerStart;
+	};
+}
 
 class BaseState;
 
@@ -208,37 +225,15 @@ class Message
 public:
 	Message()
 	{
-		Reset();
 	}
 
 	Message(const MessageType& aMessageType)
 	{
-		Reset();
 		myMessageType = aMessageType;
 	}
 
 	~Message() = default;
 
-	void Reset()
-	{
-		myMessageType = MessageType::None;
-		myText = "";
-		myIntValue = 0;
-		myIntValue2 = 0;
-		myFloatValue = 0.0f;
-		myFloatValue2 = 0.0f;
-		myBool = false;
-		myState = nullptr;
-		myData = nullptr;
-	}
-
-	MessageType myMessageType;
-	std::string_view myText;
-	int myIntValue;
-	int myIntValue2;
-	float myFloatValue;
-	float myFloatValue2;
-	bool myBool;
-	BaseState* myState;
-	void* myData;
+	MessageType myMessageType = MessageType::None;
+	const void* myData = nullptr;
 };

@@ -15,8 +15,7 @@ public:
 	DirectX11Framework();
 	~DirectX11Framework();
 
-	bool Init(void* aWindowHandle);
-	bool Init(ID3D11Device* aDevice, ID3D11DeviceContext* aContext);
+	bool Init();
 
 	void SetRenderTargetAndDepthStencil(ID3D11RenderTargetView* aRenterTarget, ID3D11DepthStencilView* aDepthStencil);
 
@@ -32,7 +31,7 @@ public:
 #if USEIMGUI
 	static void Imgui();
 #endif // USEIMGUI
-	static void AddMemoryUsage(size_t aAmount, const std::string& aName, const std::string& aCategory);
+	static void AddGraphicsMemoryUsage(size_t aAmount, const std::string& aName, const std::string& aCategory);
 
 private:
 	struct memoryUser

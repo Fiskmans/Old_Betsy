@@ -2,9 +2,9 @@
 #ifdef _DEBUG
 
 #include "CommonUtilities\PlaneVolume.hpp"
+#include "CommonUtilities\Ray.hpp"
 
 class LightLoader;
-class SlabRay;
 class ModelInstance;
 class Scene;
 class DebugTools
@@ -15,7 +15,7 @@ public:
 	static std::map<std::string, std::vector<std::string>>* FileList;
 	static std::string myUsername;
 	static LightLoader* myLightLoader;
-	static SlabRay* LastKnownMouseRay;
+	static FRay* LastKnownMouseRay;
 	static Camera* myCamera;
 	static std::set<std::wstring> CommandLineFlags;
 

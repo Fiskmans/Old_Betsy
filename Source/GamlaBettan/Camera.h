@@ -20,7 +20,7 @@ public:
 	Camera();
 	~Camera();
 
-	bool Init(float aFoV, CommonUtilities::Vector2<float> aResolution, float aNear, float aFar, const bool aShouldAdaptToWindowRes);
+	bool Init(float aFoV, V2ui aResolution, float aNear, float aFar, const bool aShouldAdaptToWindowRes);
 	bool Init(CommonUtilities::Vector3<float> aBoundingBox);
 	void SetTransform(CommonUtilities::Vector3<float> aPosition, CommonUtilities::Vector3<float> aRotation);
 	void SetTransform(M44f aTransform);
@@ -30,8 +30,8 @@ public:
 	void Move(CommonUtilities::Vector3<float> aMovement);
 	void Rotate(CommonUtilities::Vector3<float> aRotation);
 	void RotateWorldSpace(CommonUtilities::Vector3<float> aRotation);
-	void SetFov(const float aFov, bool aSetAsSecondary = false);
-	void SetResolution(const CommonUtilities::Vector2<float>& aResolution);
+	void SetFov(const float aFov);
+	void SetResolution(const V2ui& aResolution);
 	float GetFoV() const;
 	void RecieveMessage(const Message& aMessage) override;
 	
@@ -41,14 +41,12 @@ public:
 
 
 	CommonUtilities::Matrix4x4<float> GetTransform() const;
-	CommonUtilities::Matrix4x4<float> GetProjection(bool aWantsSecondary) const;
+	CommonUtilities::Matrix4x4<float> GetProjection() const;
 
 	CommonUtilities::Vector3<float> GetForward() const;
 	CommonUtilities::Vector3<float> GetFlatForward() const;
 	CommonUtilities::Vector3<float> GetUp() const;
 	CommonUtilities::Vector3<float> GetRight() const;
-
-	bool IsInView(const CommonUtilities::Vector3<float>& aPosition) const;
 
 	CommonUtilities::Vector3<float> GetPosition() const;
 
@@ -60,12 +58,10 @@ private:
 	CommonUtilities::Matrix4x4<float> myProjection2;
 
 	CommonUtilities::Vector3<float> myOrthoBounds;
-	CommonUtilities::Vector2<float> myResolution;
+	V2ui myResolution;
 	float myNearPlane;
 	float myFarPlane;
 	float myFOV;
-	float myFov2;
-	bool myHasSecondaryFov;
 	bool myIsListening;
 	bool myIsOrthogonal;
 

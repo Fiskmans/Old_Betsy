@@ -23,12 +23,8 @@ void Secret::Input(char aKey)
 		myAt++;
 		if (myAt == myKey.size())
 		{
-			PostMaster* pm = PostMaster::GetInstance();
-			if (pm)
-			{
-				myHasActivated = true;
-				pm->SendMessages(myMessageType);
-			}
+			myHasActivated = true;
+			PostMaster::GetInstance().SendMessages(myMessageType);
 		}
 	}
 	else

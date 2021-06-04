@@ -4,13 +4,11 @@
 #include "ModelInstance.h"
 #include "PointLight.h"
 #include "ParticleInstance.h"
-#include <SlabRay.h>
 #include "CommonUtilities\Ray.hpp"
 #include "CommonUtilities\Intersection.hpp"
 #include "WindSystem.h"
 #include "CommonUtilities\Sphere.hpp"
 #include "SpriteInstance.h"
-#include "ProgressBar.h"
 #include "TextInstance.h"
 
 Scene::~Scene()
@@ -80,13 +78,6 @@ void Scene::AddSprite(SpriteInstance* aSprite)
 			SYSWARNING("Sprite instance added to scene more than once!");
 		}
 	}
-}
-
-void Scene::AddProgressBar(ProgressBar* aBar)
-{
-	AddSprite(aBar->GetBackground());
-	AddSprite(aBar->GetBar());
-	AddSprite(aBar->GetForeground());
 }
 
 void Scene::AddText(TextInstance* aText)
@@ -205,60 +196,6 @@ void Scene::RemoveSprite(SpriteInstance* aSprite)
 
 }
 
-void Scene::RemoveProgressBar(ProgressBar* aBar)
-{
-	short removedSprites = 0;
-
-	SpriteInstance* background = aBar->GetBackground();
-	SpriteInstance* foreground = aBar->GetForeground();
-	SpriteInstance* bar = aBar->GetBar();
-
-	if (!background)
-	{
-		removedSprites++;
-	}
-	if (!foreground)
-	{
-		removedSprites++;
-	}
-	if (!bar)
-	{
-		removedSprites++;
-	}
-
-	for (int i = mySprites.size() - 1; i >= 0; i--)
-	{
-		if (mySprites[i] == background)
-		{
-			background->RemoveFromScene();
-			mySprites.erase(mySprites.begin() + i);
-			removedSprites++;
-			continue;
-		}
-
-		if (mySprites[i] == bar)
-		{
-			bar->RemoveFromScene();
-			mySprites.erase(mySprites.begin() + i);
-			removedSprites++;
-			continue;
-		}
-
-		if (mySprites[i] == foreground)
-		{
-			foreground->RemoveFromScene();
-			mySprites.erase(mySprites.begin() + i);
-			removedSprites++;
-			continue;
-		}
-
-		if (removedSprites >= 3)
-		{
-			return;
-		}
-	}
-}
-
 void Scene::RemoveText(TextInstance* aText)
 {
 	for (size_t i = 0; i < myTexts.size(); i++)
@@ -322,15 +259,14 @@ void Scene::SetSkybox(ModelInstance* aSkybox)
 	mySkybox = aSkybox;
 }
 
-ModelInstance* Scene::GetInstance(SlabRay* aRay)
+ModelInstance* Scene::GetInstance(const FRay& aRay)
 {
 	float closest = _HUGE_ENUF;
-	CommonUtilities::Ray<float> ray = aRay->AsCU();
 	ModelInstance* found = nullptr;
 	for (auto& ins : myModels)
 	{
 		float t;
-		if (CommonUtilities::IntersectionSphereRay(ins->GetGraphicBoundingSphere(), ray, t))
+		if (CommonUtilities::IntersectionSphereRay(ins->GetGraphicBoundingSphere(), aRay, t))
 		{
 			if (t < closest)
 			{
@@ -343,14 +279,13 @@ ModelInstance* Scene::GetInstance(SlabRay* aRay)
 	return found;
 }
 
-std::vector<ModelInstance*> Scene::GetIntersections(SlabRay* aRay)
+std::vector<ModelInstance*> Scene::GetIntersections(const FRay& aRay)
 {
-	CommonUtilities::Ray<float> ray = aRay->AsCU();
 	std::vector<ModelInstance*> found;
 	for (auto& ins : myModels)
 	{
 		float t;
-		if (CommonUtilities::IntersectionSphereRay(ins->GetGraphicBoundingSphere(), ray, t))
+		if (CommonUtilities::IntersectionSphereRay(ins->GetGraphicBoundingSphere(), aRay, t))
 		{
 			found.push_back(ins);
 		}

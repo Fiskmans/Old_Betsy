@@ -111,7 +111,7 @@ void HighlightRenderer::Render(const std::vector<class ModelInstance*>& aModels,
 		}
 		modelData = model->GetModelData();
 
-		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(aModels[i]->GetIsUsingSecondaryFov()));
+		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
 		result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 		if (FAILED(result))
 		{

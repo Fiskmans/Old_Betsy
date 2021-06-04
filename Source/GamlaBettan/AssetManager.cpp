@@ -180,7 +180,7 @@ AssetHandle AssetManager::GetGeometryShader(const std::string& aPath, ShaderFlag
     return AssetHandle(myCachedGeometryShaders[aPath][aFlags]);
 }
 
-AssetHandle AssetManager::GetPerlinTexture(CommonUtilities::Vector2<size_t> aSize, V2F aScale, unsigned int aSeed)
+AssetHandle AssetManager::GetPerlinTexture(V2ui aSize, V2f aScale, unsigned int aSeed)
 {
     Asset* texture = myTextureLoader->GeneratePerlin(aSize, aScale, aSeed);
     AssetHandle out = AssetHandle(texture);

@@ -26,7 +26,7 @@ public:
 	AssetHandle GetVertexShader(const std::string& aPath, ShaderFlags aFlags = ShaderFlags());
 	AssetHandle GetGeometryShader(const std::string& aPath, ShaderFlags aFlags = ShaderFlags());
 
-	AssetHandle GetPerlinTexture(CommonUtilities::Vector2<size_t> aSize, V2F aScale, unsigned int aSeed);
+	AssetHandle GetPerlinTexture(V2ui aSize, V2f aScale, unsigned int aSeed);
 
 	AssetHandle GetJSON(const std::string& aPath);
 	AssetHandle GetJSONRelative(const std::string& aBase, const std::string& aPath);

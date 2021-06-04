@@ -37,7 +37,7 @@ TextInstance* TextFactory::CreateText()
 	return AssetManager::GetInstance().GetFont("default.spritefont").InstansiateText();
 }
 
-TextInstance* TextFactory::CreateToolTip(SpriteInstance* aBackground, const V2F& aBuffer, const std::string& someText, const std::string& aFontPath)
+TextInstance* TextFactory::CreateToolTip(SpriteInstance* aBackground, const V2f& aBuffer, const std::string& someText, const std::string& aFontPath)
 {
 	TextInstance* toolTip = AssetManager::GetInstance().GetFont(aFontPath).InstansiateText();
 
@@ -51,7 +51,7 @@ TextInstance* TextFactory::CreateToolTip(SpriteInstance* aBackground, const V2F&
 	return toolTip;
 }
 
-TextInstance* TextFactory::CreateToolTip(const std::string& aBackgroundPath, const V2F& aBuffer, const std::string& someText, const std::string& aFontPath)
+TextInstance* TextFactory::CreateToolTip(const std::string& aBackgroundPath, const V2f& aBuffer, const std::string& someText, const std::string& aFontPath)
 {
 	return CreateToolTip(mySpriteFactoryPtr->CreateSprite(aBackgroundPath), aBuffer, someText, aFontPath);
 }

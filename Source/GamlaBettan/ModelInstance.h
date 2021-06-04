@@ -62,9 +62,6 @@ public:
 	void SetIsHighlighted(bool aState);
 	bool GetIsHighlighted();
 
-	void SetUsingSecondaryFov(bool aState);
-	bool GetIsUsingSecondaryFov();
-
 	void Interact();
 	float GetLastInteraction();
 
@@ -76,7 +73,6 @@ private:
 	static int myGlobalEventStatus;
 
 	bool myIsHighlighted = false;
-	bool myIsUsingSecondaryFov = false;
 
 	float myCustomData[MODELSAMOUNTOFCUSTOMDATA*2];
 

@@ -1,9 +1,5 @@
 #include <pch.h>
-#include <iostream>
 #include "PostMaster.hpp"
-#include "Observer.hpp"
-#include "assert.h"
-PostMaster* PostMaster::ourInstance = nullptr;
 
 PostMaster::PostMaster()
 {
@@ -12,63 +8,39 @@ PostMaster::PostMaster()
 
 PostMaster::~PostMaster()
 {
-	for (auto mapIterator = mySubscriptions.begin(); mapIterator != mySubscriptions.end(); ++mapIterator)
-	{
-		std::vector<Observer*> observervector = (*mapIterator).second;
-		observervector.clear();
-	}
-}
-
-void PostMaster::Create()
-{
-	assert(ourInstance == nullptr && "Postmaster already Instantiated");
-	ourInstance = new PostMaster();
-}
-
-void PostMaster::Destroy()
-{
-	assert(ourInstance != nullptr && "PostMaster not Instatiated");
-	delete ourInstance;
-	ourInstance = nullptr;
-}
-
-PostMaster* PostMaster::GetInstance()
-{
-	assert(ourInstance != nullptr && "PostMaster not Instatiated");
-
-	return ourInstance;
-}
-
-void PostMaster::Subscribe(MessageType aMessageToSubscribe, Observer* aObserver)
-{
-	mySubscriptions[aMessageToSubscribe].push_back(aObserver);
-}
-
-void PostMaster::UnSubscribe(MessageType aMessageToSubscribe, Observer * aObserverToRemove)
-{
-	std::vector<Observer*>& aVectorToRemoveFrom = mySubscriptions[aMessageToSubscribe];
-	for (int aObserverIndex = 0; aObserverIndex < aVectorToRemoveFrom.size(); ++aObserverIndex)
-	{
-		if (aVectorToRemoveFrom[aObserverIndex] == aObserverToRemove)
-		{
-			aVectorToRemoveFrom.erase(aVectorToRemoveFrom.begin() + aObserverIndex);
-			break;
-		}
-	}
+	mySubscriptions.clear();
 }
 
 void PostMaster::SendMessages(const Message& aMessage)
 {
 	PERFORMANCETAG("sentmessagefrompostmaster");
-	for (int subIndex = 0; subIndex < mySubscriptions[aMessage.myMessageType].size(); ++subIndex)
+	for (auto& observer : mySubscriptions[aMessage.myMessageType])
 	{
-		mySubscriptions[aMessage.myMessageType][subIndex]->RecieveMessage(aMessage);
+		observer->RecieveMessage(aMessage);
 	}
 }
 
-void PostMaster::SendMessages(MessageType aMessageType)
+void PostMaster::SendMessages(MessageType aMessageType, const void* aPayload)
 {
 	Message msg;
 	msg.myMessageType = aMessageType;
+	msg.myData = aPayload;
 	SendMessages(msg);
+}
+
+void PostMaster::Subscribe(Observer* aObserver, MessageType aMessageType)
+{
+	mySubscriptions[aMessageType].push_back(aObserver);
+}
+
+bool PostMaster::UnSubscribe(Observer* aObserver, MessageType aMessageType)
+{
+	auto& list = mySubscriptions[aMessageType];
+	auto it = std::find(list.begin(), list.end(), aObserver);
+	if (it == list.end())
+	{
+		return false;
+	}
+	list.erase(it);
+	return true;
 }

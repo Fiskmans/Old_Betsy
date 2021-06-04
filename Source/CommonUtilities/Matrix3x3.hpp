@@ -372,7 +372,7 @@ namespace CommonUtilities
 	template<>
 	inline bool Matrix3x3<float>::operator==(const Matrix3x3<float>& aMatrix) const
 	{
-		const float eps = 1e-50;
+		const float eps = 1e-10f;
 		for (size_t i = 0; i < 16; i++)
 		{
 			if (abs(myElements[i] - aMatrix.myElements[i]) > eps)
@@ -386,7 +386,7 @@ namespace CommonUtilities
 	template<>
 	inline bool Matrix3x3<double>::operator==(const Matrix3x3<double>& aMatrix) const
 	{
-		const double eps = 1e-50;
+		const double eps = 1e-10;
 		for (size_t i = 0; i < 16; i++)
 		{
 			if (abs(myElements[i] - aMatrix.myElements[i]) > eps)

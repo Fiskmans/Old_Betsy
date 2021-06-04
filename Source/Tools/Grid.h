@@ -27,12 +27,12 @@ public:
 	Grid() = default;
 	~Grid() = default;
 
-	void Init(const V2F& aMin, const V2F& aMax, const float aApproxNodeSize);
+	void Init(const V2f& aMin, const V2f& aMax, const float aApproxNodeSize);
 
-	void AddAtPos(const T& anElement, const V2F& aPosition, const bool aCheckIfAdded = false);
+	void AddAtPos(const T& anElement, const V2f& aPosition, const bool aCheckIfAdded = false);
 
-	GridNode<T>& GetNode(const V2F& aPosition);
-	const GridNode<T>& GetNode(const V2F& aPosition) const;
+	GridNode<T>& GetNode(const V2f& aPosition);
+	const GridNode<T>& GetNode(const V2f& aPosition) const;
 
 	GridNode<T>& operator[](const int anIndex);
 	const GridNode<T>& operator[](const int anIndex) const;
@@ -40,14 +40,14 @@ public:
 	GridNode<T>& operator()(const int aX, const int aY);
 	const GridNode<T>& operator()(const int aX, const int aY) const;
 
-	CU::Vector2<int> GetGridIndex(const V2F& aPosition) const;
+	CU::Vector2<int> GetGridIndex(const V2f& aPosition) const;
 
 	size_t GetWidth() const;
 	size_t GetHeight() const;
 	size_t GetNumberOfNodes() const;
 
-	const V2F& GetNodeSize() const;
-	const V2F& GetCenterPosition() const;
+	const V2f& GetNodeSize() const;
+	const V2f& GetCenterPosition() const;
 
 
 private:
@@ -55,13 +55,13 @@ private:
 
 	size_t myWidth = 0;
 	size_t myHeight = 0;
-	V2F myNodeSize;
-	V2F myCenterPosition;
-	V2F myMin;
+	V2f myNodeSize;
+	V2f myCenterPosition;
+	V2f myMin;
 };
 
 template<class T>
-inline void Grid<T>::Init(const V2F& aMin, const V2F& aMax, const float aApproxNodeSize)
+inline void Grid<T>::Init(const V2f& aMin, const V2f& aMax, const float aApproxNodeSize)
 {
 	if (aMin.x > aMax.x || aMin.y > aMax.y)
 	{
@@ -71,7 +71,7 @@ inline void Grid<T>::Init(const V2F& aMin, const V2F& aMax, const float aApproxN
 	const float width = aMax.x - aMin.x;
 	const float height = aMax.y - aMin.y;
 
-	myCenterPosition = V2F(aMin.x + width * 0.5f, aMin.y + height * 0.5f);
+	myCenterPosition = V2f(aMin.x + width * 0.5f, aMin.y + height * 0.5f);
 
 	myMin = aMin;
 
@@ -93,14 +93,14 @@ inline void Grid<T>::Init(const V2F& aMin, const V2F& aMax, const float aApproxN
 }
 
 template<class T>
-inline void Grid<T>::AddAtPos(const T& anElement, const V2F& aPosition, const bool aCheckIfAdded)
+inline void Grid<T>::AddAtPos(const T& anElement, const V2f& aPosition, const bool aCheckIfAdded)
 {
 	GetNode(aPosition).Add(&anElement, aCheckIfAdded);
 }
 
 
 template<class T>
-inline GridNode<T>& Grid<T>::GetNode(const V2F& aPosition)
+inline GridNode<T>& Grid<T>::GetNode(const V2f& aPosition)
 {
 	const CU::Vector2<int> pos = GetGridIndex(aPosition);
 
@@ -108,7 +108,7 @@ inline GridNode<T>& Grid<T>::GetNode(const V2F& aPosition)
 }
 
 template<class T>
-inline const GridNode<T>& Grid<T>::GetNode(const V2F& aPosition) const
+inline const GridNode<T>& Grid<T>::GetNode(const V2f& aPosition) const
 {
 	const CU::Vector2<int> pos = GetGridIndex(aPosition);
 	return (*this)(pos.x, pos.y);
@@ -181,7 +181,7 @@ inline const GridNode<T>& Grid<T>::operator()(const int aX, const int aY) const
 }
 
 template<class T>
-inline CU::Vector2<int> Grid<T>::GetGridIndex(const V2F& aPosition) const
+inline CU::Vector2<int> Grid<T>::GetGridIndex(const V2f& aPosition) const
 {
 	return CU::Vector2<int>(CAST(int, floor(aPosition.x / myNodeSize.x)), CAST(int, floor(aPosition.y / myNodeSize.y))) - CU::Vector2<int>(CAST(int, floor(myMin.x / myNodeSize.x)), CAST(int, floor(myMin.y / myNodeSize.y)));
 }
@@ -205,13 +205,13 @@ inline size_t Grid<T>::GetNumberOfNodes() const
 }
 
 template<class T>
-inline const V2F& Grid<T>::GetNodeSize() const
+inline const V2f& Grid<T>::GetNodeSize() const
 {
 	return myNodeSize;
 }
 
 template<class T>
-inline const V2F& Grid<T>::GetCenterPosition() const
+inline const V2f& Grid<T>::GetCenterPosition() const
 {
 	return myCenterPosition;
 }

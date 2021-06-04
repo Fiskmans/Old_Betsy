@@ -114,9 +114,6 @@
     <ClInclude Include="Stack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StateStackEnum.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="StaticArray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -11,7 +11,24 @@
 
 AudioManager::AudioManager():
 	myWwiseFramework(nullptr),
-	myListenerID(NULL)
+	myListenerID(NULL),
+	Observer({
+			MessageType::StartLoading,
+			MessageType::UnloadLevel,
+			MessageType::InputPauseHit,
+			MessageType::SetMasterVolume,
+			MessageType::StartInGameAudio,
+			MessageType::MenuButtonActive,
+			MessageType::MenuButtonHit,
+			MessageType::DialogueStarted,
+			MessageType::ChangedItem,
+			MessageType::NewDay,
+			MessageType::UpdateTime,
+			MessageType::RespawnTrader,
+			MessageType::PlayIntro,
+			MessageType::SpawnItem,
+			MessageType::MainMenuStateActivated
+		})
 {
 }
 
@@ -42,15 +59,12 @@ void AudioManager::RecieveMessage(const Message& aMessage)
 	break;
 	case MessageType::InputPauseHit:
 	{
-		Message message;
-		message.myMessageType = MessageType::CurrentMasterVolume;
-		message.myIntValue = myMasterVolume;
-		SendMessages(message);
+		PostMaster::GetInstance().SendMessages(MessageType::CurrentMasterVolume,&myMasterVolume);
 	}
 	break;
 	case MessageType::SetMasterVolume:
 	{
-		SetMasterVolume(aMessage.myIntValue);
+		SetMasterVolume(*reinterpret_cast<const int*>(aMessage.myData));
 	}
 	break;
 	case MessageType::MenuButtonActive:
@@ -89,7 +103,8 @@ void AudioManager::RecieveMessage(const Message& aMessage)
 	break;
 	case MessageType::UpdateTime:
 	{
-		if (aMessage.myIntValue == 19 && myDayTime != 19)
+		const MessageStructs::UpdateTimeData& data = *reinterpret_cast<const MessageStructs::UpdateTimeData*>(aMessage.myData);
+		if (data.myHour == 19 && myDayTime != 19)
 		{
 			myDayTime = 19;
 
@@ -136,14 +151,10 @@ void AudioManager::Init()
 	myWwiseFramework->LoadBank(BANKNAME_INIT);
 	myWwiseFramework->LoadBank(BANKNAME_SFX);
 	myWwiseFramework->LoadBank(BANKNAME_MUSIC);
-
-	SubscribeToMyMessages();
 }
 
 void AudioManager::ShutDown()
-{
-	UnSubscribeToMyMessages();
-	
+{	
 	myWwiseFramework->Terminate();
 }
 
@@ -237,42 +248,4 @@ void AudioManager::UpdateObjectTransform(const LMVector& aPosition, const LMVect
 	transform.Set(position, forward, top);
 
 	myWwiseFramework->SetObjectTransform(transform, objectID);
-}
-
-void AudioManager::SubscribeToMyMessages()
-{
-	SubscribeToMessage(MessageType::StartLoading);
-	SubscribeToMessage(MessageType::UnloadLevel);
-	SubscribeToMessage(MessageType::InputPauseHit);
-	SubscribeToMessage(MessageType::SetMasterVolume);
-	SubscribeToMessage(MessageType::StartInGameAudio);
-	SubscribeToMessage(MessageType::MenuButtonActive);
-	SubscribeToMessage(MessageType::MenuButtonHit);
-	SubscribeToMessage(MessageType::DialogueStarted);
-	SubscribeToMessage(MessageType::ChangedItem);
-	SubscribeToMessage(MessageType::NewDay);
-	SubscribeToMessage(MessageType::UpdateTime);
-	SubscribeToMessage(MessageType::RespawnTrader);
-	SubscribeToMessage(MessageType::PlayIntro);
-	SubscribeToMessage(MessageType::SpawnItem);
-	SubscribeToMessage(MessageType::MainMenuStateActivated);
-}
-
-void AudioManager::UnSubscribeToMyMessages()
-{
-	UnSubscribeToMessage(MessageType::RespawnTrader);
-	UnSubscribeToMessage(MessageType::LoadLevel);
-	UnSubscribeToMessage(MessageType::UnloadLevel);
-	UnSubscribeToMessage(MessageType::InputPauseHit);
-	UnSubscribeToMessage(MessageType::SetMasterVolume);
-	UnSubscribeToMessage(MessageType::StartInGameAudio);
-	UnSubscribeToMessage(MessageType::MenuButtonActive);
-	UnSubscribeToMessage(MessageType::MenuButtonHit);
-	UnSubscribeToMessage(MessageType::DialogueStarted);
-	UnSubscribeToMessage(MessageType::ChangedItem);
-	UnSubscribeToMessage(MessageType::NewDay);
-	UnSubscribeToMessage(MessageType::UpdateTime);
-	UnSubscribeToMessage(MessageType::PlayIntro);
-	UnSubscribeToMessage(MessageType::SpawnItem);
-	UnSubscribeToMessage(MessageType::MainMenuStateActivated);
 }

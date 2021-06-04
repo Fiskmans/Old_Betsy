@@ -21,7 +21,6 @@
 CGraphicsEngine::CGraphicsEngine()
 {
 	myFrameWork = new DirectX11Framework();
-	myWindowHandler = new WindowHandler();
 	myRendreManarger = new RenderManager();
 	myLightLoader = new LightLoader();
 }
@@ -32,63 +31,28 @@ CGraphicsEngine::~CGraphicsEngine()
 
 	delete myFrameWork;
 	myFrameWork = nullptr;
-	delete myWindowHandler;
-	myWindowHandler = nullptr;
 	SAFE_DELETE(myRendreManarger);
 	SAFE_DELETE(myLightLoader);
 }
 
-bool CGraphicsEngine::Init(const Window::WindowData& aWindowData, ID3D11Device* aDeviceOverride, ID3D11DeviceContext* aContextOverride)
+bool CGraphicsEngine::Init()
 {
-	if (aDeviceOverride && aContextOverride)
+	if (!WindowHandler::GetInstance().OpenWindow())
 	{
-		if (!myWindowHandler->Init(aWindowData, nullptr))
-		{
-			SYSCRASH("Could not init fake windowhandler :c");
-			return false;
-		}
-		if (!myFrameWork->Init(aDeviceOverride,aContextOverride))
-		{
-			SYSCRASH("Could not init graphics framework :c");
-			return false;
-		}
-	}
-	else
-	{
-		if (!myWindowHandler->Init(aWindowData, myFrameWork))
-		{
-			SYSCRASH("Could not init window :c");
-			return false;
-		}
-		if (!myFrameWork->Init(myWindowHandler->GetWindowHandle()))
-		{
-			SYSCRASH("Could not init graphics framework :c");
-			return false;
-		}
-	}
-
-	AssetManager::GetInstance().Init(myFrameWork->GetDevice(), "../assets", "../baked");
-	CCameraFactory::Init(myWindowHandler, NEARPLANE, FARPLANE);
-
-
-
-	if (!mySpriteFactory.Init(myFrameWork))
-	{
-		SYSCRASH("Cound not init SpriteFactory :c")
-			return false;
-	}
-	if (!myLightLoader->Init(myFrameWork->GetDevice()))
-	{
-		SYSCRASH("Cound not init light loader :c")
-			return false;
-	}
-	if (!myRendreManarger->Init(myFrameWork, myWindowHandler))
-	{
-		SYSCRASH("Could not init rendremanargre :c");
+		SYSCRASH("Could not init window :c");
 		return false;
 	}
+	return InitInternal();
+}
 
-	return true;
+bool CGraphicsEngine::Init(V2ui aWindowSize)
+{
+	if (!WindowHandler::GetInstance().OpenWindow(aWindowSize))
+	{
+		SYSCRASH("Could not init window :c");
+		return false;
+	}
+	return InitInternal();
 }
 
 void CGraphicsEngine::BeginFrame(float aClearColor[4])
@@ -132,6 +96,36 @@ void CGraphicsEngine::Imgui()
 {
 	myRendreManarger->Imgui();
 }
+
+bool CGraphicsEngine::InitInternal()
+{
+	if (!myFrameWork->Init())
+	{
+		SYSCRASH("Could not init graphics framework :c");
+		return false;
+	}
+
+	AssetManager::GetInstance().Init(myFrameWork->GetDevice(), "../assets", "../baked");
+	CCameraFactory::Init(NEARPLANE, FARPLANE);
+
+	if (!mySpriteFactory.Init(myFrameWork))
+	{
+		SYSCRASH("Cound not init SpriteFactory :c")
+			return false;
+	}
+	if (!myLightLoader->Init(myFrameWork->GetDevice()))
+	{
+		SYSCRASH("Cound not init light loader :c")
+			return false;
+	}
+	if (!myRendreManarger->Init(myFrameWork))
+	{
+		SYSCRASH("Could not init rendremanargre :c");
+		return false;
+	}
+
+	return true;
+}
 #endif // !_RETAIL
 DirectX11Framework* CGraphicsEngine::GetFrameWork()
 {
@@ -153,24 +147,7 @@ RenderManager* CGraphicsEngine::GetRendreManarger()
 	return myRendreManarger;
 }
 
-void CGraphicsEngine::SubscribeToMessages()
-{
-	myRendreManarger->SubscribeToMessages();
-	myWindowHandler->SubscribeToMessages();
-}
-
-void CGraphicsEngine::UnsubscribeToMessages()
-{
-	myRendreManarger->UnsubscribeToMessages();
-	myWindowHandler->UnSubscrideToMessages();
-}
-
 SpriteFactory& CGraphicsEngine::GetSpriteFactory()
 {
 	return mySpriteFactory;
-}
-
-WindowHandler* CGraphicsEngine::GetWindowHandler()
-{
-	return myWindowHandler;
 }

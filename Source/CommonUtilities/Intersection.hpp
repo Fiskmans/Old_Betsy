@@ -50,83 +50,41 @@ namespace CommonUtilities
 	}
 
 	template<typename T>
-	bool IntersectionAABBRay(const AABB3D<T>& aAABB, const Ray<T>& aRay, Vector3<T>& aIntersectionPoint)
+	bool IntersectionAABBRay(const AABB3D<T>& aAABB, const Ray<T>& aRay, T& aOutDistance)
 	{
 		if (aAABB.IsInside(aRay.Position()))
 		{
-			aIntersectionPoint = aRay.Position();
+			aOutDistance = 0;
 			return true;
 		}
+		Vector3<T> dirInverse = Vector3<T>({1,1,1}) / aRay.Direction();
 
-		const char dimension = 3;
-		const char right = 0;
-		const char left = 1;
-		const char middle = 2;
+		Vector3<T> minCorner = aAABB.Min();
+		Vector3<T> maxCorner = aAABB.Max();
 
-		char quadrant[dimension];
-		int chosenPlane = 0;
-		Vector3<T> intersect;
-		Vector3<T> plane;
-		Vector3<T> maxT = Vector3<T>(-1, -1, -1);
+		Vector3<T> origin = aRay.Position();
 
-		for (size_t i = 0; i < dimension; i++)
-		{
-			quadrant[i] = middle;
+		T t1 = (minCorner.x - origin.x) * dirInverse.x;
+		T t2 = (maxCorner.x - origin.x) * dirInverse.x;
 
-			if (aRay.Position()[i] < aAABB.Min()[i])
-			{
-				quadrant[i] = left;
-				plane[i] = aAABB.Min()[i];
+		T t3 = (minCorner.y - origin.y) * dirInverse.y;
+		T t4 = (maxCorner.y - origin.y) * dirInverse.y;
 
-			}
-			else if (aRay.Position()[i] > aAABB.Max()[i])
-			{
-				quadrant[i] = right;
-				plane[i] = aAABB.Max()[i];
-			}
+		T t5 = (minCorner.z - origin.z) * dirInverse.z;
+		T t6 = (maxCorner.z - origin.z) * dirInverse.z;
 
-			if (quadrant[i] != middle && aRay.Direction()[i] != T(0))
-			{
-				maxT[i] = (plane[i] - aRay.Position()[i]) / aRay.Direction()[i];
+		T tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
+		T tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
 
-				if (maxT[i] > maxT[chosenPlane])
-				{
-					chosenPlane = i;
-				}
-			}
-		}
-
-		if (maxT[chosenPlane] < T(0))
-		{
-			return false;
-		}
-
-		for (size_t i = 0; i < dimension; i++)
-		{
-			if (chosenPlane != i)
-			{
-				intersect[i] = aRay.Position()[i] + maxT[chosenPlane] * aRay.Direction()[i];
-				if (intersect[i] < aAABB.Min()[i] || intersect[i] > aAABB.Max()[i])
-				{
-					return false;
-				}
-			}
-			else
-			{
-				intersect[i] = plane[i];
-			}
-		}
-
-		aIntersectionPoint = intersect;
-		return true;
+		aOutDistance = tmin;
+		return !(tmax < 0) && !(tmin > tmax);
 	}
 
 	template<typename T>
 	bool IntersectionAABBRay(const AABB3D<T>& aAABB, const Ray<T>& aRay)
 	{
-		Vector3<T> vec;
-
-		return IntersectionAABBRay(aAABB, aRay, vec);
+		T distance;
+		return IntersectionAABBRay(aAABB, aRay,distance);
 	}
 
 	template<typename T>

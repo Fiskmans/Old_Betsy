@@ -27,7 +27,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	for (size_t i = 0; i < 6; i++)
 	{
 		myCameras[i] = CCameraFactory::CreateCamera(90, false, SHADOWNEARPLANE, SHADOWFARPLANE);
-		myCameras[i]->SetResolution(V2F(SHADOWRESOLUTION, SHADOWRESOLUTION));
+		myCameras[i]->SetResolution(V2ui(SHADOWRESOLUTION, SHADOWRESOLUTION));
 	}
 	myCameras[0]->SetRotation(V3F(0, 0, 0));
 	myCameras[1]->SetRotation(V3F(PI, 0, 0));
@@ -70,7 +70,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 
 	myDevice = device;
 
-	DirectX11Framework::AddMemoryUsage(static_cast<size_t>(tdesc.Height * tdesc.Width * DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R32_TYPELESS]), "Poitlight Depth", "Engine Depth");
+	DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(tdesc.Height * tdesc.Width * DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R32_TYPELESS]), "Poitlight Depth", "Engine Depth");
 	result = device->CreateTexture2D(&tdesc, nullptr, &tex);
 	if (FAILED(result))
 	{
@@ -80,7 +80,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 
 	tdesc.Width = ENVIRONMENTSHADOWRESOLUTION;
 	tdesc.Height = ENVIRONMENTSHADOWRESOLUTION;
-	DirectX11Framework::AddMemoryUsage(static_cast<size_t>(tdesc.Height * tdesc.Width * DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R32_TYPELESS]), "Environment Depth", "Engine Depth");
+	DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(tdesc.Height * tdesc.Width * DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R32_TYPELESS]), "Environment Depth", "Engine Depth");
 	result = device->CreateTexture2D(&tdesc, nullptr, &texEnvironment);
 	if (FAILED(result))
 	{
@@ -150,7 +150,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	desc2.SampleDesc.Count = 1;
 	desc2.SampleDesc.Quality = 0;
 
-	DirectX11Framework::AddMemoryUsage(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format], "pointlight rt", "Engine Texture");
+	DirectX11Framework::AddGraphicsMemoryUsage(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format], "pointlight rt", "Engine Texture");
 	result = device->CreateTexture2D(&desc2, nullptr, &tex2_1x6);
 	if (FAILED(result))
 	{
@@ -162,7 +162,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	desc2.Width = ENVIRONMENTSHADOWRESOLUTION;
 	desc2.Height = ENVIRONMENTSHADOWRESOLUTION;
 
-	DirectX11Framework::AddMemoryUsage(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format], "environment rt", "Engine Texture");
+	DirectX11Framework::AddGraphicsMemoryUsage(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format], "environment rt", "Engine Texture");
 	result = device->CreateTexture2D(&desc2, nullptr, &tex2_1x1);
 	if (FAILED(result))
 	{
@@ -173,7 +173,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	desc2.Height = DECALRESOLUTION;
 	desc2.Width = DECALRESOLUTION;
 
-	DirectX11Framework::AddMemoryUsage(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format], "decal rt", "Engine Texture");
+	DirectX11Framework::AddGraphicsMemoryUsage(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format], "decal rt", "Engine Texture");
 	result = device->CreateTexture2D(&desc2, nullptr, &texDecal);
 	if (FAILED(result))
 	{
@@ -457,7 +457,7 @@ void DepthRenderer::Render(Camera* aCamera, const std::vector<ModelInstance*>& a
 	FrameBufferData fData;
 	WIPE(fData);
 	fData.myWorldToCamera = CommonUtilities::Matrix4x4<float>::Transpose(CommonUtilities::Matrix4x4<float>::GetFastInverse(aCamera->GetTransform()));
-	fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(false));
+	fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
 	fData.myCameraPosition = aCamera->GetPosition();
 	fData.myTotalTime = RenderManager::GetTotalTime();
 
@@ -488,7 +488,7 @@ void DepthRenderer::Render(Camera* aCamera, const std::vector<ModelInstance*>& a
 		for (size_t modelIndex = 0; modelIndex < aModelList.size(); modelIndex++)
 		{
 			model = aModelList[modelIndex]->GetModelAsset().GetAsModel();
-			if (!model->ShouldRender() || aModelList[modelIndex]->GetIsUsingSecondaryFov() || !aModelList[modelIndex]->GetCastsShadows())
+			if (!model->ShouldRender() || !aModelList[modelIndex]->GetCastsShadows())
 			{
 				continue;
 			}

@@ -26,8 +26,8 @@ namespace CommonUtilities
 		void Update();
 		bool CheckIfInDeadZone();
 		// Controll Checking
-		V2F GetRightStick_Pos();
-		V2F GetLeftStick_Pos();
+		V2f GetRightStick_Pos();
+		V2f GetLeftStick_Pos();
 		bool LeftStickInDeadzone();
 		bool RightStickInDeadzone();
 

@@ -156,7 +156,7 @@ namespace CommonUtilities
 
 		void SetWindowHandle(HWNDPTR aHandle);
 		void SetMousePosition(int aX, int aY);
-		void SetMousePosition(V2F aPosition);
+		void SetMousePosition(V2f aPosition);
 
 		int GetMouseVx() const;
 		int GetMouseVy() const;

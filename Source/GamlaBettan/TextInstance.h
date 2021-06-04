@@ -28,7 +28,7 @@ public:
 
 	float GetWidth() const;
 	float GetHeight() const;
-	virtual V2F GetSize() const;
+	virtual V2f GetSize() const;
 
 	virtual void SetText(const std::wstring& aText);
 	virtual void SetText(const std::string& aText);
@@ -40,11 +40,11 @@ public:
 	virtual const std::wstring& GetWideTitle() const;
 	virtual std::string GetSlimTitle() const;
 
-	const V2F& GetPixelPosition() const;
-	void SetPixelPosition(const V2F& aPosition);
+	const V2f& GetPixelPosition() const;
+	void SetPixelPosition(const V2f& aPosition);
 
-	V2F GetPosition() const;
-	void SetPosition(const V2F& aPosition);
+	V2f GetPosition() const;
+	void SetPosition(const V2f& aPosition);
 
 	const V4F& GetColor() const;
 	void SetColor(const V4F& aColor);
@@ -52,20 +52,20 @@ public:
 	const V4F& GetTitleColor() const;
 	void SetTitleColor(const V4F& aColor);
 
-	const V2F& GetScale() const;
-	void SetScale(const V2F& aScale);
+	const V2f& GetScale() const;
+	void SetScale(const V2f& aScale);
 
-	const V2F& GetTitleScale() const;
-	void SetTitleScale(const V2F& aScale);
+	const V2f& GetTitleScale() const;
+	void SetTitleScale(const V2f& aScale);
 
 	float GetRotation() const;
 	void SetRotation(const float aRotation);
 
-	const V2F& GetPivot() const;
-	void SetPivot(const V2F& aPivot);
+	const V2f& GetPivot() const;
+	void SetPivot(const V2f& aPivot);
 
-	const V2F& GetBuffer() const;
-	void SetBuffer(const V2F& aBuffer);
+	const V2f& GetBuffer() const;
+	void SetBuffer(const V2f& aBuffer);
 
 	const TextEffect GetEffect() const;
 	void SetEffect(const TextEffect anEffect);
@@ -81,18 +81,18 @@ public:
 	const bool HadBeenAddedToScene() const;
 	void SetAddedToSceneStatus(const bool aFlag);
 
-	const V2F GetBackgroundSize();
+	const V2f GetBackgroundSize();
 
 protected:
 	friend class TextFactory;
 
 	V4F myColor;
 	V4F myTitleColor;
-	V2F myPosition;
-	V2F myScale;
-	V2F myTitleScale;
-	V2F myPivot;
-	V2F myBackgroundBuffer;
+	V2f myPosition;
+	V2f myScale;
+	V2f myTitleScale;
+	V2f myPivot;
+	V2f myBackgroundBuffer;
 
 	std::wstring myText;
 	std::wstring myTitle;
@@ -110,8 +110,8 @@ protected:
 	static SpriteRenderer* ourBackgroundRendererPtr;
 
 	void CalculateBackgroundSize();
-	virtual V2F GetTitleSize() const;
-	V2F GetSize(const std::wstring& someText, const std::wstring& aTitle) const;
+	virtual V2f GetTitleSize() const;
+	V2f GetSize(const std::wstring& someText, const std::wstring& aTitle) const;
 };
 
 

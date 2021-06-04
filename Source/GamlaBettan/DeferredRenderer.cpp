@@ -198,7 +198,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 				SYSERROR("Could not map frame buffer");
 				return aModelList;
 			}
-			fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection(aModelList[i]->GetIsUsingSecondaryFov()));
+			fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
 			memcpy(bufferData.pData, &fData, sizeof(fData));
 			myContext->Unmap(myFrameBuffer, 0);
 
@@ -407,7 +407,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 			myContext->PSSetShaderResources(9, i->myTextures.size(), resource);
 
 			fData.myToCamera = M44f::GetFastInverse(i->myCamera->GetTransform());
-			fData.myToProj = i->myCamera->GetProjection(false);
+			fData.myToProj = i->myCamera->GetProjection();
 			fData.myLifeTime = now - i->myTimestamp;
 			fData.myCustomData = i->myCustomData;
 
@@ -519,7 +519,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 			for (size_t i = 0; i < 6; i++)
 			{
 				fData.myToCamera[i] = M44f::GetFastInverse(shadowCameras[i]->GetTransform());
-				fData.myToProj[i] = shadowCameras[i]->GetProjection(false);
+				fData.myToProj[i] = shadowCameras[i]->GetProjection();
 			}
 
 
@@ -587,7 +587,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 			//Render Shadows on/to resource 8-14
 
 			fData.myToCamera = M44f::GetFastInverse(i->myCamera->GetTransform());
-			fData.myToProj = i->myCamera->GetProjection(false);
+			fData.myToProj = i->myCamera->GetProjection();
 
 
 			WIPE(bufferData);
@@ -642,7 +642,7 @@ void DeferredRenderer::MapEnvLightBuffer(Scene* aScene)
 
 	const Camera* cam = myShadowRenderer->GetEnvirontmentCamera();
 	fData.myToCamera = M44f::GetFastInverse(cam->GetTransform());
-	fData.myToProjection = cam->GetProjection(false);
+	fData.myToProjection = cam->GetProjection();
 	fData.time = Tools::GetTotalTime();
 	fData.myCloudIntensity = myCloudIntensity;
 

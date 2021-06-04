@@ -21,17 +21,14 @@ public:
 	SpriteInstance* GetTopBorderSprite();
 	SpriteInstance* GetLowerBorderSprite();
 
-	bool CheckHover(float aMouseX, float aMouseY);
+	bool CheckHover(const V2f& aPosition);
 	bool Init(const std::string& aNormalPath, const std::string& aHoveredPath, const std::string& aPressedPath, const std::string& aDisabledPath, const CommonUtilities::Vector2<float>& aPosition,
-		const V2F& aHitBoxSize = V2F(1.f, 1.f), SpriteFactory* aSpriteFactory = ourSpriteFactoryPtr);
-	bool Init(const std::string& aFolderPath, const std::string& aButtonName, const CommonUtilities::Vector2<float>& aPosition, 
-		const V2F& aHitBoxSize = V2F(1.f, 1.f), SpriteFactory* aSpriteFactory = ourSpriteFactoryPtr);
+		const V2f& aHitBoxSize = V2f(1.f, 1.f), SpriteFactory* aSpriteFactory = ourSpriteFactoryPtr);
+	bool Init(const std::string& aFolderPath, const std::string& aButtonName, const CommonUtilities::Vector2<float>& aPosition,
+		const V2f& aHitBoxSize = V2f(1.f, 1.f), SpriteFactory* aSpriteFactory = ourSpriteFactoryPtr);
 	bool IsActive();
 	bool IsPressed();
 	void RecieveMessage(const Message& aMessage) override;
-
-	void Subscribe();
-	void Unsubscribe();
 
 	static void SetSpriteFactory(SpriteFactory* aSpriteFactory);
 	void SetScenePtr(Scene* aScenePtr);

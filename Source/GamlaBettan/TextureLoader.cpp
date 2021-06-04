@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "TextureLoader.h"
-#include "../Game/perlin_noise.h"
+#include "Tools\perlin_noise.h"
 
 #include "DirectXTK\Inc\DDSTextureLoader.h"
 
@@ -24,7 +24,7 @@ Asset* TextureLoader::LoadCubeTexture(const std::string& aFile)
 	return LoadTextureInternal(aFile, D3D11_RESOURCE_MISC_TEXTURECUBE, false);
 }
 
-Asset* TextureLoader::GeneratePerlin(CommonUtilities::Vector2<size_t> aSize, V2F aScale, unsigned int aSeed)
+Asset* TextureLoader::GeneratePerlin(V2ui aSize, V2f aScale, unsigned int aSeed)
 {
 	V4F* color = new V4F[aSize.x * aSize.y];
 
@@ -109,7 +109,7 @@ Asset* TextureLoader::LoadTextureInternal(const std::string& aFile, D3D11_RESOUR
 		D3D11_TEXTURE2D_DESC desc;
 		tex2d->GetDesc(&desc);
 		tex2d->Release();
-		DirectX11Framework::AddMemoryUsage(desc.Width * desc.Height * DirectX11Framework::FormatToSizeLookup[desc.Format], aFile, "Texture2d");
+		DirectX11Framework::AddGraphicsMemoryUsage(desc.Width * desc.Height * DirectX11Framework::FormatToSizeLookup[desc.Format], aFile, "Texture2d");
 	}
 
 	ID3D11Texture3D* tex3d;
@@ -119,7 +119,7 @@ Asset* TextureLoader::LoadTextureInternal(const std::string& aFile, D3D11_RESOUR
 		D3D11_TEXTURE3D_DESC desc;
 		tex3d->GetDesc(&desc);
 		tex3d->Release();
-		DirectX11Framework::AddMemoryUsage(desc.Width * desc.Height * desc.Depth * DirectX11Framework::FormatToSizeLookup[desc.Format], aFile, "Texture3d");
+		DirectX11Framework::AddGraphicsMemoryUsage(desc.Width * desc.Height * desc.Depth * DirectX11Framework::FormatToSizeLookup[desc.Format], aFile, "Texture3d");
 	}
 	res->Release();
 

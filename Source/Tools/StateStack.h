@@ -1,7 +1,5 @@
 #pragma once
 #include "Observer.hpp"
-#include <vector>
-#include <queue>
 
 class BaseState;
 class CGraphicsEngine;
@@ -30,7 +28,7 @@ private:
 	void PopMinor();
 	void Pop();
 	void ActivateStates(int aActivationDepth);
-	std::vector<BaseState*>* myStates;
+	std::vector<BaseState*> myStates;
 
 	struct StateMessage
 	{

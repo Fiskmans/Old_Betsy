@@ -5,6 +5,7 @@
 #include "SpriteFontInclude.h"
 #include "TimeHelper.h"
 #include "Sprite.h"
+#include "WindowHandler.h"
 
 SpriteRenderer* TextInstance::ourBackgroundRendererPtr;
 
@@ -63,7 +64,7 @@ void TextInstance::Render(DirectX::SpriteBatch* aSpriteBatch)
 
 			CalculateBackgroundSize();
 
-			myBackground->SetPosition((myPosition + (myBackgroundBuffer * myPivot)) / Sprite::ourWindowSize);
+			myBackground->SetPosition((myPosition + (myBackgroundBuffer * myPivot)) / static_cast<V2f>(WindowHandler::GetInstance().GetSize()));
 			myBackground->SetRotation(myRotation);
 
 			ourBackgroundRendererPtr->Render(sprite);
@@ -72,11 +73,11 @@ void TextInstance::Render(DirectX::SpriteBatch* aSpriteBatch)
 		}
 
 
-		mySpriteFont.GetAsFont()->DrawString(aSpriteBatch, myText.c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + V2F(0.f, GetTitleSize().y)), ToShitVector(myColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myScale), CAST(DirectX::SpriteEffects, myEffect));
+		mySpriteFont.GetAsFont()->DrawString(aSpriteBatch, myText.c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + V2f(0.f, GetTitleSize().y)), ToShitVector(myColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myScale), CAST(DirectX::SpriteEffects, myEffect));
 
 		if (!myTitle.empty())
 		{
-			mySpriteFont.GetAsFont()->DrawString(aSpriteBatch, myTitle.c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + GetTitleSize() * (myPivot * V2F(myTitleScale.x - myScale.x, 0.5f))), ToShitVector(myTitleColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myTitleScale), CAST(DirectX::SpriteEffects, myEffect));
+			mySpriteFont.GetAsFont()->DrawString(aSpriteBatch, myTitle.c_str(), ToShitVector(myPosition - (myBackgroundBuffer * myPivot) + (myBackgroundBuffer * 0.5f) + GetTitleSize() * (myPivot * V2f(myTitleScale.x - myScale.x, 0.5f))), ToShitVector(myTitleColor), myRotation, ToShitVector(GetSize() * myPivot), ToShitVector(myTitleScale), CAST(DirectX::SpriteEffects, myEffect));
 
 		}
 	}
@@ -92,7 +93,7 @@ void TextInstance::SetAddedToSceneStatus(const bool aFlag)
 	myIsAddedToScene = aFlag;
 }
 
-const V2F TextInstance::GetBackgroundSize()
+const V2f TextInstance::GetBackgroundSize()
 {
 	return myBackground->GetSizeOnScreen();
 }
@@ -102,20 +103,20 @@ void TextInstance::CalculateBackgroundSize()
 	myBackground->SetScale((GetSize() + myBackgroundBuffer * 2.f) / myBackground->GetImageSize());
 }
 
-V2F TextInstance::GetTitleSize() const
+V2f TextInstance::GetTitleSize() const
 {
 	return GetSize(L"", myTitle);
 }
 
-V2F TextInstance::GetSize() const
+V2f TextInstance::GetSize() const
 {
 	return GetSize(myText, myTitle);
 }
 
-V2F TextInstance::GetSize(const std::wstring& someText, const std::wstring& aTitle) const
+V2f TextInstance::GetSize(const std::wstring& someText, const std::wstring& aTitle) const
 {
-	V2F size = FromShitVector(mySpriteFont.GetAsFont()->MeasureString(someText.c_str())) * myScale;
-	V2F titleSize = (aTitle.empty() ? V2F() : FromShitVector(mySpriteFont.GetAsFont()->MeasureString(aTitle.c_str())) * myTitleScale);
+	V2f size = FromShitVector(mySpriteFont.GetAsFont()->MeasureString(someText.c_str())) * myScale;
+	V2f titleSize = (aTitle.empty() ? V2f() : FromShitVector(mySpriteFont.GetAsFont()->MeasureString(aTitle.c_str())) * myTitleScale);
 
 	size.y += titleSize.y;
 	size.x = MAX(titleSize.x, size.x);
@@ -173,24 +174,24 @@ std::string TextInstance::GetSlimTitle() const
 	return std::string(myTitle.begin(), myTitle.end());
 }
 
-const V2F& TextInstance::GetPixelPosition() const
+const V2f& TextInstance::GetPixelPosition() const
 {
 	return myPosition;
 }
 
-void TextInstance::SetPixelPosition(const V2F& aPosition)
+void TextInstance::SetPixelPosition(const V2f& aPosition)
 {
 	myPosition = aPosition;
 }
 
-V2F TextInstance::GetPosition() const
+V2f TextInstance::GetPosition() const
 {
-	return V2F(myPosition.x / Sprite::ourWindowSize.x, myPosition.y / Sprite::ourWindowSize.y);
+	return myPosition / static_cast<V2f>(WindowHandler::GetInstance().GetSize());
 }
 
-void TextInstance::SetPosition(const V2F& aPosition)
+void TextInstance::SetPosition(const V2f& aPosition)
 {
-	SetPixelPosition({ aPosition.x * Sprite::ourWindowSize.x, aPosition.y * Sprite::ourWindowSize.y });
+	SetPixelPosition(aPosition * static_cast<V2f>(WindowHandler::GetInstance().GetSize()));
 }
 
 const V4F& TextInstance::GetColor() const
@@ -213,22 +214,22 @@ void TextInstance::SetTitleColor(const V4F& aColor)
 	myTitleColor = aColor;
 }
 
-const V2F& TextInstance::GetScale() const
+const V2f& TextInstance::GetScale() const
 {
 	return myScale;
 }
 
-const V2F& TextInstance::GetTitleScale() const
+const V2f& TextInstance::GetTitleScale() const
 {
 	return myTitleScale;
 }
 
-void TextInstance::SetTitleScale(const V2F& aScale)
+void TextInstance::SetTitleScale(const V2f& aScale)
 {
 	myTitleScale = aScale;
 }
 
-void TextInstance::SetScale(const V2F& aScale)
+void TextInstance::SetScale(const V2f& aScale)
 {
 	myScale = aScale;
 }
@@ -243,12 +244,12 @@ void TextInstance::SetRotation(const float aRotation)
 	myRotation = aRotation;
 }
 
-const V2F& TextInstance::GetPivot() const
+const V2f& TextInstance::GetPivot() const
 {
 	return myPivot;
 }
 
-void TextInstance::SetPivot(const V2F& aPivot)
+void TextInstance::SetPivot(const V2f& aPivot)
 {
 	myPivot = aPivot;
 
@@ -258,12 +259,12 @@ void TextInstance::SetPivot(const V2F& aPivot)
 	}
 }
 
-const V2F& TextInstance::GetBuffer() const
+const V2f& TextInstance::GetBuffer() const
 {
 	return myBackgroundBuffer;
 }
 
-void TextInstance::SetBuffer(const V2F& aBuffer)
+void TextInstance::SetBuffer(const V2f& aBuffer)
 {
 	myBackgroundBuffer = aBuffer;
 }

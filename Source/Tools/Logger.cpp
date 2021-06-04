@@ -193,7 +193,7 @@ namespace Logger
 					ImGui::PushStyleColor(ImGuiCol_Text, col);
 
 					ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);
-					if (ImGui::TreeNode(nameLookup[1].c_str()))
+					if (ImGui::TreeNode(nameLookup[root.first].c_str()))
 					{
 						UnpackNode(&root.second);
 						ImGui::TreePop();

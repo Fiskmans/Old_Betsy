@@ -48,7 +48,6 @@
     <ClInclude Include="Sphere.hpp" />
     <ClInclude Include="Src\NonCopyably.hpp" />
     <ClInclude Include="Stack.hpp" />
-    <ClInclude Include="StateStackEnum.hpp" />
     <ClInclude Include="StaticArray.hpp" />
     <ClInclude Include="Vector.hpp" />
     <ClInclude Include="Vector2.hpp" />

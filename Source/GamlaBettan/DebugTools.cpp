@@ -2,19 +2,17 @@
 #include "DebugTools.h"
 #include "Scene.h"
 #include "ModelInstance.h"
-#include <bitset>
-#include <SlabRay.h>
-#include <Octree.h>
 
 #include "AssetManager.h"
+#include "CommonUtilities\Ray.hpp"
+#include "CommonUtilities\Intersection.hpp"
 
 #ifdef _DEBUG
-ModelLoader* DebugTools::myModelLoader;
 CommonUtilities::PlaneVolume<float> DebugTools::CameraFrustum;
 std::map<std::string, std::vector<std::string>>* DebugTools::FileList = nullptr;
 std::string DebugTools::myUsername;
 LightLoader* DebugTools::myLightLoader;
-SlabRay* DebugTools::LastKnownMouseRay = nullptr;
+FRay* DebugTools::LastKnownMouseRay = nullptr;
 Camera* DebugTools::myCamera = nullptr;
 std::set<std::wstring> DebugTools::CommandLineFlags;
 
@@ -93,7 +91,7 @@ void DebugTools::UpdateGizmo()
 		for (size_t i = 0; i < 6; i++)
 		{
 			float t;
-			if (Octree::CheckRayVSBB(aabbs[i], *LastKnownMouseRay,&t))
+			if (CommonUtilities::IntersectionAABBRay(aabbs[i], *LastKnownMouseRay, t))
 			{
 				if (t < closest)
 				{
@@ -119,7 +117,8 @@ void DebugTools::UpdateGizmo()
 		{
 			if (isMoving)
 			{
-				V3F pos = LastKnownMouseRay->FindIntersection(movementPlane, dump);
+				V3F pos;
+				LastKnownMouseRay->FindIntersection(movementPlane, pos);
 				if (axisControl[0])
 				{
 					myGizmoVector->x += pos.x - lastMousePos.x;
@@ -141,7 +140,8 @@ void DebugTools::UpdateGizmo()
 					isMoving = true;
 					movementPlane = planeMapping[selected];
 					axisControl = axisMapping[selected];
-					lastMousePos = LastKnownMouseRay->FindIntersection(movementPlane, dump);
+
+					LastKnownMouseRay->FindIntersection(movementPlane, lastMousePos, dump);
 				}
 			}
 		}

@@ -1,26 +1,25 @@
 #pragma once
-#include <vector>
-#include <unordered_map>
 #include "Message.hpp"
+
+#include "CommonUtilities\Singleton.hpp"
 
 class Observer;
 
-class PostMaster
+class PostMaster : public CommonUtilities::Singleton<PostMaster>
 {
 public:
+	PostMaster();
+	~PostMaster();
 
-	static void Create();
-	static void Destroy();
-	static PostMaster* GetInstance();
-	void Subscribe(MessageType aMessageToSubscribe, Observer* aObserver);
-	void UnSubscribe(MessageType aMessageToSubscribe, Observer* aObserverToRemove);
 	void SendMessages(const Message& aMessage);
-	void SendMessages(MessageType aMessageType);
+	void SendMessages(MessageType aMessageType, const void* aPayload = nullptr);
 
 
 private:
-	static PostMaster* ourInstance;
-	PostMaster();
-	~PostMaster();
+	friend Observer;
+
+	void Subscribe(Observer* aObserver,MessageType aMessageType);
+	bool UnSubscribe(Observer* aObserver, MessageType aMessageType);
+
 	std::unordered_map<MessageType, std::vector<Observer*>> mySubscriptions;
 };

@@ -8,27 +8,33 @@ namespace CommonUtilities
 	class Ray
 	{
 	public:
-		// Default constructor: there is no ray, the origin and direction are the
-		// zero vector.
 		Ray();
-		// Copy constructor.
 		Ray(const Ray<T>& aRay);
-		// Constructor that takes two points that define the ray, the direction is
-		// aPoint - aOrigin and the origin is aOrigin.
-		Ray(const Vector3<T>& aOrigin, const Vector3<T>& aPoint);
-		// Init the ray with two points, the same as the constructor above.
+		Ray(const Vector3<T>& aOrigin, const Vector3<T>& aDirection);
 		void InitWith2Points(const Vector3<T>& aOrigin, const Vector3<T>& aPoint);
-		// Init the ray with an origin and a direction.
 		void InitWithOriginAndDirection(const Vector3<T>& aOrigin, const Vector3<T>& aDirection);
 
-		Vector3<T> FindIntersection(Plane<T> aPlane);
+		bool FindIntersection(const Plane<T>& aPlane, Vector3<T>& aOutPoint = ourOutDefaultVector, T& aOutDistance = ourOutDefaultScalar) const;
+		bool FindIntersection(const Plane<T>& aPlane, T& aOutDistance) const;
 
 		const Vector3<T>& Position() const;
 		const Vector3<T>& Direction() const;
+
+		Vector3<T> PointAtDistance(const T& aDistance) const;
+
 	private:
+		static thread_local Vector3<T> ourOutDefaultVector;
+		static thread_local T ourOutDefaultScalar;
+
 		Vector3<T> myPosition;
 		Vector3<T> myDirection;
 	};
+
+	template<typename T>
+	thread_local Vector3<T> Ray<T>::ourOutDefaultVector;
+
+	template<typename T>
+	thread_local T Ray<T>::ourOutDefaultScalar;
 
 	template<typename T>
 	inline Ray<T>::Ray()
@@ -43,9 +49,9 @@ namespace CommonUtilities
 	}
 
 	template<typename T>
-	inline Ray<T>::Ray(const Vector3<T>& aOrigin, const Vector3<T>& aPoint) :
+	inline Ray<T>::Ray(const Vector3<T>& aOrigin, const Vector3<T>& aDirection) :
 		myPosition(aOrigin),
-		myDirection(aPoint - aOrigin)
+		myDirection(aDirection)
 	{
 	}
 	template<typename T>
@@ -60,6 +66,28 @@ namespace CommonUtilities
 		myPosition = aOrigin;
 		myDirection = aDirection;
 	}
+
+	template<typename T>
+	inline bool Ray<T>::FindIntersection(const Plane<T>& aPlane, T& aOutDistance) const
+	{
+		return FindIntersection(aPlane,ourOutDefaultVector,aOutDistance);
+	}
+
+	template<typename T>
+	inline bool Ray<T>::FindIntersection(const Plane<T>& aPlane, Vector3<T>& aOutPoint, T & aOutDistance) const
+	{
+		Vector3<T> toPlane = aPlane.Point() - myPosition;
+		toPlane = toPlane.Dot(aPlane.Normal()) * aPlane.Normal();
+
+		aOutDistance = toPlane.Dot(myDirection);
+
+		if (aOutDistance > 0)
+		{
+			aOutPoint = myPosition + aOutDistance * myDirection;
+			return true;
+		}
+		return false;
+	}
 	template<typename T>
 	inline const Vector3<T>& Ray<T>::Position() const
 	{
@@ -70,4 +98,12 @@ namespace CommonUtilities
 	{
 		return myDirection;
 	}
+	template<typename T>
+	inline Vector3<T> Ray<T>::PointAtDistance(const T& aDistance) const
+	{
+		return myPosition + myDirection * aDistance;
+	}
 }
+
+typedef CommonUtilities::Ray<float> FRay;
+typedef CommonUtilities::Ray<double> DRay;

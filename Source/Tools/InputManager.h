@@ -1,6 +1,4 @@
 #pragma once
-#include "Publisher.hpp"
-#include "Observer.hpp"
 #include "Secret.h"
 
 namespace CommonUtilities
@@ -8,7 +6,7 @@ namespace CommonUtilities
 	class InputHandler;
 }
 
-class InputManager : Publisher, public Observer
+class InputManager :  public Observer
 {
 public:
 
@@ -35,8 +33,6 @@ private:
 	bool myIsPaused;
 	bool myMouseIsMoving;
 	bool myGameExists;
-
-	int myLevel;
 
 	std::vector<Secret> mySecrets;
 };

@@ -188,35 +188,24 @@
     <ClCompile Include="AssetImportHelpers.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="AudioManager.cpp" />
-    <ClCompile Include="CinematicTarget.cpp" />
     <ClCompile Include="DecalFactory.cpp" />
     <ClCompile Include="LevelLoader.cpp" />
     <ClCompile Include="NavMeshLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraFactory.cpp" />
-    <ClCompile Include="CameraPan.cpp" />
-    <ClCompile Include="CinematicEvent.cpp" />
-    <ClCompile Include="CinematicPath.cpp" />
     <ClCompile Include="DebugDrawer.cpp" />
     <ClCompile Include="DebugTools.cpp" />
     <ClCompile Include="DeferredRenderer.cpp" />
     <ClCompile Include="DirectX11Framework.cpp" />
     <ClCompile Include="Environmentlight.cpp" />
-    <ClCompile Include="FadeScreen.cpp" />
     <ClCompile Include="ForwardRenderer.cpp" />
     <ClCompile Include="FullscreenRenderer.cpp" />
     <ClCompile Include="FullscreenTexture.cpp" />
     <ClCompile Include="FullscreenTextureFactory.cpp" />
     <ClCompile Include="GBuffer.cpp" />
     <ClCompile Include="HighlightRenderer.cpp" />
-    <ClCompile Include="MoveObject.cpp" />
     <ClCompile Include="GraphicEngine.cpp" />
-    <ClCompile Include="ParticleBurst.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
     <ClCompile Include="PathFinder.cpp" />
-    <ClCompile Include="PlayAnimation.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="DepthRenderer.cpp" />
     <ClCompile Include="SpotLightFactory.cpp" />
@@ -245,7 +234,6 @@
     <ClCompile Include="TextInstance.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
-    <ClCompile Include="video.cpp" />
     <ClCompile Include="videoplayer.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
     <ClCompile Include="WindSystem.cpp" />
@@ -259,37 +247,26 @@
     <ClInclude Include="AssetImportHelpers.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="AudioManager.h" />
-    <ClInclude Include="CinematicTarget.h" />
     <ClInclude Include="Decal.h" />
     <ClInclude Include="DecalFactory.h" />
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="NavMeshLoader.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraFactory.h" />
-    <ClInclude Include="CameraPan.h" />
-    <ClInclude Include="CinematicEvent.h" />
-    <ClInclude Include="CinematicPath.h" />
     <ClInclude Include="DebugDrawer.h" />
     <ClInclude Include="DebugTools.h" />
     <ClInclude Include="DeferredRenderer.h" />
     <ClInclude Include="DirectX11Framework.h" />
     <ClInclude Include="Environmentlight.h" />
-    <ClInclude Include="FadeScreen.h" />
     <ClInclude Include="ForwardRenderer.h" />
     <ClInclude Include="FullscreenRenderer.h" />
     <ClInclude Include="FullscreenTexture.h" />
     <ClInclude Include="FullscreenTextureFactory.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="HighlightRenderer.h" />
-    <ClInclude Include="MoveObject.h" />
     <ClInclude Include="GraphicEngine.h" />
     <ClCompile Include="ParticleRenderer.cpp" />
-    <ClInclude Include="ParticleBurst.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
     <ClInclude Include="PathFinder.h" />
-    <ClInclude Include="PlayAnimation.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="DepthRenderer.h" />
     <ClInclude Include="SpotLight.h" />
@@ -324,9 +301,7 @@
     <ClInclude Include="TextInstance.h" />
     <ClInclude Include="TextRenderer.h" />
     <ClInclude Include="TextureLoader.h" />
-    <ClInclude Include="video.h" />
     <ClInclude Include="videoplayer.h" />
-    <ClInclude Include="WindowData.h" />
     <ClInclude Include="WindowHandler.h" />
     <ClInclude Include="WindSystem.h" />
     <ClInclude Include="WwiseFramework.h" />

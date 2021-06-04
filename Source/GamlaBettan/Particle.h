@@ -46,7 +46,7 @@ class Particle
 public:
 	struct Vertex
 	{
-		Vertex(V4F aPosition, V4F aMovement, V4F aColor, V2F aSize)
+		Vertex(V4F aPosition, V4F aMovement, V4F aColor, V2f aSize)
 		{
 			myPosition = aPosition;
 			myPosition.w = 1;
@@ -59,12 +59,12 @@ public:
 		V4F myPosition;
 		V4F myMovement;
 		V4F myColor;
-		V2F mySize;
+		V2f mySize;
 		float myDistanceToCamera;
 		float myLifetime;
 
-		V2F myUVMin = V2F(0.f, 0.f);
-		V2F myUVMax = V2F(1.f, 1.f);
+		V2f myUVMin = V2f(0.f, 0.f);
+		V2f myUVMax = V2f(1.f, 1.f);
 		float myFlipBookTimer = 0;
 	};
 	struct Data

@@ -34,8 +34,8 @@ namespace Pathfinderhelpers
 {
 	struct Portal
 	{
-		V2F left;
-		V2F right;
+		V2f left;
+		V2f right;
 		float ly = 0.f;
 		float ry = 0.f;
 	};
@@ -90,20 +90,20 @@ namespace Pathfinderhelpers
 		return leftAlignment > span && rightAlignment > span;
 	}
 
-	inline float triarea2(const V2F a, const V2F b, const V2F c)
+	inline float triarea2(const V2f a, const V2f b, const V2f c)
 	{
-		const V2F ax = b - a;
-		const V2F bx = c - a;
+		const V2f ax = b - a;
+		const V2f bx = c - a;
 		return bx.x * ax.y - ax.x * bx.y;
 	}
 
-	inline bool vequal(const V2F a, const V2F b)
+	inline bool vequal(const V2f a, const V2f b)
 	{
 		static const float eq = 0.001f * 0.001f;
 		return (a - b).LengthSqr() < eq;
 	}
 
-	void AddIntersections(const std::vector<Portal>& aPortals, size_t aFrom, size_t aTo, V2F aStart, V2F aEnd, std::vector<V3F>& aOutPoints)
+	void AddIntersections(const std::vector<Portal>& aPortals, size_t aFrom, size_t aTo, V2f aStart, V2f aEnd, std::vector<V3F>& aOutPoints)
 	{
 		float discard;
 		V3F start = V3F(aStart.x, 0.f, aStart.y);
@@ -122,9 +122,10 @@ namespace Pathfinderhelpers
 			V3F rayStart = V3F(aPortals[i].left.x, aPortals[i].ly, aPortals[i].left.y);
 			V3F rayEnd = V3F(aPortals[i].right.x, aPortals[i].ry, aPortals[i].right.y);
 
-			SlabRay ray(V4F(rayStart, 1.f), V4F(rayEnd, 1.f));
-			V3F inters = ray.FindIntersection(plane, discard);
-			if (inters == V3F(0.f, 0.f, 0.f))
+			FRay ray(V4F(rayStart, 1.f), V4F(rayEnd, 1.f));
+			V3F inters;
+
+			if (!ray.FindIntersection(plane,inters))
 			{
 				inters = rayStart;
 			}
@@ -137,7 +138,7 @@ namespace Pathfinderhelpers
 	{
 		// Find straight path.
 		// Init scan state
-		V2F portalApex, portalLeft, portalRight;
+		V2f portalApex, portalLeft, portalRight;
 		int apexIndex = 0, leftIndex = 0, rightIndex = 0;
 		portalApex = aPortals[0].left;
 		portalLeft = aPortals[0].left;
@@ -150,8 +151,8 @@ namespace Pathfinderhelpers
 
 		for (int i = 1; i < aPortals.size(); ++i)
 		{
-			V2F left = aPortals[i].left;
-			V2F right = aPortals[i].right;
+			V2f left = aPortals[i].left;
+			V2f right = aPortals[i].right;
 			float ly = aPortals[i].ly;
 			float ry = aPortals[i].ry;
 
@@ -256,7 +257,7 @@ void PathFinder::DrawDebug()
 	}
 }
 
-V3F PathFinder::FindPoint(SlabRay aRay)
+V3F PathFinder::FindPoint(const FRay& aRay)
 {
 	if (!myNavMesh.IsValid() || !myNavMesh.IsLoaded())
 	{
@@ -269,7 +270,8 @@ V3F PathFinder::FindPoint(SlabRay aRay)
 	float closest = _HUGE_ENUF;
 	if (myIsDisabled)
 	{
-		return aRay.FindIntersection(CommonUtilities::Plane<float>(V3F(0, 0, 0), V3F(0, 1, 0)), closest);
+		aRay.FindIntersection(CommonUtilities::Plane<float>(V3F(0, 0, 0), V3F(0, 1, 0)), closest);
+		return aRay.PointAtDistance(closest);
 	}
 
 	V3F result = V3F(0, 0, 0);
@@ -278,7 +280,11 @@ V3F PathFinder::FindPoint(SlabRay aRay)
 	{
 		//TODO: filter to increase performance
 		float t;
-		V3F inters = aRay.FindIntersection(node.myPlane, t);
+		V3F inters;
+		if (!aRay.FindIntersection(node.myPlane, inters, t))
+		{
+			continue;
+		}
 
 		if (Pathfinderhelpers::PointInTriangle(inters,
 			mesh->myVertexCollection[node.myCorners[0]],
@@ -303,8 +309,8 @@ std::vector<V3F> PathFinder::FindPath(V3F aFrom, V3F aTo)
 		return { aTo };
 	}
 	std::vector<V3F> result;
-	NavMeshIndexType start = FindNode(SlabRay(aFrom + V3F(0, 10000000.f, 0), V3F(0, -1, 0)));
-	NavMeshIndexType end = FindNode(SlabRay(aTo + V3F(0, 10000000.f, 0), V3F(0, -1, 0)));
+	NavMeshIndexType start = FindNode(FRay(aFrom + V3F(0, 10000000.f, 0), V3F(0, -1, 0)));
+	NavMeshIndexType end = FindNode(FRay(aTo + V3F(0, 10000000.f, 0), V3F(0, -1, 0)));
 	std::vector<NavMeshIndexType> passedNodes;
 	if (!start || !end || !FindPath(start, end, passedNodes))
 	{
@@ -317,7 +323,7 @@ std::vector<V3F> PathFinder::FindPath(V3F aFrom, V3F aTo)
 
 V3F PathFinder::Floorify(V3F aPoint)
 {
-	return FindPoint(SlabRay(aPoint + V3F(0, 1000_m, 0), V3F(0, -1_m, 0)));
+	return FindPoint(FRay(aPoint + V3F(0, 1000_m, 0), V3F(0, -1_m, 0)));
 }
 
 void PathFinder::Imgui()
@@ -471,10 +477,10 @@ bool PathFinder::IntersectionWithWalls(V3F aStart, V3F aEnd)
 }
 
 
-inline void FindMinMax(NavMeshNode& node, V2F& aMin, V2F& aMax, NavMesh* navmesh)
+inline void FindMinMax(NavMeshNode& node, V2f& aMin, V2f& aMax, NavMesh* navmesh)
 {
-	aMin = V2F(CAST(float, INT_MAX), CAST(float, INT_MAX));
-	aMax = V2F(CAST(float, INT_MIN), CAST(float, INT_MIN));
+	aMin = V2f(CAST(float, INT_MAX), CAST(float, INT_MAX));
+	aMax = V2f(CAST(float, INT_MIN), CAST(float, INT_MIN));
 
 	for (auto& i : node.myCorners)
 	{
@@ -665,9 +671,9 @@ void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<NavMeshInd
 	V3F lastRight = aStart;
 	{
 		Pathfinderhelpers::Portal portal;
-		portal.left = V2F(lastLeft.x, lastLeft.z);
+		portal.left = V2f(lastLeft.x, lastLeft.z);
 		portal.ly = lastLeft.y;
-		portal.right = V2F(lastRight.x, lastRight.z);
+		portal.right = V2f(lastRight.x, lastRight.z);
 		portal.ry = lastRight.y;
 		portals.push_back(portal);
 	}
@@ -684,9 +690,9 @@ void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<NavMeshInd
 		}
 
 		Pathfinderhelpers::Portal portal;
-		portal.left = V2F(lastLeft.x, lastLeft.z);
+		portal.left = V2f(lastLeft.x, lastLeft.z);
 		portal.ly = lastLeft.y;
-		portal.right = V2F(lastRight.x, lastRight.z);
+		portal.right = V2f(lastRight.x, lastRight.z);
 		portal.ry = lastRight.y;
 		portals.push_back(portal);
 	}
@@ -696,9 +702,9 @@ void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<NavMeshInd
 
 	{
 		Pathfinderhelpers::Portal portal;
-		portal.left = V2F(lastLeft.x, lastLeft.z);
+		portal.left = V2f(lastLeft.x, lastLeft.z);
 		portal.ly = lastLeft.y;
-		portal.right = V2F(lastRight.x, lastRight.z);
+		portal.right = V2f(lastRight.x, lastRight.z);
 		portal.ry = lastRight.y;
 		portals.push_back(portal);
 	}
@@ -737,7 +743,7 @@ void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<NavMeshInd
 	aOutPath.push_back(aEnd);
 }
 
-NavMeshIndexType PathFinder::FindNode(SlabRay aRay)
+NavMeshIndexType PathFinder::FindNode(FRay aRay)
 {
 	NavMeshIndexType foundNode = -1;
 
@@ -752,7 +758,8 @@ NavMeshIndexType PathFinder::FindNode(SlabRay aRay)
 		//TODO: filter to increase performance
 
 		float t;
-		V3F inters = aRay.FindIntersection(node.myPlane, t);
+		V3F inters;
+		aRay.FindIntersection(node.myPlane, inters, t);
 
 		if (Pathfinderhelpers::PointInTriangle(inters,
 			mesh->myVertexCollection[node.myCorners[0]],

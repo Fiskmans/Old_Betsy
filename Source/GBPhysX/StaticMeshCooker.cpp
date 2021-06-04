@@ -20,14 +20,16 @@ using namespace physx;
 
 StaticMeshCooker::StaticMeshCooker() :
 	myCooker(nullptr),
-	myUniqueMeshID(0)
+	myUniqueMeshID(0),
+	Observer({
+			MessageType::SerializePhysXObjects
+		})
 {
 
 }
 
 StaticMeshCooker::~StaticMeshCooker()
 {
-	UnSubscribeToMessage(MessageType::SerializePhysXObjects);
 }
 
 bool StaticMeshCooker::Init(PxFoundation* aFoundation, PxPhysics* aPhysics)
@@ -41,8 +43,6 @@ bool StaticMeshCooker::Init(PxFoundation* aFoundation, PxPhysics* aPhysics)
 	}
 
 	myTriangleMeshCollection = PxCreateCollection();
-
-	SubscribeToMessage(MessageType::SerializePhysXObjects);
 
 	std::string path = "Data/Metrics/SerializedObjects.xml";
 	DeSerializeObjects(myPhysicsPtr, path);

@@ -11,7 +11,7 @@ public:
 
 	Asset* LoadTexture(const std::string& aFile, bool aFailSilenty = false);
 	Asset* LoadCubeTexture(const std::string& aFile);
-	Asset* GeneratePerlin(CommonUtilities::Vector2<size_t> aSize, V2F aScale = { 1,1 }, unsigned int aSeed = 0);
+	Asset* GeneratePerlin(V2ui aSize, V2f aScale = { 1.f, 1.f }, unsigned int aSeed = 0);
 
 private:
 	Asset* LoadTextureInternal(const std::string& aFile, D3D11_RESOURCE_MISC_FLAG aFlags, bool aFailSilenty);

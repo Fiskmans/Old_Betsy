@@ -37,9 +37,9 @@ float Tools::RandomRange(float aMin, float aMax)
 	return dist(random());
 }
 
-V2F Tools::RandomRange(const V2F& aMin, const V2F& aMax)
+V2f Tools::RandomRange(const V2f& aMin, const V2f& aMax)
 {
-	return V2F(RandomRange(aMin.x, aMax.x), RandomRange(aMin.y, aMax.y));
+	return V2f(RandomRange(aMin.x, aMax.x), RandomRange(aMin.y, aMax.y));
 }
 
 V3F Tools::RandomRange(const V3F& aMin, const V3F& aMax)

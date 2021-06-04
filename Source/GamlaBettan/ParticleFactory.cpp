@@ -649,7 +649,7 @@ namespace Constructing
 
 		ID3D11Buffer* buffer;
 
-		DirectX11Framework::AddMemoryUsage(desc.ByteWidth, "Unkown Particle", "Particles");
+		DirectX11Framework::AddGraphicsMemoryUsage(desc.ByteWidth, "Unkown Particle", "Particles");
 		HRESULT result = aDevice->CreateBuffer(&desc, nullptr, &buffer);
 		if (FAILED(result))
 		{

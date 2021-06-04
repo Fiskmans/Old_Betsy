@@ -351,15 +351,6 @@ bool ModelInstance::GetIsHighlighted()
 	return myIsHighlighted;
 }
 
-void ModelInstance::SetUsingSecondaryFov(bool aState)
-{
-	myIsUsingSecondaryFov = aState;
-}
-
-bool ModelInstance::GetIsUsingSecondaryFov()
-{
-	return myIsUsingSecondaryFov;
-}
 
 void ModelInstance::Interact()
 {

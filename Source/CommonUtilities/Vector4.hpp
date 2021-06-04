@@ -345,7 +345,7 @@ namespace CommonUtilities
 	template<>
 	inline bool Vector4<float>::operator==(const Vector4<float>& aVector) const
 	{
-		const float eps = 1e-10;
+		const float eps = 1e-10f;
 		return  abs(x - aVector.x) < eps 
 			&&	abs(y - aVector.y) < eps 
 			&&	abs(z - aVector.z) < eps 

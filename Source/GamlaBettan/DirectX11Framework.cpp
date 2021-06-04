@@ -145,58 +145,40 @@ DirectX11Framework::~DirectX11Framework()
 	myDepthBuffer = nullptr;
 }
 
-bool DirectX11Framework::Init(void* aWindowHandle)
+bool DirectX11Framework::Init()
 {
-	HRESULT result = E_FAIL;
-
-	DXGI_SWAP_CHAIN_DESC desc = {  };
-	//ZeroMemory(&desc, sizeof(desc));
+	DXGI_SWAP_CHAIN_DESC desc;
+	WIPE(desc);
 	desc.BufferCount = 1;
 	desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	desc.OutputWindow = static_cast<HWND>(aWindowHandle);
+	desc.OutputWindow = WindowHandler::GetInstance().GetWindowHandle();
 	desc.SampleDesc.Count = 1;
 	desc.Windowed = true;
 
-	AddMemoryUsage(DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R8G8B8A8_UNORM] * Sprite::ourWindowSize.x * Sprite::ourWindowSize.y,"Backbuffer","Engine");
-
-#ifdef _DEBUG
-	if (DebugTools::CommandLineFlags.count(L"-DebugDxDevice"))
-	{
-		result = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, &desc, &mySwapChain, &myDevice, nullptr, &myDeviceContext);
-		if (FAILED(result))
-		{
-			SYSERROR("Could not start requested debug dx device");
-		}
-	}
-#endif // _DEBUG
-
-
+	HRESULT result = D3D11CreateDeviceAndSwapChain(
+		nullptr, 
+		D3D_DRIVER_TYPE_HARDWARE, 
+		nullptr, 
+		0, 
+		nullptr, 
+		0, 
+		D3D11_SDK_VERSION,
+		&desc, 
+		&mySwapChain, 
+		&myDevice, 
+		nullptr, 
+		&myDeviceContext);
 
 	if (FAILED(result))
 	{
-		result = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0 , nullptr, 0, D3D11_SDK_VERSION,
-			&desc, &mySwapChain, &myDevice, nullptr, &myDeviceContext);
-		if (FAILED(result))
-		{
-			SYSCRASH("Could not create swapchain","oh noes")
-			return false;
-		}
+		SYSCRASH("Could not create swapchain","oh noes")
+		return false;
 	}
 
-#if USEFULLSCREEN
-	//mySwapChain->SetFullscreenState(TRUE,NULL);
-#endif
-
+	V2ui size = WindowHandler::GetInstance().GetSize();
+	AddGraphicsMemoryUsage(DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R8G8B8A8_UNORM] * size.x * size.y, "Backbuffer", "Engine");
 	return true;
-}
-
-bool DirectX11Framework::Init(ID3D11Device* aDevice, ID3D11DeviceContext* aContext)
-{
-	myDeviceContext = aContext;
-	myDevice = aDevice;
-
-	return !!aDevice && !!aContext;
 }
 
 void DirectX11Framework::SetRenderTargetAndDepthStencil(ID3D11RenderTargetView* aRenterTarget, ID3D11DepthStencilView* aDepthStencil)
@@ -222,11 +204,11 @@ void DirectX11Framework::Resize(void* aHWND)
 		RECT rect;
 		GetWindowRect(static_cast<HWND>(aHWND), &rect);
 
-		Message msg;
-		msg.myMessageType = MessageType::WindowResize;
-		msg.myIntValue = rect.right - rect.left;
-		msg.myIntValue2 = rect.bottom - rect.top;
-		PostMaster::GetInstance()->SendMessages(msg);
+		V2ui data{
+			static_cast<unsigned int>(rect.right - rect.left),
+			static_cast<unsigned int>(rect.bottom - rect.top)
+		};
+		PostMaster::GetInstance().SendMessages(MessageType::WindowResize, &data);
 	}
 }
 
@@ -308,7 +290,7 @@ void DirectX11Framework::Imgui()
 		});
 }
 #endif
-void DirectX11Framework::AddMemoryUsage(size_t aAmount, const std::string& aName, const std::string& aCategory)
+void DirectX11Framework::AddGraphicsMemoryUsage(size_t aAmount, const std::string& aName, const std::string& aCategory)
 {
 #if TRACKGFXMEM
 	static std::mutex mutex;

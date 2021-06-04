@@ -10,7 +10,7 @@ void WindSystem::Init(const V3F& aStartBaseWind)
 		myGrid[i].Add(&aStartBaseWind);
 	}
 
-	AddWindToArea(V3F(3, 6, 8), V2F(0, 0), 50.f);
+	AddWindToArea(V3F(3, 6, 8), V2f(0, 0), 50.f);
 }
 
 void WindSystem::Update(const float aDeltaTime)
@@ -41,15 +41,15 @@ void WindSystem::SetBaseWind(const V3F& aWindPower)
 
 void WindSystem::AddWindToArea(const V3F& aWindPower, const V3F& aPosition, const float aRadius)
 {
-	AddWindToArea(aWindPower, V2F(aPosition.x, aPosition.z), aRadius);
+	AddWindToArea(aWindPower, V2f(aPosition.x, aPosition.z), aRadius);
 }
 
-void WindSystem::AddWindToArea(const V3F& aWindPower, const V2F& aPosition, const float aRadius)
+void WindSystem::AddWindToArea(const V3F& aWindPower, const V2f& aPosition, const float aRadius)
 {
 	CommonUtilities::Vector2<int> center = myGrid.GetGridIndex(aPosition);
 	std::vector<CommonUtilities::Vector2<int>> circle;
 
-	const int radius = MIN(myGrid.GetGridIndex(V2F(aRadius, 0)).x - myGrid.GetGridIndex(V2F(0, 0)).x, 50);
+	const int radius = MIN(myGrid.GetGridIndex(V2f(aRadius, 0)).x - myGrid.GetGridIndex(V2f(0, 0)).x, 50);
 	int x = radius;
 	int y = 0;
 	int xChange = 1 - (x << 1);
@@ -172,5 +172,5 @@ void WindSystem::AddWindToArea(const V3F& aWindPower, const V2F& aPosition, cons
 
 V3F WindSystem::GetWindAmount(const V3F& aPosition)
 {
-	return myGrid.GetNode(V2F(aPosition.x, aPosition.y)).GetData().front();
+	return myGrid.GetNode(V2f(aPosition.x, aPosition.y)).GetData().front();
 }

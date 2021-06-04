@@ -1,5 +1,4 @@
 #pragma once
-#include "WindowData.h"
 #include "ModelLoader.h"
 #include "SpriteFactory.h"
 
@@ -12,6 +11,7 @@ class Scene;
 class Camera;
 class Skybox;
 class TextInstance;
+class RenderManager;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -23,7 +23,8 @@ public:
 	CGraphicsEngine();
 	~CGraphicsEngine();
 
-	bool Init(const Window::WindowData& aWindowData,ID3D11Device* aDeviceOverride,ID3D11DeviceContext* aContextOverride);
+	bool Init();
+	bool Init(V2ui aWindowSize);
 	void BeginFrame(float aClearColor[4]);
 	void RenderFrame(Scene* aScene);
 	void RenderMovie(const std::vector<SpriteInstance*>& aSpriteList);
@@ -34,15 +35,10 @@ public:
 	void AddExtraSpriteToRender(SpriteInstance* aSprite);
 
 	SpriteFactory& GetSpriteFactory();
-	WindowHandler* GetWindowHandler();
 	DirectX11Framework* GetFrameWork();
 	LightLoader* GetLightLoader();
-	class SpriteRenderer* GetSpriteRenderer();
-	class RenderManager* GetRendreManarger();
-
-	void SubscribeToMessages();
-
-	void UnsubscribeToMessages();
+	SpriteRenderer* GetSpriteRenderer();
+	RenderManager* GetRendreManarger();
 
 #if USEIMGUI
 	void Imgui();
@@ -50,10 +46,11 @@ public:
 
 
 private:
-	class RenderManager* myRendreManarger;
+	bool InitInternal();
+
+	RenderManager* myRendreManarger;
 
 	DirectX11Framework* myFrameWork;
-	WindowHandler* myWindowHandler;
 	SpriteFactory mySpriteFactory;
 	LightLoader* myLightLoader;
 };

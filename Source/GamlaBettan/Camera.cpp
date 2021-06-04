@@ -7,26 +7,25 @@ Camera::Camera() :
 	myNearPlane(0.f),
 	myFOV(0.f),
 	myIsListening(false),
-	myIsOrthogonal(false)
+	myIsOrthogonal(false),
+	Observer({
+			MessageType::WindowResize
+		})
 {
 
 }
 Camera::~Camera()
 {
-	if (myIsListening)
-	{
-		UnSubscribeToMessage(MessageType::WindowResize);
-	}
 }
 
-bool Camera::Init(float aFoV, CU::Vector2<float> aResolution, float aNear, float aFar, const bool aShouldAdaptToWindowRes)
+bool Camera::Init(float aFoV, V2ui aResolution, float aNear, float aFar, const bool aShouldAdaptToWindowRes)
 {
 	myFarPlane = aFar;
 	myNearPlane = aNear;
 	myFOV = aFoV;
-	myResolution = aResolution;
 	myProjection = CommonUtilities::Matrix4x4<float>::Identity();
-	SetFov(aFoV, false);
+	SetFov(aFoV);
+	SetResolution(aResolution);
 	myProjection(3, 3) = aFar / (aFar - aNear);
 	myProjection(4, 3) = (-aFar * aNear) / (aFar - aNear);
 	myProjection(4, 4) = 0;
@@ -40,7 +39,6 @@ bool Camera::Init(float aFoV, CU::Vector2<float> aResolution, float aNear, float
 
 	if (aShouldAdaptToWindowRes)
 	{
-		SubscribeToMessage(MessageType::WindowResize);
 		myIsListening = true;
 	}
 
@@ -62,22 +60,13 @@ bool Camera::Init(CommonUtilities::Vector3<float> aBoundingBox)
 	return true;
 }
 
-void Camera::SetFov(const float aFov, bool aSetAsSecondary)
+void Camera::SetFov(const float aFov)
 {
 	float calculatedFoV = 1.f / (tan((aFov / 2) * (PI / 180.f)));
-	if (aSetAsSecondary)
-	{
-		myProjection2(1, 1) = calculatedFoV;
-		myProjection2(2, 2) = calculatedFoV * (myResolution.x / myResolution.y);
-		myFov2 = aFov;
-		myHasSecondaryFov = true;
-	}
-	else
-	{
-		myProjection(1, 1) = calculatedFoV;
-		myProjection(2, 2) = calculatedFoV * (myResolution.x / myResolution.y);
-		myFOV = aFov;
-	}
+
+	myProjection(1, 1) = calculatedFoV;
+	myProjection(2, 2) = calculatedFoV * (static_cast<float>(myResolution.x) / static_cast<float>(myResolution.y));
+	myFOV = aFov;
 }
 
 float Camera::GetFoV() const
@@ -87,15 +76,15 @@ float Camera::GetFoV() const
 
 void Camera::RecieveMessage(const Message& aMessage)
 {
-	if (aMessage.myMessageType == MessageType::WindowResize)
+	if (aMessage.myMessageType == MessageType::WindowResize && myIsListening)
 	{
-		SetResolution({CAST(float, aMessage.myIntValue), CAST(float, aMessage.myIntValue2)});
+		SetResolution(*reinterpret_cast<const V2ui*>(aMessage.myData));
 	}
 }
 
-void Camera::SetResolution(const CommonUtilities::Vector2<float>& aResolution)
+void Camera::SetResolution(const V2ui& aResolution)
 {
-	myProjection(2, 2) = myProjection(1, 1) * (aResolution.x / aResolution.y);
+	myProjection(2, 2) = myProjection(1, 1) * (static_cast<float>(aResolution.x) / static_cast<float>(aResolution.y));
 	myResolution = aResolution;
 }
 
@@ -226,15 +215,10 @@ CommonUtilities::Matrix4x4<float> Camera::GetTransform() const
 	return myTransform;
 }
 
-CommonUtilities::Matrix4x4<float> Camera::GetProjection(bool aWantsSecondary) const
+CommonUtilities::Matrix4x4<float> Camera::GetProjection() const
 {
-	if (aWantsSecondary && myHasSecondaryFov)
-	{
-		return myProjection2;
-	}
 	return myProjection;
 }
-
 
 CommonUtilities::Vector3<float> Camera::GetForward() const
 {
@@ -260,25 +244,6 @@ CommonUtilities::Vector3<float> Camera::GetRight() const
 	CommonUtilities::Vector4<float> right(1, 0, 0, 0);
 	right = right * myTransform;
 	return CommonUtilities::Vector3<float>(right.x, right.y, right.z);
-}
-
-bool Camera::IsInView(const CommonUtilities::Vector3<float>& aPosition) const
-{
-	static CommonUtilities::PlaneVolume<float> frustum;
-	static CommonUtilities::Matrix4x4<float> lastTransform = myTransform;
-
-	if (aPosition.z <= GetPosition().z + myNearPlane && aPosition.z >= GetPosition().z + myFarPlane)
-	{
-		return false;
-	}
-
-	if (lastTransform != myTransform)
-	{
-		frustum = GenerateFrustum();
-		lastTransform = myTransform;
-	}
-
-	return frustum.Inside(aPosition);
 }
 
 CommonUtilities::Vector3<float> Camera::GetPosition() const

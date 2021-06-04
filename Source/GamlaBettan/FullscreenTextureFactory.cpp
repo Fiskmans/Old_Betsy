@@ -32,7 +32,7 @@ FullscreenTexture FullscreenTextureFactory::CreateTexture(CU::Vector2<unsigned i
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = 0;
 
-	DirectX11Framework::AddMemoryUsage(aSize.x*aSize.y*DirectX11Framework::FormatToSizeLookup[aFormat],aName, "Engine Texture");
+	DirectX11Framework::AddGraphicsMemoryUsage(aSize.x*aSize.y*DirectX11Framework::FormatToSizeLookup[aFormat],aName, "Engine Texture");
 
 	ID3D11Texture2D* texture;
 	result = myFramework->GetDevice()->CreateTexture2D(&desc, nullptr, &texture);
@@ -103,7 +103,7 @@ FullscreenTexture FullscreenTextureFactory::CreateDepth(CU::Vector2<unsigned int
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = 0;
 
-	DirectX11Framework::AddMemoryUsage(aSize.x * aSize.y * DirectX11Framework::FormatToSizeLookup[desc.Format], aName, "Engine Depth");
+	DirectX11Framework::AddGraphicsMemoryUsage(aSize.x * aSize.y * DirectX11Framework::FormatToSizeLookup[desc.Format], aName, "Engine Depth");
 	ID3D11Texture2D* texture;
 	result = myFramework->GetDevice()->CreateTexture2D(&desc, nullptr, &texture);
 	if (FAILED(result))
@@ -188,7 +188,7 @@ GBuffer FullscreenTextureFactory::CreateGBuffer(const CU::Vector2<unsigned int>&
 			bpp += DirectX11Framework::FormatToSizeLookup[i];
 		}
 
-		DirectX11Framework::AddMemoryUsage(aSize.x * aSize.y * bpp, aName, "Engine GBuffer");
+		DirectX11Framework::AddGraphicsMemoryUsage(aSize.x * aSize.y * bpp, aName, "Engine GBuffer");
 	}
 
 	GBuffer buffer;

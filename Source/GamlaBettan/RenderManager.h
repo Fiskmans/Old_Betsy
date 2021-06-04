@@ -28,7 +28,7 @@ public:
 	RenderManager();
 	~RenderManager() = default;
 
-	bool Init(DirectX11Framework* aFramework, WindowHandler* aWindowHandler);
+	bool Init(DirectX11Framework* aFramework);
 	bool Release();
 
 	void BeginFrame(float aClearColor[4]);
@@ -41,8 +41,6 @@ public:
 
 	void AddExtraSpriteToRender(SpriteInstance* aSprite);
 
-	void SubscribeToMessages();
-	void UnsubscribeToMessages();
 	void RecieveMessage(const Message& aMessage);
 
 	void SetupBoneTexture(const std::vector<ModelInstance*>& aModelList);
@@ -113,8 +111,6 @@ private:
 	GBuffer myBufferGBuffer;
 	BoneTextureCPUBuffer myBoneBuffer;
 
-	CU::Vector2<unsigned int> myScreenSize;
-
 #if ENABLESSAO
 	bool myDoSSAO = false;
 #endif
@@ -125,8 +121,8 @@ private:
 #endif // !_RETAIL
 
 	void RenderSelection(const std::vector<ModelInstance*>& aModelsToHighlight, Camera* aCamera);
-	bool CreateTextures(const unsigned int aWidth, const unsigned int aHeight);
-	void Resize(const unsigned int aWidth, const unsigned int aHeight);
+	bool CreateTextures(const V2ui& aSize);
+	void Resize(const V2ui& aSize);
 
 	void FullscreenPass(std::vector<Textures> aSources,Textures aTarget, FullscreenRenderer::Shader aShader);
 	void UnbindResources();

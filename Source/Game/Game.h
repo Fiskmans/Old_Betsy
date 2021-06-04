@@ -6,8 +6,6 @@ class CGraphicsEngine;
 class WindowHandler;
 class ModelLoader;
 class LightLoader;
-struct HWND__;
-typedef HWND__* HWND;
 class InputManager;
 class SpriteFactory;
 struct ID3D11DeviceContext;
@@ -19,7 +17,7 @@ public:
 	Game();
 	~Game();
 
-	bool Init(WindowHandler* aWindowHandler,CommonUtilities::InputHandler* aInputHandler, LightLoader* aLightLoader, SpriteFactory* aSpriteFactory,
+	bool Init(CommonUtilities::InputHandler* aInputHandler, LightLoader* aLightLoader, SpriteFactory* aSpriteFactory,
 		DirectX11Framework* aFramework, AudioManager* aAudioManager, class SpriteRenderer* aSpriteRenderer);
 	bool Run(CGraphicsEngine* aEngine, float aDeltaTime);
 

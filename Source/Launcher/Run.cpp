@@ -87,17 +87,10 @@ int Run()
 			mainVolume = 0.f;
 #endif
 
-			Window::WindowData windowData;
-			windowData.myX = 0;
-			windowData.myY = 0;
-			windowData.myWidth = 1920;
-			windowData.myHeight = 1080;
 
 			CGraphicsEngine engine;
 
-			PostMaster::Create();
-
-			if (!engine.Init(windowData, nullptr, nullptr))
+			if (!engine.Init())
 			{
 				SYSCRASH("Could not start engine");
 				return -1;
@@ -109,20 +102,15 @@ int Run()
 
 			AudioManager audioManager;
 			audioManager.Init();
-			bool shouldRun = game->Init(engine.GetWindowHandler(), &engine.GetWindowHandler()->GetInputHandler(), engine.GetLightLoader(), &engine.GetSpriteFactory(), engine.GetFrameWork(), &audioManager, engine.GetSpriteRenderer());
-
-			engine.SubscribeToMessages();
-
+			bool shouldRun = game->Init(&WindowHandler::GetInstance().GetInputHandler(), engine.GetLightLoader(), &engine.GetSpriteFactory(), engine.GetFrameWork(), &audioManager, engine.GetSpriteRenderer());
 
 #if USEIMGUI
-
 			IMGUI_CHECKVERSION();
 			ImGui::CreateContext();
-			//ImGuiIO& io = ImGui::GetIO(); enable keyboard and gamepad input using this
 
 			LoadOrDefaultImGuiStyle();
 			ImGui_ImplDX11_Init(engine.GetFrameWork()->GetDevice(), engine.GetFrameWork()->GetContext());
-			ImGui_ImplWin32_Init(engine.GetWindowHandler()->GetWindowHandle());
+			ImGui_ImplWin32_Init(WindowHandler::GetInstance().GetWindowHandle());
 #endif // !USEIMGUI
 
 
@@ -146,7 +134,6 @@ int Run()
 			}
 #endif // BOOTUPDIAGNOSTIC
 
-			int framesWithMessage = 0;
 			while (shouldRun)
 			{
 				{
@@ -192,7 +179,7 @@ int Run()
 							}
 							if (ImGui::Button("SerilizePhysXObjects"))
 							{
-								PostMaster::GetInstance()->SendMessages(MessageType::SerializePhysXObjects);
+								PostMaster::GetInstance().SendMessages(MessageType::SerializePhysXObjects);
 							}
 
 #if BOOTUPDIAGNOSTIC
@@ -295,14 +282,6 @@ int Run()
 						engine.EndFrame();
 					}
 				}
-
-
-				if (framesWithMessage < 5)
-				{
-					engine.GetFrameWork()->Resize(engine.GetWindowHandler()->GetWindowHandle());
-					framesWithMessage++;
-				}
-
 			}
 
 #if USEIMGUI
@@ -311,8 +290,6 @@ int Run()
 			ImGui::DestroyContext();
 #endif // !USEIMGUI
 
-
-			engine.UnsubscribeToMessages();
 			delete game;
 
 #if USEAUDIO

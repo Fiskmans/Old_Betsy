@@ -288,7 +288,7 @@ namespace CommonUtilities
 		SetCursorPos(p.x, p.y);
 	}
 
-	void InputHandler::SetMousePosition(V2F	aPosition)
+	void InputHandler::SetMousePosition(V2f	aPosition)
 	{
 		SetMousePosition(LERP(myWindowRect.left, myWindowRect.right, aPosition.x), LERP(myWindowRect.top, myWindowRect.bottom, aPosition.y));
 	}
