@@ -20,12 +20,7 @@ namespace Tools
 	FileWatcher::~FileWatcher()
 	{
 		myIsRunning = false;
-		if (myWorkHorse.joinable())
-		{
-			myWorkHorse.join();
-		}
-		int a = 10;
-		//myWorkHorse.detach();
+		myWorkHorse.join();
 	}
 
 	FileWatcher::UniqueID FileWatcher::RegisterCallback(std::string aFile, Tools::CallbackFunction aCallback, bool aCallImmediately)

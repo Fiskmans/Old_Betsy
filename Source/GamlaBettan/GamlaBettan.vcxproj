@@ -188,6 +188,8 @@
     <ClCompile Include="AssetImportHelpers.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="AudioManager.cpp" />
+    <ClCompile Include="ComponentManager.cpp" />
+    <ClCompile Include="ComponentSystem.cpp" />
     <ClCompile Include="DecalFactory.cpp" />
     <ClCompile Include="LevelLoader.cpp" />
     <ClCompile Include="NavMeshLoader.cpp" />
@@ -247,6 +249,8 @@
     <ClInclude Include="AssetImportHelpers.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="AudioManager.h" />
+    <ClInclude Include="ComponentManager.h" />
+    <ClInclude Include="ComponentSystem.h" />
     <ClInclude Include="Decal.h" />
     <ClInclude Include="DecalFactory.h" />
     <ClInclude Include="LevelLoader.h" />

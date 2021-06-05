@@ -65,10 +65,14 @@ namespace CommonUtilities
 	{
 		return myNormal.Dot(aPosition - myPoint) <= 0;
 	}
+
+	template<>
 	inline bool Plane<float>::Inside(const Vector3<float>& aPosition) const
 	{
 		return myNormal.Dot(aPosition - myPoint) <= EPSILON;
 	}
+
+	template<>
 	inline bool Plane<double>::Inside(const Vector3<double>& aPosition) const
 	{
 		return myNormal.Dot(aPosition - myPoint) <= EPSILON_D;

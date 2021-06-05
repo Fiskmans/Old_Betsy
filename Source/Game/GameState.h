@@ -83,10 +83,6 @@ private:
 #endif
 
 	std::string myCurrentLevel;
-
-#if DEMOSCENE
-	std::vector<PointLight*> myLights;
-#endif // DEMOSCENE
 	std::unordered_set<std::string> myCurrentLoadedLevels;
 	std::vector<std::string> myLevelSequence;
 	unsigned int myCurrentLevelindex;

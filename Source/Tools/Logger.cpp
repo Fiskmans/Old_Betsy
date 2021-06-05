@@ -543,25 +543,6 @@ namespace Logger
 			ImGui::EndChild();
 			ImGui::NextColumn();
 
-			ImGui::Separator();
-			static char commandLine[256];
-			static bool first = true;
-			if (first)
-			{
-				WIPE(commandLine);
-				first = false;
-			}
-			ImGui::InputText("", commandLine, 256);
-			if (ImGui::IsKeyPressed(VK_RETURN) && (*commandLine) != '\0')
-			{
-#ifdef _DEBUG
-				LOGINFO("[" + DebugTools::myUsername + "]: " + commandLine);
-#else
-				LOGINFO(commandLine);
-#endif // _DEBUG
-
-				WIPE(commandLine);
-			}
 		}
 		ImGui::EndChild();
 

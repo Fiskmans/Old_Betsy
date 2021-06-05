@@ -48,8 +48,8 @@ bool LoadVerticies(aiMesh* fbxMesh, char** aVertexBuffer, size_t* aVertexCount, 
 
 	ShaderTypes::Offsets offsets = ShaderTypes::OffsetsFromFlags(aFlags);
 
-	static const float one = 1.0f;
-	static const float zero = 0.0f;
+	float one = 1.0f;
+	float zero = 0.0f;
 
 	char* buffer = new char[(*aVertexCount + fbxMesh->mNumVertices) * offsets.size];
 	memcpy(buffer, *aVertexBuffer, *aVertexCount * offsets.size);

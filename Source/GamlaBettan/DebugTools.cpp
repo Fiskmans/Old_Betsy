@@ -8,13 +8,8 @@
 #include "CommonUtilities\Intersection.hpp"
 
 #ifdef _DEBUG
-CommonUtilities::PlaneVolume<float> DebugTools::CameraFrustum;
-std::map<std::string, std::vector<std::string>>* DebugTools::FileList = nullptr;
-std::string DebugTools::myUsername;
-LightLoader* DebugTools::myLightLoader;
 FRay* DebugTools::LastKnownMouseRay = nullptr;
 Camera* DebugTools::myCamera = nullptr;
-std::set<std::wstring> DebugTools::CommandLineFlags;
 
 ModelInstance* DebugTools::gizmoParts[6];
 V3F* DebugTools::myGizmoVector;

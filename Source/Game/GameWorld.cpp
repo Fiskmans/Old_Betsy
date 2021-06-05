@@ -299,40 +299,6 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 	}
 	if (myIsInModelViewerMode)
 	{
-#ifdef  _DEBUG
-		if (modelInstance && DebugTools::FileList)
-		{
-			static bool drawSkeleton = false;
-			static bool drawSkeletonSpaces = false;
-			if (ImGui::Begin("Model settings"))
-			{
-				ImGui::Checkbox("Draw Skeleton", &drawSkeleton);
-				ImGui::Checkbox("Draw Skeleton spaces", &drawSkeletonSpaces);
-				modelInstance->ImGuiNode(*DebugTools::FileList, myScene->GetMainCamera());
-				Model* model = modelInstance->GetModelAsset().GetAsModel();
-				if (model)
-				{
-					ImGui::Separator();
-					model->ImGuiNode(*DebugTools::FileList);
-				}
-			}
-			ImGui::End();
-			if (drawSkeleton)
-			{
-				DebugDrawer::GetInstance().DrawSkeleton(modelInstance);
-			}
-			if (drawSkeletonSpaces)
-			{
-				std::array<M44f, NUMBEROFANIMATIONBONES> spaces;
-				auto positions = modelInstance->GetBonePositions();
-				modelInstance->SetupanimationMatrixes(spaces);
-				for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)
-				{
-					DebugDrawer::GetInstance().DrawGizmo(positions[i], 15, spaces[i]);
-				}
-			}
-		}
-#endif
 		static V3F lightOffset(-67, -34, 79);
 		//ImGui::DragFloat3("Light arrow position", &lightOffset.x);
 		if (myScene->GetEnvironmentLight())

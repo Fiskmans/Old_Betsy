@@ -8,9 +8,9 @@
       <ProgramDataBaseFileName>$(SolutionDir)pch\vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <AdditionalIncludeDirectories>$(solutiondir)precompiled/;$(solutionDir)Tools/;$(solutionDir)CommonUtilities/CommonUtilities/;$(solutionDir)GamlaBettan/;$(Solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(solutionDir)Game/;$(solutionDir)GBPhysX/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(SolutionDir)pch/pch.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>$(solutiondir)Workbed\$(ProjectName)\pch.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

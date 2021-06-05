@@ -187,6 +187,8 @@
     <ClCompile Include="NavMeshLoader.cpp">
       <Filter>Loaders</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentManager.cpp" />
+    <ClCompile Include="ComponentSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -374,6 +376,8 @@
     <ClInclude Include="NavMeshLoader.h">
       <Filter>Loaders</Filter>
     </ClInclude>
+    <ClInclude Include="ComponentManager.h" />
+    <ClInclude Include="ComponentSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">

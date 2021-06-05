@@ -131,7 +131,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\Wwise\lib\;$(SolutionDir)Pch\;$(OutputPath)PhysX_Debug\;$(solutiondir)libs\;$(solutiondir)ExternalLibs\;$(SolutionDir)Audio\Wwise\Wwise\Profile(StaticCRT)\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>pch.lib;GBPhysX_$(Configuration).lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;imgui_$(Configuration).lib;imgui_canvas_$(Configuration).lib;imgui_node_editor_$(Configuration).lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>"$(SolutionDir)pch/pch.obj" %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
@@ -147,7 +146,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\Wwise\lib\;$(SolutionDir)Pch\;$(solutiondir)libs\;$(SolutionDir)Audio\FMOD\studio\lib\x64\;$(SolutionDir)Audio\FMOD\core\lib\x64\;$(solutiondir)ExternalLibs\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>pch.lib;GBPhysX_$(Configuration).lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;Wwise_$(Configuration).lib;imgui_$(Configuration).lib;imgui_canvas_$(Configuration).lib;imgui_node_editor_$(Configuration).lib;Ws2_32.lib;TClient_$(Configuration).lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>"$(SolutionDir)pch/pch.obj" %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -167,7 +165,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\Wwise\lib\;$(SolutionDir)Pch\;$(solutiondir)libs\;$(SolutionDir)Audio\Wwise\Wwise\Profile(StaticCRT)\lib\;$(SolutionDir)Audio\Wwise\Wwise\Release(StaticCRT)\lib\;$(solutiondir)ExternalLibs\;$(OutputPath)PhysX_Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>pch.lib;GBPhysX_$(Configuration).lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;Wwise_$(Configuration).lib;imgui_$(Configuration).lib;imgui_canvas_$(Configuration).lib;imgui_node_editor_$(Configuration).lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>"$(SolutionDir)pch/pch.obj" %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
       <Command>COPY "C:\Program Files\OpenSSL-Win64\bin\*.dll" "$(outdir)" /Y</Command>
@@ -190,7 +187,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\Wwise\lib\;$(SolutionDir)Pch\;$(solutiondir)libs\;$(SolutionDir)Audio\Wwise\Wwise\Profile(StaticCRT)\lib\;$(OutputPath)PhysX_Release\;$(solutiondir)ExternalLibs\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>pch.lib;GBPhysX_release.lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;Wwise_release.lib;imgui_release.lib;imgui_canvas_release.lib;imgui_node_editor_release.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>"$(SolutionDir)pch/pch.obj" %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

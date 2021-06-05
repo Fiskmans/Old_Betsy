@@ -4,6 +4,7 @@
 #include "ShaderFlags.h"
 #include "TextureLoader.h"
 #include "ShaderCompiler.h"
+#include "ModelLoader.h"
 
 
 class AssetManager

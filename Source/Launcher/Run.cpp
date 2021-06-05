@@ -44,16 +44,6 @@ void LoadOrDefaultImGuiStyle()
 
 int Run()
 {
-
-#ifdef _DEBUG
-	const wchar_t* commLine = GetCommandLineW();
-	int argc;
-	LPWSTR* argv = CommandLineToArgvW(commLine, &argc);
-	for (size_t i = 0; i < argc; i++)
-	{
-		DebugTools::CommandLineFlags.emplace(argv[i]);
-	}
-#endif //_DEBUG
 	{
 #if BOOTUPDIAGNOSTIC
 		long long startTime = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
@@ -62,26 +52,24 @@ int Run()
 #if USELOGGER
 		AllocConsole();
 #endif
+		FILE* fp;
+		freopen_s(&fp, "CONOUT$", "w", stdout);
+		freopen_s(&fp, "CONIN$", "r", stdin);
+		freopen_s(&fp, "CONOUT$", "w", stderr);
+
+		Logger::SetFilter(Logger::Type::AnyWarning | Logger::Type::AllSystem & ~Logger::Type::AnyVerbose);
+		Logger::SetHalting(Logger::Type::SystemCrash);
+
+
+		Logger::Map(Logger::Type::AnyGame, "info");
+		Logger::Map(Logger::Type::AnySystem, "system");
+		Logger::SetColor(Logger::Type::AnyError, FOREGROUND_RED | FOREGROUND_INTENSITY);
+		Logger::SetColor(Logger::Type::AnyWarning, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		Logger::SetColor(Logger::Type::AnyInfo, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+		Logger::SetColor(Logger::Type::SystemNetwork, FOREGROUND_GREEN | FOREGROUND_BLUE);
 
 
 		{
-#if USELOGGER
-			FILE* fp;
-			freopen_s(&fp, "CONOUT$", "w", stdout);
-			freopen_s(&fp, "CONIN$", "r", stdin);
-			freopen_s(&fp, "CONOUT$", "w", stderr);
-
-			Logger::SetFilter(Logger::Type::AnyWarning | Logger::Type::AllSystem & ~Logger::Type::AnyVerbose);
-			Logger::SetHalting(Logger::Type::SystemCrash);
-
-
-			Logger::Map(Logger::Type::AnyGame, "info");
-			Logger::Map(Logger::Type::AnySystem, "system");
-			Logger::SetColor(Logger::Type::AnyError, FOREGROUND_RED | FOREGROUND_INTENSITY);
-			Logger::SetColor(Logger::Type::AnyWarning, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-			Logger::SetColor(Logger::Type::AnyInfo, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
-			Logger::SetColor(Logger::Type::SystemNetwork, FOREGROUND_GREEN | FOREGROUND_BLUE);
-#endif
 			static float mainVolume = 0.5f;
 #ifdef _DEBUG
 			mainVolume = 0.f;
@@ -189,12 +177,12 @@ int Run()
 #if USEIMGUI
 							engine.Imgui();
 #endif
+#if USEAUDIO
 							if (ImGui::DragFloat("Volume", &mainVolume, 0.01f, 0.0f, 1.f))
 							{
-#if USEAUDIO
 								audioManager.SetMasterVolume(mainVolume);
-#endif
 							}
+#endif
 							if (ImGui::Button("Edit Window Style"))
 							{
 								ImGui::OpenPopup("ImguiStyleEditor");

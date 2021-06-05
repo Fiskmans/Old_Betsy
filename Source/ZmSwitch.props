@@ -6,9 +6,7 @@
     <_PropertySheetDisplayName>CommandLineSwitches</_PropertySheetDisplayName>
   </PropertyGroup>
   <ItemDefinitionGroup>
-    <ClCompile>
-      <AdditionalOptions>/Zm1000 /MP8 /FS %(AdditionalOptions)</AdditionalOptions>
-    </ClCompile>
+    <ClCompile />
     <Link />
   </ItemDefinitionGroup>
   <ItemGroup />

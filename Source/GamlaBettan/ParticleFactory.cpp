@@ -345,26 +345,6 @@ void ParticleFactory::EditParticles(Scene* aScene)
 			{
 				std::string before = customizable.myFilePath;
 				ImGui::InputText("Texture", customizable.myFilePath, 96);
-	#ifdef _DEBUG
-				ImGui::SameLine();
-				if (ImGui::Button("Select"))
-				{
-					ImGui::OpenPopup("textureSelector");
-				}
-				if (ImGui::BeginPopup("textureSelector"))
-				{
-					ImGui::Text("Textures");
-					ImGui::Separator();
-					for (auto& i : DebugTools::FileList->operator[](".dds"))
-					{
-						if (ImGui::Selectable(i.c_str()))
-						{
-							strcpy_s<sizeof(customizable.myFilePath)>(customizable.myFilePath, i.c_str());
-						}
-					}
-					ImGui::EndPopup();
-				}
-	#endif // _DEBUG
 
 
 				if (before != customizable.myFilePath)
