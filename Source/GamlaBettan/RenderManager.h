@@ -34,7 +34,7 @@ public:
 	void BeginFrame(float aClearColor[4]);
 	void EndFrame();
 
-	void Render(Scene* aScene);
+	void Render();
 	void RenderMovie(const std::vector<SpriteInstance*>& aSpriteList);
 	void RenderSprites(const std::vector<SpriteInstance*>& aSpriteList, const bool aShouldRenderExtraSprites = false);
 	void RenderText(const std::vector<TextInstance*>& aTextList);

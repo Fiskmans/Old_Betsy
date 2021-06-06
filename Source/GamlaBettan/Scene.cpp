@@ -29,8 +29,8 @@ void Scene::Update(float aDeltaTime)
 	{
 		if (myParticles[i]->IsDead() && !myParticles[i]->IsEternal())
 		{
+			RemoveFromScene(myParticles[i]);
 			delete myParticles[i];
-			RemoveFrom(myParticles[i]);
 		}
 	}
 	{
@@ -64,7 +64,7 @@ void Scene::AddToScene(Decal* aDecal)
 	myDecals.push_back(aDecal);
 }
 
-void Scene::AddSprite(SpriteInstance* aSprite)
+void Scene::AddToScene(SpriteInstance* aSprite)
 {
 	if (aSprite)
 	{
@@ -80,7 +80,7 @@ void Scene::AddSprite(SpriteInstance* aSprite)
 	}
 }
 
-void Scene::AddText(TextInstance* aText)
+void Scene::AddToScene(TextInstance* aText)
 {
 	if (!aText->HadBeenAddedToScene())
 	{
@@ -89,12 +89,7 @@ void Scene::AddText(TextInstance* aText)
 	}
 }
 
-void Scene::AddInstance(Camera* aCamera)
-{
-	myCameras.push_back(aCamera);
-}
-
-void Scene::RemoveModel(ModelInstance* aModel)
+void Scene::RemoveFromScene(ModelInstance* aModel)
 {
 	auto at = std::find(myPreCull.begin(), myPreCull.end(), aModel);
 	if (at != myPreCull.end())
@@ -115,11 +110,6 @@ void Scene::RemoveModel(ModelInstance* aModel)
 
 void Scene::SetMainCamera(Camera* aCamera)
 {
-	if (std::find(myCameras.begin(), myCameras.end(), aCamera) == myCameras.end())
-	{
-		SYSERROR("Trying to set a maincamera that is not in the scene");
-		return;
-	}
 	myMainCamera = aCamera;
 }
 
@@ -128,12 +118,12 @@ void Scene::SetEnvironmentLight(EnvironmentLight* aLight)
 	myEnvironmentLight = aLight;
 }
 
-void Scene::AddPointLight(PointLight* aLight)
+void Scene::AddToScene(PointLight* aLight)
 {
 	myPointLights.push_back(aLight);
 }
 
-void Scene::RemovePointLight(PointLight* aLight)
+void Scene::RemoveFromScene(PointLight* aLight)
 {
 	auto it = std::find(myPointLights.begin(), myPointLights.end(), aLight);
 
@@ -146,7 +136,7 @@ void Scene::RemovePointLight(PointLight* aLight)
 	SYSWARNING("Tried to remove invalid point light :c");
 }
 
-void Scene::RemoveFrom(ParticleInstance* aParticle)
+void Scene::RemoveFromScene(ParticleInstance* aParticle)
 {
 	for (size_t i = 0; i < myParticles.size(); i++)
 	{
@@ -158,7 +148,7 @@ void Scene::RemoveFrom(ParticleInstance* aParticle)
 	}
 }
 
-void Scene::RemoveFrom(Decal* aDecal)
+void Scene::RemoveFromScene(Decal* aDecal)
 {
 	for (size_t i = 0; i < myDecals.size(); i++)
 	{
@@ -170,7 +160,7 @@ void Scene::RemoveFrom(Decal* aDecal)
 	}
 }
 
-void Scene::RemoveFrom(SpotLight* aSpotLight)
+void Scene::RemoveFromScene(SpotLight* aSpotLight)
 {
 	for (size_t i = 0; i < mySpotlights.size(); i++)
 	{
@@ -182,7 +172,7 @@ void Scene::RemoveFrom(SpotLight* aSpotLight)
 	}
 }
 
-void Scene::RemoveSprite(SpriteInstance* aSprite)
+void Scene::RemoveFromScene(SpriteInstance* aSprite)
 {
 	for (size_t i = 0; i < mySprites.size(); i++)
 	{
@@ -196,7 +186,7 @@ void Scene::RemoveSprite(SpriteInstance* aSprite)
 
 }
 
-void Scene::RemoveText(TextInstance* aText)
+void Scene::RemoveFromScene(TextInstance* aText)
 {
 	for (size_t i = 0; i < myTexts.size(); i++)
 	{
@@ -209,30 +199,6 @@ void Scene::RemoveText(TextInstance* aText)
 	}
 
 	SYSWARNING("Tried to remove invalid text :c");
-}
-
-bool Scene::Contains(ParticleInstance* aParticle)
-{
-	for (auto& i : myParticles)
-	{
-		if (i == aParticle)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Scene::Contains(ModelInstance* aModel)
-{
-	for (auto& i : myModels)
-	{
-		if (i == aModel)
-		{
-			return true;
-		}
-	}
-	return false;
 }
 
 void Scene::RemoveAll()
@@ -259,41 +225,6 @@ void Scene::SetSkybox(ModelInstance* aSkybox)
 	mySkybox = aSkybox;
 }
 
-ModelInstance* Scene::GetInstance(const FRay& aRay)
-{
-	float closest = _HUGE_ENUF;
-	ModelInstance* found = nullptr;
-	for (auto& ins : myModels)
-	{
-		float t;
-		if (CommonUtilities::IntersectionSphereRay(ins->GetGraphicBoundingSphere(), aRay, t))
-		{
-			if (t < closest)
-			{
-				closest = t;
-				found = ins;
-			}
-		}
-	}
-
-	return found;
-}
-
-std::vector<ModelInstance*> Scene::GetIntersections(const FRay& aRay)
-{
-	std::vector<ModelInstance*> found;
-	for (auto& ins : myModels)
-	{
-		float t;
-		if (CommonUtilities::IntersectionSphereRay(ins->GetGraphicBoundingSphere(), aRay, t))
-		{
-			found.push_back(ins);
-		}
-	}
-
-	return found;
-}
-
 std::vector<ParticleInstance*> Scene::GetParticles()
 {
 	return myParticles;
@@ -303,43 +234,6 @@ ModelInstance* Scene::GetSkybox()
 {
 	return mySkybox;
 }
-
-#if USEIMGUI
-void Scene::Stash(StashOp aOP)
-{
-	static std::vector<ModelInstance*> stashModels;
-	static std::vector<SpriteInstance*> stashSprites;
-	static std::vector<Camera*> stashCameras;
-	static std::vector<PointLight*> stashPointLights;
-	static std::vector<ParticleInstance*> stashParticles;
-	static std::vector<SpotLight*> stashSpotlights;
-
-	if (aOP == StashOp::Push)
-	{
-		stashModels = myModels;
-		stashSprites = mySprites;
-		stashCameras = myCameras;
-		stashPointLights = myPointLights;
-		stashParticles = myParticles;
-		stashSpotlights = mySpotlights;
-		myModels.clear();
-		mySprites.clear();
-		myCameras.clear();
-		myPointLights.clear();
-		myParticles.clear();
-		stashSpotlights.clear();
-	}
-	else if (aOP == StashOp::Pop)
-	{
-		myModels = stashModels;
-		mySprites = stashSprites;
-		myCameras = stashCameras;
-		myPointLights = stashPointLights;
-		myParticles = stashParticles;
-		mySpotlights = stashSpotlights;
-	}
-}
-#endif
 
 std::vector<ModelInstance*> Scene::Cull(const CommonUtilities::Sphere<float>& aBoundingSphere)
 {
@@ -458,7 +352,8 @@ std::vector<ModelInstance*>::iterator Scene::end()
 {
 	return myModels.end();
 }
-void Scene::AddInstance(ParticleInstance* aParticle)
+
+void Scene::AddToScene(ParticleInstance* aParticle)
 {
 	myParticles.push_back(aParticle);
 }

@@ -62,7 +62,6 @@ private:
 	ID3D11DeviceContext* myContext;
 	ID3D11Device* myDevice;
 
-	Scene* myScene;
 	ModelInstance* mySkybox;
 	GameWorld* myGameWorld;
 	NodePollingStation* myNodePollingStation;

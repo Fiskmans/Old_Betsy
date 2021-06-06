@@ -261,12 +261,12 @@ void DepthRenderer::BindShadowDensityToSlot(int aSlot)
 	myContext->PSSetShaderResources(aSlot, 1, &myRenderTargetResourceView1x1);
 }
 
-void DepthRenderer::Render(PointLight* aLight, Scene* aScene, std::unordered_map<ModelInstance*, short>& aBoneMapping)
+void DepthRenderer::Render(PointLight* aLight, std::unordered_map<ModelInstance*, short>& aBoneMapping)
 {
 	std::vector<ModelInstance*> preCull;
 	{
 		PERFORMANCETAG("Precull");
-		preCull = aScene->Cull(CommonUtilities::Sphere<float>(aLight->position, SHADOWFARPLANE * CUBEHALFSIZETOENCAPSULATINGSPHERERADIUS));
+		preCull = Scene::GetInstance().Cull(CommonUtilities::Sphere<float>(aLight->position, SHADOWFARPLANE * CUBEHALFSIZETOENCAPSULATINGSPHERERADIUS));
 	}
 
 
@@ -289,14 +289,14 @@ void DepthRenderer::Render(PointLight* aLight, Scene* aScene, std::unordered_map
 		std::vector<class ModelInstance*> filtered;
 		{
 			PERFORMANCETAG("Culling");
-			filtered = aScene->Cull(myCameras[i], preCull, false);
+			filtered = Scene::GetInstance().Cull(myCameras[i], preCull, false);
 		}
 
 		Render(myCameras[i], filtered, aBoneMapping);
 	}
 }
 
-void DepthRenderer::RenderSpotLightDepth(SpotLight* aSpotlight, Scene* aScene, std::unordered_map<ModelInstance*, short>& aBoneMapping)
+void DepthRenderer::RenderSpotLightDepth(SpotLight* aSpotlight, std::unordered_map<ModelInstance*, short>& aBoneMapping)
 {
 	myContext->ClearDepthStencilView(myDepth1x6, D3D11_CLEAR_DEPTH, 1.f, 0);
 
@@ -315,14 +315,14 @@ void DepthRenderer::RenderSpotLightDepth(SpotLight* aSpotlight, Scene* aScene, s
 	std::vector<class ModelInstance*> filtered;
 	{
 		PERFORMANCETAG("Culling");
-		filtered = aScene->Cull(aSpotlight->myCamera, false);
+		filtered = Scene::GetInstance().Cull(aSpotlight->myCamera, false);
 	}
 
 	Render(aSpotlight->myCamera, filtered, aBoneMapping);
 	myLastDepthView = myDepthsResource1x6;
 }
 
-void DepthRenderer::RenderEnvironmentDepth(EnvironmentLight* aLight, Scene* aScene, std::unordered_map<ModelInstance*, short>& aBoneMapping, std::function<void()> aPreRenderFunction)
+void DepthRenderer::RenderEnvironmentDepth(EnvironmentLight* aLight, std::unordered_map<ModelInstance*, short>& aBoneMapping, std::function<void()> aPreRenderFunction)
 {
 	if (!aLight)
 	{
@@ -352,7 +352,7 @@ void DepthRenderer::RenderEnvironmentDepth(EnvironmentLight* aLight, Scene* aSce
 	std::vector<class ModelInstance*> filtered;
 	{
 		PERFORMANCETAG("Culling");
-		filtered = aScene->Cull(myEnvironmentCamera, false);
+		filtered = Scene::GetInstance().Cull(myEnvironmentCamera, false);
 	}
 
 
@@ -365,7 +365,7 @@ void DepthRenderer::RenderEnvironmentDepth(EnvironmentLight* aLight, Scene* aSce
 	myLastDepthView = myDepthsResource1x1;
 }
 
-ID3D11ShaderResourceView* DepthRenderer::RenderDecalDepth(Decal* aDecal, Scene* aScene, std::unordered_map<ModelInstance*, short>& aBoneMapping)
+ID3D11ShaderResourceView* DepthRenderer::RenderDecalDepth(Decal* aDecal, std::unordered_map<ModelInstance*, short>& aBoneMapping)
 {
 	ID3D11ShaderResourceView* view;
 	ID3D11DepthStencilView* depth;
@@ -434,7 +434,7 @@ ID3D11ShaderResourceView* DepthRenderer::RenderDecalDepth(Decal* aDecal, Scene* 
 	myContext->RSSetViewports(1, &port);
 	myContext->OMSetRenderTargets(1, &myDecalRenderTarget, depth);
 
-	std::vector<class ModelInstance*> filtered = aScene->Cull(aDecal->myCamera);
+	std::vector<class ModelInstance*> filtered = Scene::GetInstance().Cull(aDecal->myCamera);
 	Render(aDecal->myCamera, filtered, aBoneMapping);
 
 	tex->Release();

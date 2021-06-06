@@ -157,7 +157,7 @@ void RenderManager::EndFrame()
 #endif // USEIMGUI
 }
 
-void RenderManager::Render(Scene* aScene)
+void RenderManager::Render()
 {
 	ourTotalTime = Tools::GetTotalTime() - myStartedAt;
 
@@ -166,7 +166,7 @@ void RenderManager::Render(Scene* aScene)
 	static std::vector<std::array<PointLight*, NUMBEROFPOINTLIGHTS>> affectingLights;
 	{
 		PERFORMANCETAG("Culling");
-		modelsLeftToRender = aScene->Cull(aScene->GetMainCamera());
+		modelsLeftToRender = Scene::GetInstance().Cull(Scene::GetInstance().GetMainCamera());
 	}
 	std::vector<ModelInstance*> modelsToHighlight;
 	std::vector<ModelInstance*> shadowCasters = modelsLeftToRender;
@@ -177,7 +177,7 @@ void RenderManager::Render(Scene* aScene)
 			modelsToHighlight.push_back(mod);
 		}
 	}
-	sprites = aScene->GetSprites();
+	sprites = Scene::GetInstance().GetSprites();
 	for (auto& sprite : myExtraSpritesToRenderThisFrame)
 	{
 		sprites.push_back(sprite);
@@ -188,7 +188,7 @@ void RenderManager::Render(Scene* aScene)
 		PERFORMANCETAG("BoneTexture Generation");
 		static std::vector<ModelInstance*> buffer;
 		buffer.clear();
-		std::copy_if(aScene->begin(), aScene->end(), std::back_inserter(buffer), [](ModelInstance* aInstance) { return !!(aInstance->GetModelAsset().GetAsModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones); });
+		std::copy_if(Scene::GetInstance().begin(), Scene::GetInstance().end(), std::back_inserter(buffer), [](ModelInstance* aInstance) { return !!(aInstance->GetModelAsset().GetAsModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones); });
 		SetupBoneTexture(buffer);
 	}
 
@@ -207,7 +207,7 @@ void RenderManager::Render(Scene* aScene)
 		UnbindResources();
 		myStateManerger.SetDepthStencilState(RenderStateManager::DepthStencilState::Default);
 		myFrameworkPtr->GetContext()->VSSetShaderResources(5, 1, &myBoneTextureView);
-		modelsLeftToRender = myDeferredRenderer.GenerateGBuffer(aScene->GetMainCamera(), modelsLeftToRender, myBoneOffsetMap, &myTextures[static_cast<int>(Textures::BackFaceBuffer)], &myStateManerger, aScene->GetDecals(), &myGBuffer, &myBufferGBuffer, myFullscreenRenderer, aScene, &myTextures[ENUM_CAST(Textures::IntermediateDepth)], myBoneBuffer);
+		modelsLeftToRender = myDeferredRenderer.GenerateGBuffer(Scene::GetInstance().GetMainCamera(), modelsLeftToRender, myBoneOffsetMap, &myTextures[static_cast<int>(Textures::BackFaceBuffer)], &myStateManerger, Scene::GetInstance().GetDecals(), &myGBuffer, &myBufferGBuffer, myFullscreenRenderer, &myTextures[ENUM_CAST(Textures::IntermediateDepth)], myBoneBuffer);
 		myStateManerger.SetAllStates();
 	}
 
@@ -225,7 +225,7 @@ void RenderManager::Render(Scene* aScene)
 		};
 
 		myFrameworkPtr->GetContext()->PSSetShaderResources(9, 1, texture);
-		myDeferredRenderer.MapEnvLightBuffer(aScene);
+		myDeferredRenderer.MapEnvLightBuffer();
 		myTextures[static_cast<int>(Textures::BackFaceBuffer)].SetAsResourceOnSlot(10);
 		myTextures[ENUM_CAST(Textures::IntermediateDepth)].SetAsResourceOnSlot(8);
 		myTextures[static_cast<int>(Textures::SSAOBuffer)].SetAsActiveTarget();
@@ -249,16 +249,16 @@ void RenderManager::Render(Scene* aScene)
 		myTextures[ENUM_CAST(Textures::IntermediateDepth)].SetAsResourceOnSlot(15);
 		myStateManerger.SetSamplerState(RenderStateManager::SamplerState::Point);
 		myStateManerger.SetRasterizerState(RenderStateManager::RasterizerState::Default);
-		myDeferredRenderer.Render(myFullscreenRenderer, aScene->GetPointLights(), aScene->GetSpotLights(), aScene, &myStateManerger, myBoneOffsetMap);
+		myDeferredRenderer.Render(myFullscreenRenderer, Scene::GetInstance().GetPointLights(), Scene::GetInstance().GetSpotLights(), &myStateManerger, myBoneOffsetMap);
 		myStateManerger.SetSamplerState(RenderStateManager::SamplerState::Trilinear);
 	}
 
 	for (auto& model : modelsLeftToRender)
 	{
-		affectingLights.push_back(aScene->CullPointLights(model));
+		affectingLights.push_back(Scene::GetInstance().CullPointLights(model));
 	}
 
-	ModelInstance* skybox = aScene->GetSkybox();
+	ModelInstance* skybox = Scene::GetInstance().GetSkybox();
 	if (skybox)
 	{
 		myForwardRenderer.SetSkybox(skybox);
@@ -279,7 +279,7 @@ void RenderManager::Render(Scene* aScene)
 		//myStateManerger.SetDepthStencilState(RenderStateManager::DepthStencilState::ReadOnly);
 		myGBuffer.SetAsResourceOnSlot(GBuffer::Textures::Postion, 8);
 		myTextures[static_cast<int>(Textures::IntermediateTexture)].SetAsActiveTarget(&myTextures[static_cast<int>(Textures::IntermediateDepth)]);
-		myForwardRenderer.Render(modelsLeftToRender, aScene->GetMainCamera(), aScene, affectingLights, myBoneOffsetMap, myStateManerger, myBoneBuffer);
+		myForwardRenderer.Render(modelsLeftToRender, Scene::GetInstance().GetMainCamera(), affectingLights, myBoneOffsetMap, myStateManerger, myBoneBuffer);
 		myStateManerger.SetBlendState(RenderStateManager::BlendState::Disable);
 	}
 
@@ -290,7 +290,7 @@ void RenderManager::Render(Scene* aScene)
 		ID3D11ShaderResourceView* arr[16] = { nullptr };
 		myFrameworkPtr->GetContext()->PSSetShaderResources(0, 16, arr);
 		myTextures[static_cast<int>(Textures::IntermediateTexture)].SetAsActiveTarget(&myTextures[static_cast<int>(Textures::IntermediateDepth)]);
-		myParticleRenderer.Render(aScene->GetMainCamera(), aScene->GetParticles());
+		myParticleRenderer.Render(Scene::GetInstance().GetMainCamera(), Scene::GetInstance().GetParticles());
 	}
 
 
@@ -301,7 +301,7 @@ void RenderManager::Render(Scene* aScene)
 		myStateManerger.SetAllStates();
 		myStateManerger.SetBlendState(RenderStateManager::BlendState::AlphaBlend);
 		myTextures[static_cast<int>(Textures::IntermediateTexture)].SetAsActiveTarget(&myTextures[static_cast<int>(Textures::IntermediateDepth)]);
-		DebugDrawer::GetInstance().Render(aScene->GetMainCamera());
+		DebugDrawer::GetInstance().Render(Scene::GetInstance().GetMainCamera());
 		myStateManerger.SetBlendState(RenderStateManager::BlendState::Disable);
 	}
 #endif
@@ -337,11 +337,11 @@ void RenderManager::Render(Scene* aScene)
 		FullscreenPass({ Textures::IntermediateTexture }, Textures::BackBuffer, FullscreenRenderer::Shader::COPY);
 	}
 
-	RenderSelection(modelsToHighlight, aScene->GetMainCamera());
+	RenderSelection(modelsToHighlight, Scene::GetInstance().GetMainCamera());
 
 
 	RenderSprites(sprites);
-	RenderText(aScene->GetText()); //Todo: probs some culling
+	RenderText(Scene::GetInstance().GetText());
 }
 
 void RenderManager::RenderMovie(const std::vector<SpriteInstance*>& aSpriteList)

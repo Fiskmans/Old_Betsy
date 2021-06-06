@@ -40,7 +40,6 @@
 #include "GamlaBettan\Scene.h"
 
 GameWorld::GameWorld() :
-	myScene(nullptr),
 	myParticleFactory(nullptr),
 	myGBPhysXPtr(nullptr),
 	myGBPhysXColliderFactory(nullptr),
@@ -70,14 +69,13 @@ GameWorld::GameWorld() :
 
 GameWorld::~GameWorld()
 {
-	myScene = nullptr;
 	myGBPhysXPtr = nullptr;
 
 	SAFE_DELETE(myParticleFactory);
 	SAFE_DELETE(myGBPhysXColliderFactory);
 }
 
-void GameWorld::SystemLoad(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader)
+void GameWorld::SystemLoad(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader)
 {
 	myWindowSize.x = 1920;
 	myWindowSize.y = 1080;
@@ -94,9 +92,8 @@ void GameWorld::SystemLoad(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX
 	myParticleFactory->Init(aFramework);
 }
 
-void GameWorld::Init(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework)
+void GameWorld::Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework)
 {
-	myScene = aScene;
 	mySpriteFactory = aSpriteFactory;
 }
 
@@ -145,7 +142,6 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 #if USEIMGUI
 	static bool gameIsPaused = false;
 	static bool showBoundingBoxes = false;
-	static bool editParticles = false;
 	static bool pauseAnimations = false;
 	static bool snapCameraOnLoad = true;
 	static float expectedLifetime = 10.f;
@@ -154,120 +150,34 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 	static size_t offset;
 	static ModelInstance* skybox = nullptr;
 	static std::string skyboxPath;
-	bool modelViewerOpen = WindowControl::Window("Model Viewer", [&]()
-		{
-#ifdef _DEBUG
-			if (ImGui::BeginTabBar("Viewer"))
-			{
-				if (ImGui::BeginTabItem("Models"))
-				{
-					static bool movedCamera = false;
-					ImGui::SameLine();
-					ImGui::Checkbox("Show Bounding Boxes", &showBoundingBoxes);
-					ImGui::Text("LifeTime: %f", modelInstance ? (Tools::GetTotalTime() - modelInstance->GetSpawnTime()) : 0.0f);
-					if (ImGui::InputFloat("Expected LifeTime", &expectedLifetime))
-					{
-						if (modelInstance)
-						{
-							modelInstance->SetExpectedLifeTime(expectedLifetime);
-						}
-					}
-					ImGui::Checkbox("Snap camera", &snapCameraOnLoad);
-
-					ImGui::Separator();
-					ImGui::EndChild();
-					if (!movedCamera && modelInstance && snapCameraOnLoad)
-					{
-						CommonUtilities::Sphere<float> sphere = modelInstance->GetGraphicBoundingSphere();
-						if (abs(sphere.Radius() - 1.f) > 0.1f)
-						{
-							V3F pos = myScene->GetMainCamera()->GetPosition();
-							pos.Normalize();
-							pos *= sphere.Radius() * 2;
-							myScene->GetMainCamera()->SetPosition(pos);
-							movedCamera = true;
-						}
-					}
-					if (showBoundingBoxes && modelInstance)
-					{
-						for (auto& i : modelInstance->GetModelAsset().GetAsModel()->myCollisions)
-						{
-							DebugDrawer::GetInstance().DrawBoundingBox(i);
-						}
-					}
-					ImGui::EndTabItem();
-				}
-				ImGui::EndTabBar();
-			}
-#endif // _DEBUG
-		});
-	bool particleEditorOpen = WindowControl::Window("Particle Editor", [&]()
-		{
-			myScene->RefreshAll(1.f);
-			myParticleFactory->EditParticles(myScene);
-		});
+	
 	WindowControl::Window("GameWorld", [&]()
 		{
-			if (!particleEditorOpen)
-			{
-				ImGui::Checkbox("Edit particles", &particleEditorOpen);
-			}
-			if (!editParticles)
-			{
-				ImGui::Checkbox("Model Viewer", &modelViewerOpen);
-			}
-
 			ImGui::Checkbox("Show Bounding Boxes", &showBoundingBoxes);
 			ImGui::Checkbox("Pause Game", &gameIsPaused);
 		});
 
-	if (particleEditorOpen != editParticles)
-	{
-		editParticles = particleEditorOpen;
-		static V3F cameraPos;
-		if (editParticles)
-		{
-			myScene->Stash(Scene::StashOp::Push);
-			cameraPos = myScene->GetMainCamera()->GetPosition();
-			myScene->GetMainCamera()->SetPosition(myScene->GetMainCamera()->GetForward() * -400.f);
-		}
-		else
-		{
-			myScene->Stash(Scene::StashOp::Pop);
-			myScene->GetMainCamera()->SetPosition(cameraPos);
-		}
-	}
-	if (modelViewerOpen != myIsInModelViewerMode)
-	{
-		myIsInModelViewerMode = modelViewerOpen;
-		static V3F cameraPos;
-		if (myIsInModelViewerMode)
-		{
-			myScene->Stash(Scene::StashOp::Push);
-			cameraPos = myScene->GetMainCamera()->GetPosition();
-			myScene->GetMainCamera()->SetPosition(myScene->GetMainCamera()->GetForward() * -400.f);
-		}
-		else
-		{
-			if (modelInstance)
-			{
-				myScene->RemoveModel(modelInstance);
-				delete modelInstance;
-				modelInstance = nullptr;
-			}
-			SAFE_DELETE(animator);
-			myScene->Stash(Scene::StashOp::Pop);
-			myScene->GetMainCamera()->SetPosition(cameraPos);
-		}
-	}
-
 	bool isRunningStandard = !gameIsPaused;
 
-	if (editParticles || myIsInModelViewerMode) //Cameracontrols
+	if (isRunningStandard)
+#endif // !USEIMGUI
+	{
+		{
+			EnvironmentLight* env = Scene::GetInstance().GetEnvironmentLight();
+			if (env)
+			{
+				env->myShadowCorePosition = V3F(0, 0, 0);
+			}
+		}
+	}
+#if USEIMGUI
+	else
 	{
 #pragma region Cameracontrols
 		if (aInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key_Alt))
 		{
+			Camera* mainCam = Scene::GetInstance().GetMainCamera();
+
 			static Point lastmp = aInputHandler.GetMousePosition();
 			Point mp = aInputHandler.GetMousePosition();
 			if (aInputHandler.IsMouseDown(CommonUtilities::InputHandler::Mouse::Mouse_Right))
@@ -275,19 +185,18 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 				const static float speed = 0.001f;
 
 				float totalDiff = 1 / (1 + (mp.x - lastmp.x) * speed) * 1 / (1 + (mp.y - lastmp.y) * speed);
-				myScene->GetMainCamera()->SetPosition(myScene->GetMainCamera()->GetPosition() * totalDiff);
+				mainCam->SetPosition(mainCam->GetPosition() * totalDiff);
 			}
 			else if (aInputHandler.IsMouseDown(CommonUtilities::InputHandler::Mouse::Mouse_Left))
 			{
-
-				V3F pos = myScene->GetMainCamera()->GetPosition();
+				V3F pos = mainCam->GetPosition();
 				float length = pos.Length();
-				pos += myScene->GetMainCamera()->GetRight() * length * -static_cast<float>(mp.x - lastmp.x) * 0.001f;
-				pos += myScene->GetMainCamera()->GetUp() * length * static_cast<float>(mp.y - lastmp.y) * 0.001f;
+				pos += mainCam->GetRight() * length * -static_cast<float>(mp.x - lastmp.x) * 0.001f;
+				pos += mainCam->GetUp() * length * static_cast<float>(mp.y - lastmp.y) * 0.001f;
 				pos = pos.GetNormalized() * length;
 
-				myScene->GetMainCamera()->SetPosition(pos);
-				myScene->GetMainCamera()->LookAt(V3F(0, 0, 0));
+				mainCam->SetPosition(pos);
+				mainCam->LookAt(V3F(0, 0, 0));
 			}
 			else
 			{
@@ -297,33 +206,7 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 		}
 #pragma endregion
 	}
-	if (myIsInModelViewerMode)
-	{
-		static V3F lightOffset(-67, -34, 79);
-		//ImGui::DragFloat3("Light arrow position", &lightOffset.x);
-		if (myScene->GetEnvironmentLight())
-		{
-			DebugDrawer::GetInstance().DrawDirection(
-				myScene->GetMainCamera()->GetPosition() +
-				myScene->GetMainCamera()->GetForward() * lightOffset.z +
-				myScene->GetMainCamera()->GetUp() * lightOffset.y +
-				myScene->GetMainCamera()->GetRight() * lightOffset.x,
-				-myScene->GetEnvironmentLight()->myDirection);
-		}
-	}
-	else if (editParticles) {/*NO-OP*/ }
-	else if (isRunningStandard)
-#endif // !USEIMGUI
-	{
-
-		{
-			EnvironmentLight* env = myScene->GetEnvironmentLight();
-			if (env)
-			{
-				env->myShadowCorePosition = V3F(0, 0, 0);
-			}
-		}
-	}
+#endif
 
 
 	CommonUtilities::Vector3<float> movement = { 0.f, 0.f, 0.f };
@@ -373,8 +256,10 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 		{
 			rotation.x += myFreecamRotationSpeed * aDeltatime;
 		}
-		myScene->GetMainCamera()->Move(movement);
-		myScene->GetMainCamera()->Rotate(rotation);
+		Camera* mainCam = Scene::GetInstance().GetMainCamera();
+
+		mainCam->Move(movement);
+		mainCam->Rotate(rotation);
 	}
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CommonUtilities\Sphere.hpp"
+#include "CommonUtilities\Singleton.hpp"
 
 
 class ModelInstance;
@@ -14,7 +15,7 @@ class ProgressBar;
 struct SpotLight;
 struct Decal;
 
-class Scene
+class Scene : public CommonUtilities::Singleton<Scene>
 {
 public:
 	~Scene();
@@ -24,46 +25,29 @@ public:
 	void AddToScene(ModelInstance* aModel);
 	void AddToScene(SpotLight* aSpotLight);
 	void AddToScene(Decal* aDecal);
-	void AddSprite(SpriteInstance* aSprite);
-	void AddText(TextInstance* aText);
-	void AddInstance(Camera* aCamera);
-	void AddInstance(ParticleInstance* aParticle);
-	void RemoveModel(ModelInstance* aModel);
+	void AddToScene(SpriteInstance* aSprite);
+	void AddToScene(TextInstance* aText);
+	void AddToScene(ParticleInstance* aParticle);
+	void AddToScene(PointLight* aLight);
+
 	void SetMainCamera(Camera* aCamera);
 	void SetEnvironmentLight(EnvironmentLight* aLight);
-	void AddPointLight(PointLight* aLight);
-	void RemovePointLight(PointLight* aLight);
-	void RemoveFrom(ParticleInstance* aParticle);
-	void RemoveFrom(SpotLight* aDecal);
-	void RemoveFrom(Decal* aSpotLight);
-	void RemoveSprite(SpriteInstance* aSprite);
-	void RemoveText(TextInstance* aText);
-	bool Contains(ParticleInstance* aParticle);
-	bool Contains(ModelInstance* aModel);
+
+	void RemoveFromScene(ModelInstance* aModel);
+	void RemoveFromScene(PointLight* aLight);
+	void RemoveFromScene(ParticleInstance* aParticle);
+	void RemoveFromScene(SpotLight* aDecal);
+	void RemoveFromScene(Decal* aSpotLight);
+	void RemoveFromScene(SpriteInstance* aSprite);
+	void RemoveFromScene(TextInstance* aText);
+
 	void RemoveAll();
 	void RefreshAll(float aAmount);
 	void SetSkybox(ModelInstance* aSkybox);
 
-	ModelInstance* GetInstance(const FRay& aRay);
-	std::vector<ModelInstance*> GetIntersections(const FRay& aRay);
-
-#if USEIMGUI
-	enum class StashOp
-	{
-		Push,
-		Pop
-	};
-	void Stash(StashOp aOP);
-#endif // USEIMGUI
-
-	std::vector<ParticleInstance*> GetParticles();
-
-	ModelInstance* GetSkybox();
-	Camera* GetMainCamera();
-	EnvironmentLight* GetEnvironmentLight();
-	std::vector<PointLight*>& GetPointLights();
-	std::vector<SpotLight*>& GetSpotLights();
-	std::vector<Decal*>& GetDecals();
+	ModelInstance*		GetSkybox();
+	Camera*				GetMainCamera();
+	EnvironmentLight*	GetEnvironmentLight();
 
 	std::vector<ModelInstance*> Cull(Camera* aCamera, bool aShouldSort = true);
 	std::vector<ModelInstance*> Cull(Camera* aCamera, std::vector<ModelInstance*>& aSelection, bool aShouldSort = true, float aRangeModifier = 1.f);
@@ -72,8 +56,12 @@ public:
 
 	std::array<PointLight*, NUMBEROFPOINTLIGHTS> CullPointLights(ModelInstance* aModel);
 
+	std::vector<ParticleInstance*> GetParticles();
 	const std::vector<SpriteInstance*>& GetSprites();
 	const std::vector<TextInstance*>& GetText();
+	std::vector<PointLight*>& GetPointLights();
+	std::vector<SpotLight*>& GetSpotLights();
+	std::vector<Decal*>& GetDecals();
 
 	std::vector<ModelInstance*>::iterator begin();
 	std::vector<ModelInstance*>::iterator end();
@@ -82,7 +70,6 @@ private:
 	std::vector<ModelInstance*> myPreCull;
 	std::vector<ModelInstance*> myModels;
 	std::vector<SpriteInstance*> mySprites;
-	std::vector<Camera*> myCameras;
 	std::vector<PointLight*> myPointLights;
 	std::vector<SpotLight*> mySpotlights;
 	std::vector<Decal*> myDecals;

@@ -22,7 +22,7 @@ public:
 
 	bool Init(DirectX11Framework* aFramework, const std::string& aThroughWallPSName, const std::string& aEnemyThroughWallPSName, AssetHandle aPerlinHandle, DepthRenderer* aDepthRenderer);
 
-	void Render(std::vector<ModelInstance*>& aModelList, Camera* aCamera, Scene* aScene, std::vector<std::array<PointLight*, NUMBEROFPOINTLIGHTS>>& aLightList, std::unordered_map<ModelInstance*, short>& aBoneMapping, class RenderStateManager& aStateManager,BoneTextureCPUBuffer& aBoneBuffer);
+	void Render(std::vector<ModelInstance*>& aModelList, Camera* aCamera, std::vector<std::array<PointLight*, NUMBEROFPOINTLIGHTS>>& aLightList, std::unordered_map<ModelInstance*, short>& aBoneMapping, class RenderStateManager& aStateManager,BoneTextureCPUBuffer& aBoneBuffer);
 
 	void SetSkyboxTexture(AssetHandle aTexture);
 	void SetSkybox(ModelInstance* aSkyBox);

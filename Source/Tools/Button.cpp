@@ -26,7 +26,6 @@ Button::Button()
 	myPosition = { 0,0 };
 	myScreenSize = { 1600.f, 900.f };
 	myIsListening = false;
-	myScenePtr = nullptr;
 }
 
 Button::~Button()
@@ -57,13 +56,12 @@ SpriteInstance* Button::GetCurrentSprite()
 
 void Button::SetActive()
 {
-	if (myScenePtr != nullptr)
+	
+
+	if (myState != ButtonState::Hover)
 	{
-		if (myState != ButtonState::Hover)
-		{
-			myScenePtr->RemoveSprite(mySprites[CAST(int, myState)]);
-			myScenePtr->AddSprite(mySprites[CAST(int, ButtonState::Hover)]);
-		}
+		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
+		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Hover)]);
 	}
 	myState = ButtonState::Hover;
 	
@@ -72,13 +70,10 @@ void Button::SetActive()
 
 void Button::SetPressed()
 {
-	if (myScenePtr != nullptr)
+	if (myState != ButtonState::Pressed)
 	{
-		if (myState != ButtonState::Pressed)
-		{
-			myScenePtr->RemoveSprite(mySprites[CAST(int, myState)]);
-			myScenePtr->AddSprite(mySprites[CAST(int, ButtonState::Pressed)]);
-		}
+		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
+		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Pressed)]);
 	}
 	myState = ButtonState::Pressed;
 
@@ -87,13 +82,10 @@ void Button::SetPressed()
 
 void Button::SetToNormal()
 {
-	if (myScenePtr != nullptr)
+	if (myState != ButtonState::Normal)
 	{
-		if (myState != ButtonState::Normal)
-		{
-			myScenePtr->RemoveSprite(mySprites[CAST(int, myState)]);
-			myScenePtr->AddSprite(mySprites[CAST(int, ButtonState::Normal)]);
-		}
+		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
+		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Normal)]);
 	}
 	myState = ButtonState::Normal;
 }
@@ -102,8 +94,8 @@ void Button::ActuallyEnable()
 {
 	if (!myIsListeningToClick)
 	{
-		myScenePtr->RemoveSprite(mySprites[CAST(int, ButtonState::Disabled)]);
-		myScenePtr->AddSprite(mySprites[CAST(int, ButtonState::Normal)]);
+		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, ButtonState::Disabled)]);
+		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Normal)]);
 		myIsListeningToClick = true;
 		myState = ButtonState::Normal;
 	}
@@ -113,8 +105,8 @@ void Button::ActuallyDisable()
 {
 	if (myIsListeningToClick)
 	{
-		myScenePtr->RemoveSprite(mySprites[CAST(int, myState)]);
-		myScenePtr->AddSprite(mySprites[CAST(int, ButtonState::Disabled)]);
+		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
+		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Disabled)]);
 		myIsListeningToClick = false;
 		myState = ButtonState::Disabled;
 	}
@@ -247,11 +239,11 @@ void Button::RecieveMessage(const Message& aMessage)
 	else if (aMessage.myMessageType == MessageType::WindowResize)
 	{
 		const V2ui& source = *reinterpret_cast<const V2ui*>(aMessage.myData);
-		myScreenSize = 
-			V2f{ 
-				static_cast<float>(source.x), 
-				static_cast<float>(source.y) 
-			};
+		myScreenSize =
+			V2f{
+				static_cast<float>(source.x),
+				static_cast<float>(source.y)
+		};
 		SetupBounds();
 
 	}
@@ -262,20 +254,12 @@ void Button::SetSpriteFactory(SpriteFactory* aSpriteFactory)
 	ourSpriteFactoryPtr = aSpriteFactory;
 }
 
-void Button::SetScenePtr(Scene* aScenePtr)
-{
-	myScenePtr = aScenePtr;
-}
-
 void Button::RemoveAllSprites()
 {
-	if (myScenePtr != nullptr)
-	{
-		myScenePtr->RemoveSprite(mySprites[ButtonState::Hover]);
-		myScenePtr->RemoveSprite(mySprites[ButtonState::Normal]);
-		myScenePtr->RemoveSprite(mySprites[ButtonState::Pressed]);
-		myScenePtr->RemoveSprite(mySprites[ButtonState::Disabled]);
-	}
+	Scene::GetInstance().RemoveFromScene(mySprites[ButtonState::Hover]);
+	Scene::GetInstance().RemoveFromScene(mySprites[ButtonState::Normal]);
+	Scene::GetInstance().RemoveFromScene(mySprites[ButtonState::Pressed]);
+	Scene::GetInstance().RemoveFromScene(mySprites[ButtonState::Disabled]);
 }
 
 SpriteFactory* Button::GetSpriteFactory()

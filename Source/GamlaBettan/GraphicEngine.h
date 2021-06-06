@@ -26,7 +26,7 @@ public:
 	bool Init();
 	bool Init(V2ui aWindowSize);
 	void BeginFrame(float aClearColor[4]);
-	void RenderFrame(Scene* aScene);
+	void RenderFrame();
 	void RenderMovie(const std::vector<SpriteInstance*>& aSpriteList);
 	void RenderSprites(const std::vector<SpriteInstance*>& aSpriteList, const bool aShouldRenderExtraSprites = false);
 	void RenderText(const std::vector<TextInstance*>& aTextList);

@@ -17,7 +17,7 @@ public:
 	_NODISCARD ParticleInstance* InstantiateParticle(const std::string& aFilePath);
 
 #if USEIMGUI
-	void EditParticles(Scene* aScene);
+	void EditParticles();
 #endif
 
 private:

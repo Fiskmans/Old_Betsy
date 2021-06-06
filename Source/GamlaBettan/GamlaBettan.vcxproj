@@ -192,6 +192,7 @@
     <ClCompile Include="DecalFactory.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="LevelLoader.cpp" />
+    <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="NavMeshLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraFactory.cpp" />
@@ -256,6 +257,7 @@
     <ClInclude Include="DecalFactory.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="LevelLoader.h" />
+    <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="NavMeshLoader.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraFactory.h" />

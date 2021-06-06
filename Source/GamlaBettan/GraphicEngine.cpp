@@ -60,9 +60,9 @@ void CGraphicsEngine::BeginFrame(float aClearColor[4])
 	myRendreManarger->BeginFrame(aClearColor);
 }
 
-void CGraphicsEngine::RenderFrame(Scene* aScene)
+void CGraphicsEngine::RenderFrame()
 {
-	myRendreManarger->Render(aScene);
+	myRendreManarger->Render();
 }
 
 void CGraphicsEngine::RenderMovie(const std::vector<SpriteInstance*>& aSpriteList)

@@ -122,7 +122,7 @@ void EditOverTime(Particle::Data::Customizable::OverTime& aOverTime)
 	ImGui::ColorPicker4("Color", &aOverTime.myParticleColor.x);
 }
 
-void ParticleFactory::EditParticles(Scene* aScene)
+void ParticleFactory::EditParticles()
 {
 	static V4F direction;
 	if (ImGui::Button("Check For Particles"))
@@ -181,10 +181,6 @@ void ParticleFactory::EditParticles(Scene* aScene)
 
 	for (auto particle : myParticalsEditing)
 	{
-		if (!aScene->Contains(particle.instance))
-		{
-			particle.instance = nullptr;
-		}
 		if (particle.instance)
 		{
 			particle.instance->RefreshTimeout(1.f);
@@ -211,7 +207,7 @@ void ParticleFactory::EditParticles(Scene* aScene)
 					particle.editing = it;
 					particle.instance = InstantiateParticle(it->first);
 					particle.instance->SetDirection(direction);
-					aScene->AddInstance(particle.instance);
+					Scene::GetInstance().AddToScene(particle.instance);
 
 					shouldClear = false;
 					break;
@@ -225,7 +221,7 @@ void ParticleFactory::EditParticles(Scene* aScene)
 					if (particle.instance)
 					{
 						particle.editing = myParticles.end();
-						aScene->RemoveFrom(particle.instance);
+						Scene::GetInstance().RemoveFromScene(particle.instance);
 						SAFE_DELETE(particle.instance);
 					}
 				}
@@ -237,7 +233,7 @@ void ParticleFactory::EditParticles(Scene* aScene)
 						particle.editing = it;
 						particle.instance = InstantiateParticle(it->first);
 						particle.instance->SetDirection(direction);
-						aScene->AddInstance(particle.instance);
+						Scene::GetInstance().AddToScene(particle.instance);
 						break;
 					}
 				}

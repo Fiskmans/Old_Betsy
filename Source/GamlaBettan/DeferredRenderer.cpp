@@ -143,7 +143,7 @@ bool DeferredRenderer::Init(DirectX11Framework* aFramework, AssetHandle aPerlinH
 	return true;
 }
 
-std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, std::vector<class ModelInstance*>& aModelList, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer, GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer, Scene* aScene, FullscreenTexture* aDepth, BoneTextureCPUBuffer& aBoneTextureBuffer)
+std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, std::vector<class ModelInstance*>& aModelList, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer, GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer, FullscreenTexture* aDepth, BoneTextureCPUBuffer& aBoneTextureBuffer)
 {
 
 	std::vector<class ModelInstance*> filtered;
@@ -367,7 +367,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 				myContext->PSGetShaderResources(0, 16, oldShaderResources);
 				myContext->RSGetViewports(&oldPortCount, oldPort);
 				myContext->OMGetRenderTargets(8, oldView, &oldDepth);
-				i->myDepth = myShadowRenderer->RenderDecalDepth(i, aScene, aBoneMapping);
+				i->myDepth = myShadowRenderer->RenderDecalDepth(i, aBoneMapping);
 				myContext->OMSetRenderTargets(8, oldView, oldDepth);
 				myContext->RSSetViewports(oldPortCount, oldPort);
 				myContext->PSSetShaderResources(0, 16, oldShaderResources);
@@ -435,13 +435,13 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 	return filtered;
 }
 
-void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vector<PointLight*>& aPointLightList, std::vector<SpotLight*>& aSpotLightList, Scene* aScene, RenderStateManager* aRenderStateManager, std::unordered_map<ModelInstance*, short>& aBoneMapping)
+void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vector<PointLight*>& aPointLightList, std::vector<SpotLight*>& aSpotLightList, RenderStateManager* aRenderStateManager, std::unordered_map<ModelInstance*, short>& aBoneMapping)
 {
 
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE bufferData;
 	WIPE(bufferData);
-	CommonUtilities::PlaneVolume<float> frustum = aScene->GetMainCamera()->GenerateFrustum();
+	CommonUtilities::PlaneVolume<float> frustum = Scene::GetInstance().GetMainCamera()->GenerateFrustum();
 
 	ID3D11ShaderResourceView* perlinResource[1] =
 	{
@@ -461,13 +461,13 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 		myContext->PSGetShaderResources(0, 16, oldShaderResources);
 		myContext->RSGetViewports(&oldPortCount, oldPort);
 		myContext->OMGetRenderTargets(1, &oldView, &oldDepth);
-		myShadowRenderer->RenderEnvironmentDepth(aScene->GetEnvironmentLight(), aScene, aBoneMapping);
+		myShadowRenderer->RenderEnvironmentDepth(Scene::GetInstance().GetEnvironmentLight(), aBoneMapping);
 		myContext->OMSetRenderTargets(1, &oldView, oldDepth);
 		myContext->RSSetViewports(oldPortCount, oldPort);
 		myContext->PSSetShaderResources(0, 16, oldShaderResources);
 		myShadowRenderer->BindshadowsToSlots(9);
 
-		MapEnvLightBuffer(aScene);
+		MapEnvLightBuffer();
 		myContext->PSSetShaderResources(10, 1, perlinResource);
 		aRenderStateManager->SetSamplerState(RenderStateManager::SamplerState::Trilinear);
 		aFullscreenRenderer.Render(FullscreenRenderer::Shader::PBREnvironmentLight);
@@ -477,7 +477,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 		DefPixelPointLightBuffer fData;
 
 		WIPE(fData);
-		fData.CameraPosition = aScene->GetMainCamera()->GetPosition();
+		fData.CameraPosition = Scene::GetInstance().GetMainCamera()->GetPosition();
 		aRenderStateManager->SetBlendState(RenderStateManager::BlendState::AdditativeBlend);
 		myContext->PSSetShaderResources(7, 1, perlinResource);
 		const auto& shadowCameras = myShadowRenderer->GetCameras();
@@ -506,7 +506,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 				myContext->PSGetShaderResources(0, 16, oldShaderResources);
 				myContext->RSGetViewports(&oldPortCount, oldPort);
 				myContext->OMGetRenderTargets(1, &oldView, &oldDepth);
-				myShadowRenderer->Render(i, aScene, aBoneMapping);
+				myShadowRenderer->Render(i, aBoneMapping);
 				myContext->OMSetRenderTargets(1, &oldView, oldDepth);
 				myContext->RSSetViewports(oldPortCount, oldPort);
 				myContext->PSSetShaderResources(0, 16, oldShaderResources);
@@ -569,7 +569,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 				myContext->PSGetShaderResources(0, 16, oldShaderResources);
 				myContext->RSGetViewports(&oldPortCount, oldPort);
 				myContext->OMGetRenderTargets(1, &oldView, &oldDepth);
-				myShadowRenderer->RenderSpotLightDepth(i, aScene, aBoneMapping);
+				myShadowRenderer->RenderSpotLightDepth(i, aBoneMapping);
 				myContext->PSSetShaderResources(0, 16, clearResources);
 				myContext->OMSetRenderTargets(1, &oldView, oldDepth);
 				myContext->RSSetViewports(oldPortCount, oldPort);
@@ -607,7 +607,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 
 }
 
-void DeferredRenderer::MapEnvLightBuffer(Scene* aScene)
+void DeferredRenderer::MapEnvLightBuffer()
 {
 
 	HRESULT result;
@@ -624,8 +624,8 @@ void DeferredRenderer::MapEnvLightBuffer(Scene* aScene)
 
 	WIPE(fData);
 
-	fData.myCameraPosition = aScene->GetMainCamera()->GetPosition();
-	EnvironmentLight* envlight = aScene->GetEnvironmentLight();
+	fData.myCameraPosition = Scene::GetInstance().GetMainCamera()->GetPosition();
+	EnvironmentLight* envlight = Scene::GetInstance().GetEnvironmentLight();
 	if (envlight)
 	{
 		ID3D11ShaderResourceView* texture[1] =

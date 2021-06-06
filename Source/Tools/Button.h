@@ -31,7 +31,6 @@ public:
 	void RecieveMessage(const Message& aMessage) override;
 
 	static void SetSpriteFactory(SpriteFactory* aSpriteFactory);
-	void SetScenePtr(Scene* aScenePtr);
 	void RemoveAllSprites();
 	//sorry...
 
@@ -57,6 +56,5 @@ private:
 	static SpriteFactory* ourSpriteFactoryPtr;
 	bool myIsListening;
 	bool myIsListeningToClick = false;
-	Scene* myScenePtr;
 };
 

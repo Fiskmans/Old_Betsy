@@ -18,10 +18,10 @@ public:
 	const Camera* GetEnvirontmentCamera();
 	void BindshadowsToSlots(int aSlot);
 	void BindShadowDensityToSlot(int aSlot);
-	void Render(PointLight* aLight,Scene* aScene, std::unordered_map<ModelInstance*, short>& aBoneMapping);
-	void RenderSpotLightDepth(SpotLight* aSpotlight, Scene* aScene, std::unordered_map<ModelInstance*, short>& aBoneMapping);
-	void RenderEnvironmentDepth(EnvironmentLight* aLight, Scene* aScene, std::unordered_map<ModelInstance*, short>& aBoneMapping, std::function<void()> aPreRenderFunction = []() {});
-	ID3D11ShaderResourceView* RenderDecalDepth(Decal* aSpotlight, Scene* aScene, std::unordered_map<ModelInstance*, short>& aBoneMapping);
+	void Render(PointLight* aLight, std::unordered_map<ModelInstance*, short>& aBoneMapping);
+	void RenderSpotLightDepth(SpotLight* aSpotlight, std::unordered_map<ModelInstance*, short>& aBoneMapping);
+	void RenderEnvironmentDepth(EnvironmentLight* aLight, std::unordered_map<ModelInstance*, short>& aBoneMapping, std::function<void()> aPreRenderFunction = []() {});
+	ID3D11ShaderResourceView* RenderDecalDepth(Decal* aSpotlight, std::unordered_map<ModelInstance*, short>& aBoneMapping);
 
 private:
 	

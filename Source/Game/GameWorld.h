@@ -19,13 +19,12 @@ public:
 	GameWorld();
 	~GameWorld();
 
-	void Init(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework);
-	void SystemLoad(SpriteFactory* aSpriteFactory, Scene* aScene, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader);
+	void Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework);
+	void SystemLoad(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader);
 	
 	void Update(CommonUtilities::InputHandler& aInputHandler, float aDeltatime);
 
 #if USEIMGUI
-	bool myIsInModelViewerMode = false;
 	void ImGuiNode();
 #endif // !_RETAIL
 
@@ -37,7 +36,6 @@ private:
 	GAMEMETRIC(float, myFreecamSpeed, FREECAMSPEED, 0.3f);
 	GAMEMETRIC(float, myFreecamRotationSpeed, FREECAMROTATIONSPEED, 0.3f);
 
-	Scene* myScene;
 	bool myHasDoneInitialSetup = false;
 
 	ParticleFactory* myParticleFactory;

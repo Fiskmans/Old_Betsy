@@ -109,7 +109,7 @@ namespace RenderSort
 
 }
 
-void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aCamera, Scene* aScene, std::vector<std::array<PointLight*, NUMBEROFPOINTLIGHTS>>& aLightList, std::unordered_map<ModelInstance*, short>& aBoneMapping, RenderStateManager& aStateManager, BoneTextureCPUBuffer& aBoneBuffer)
+void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aCamera, std::vector<std::array<PointLight*, NUMBEROFPOINTLIGHTS>>& aLightList, std::unordered_map<ModelInstance*, short>& aBoneMapping, RenderStateManager& aStateManager, BoneTextureCPUBuffer& aBoneBuffer)
 {
 	std::vector<ModelAndLights> modelsAndLightsList;
 	modelsAndLightsList.reserve(aModelList.size());
@@ -143,7 +143,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 	fData.myCameraPosition = aCamera->GetPosition();
 	fData.myCameraDirection = aCamera->GetForward();
 	fData.myTotalTime = RenderManager::GetTotalTime();
-	EnvironmentLight* envoLight = aScene->GetEnvironmentLight();
+	EnvironmentLight* envoLight = Scene::GetInstance().GetEnvironmentLight();
 
 	if (envoLight)
 	{

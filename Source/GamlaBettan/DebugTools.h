@@ -19,11 +19,11 @@ public:
 	static bool IsGizmo(V3F& aVector);
 
 	static void UpdateGizmo();
-	static void Setup(Scene* aScene);
+	static void Setup();
 
 private:
 
-	static Scene* myScene;
+	static bool myGizmoInScene;
 	static ModelInstance* gizmoParts[6];
 	static V3F* myGizmoVector;
 };

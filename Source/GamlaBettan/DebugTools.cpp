@@ -10,10 +10,10 @@
 #ifdef _DEBUG
 FRay* DebugTools::LastKnownMouseRay = nullptr;
 Camera* DebugTools::myCamera = nullptr;
+bool DebugTools::myGizmoInScene = false;
 
 ModelInstance* DebugTools::gizmoParts[6];
 V3F* DebugTools::myGizmoVector;
-Scene* DebugTools::myScene;
 
 void DebugTools::AttachToGizmo(V3F& aVector)
 {
@@ -29,12 +29,13 @@ void DebugTools::UpdateGizmo()
 {
 	if (myGizmoVector)
 	{
-		if (!myScene->Contains(gizmoParts[0]))
+		if (!myGizmoInScene)
 		{
 			for (size_t i = 0; i < 6; i++)
 			{
-				myScene->AddToScene(gizmoParts[i]);
+				Scene::GetInstance().AddToScene(gizmoParts[i]);
 			}
+			myGizmoInScene = true;
 		}
 		for (size_t i = 0; i < 6; i++)
 		{
@@ -147,17 +148,18 @@ void DebugTools::UpdateGizmo()
 	}
 	else
 	{
-		if(myScene->Contains(gizmoParts[0]))
+		if (myGizmoInScene)
 		{
 			for (size_t i = 0; i < 6; i++)
 			{
-				myScene->RemoveModel(gizmoParts[i]);
+				Scene::GetInstance().RemoveFromScene(gizmoParts[i]);
 			}
+			myGizmoInScene = false;
 		}
 	}
 }
 
-void DebugTools::Setup(Scene* aScene)
+void DebugTools::Setup()
 {
 	gizmoParts[0] = AssetManager::GetInstance().GetModel("engine/x.fbx").InstansiateModel();
 	gizmoParts[1] = AssetManager::GetInstance().GetModel("engine/y.fbx").InstansiateModel();
@@ -166,8 +168,6 @@ void DebugTools::Setup(Scene* aScene)
 	gizmoParts[3] = AssetManager::GetInstance().GetModel("engine/xy.fbx").InstansiateModel();
 	gizmoParts[4] = AssetManager::GetInstance().GetModel("engine/xz.fbx").InstansiateModel();
 	gizmoParts[5] = AssetManager::GetInstance().GetModel("engine/yz.fbx").InstansiateModel();
-
-	myScene = aScene;
 }
 
 #endif // DEBUG
