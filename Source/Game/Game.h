@@ -24,7 +24,6 @@ public:
 	
 private:
 	
-
 	float myTooFastLimit = 0.f;
 
 	InputManager* myInputManager;

@@ -195,7 +195,9 @@
     <ClCompile Include="ComponentManager.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="MeshComponent.cpp" />
+    <ClCompile Include="MeshComponent.cpp">
+      <Filter>Components\EngineComponents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -397,7 +399,9 @@
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="Entity.h" />
-    <ClInclude Include="MeshComponent.h" />
+    <ClInclude Include="MeshComponent.h">
+      <Filter>Components\EngineComponents</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">

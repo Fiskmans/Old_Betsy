@@ -72,7 +72,7 @@ std::array<V4F, NUMBEROFANIMATIONBONES> ModelInstance::GetBonePositions()
 CommonUtilities::Matrix4x4<float> ModelInstance::GetModelToWorldTransform()
 {
 	//CommonUtilities::Matrix4x4<float> mat = myScaleAndRotate;
-	CommonUtilities::Matrix4x4<float> toWorld = myRotation;
+	CommonUtilities::Matrix4x4<float> toWorld = myTransform;
 
 	CommonUtilities::Matrix4x4<float> scale;
 	scale(1, 1) = myScale.x;
@@ -80,10 +80,6 @@ CommonUtilities::Matrix4x4<float> ModelInstance::GetModelToWorldTransform()
 	scale(3, 3) = myScale.z;
 
 	toWorld *= scale;
-
-	toWorld(4, 1) = myPosition.x;
-	toWorld(4, 2) = myPosition.y;
-	toWorld(4, 3) = myPosition.z;
 
 	return toWorld;
 }
@@ -102,40 +98,44 @@ M44f ModelInstance::GetModelToWorldTransformWithPotentialBoneAttachement(BoneTex
 
 void ModelInstance::SetPosition(const CommonUtilities::Vector4<float>& aPosition)
 {
-	myPosition = aPosition;
+	myTransform.AssignRow(3, aPosition);
 }
 
 void ModelInstance::Rotate(CommonUtilities::Vector3<float> aRotation)
 {
-	myRotation *= CommonUtilities::Matrix4x4<float>::CreateRotationAroundX(aRotation.x);
-	myRotation *= CommonUtilities::Matrix4x4<float>::CreateRotationAroundY(aRotation.y);
-	myRotation *= CommonUtilities::Matrix4x4<float>::CreateRotationAroundZ(aRotation.z);
+	myTransform *= M44f::CreateRotation(aRotation);
 }
 
 void ModelInstance::Rotate(const CommonUtilities::Matrix4x4<float>& aRotationMatrix)
 {
-	myRotation *= aRotationMatrix;
+	myTransform *= aRotationMatrix;
 }
 
 void ModelInstance::SetRotation(CommonUtilities::Vector3<float> aRotation)
 {
-	CommonUtilities::Matrix4x4<float> mat;
-	mat *= CommonUtilities::Matrix4x4<float>::CreateRotationAroundX(aRotation.x);
-	mat *= CommonUtilities::Matrix4x4<float>::CreateRotationAroundY(aRotation.y);
-	mat *= CommonUtilities::Matrix4x4<float>::CreateRotationAroundZ(aRotation.z);
+	V4F pos = myTransform.Row(3);
+	myTransform = M44f::CreateRotation(aRotation);
 
-	myRotation = mat;
+	myTransform.AssignRow(3, pos);
 }
 
 void ModelInstance::SetRotation(const CommonUtilities::Matrix4x4<float>& aTargetRotation)
 {
-	myRotation = aTargetRotation;
+	V4F pos = myTransform.Row(3);
+	myTransform =  aTargetRotation;
+
+	myTransform.AssignRow(3, pos);
 }
 
 void ModelInstance::SetScale(CommonUtilities::Vector3<float> aScale)
 {
 	myScale = aScale;
 	myGaphicBoundsModifier = MAX(MAX(aScale.x, aScale.y), aScale.z);
+}
+
+void ModelInstance::SetTransform(const M44f& aTransform)
+{
+	myTransform = aTransform;
 }
 
 void ModelInstance::SetShouldBeDrawnThroughWalls(const bool aFlag)
@@ -195,12 +195,12 @@ bool ModelInstance::ShouldRender() const
 
 const CommonUtilities::Vector4<float>& ModelInstance::GetV4FPosition() const
 {
-	return myPosition;
+	return myTransform.Row(3);
 }
 
 CommonUtilities::Vector3<float> ModelInstance::GetPosition() const
 {
-	return CommonUtilities::Vector3<float>(myPosition);
+	return CommonUtilities::Vector3<float>(myTransform.Row(3));
 }
 
 const std::string ModelInstance::GetFriendlyName()
@@ -313,7 +313,7 @@ CommonUtilities::Sphere<float> ModelInstance::GetGraphicBoundingSphere(float aRa
 	{
 		return myAttachedToModel->GetGraphicBoundingSphere(aRangeModifier);
 	}
-	return CommonUtilities::Sphere<float>(myPosition, myModel.GetAsModel()->GetGraphicSize() * myGaphicBoundsModifier * aRangeModifier);
+	return CommonUtilities::Sphere<float>(myTransform.Row(3), myModel.GetAsModel()->GetGraphicSize() * myGaphicBoundsModifier * aRangeModifier);
 }
 
 const float ModelInstance::GetSpawnTime()

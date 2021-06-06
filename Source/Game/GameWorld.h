@@ -1,6 +1,8 @@
 #pragma once
 #include "MetricValue.h"
 
+#include "GamlaBettan\Entity.h"
+
 
 namespace CommonUtilities
 {
@@ -31,6 +33,9 @@ public:
 	virtual void RecieveMessage(const Message& aMessage) override;
 
 private:
+
+	Entity* myPlayer;
+
 
 	CommonUtilities::Vector2<float> myWindowSize;
 	GAMEMETRIC(float, myFreecamSpeed, FREECAMSPEED, 0.3f);

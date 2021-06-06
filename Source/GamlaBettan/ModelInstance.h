@@ -10,14 +10,15 @@ class ModelInstance
 public:
 	ModelInstance(const AssetHandle& aModel);
 	AssetHandle& GetModelAsset();
-	CommonUtilities::Matrix4x4<float> GetModelToWorldTransform();
+	M44f GetModelToWorldTransform();
 	M44f GetModelToWorldTransformWithPotentialBoneAttachement(BoneTextureCPUBuffer& aBoneData, std::unordered_map<ModelInstance*, short>& aBoneMapping);
-	void SetPosition(const CommonUtilities::Vector4<float>& aPosition);
-	void Rotate(CommonUtilities::Vector3<float> aRotation);
-	void Rotate(const CommonUtilities::Matrix4x4<float>& aRotationMatrix);
-	void SetRotation(CommonUtilities::Vector3<float> aRotation);
-	void SetRotation(const CommonUtilities::Matrix4x4<float>& aTargetRotation);
-	void SetScale(CommonUtilities::Vector3<float> aScale);
+	void SetPosition(const V4F& aPosition);
+	void Rotate(V3F aRotation);
+	void Rotate(const M44f& aRotationMatrix);
+	void SetRotation(V3F aRotation);
+	void SetRotation(const M44f& aTargetRotation);
+	void SetTransform(const M44f& aTransform);
+	void SetScale(V3F aScale);
 	void SetShouldBeDrawnThroughWalls(const bool aFlag);
 	void SetUsePlayerThroughWallShader(const bool aFlag);
 	void SetShouldRender(const bool aFlag);
@@ -40,12 +41,12 @@ public:
 	bool ShouldRender() const;
 	bool GetCastsShadows() const;
 
-	const CommonUtilities::Vector4<float>& GetV4FPosition() const;
-	CommonUtilities::Vector3<float> GetPosition() const;
+	const V4F& GetV4FPosition() const;
+	V3F GetPosition() const;
 
 	const std::string GetFriendlyName();
 
-	void SetupanimationMatrixes(std::array<CommonUtilities::Matrix4x4<float>,NUMBEROFANIMATIONBONES>& aMatrixes);
+	void SetupanimationMatrixes(std::array<M44f,NUMBEROFANIMATIONBONES>& aMatrixes);
 
 #if USEIMGUI
 	virtual bool ImGuiNode(std::map<std::string, std::vector<std::string>>& aFiles, Camera* aCamera);
@@ -77,13 +78,12 @@ private:
 	float myCustomData[MODELSAMOUNTOFCUSTOMDATA*2];
 
 	std::string myFriendlyName;
-	//CommonUtilities::Matrix4x4<float> myScaleAndRotate;
-	CommonUtilities::Matrix4x4<float> myRotation;
 
-	CommonUtilities::Vector4<float> myPosition;
+	M44f myTransform;
+
 	V4F myTint;
 
-	CommonUtilities::Vector3<float> myScale;
+	V3F myScale;
 
 	class Animator* myAnimator;
 	AssetHandle myModel;

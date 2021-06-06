@@ -20,6 +20,7 @@ namespace CommonUtilities
 		static Matrix4x4<T> CreateRotationAroundX(const T anAngle);
 		static Matrix4x4<T> CreateRotationAroundY(const T anAngle);
 		static Matrix4x4<T> CreateRotationAroundZ(const T anAngle);
+		static Matrix4x4<T> CreateRotation(const Vector3<T> aAngles);
 		static Matrix4x4<T> CreateRotationAroundPointX(const T anAngle, const Vector4<T> &aPoint);
 		static Matrix4x4<T> CreateRotationAroundPointY(const T anAngle, const Vector4<T> &aPoint);
 		static Matrix4x4<T> CreateRotationAroundPointZ(const T anAngle, const Vector4<T> &aPoint);
@@ -181,6 +182,16 @@ namespace CommonUtilities
 				-s, c, 0, 0,
 				 0, 0, 1, 0,
 				 0, 0, 0, 1 };
+	}
+
+	template<class T>
+	inline Matrix4x4<T> Matrix4x4<T>::CreateRotation(const Vector3<T> aAngles)
+	{
+		return
+			CreateRotationAroundX(aAngles.x) *
+			CreateRotationAroundY(aAngles.y) *
+			CreateRotationAroundZ(aAngles.z);
+
 	}
 
 	template<class T>
