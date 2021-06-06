@@ -199,7 +199,6 @@ void SpriteInstance::ImGui()
 {
 	ImGui::Text("Sprite");
 
-
 	V2ui windowSize = WindowHandler::GetInstance().GetSize();
 	const float imScale = 0.4f;
 	ImVec2 imageSize = ImVec2(imScale * myBaseScale.x * windowSize.x, imScale * myBaseScale.y * windowSize.y);
@@ -234,9 +233,10 @@ void SpriteInstance::ImGui()
 
 	
 	ImGui::DragFloat("Depth", &myDepth, 0.01f, 0.0f, 1.0f);
-	ImGui::GetWindowDrawList()->AddRect(ImVec2(cursorpos.x + myUVMinMax.x * imageSize.x, cursorpos.y + myUVMinMax.y * imageSize.x), ImVec2(cursorpos.x + myUVMinMax.z * imageSize.x, cursorpos.y + myUVMinMax.w * imageSize.x), IM_COL32(255, 0, 0, 255));
-	ImVec2 pivotPos = ImVec2(cursorpos.x + myPivot.x * imageSize.x, cursorpos.y + myPivot.y * imageSize.x);
-	ImGui::GetWindowDrawList()->AddLine(ImVec2(pivotPos.x-20.f,pivotPos.y-20.f), ImVec2(pivotPos.x + 20.f, pivotPos.y + 20.f), IM_COL32(255, 0, 0, 255));
-	ImGui::GetWindowDrawList()->AddLine(ImVec2(pivotPos.x - 20.f, pivotPos.y + 20.f), ImVec2(pivotPos.x - 20.f, pivotPos.y + 20.f), IM_COL32(255, 0, 0, 255));
+	ImGui::DragFloat("Rotation", &myRotation, 0.01f, 0.0f, TAU);
+	ImGui::GetWindowDrawList()->AddRect(ImVec2(cursorpos.x + myUVMinMax.x * imageSize.x, cursorpos.y + myUVMinMax.y * imageSize.y), ImVec2(cursorpos.x + myUVMinMax.z * imageSize.x, cursorpos.y + myUVMinMax.w * imageSize.y), IM_COL32(255, 0, 0, 255));
+	ImVec2 pivotPos = ImVec2(cursorpos.x + myPivot.x * imageSize.x, cursorpos.y + myPivot.y * imageSize.y);
+	ImGui::GetWindowDrawList()->AddLine(ImVec2(pivotPos.x - 20.f, pivotPos.y - 20.f), ImVec2(pivotPos.x + 20.f, pivotPos.y + 20.f), IM_COL32(255, 0, 0, 255));
+	ImGui::GetWindowDrawList()->AddLine(ImVec2(pivotPos.x + 20.f, pivotPos.y - 20.f), ImVec2(pivotPos.x - 20.f, pivotPos.y + 20.f), IM_COL32(255, 0, 0, 255));
 }
 #endif

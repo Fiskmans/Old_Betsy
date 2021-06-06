@@ -65,16 +65,6 @@ void CGraphicsEngine::RenderFrame()
 	myRendreManarger->Render();
 }
 
-void CGraphicsEngine::RenderMovie(const std::vector<SpriteInstance*>& aSpriteList)
-{
-	myRendreManarger->RenderMovie(aSpriteList);
-}
-
-void CGraphicsEngine::RenderSprites(const std::vector<SpriteInstance*>& aSpriteList, const bool aShouldRenderExtraSprites)
-{
-	myRendreManarger->RenderSprites(aSpriteList, aShouldRenderExtraSprites);
-}
-
 void CGraphicsEngine::RenderText(const std::vector<TextInstance*>& aTextList)
 {
 	myRendreManarger->RenderText(aTextList);

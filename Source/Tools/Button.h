@@ -11,39 +11,39 @@ public:
 	Button();
 	~Button();
 	void SetOnPressedFunction(const std::function<void(void)> aOnPressed);
-	void TriggerOnPressed();
-	void SetActive();
-	void SetPressed();
-	void SetToNormal();
-	void ActuallyEnable();
-	void ActuallyDisable();
 	SpriteInstance* GetCurrentSprite();
-	SpriteInstance* GetTopBorderSprite();
-	SpriteInstance* GetLowerBorderSprite();
 
-	bool CheckHover(const V2f& aPosition);
-	bool Init(const std::string& aNormalPath, const std::string& aHoveredPath, const std::string& aPressedPath, const std::string& aDisabledPath, const CommonUtilities::Vector2<float>& aPosition,
-		const V2f& aHitBoxSize = V2f(1.f, 1.f), SpriteFactory* aSpriteFactory = ourSpriteFactoryPtr);
 	bool Init(const std::string& aFolderPath, const std::string& aButtonName, const CommonUtilities::Vector2<float>& aPosition,
-		const V2f& aHitBoxSize = V2f(1.f, 1.f), SpriteFactory* aSpriteFactory = ourSpriteFactoryPtr);
-	bool IsActive();
+		const V2f& aHitBoxSize, SpriteFactory* aSpriteFactory);
+
+	bool IsHovered();
 	bool IsPressed();
+
+	void Disable();
+	void Enable();
+
 	void RecieveMessage(const Message& aMessage) override;
 
-	static void SetSpriteFactory(SpriteFactory* aSpriteFactory);
-	void RemoveAllSprites();
-	//sorry...
-
-	static SpriteFactory* GetSpriteFactory();
 private:
+
+	bool CheckHover(const V2f& aPosition);
+
+	void TriggerOnPressed();
+
+	void SetHovered();
+	void SetPressed();
+	void SetToNormal();
+
 	void SetupBounds();
 	enum ButtonState
 	{
 		Normal,
 		Hover,
-		Pressed,
-		Disabled
+		Pressed
 	};
+
+	bool myIsEnabled;
+
 	std::function<void(void)> myOnPressed;
 	ButtonState myState;
 	std::array<SpriteInstance*, 4> mySprites;
@@ -52,9 +52,5 @@ private:
 	CommonUtilities::Vector2<float> myPosition;
 	CommonUtilities::Vector2<float> myScreenSize;
 	CommonUtilities::Vector2<float> mySize;
-
-	static SpriteFactory* ourSpriteFactoryPtr;
-	bool myIsListening;
-	bool myIsListeningToClick = false;
 };
 

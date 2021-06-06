@@ -135,6 +135,11 @@ void StateStack::HandleMessages()
 		{
 			if (myMessageQueue.front().myState != nullptr)
 			{
+
+				if (!myStates.empty())
+				{
+					myStates.back()->Deactivate();
+				}
 				myStates.push_back(myMessageQueue.front().myState);
 				myStates.back()->Activate();
 			}

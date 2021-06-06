@@ -35,8 +35,7 @@ public:
 	void EndFrame();
 
 	void Render();
-	void RenderMovie(const std::vector<SpriteInstance*>& aSpriteList);
-	void RenderSprites(const std::vector<SpriteInstance*>& aSpriteList, const bool aShouldRenderExtraSprites = false);
+	void RenderSprites(const std::vector<SpriteInstance*>& aSpriteList);
 	void RenderText(const std::vector<TextInstance*>& aTextList);
 
 	void AddExtraSpriteToRender(SpriteInstance* aSprite);

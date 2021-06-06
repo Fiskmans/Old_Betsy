@@ -34,22 +34,20 @@ private:
 	void MergeNextLevel();
 	bool MergeLevel(const std::string& aFilePath);
 	bool MergeQueuedLevelPartially(float aTimeBudget);
-	AssetHandle myLoadingLevel;
 
 	void UnloadCurrentLevel();
 	void UnloadLevel(std::string aFilepath);
 	void CreateWorld(DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);
-	void NextLevel();
-	void WinGame();
 
-	virtual void Activate()override;
-	virtual void Deactivate()override;
+	virtual void Activate() override;
+	virtual void Deactivate() override;
 
-	virtual void Unload()override;
+	virtual void Unload() override;
 
-	bool myIsGameWon;
+
+	AssetHandle myLoadingLevel;
+
 	bool myHasRenderedAtleastOneFrame;
-	bool myFinnishGameAfterFadeOut;
 
 	InputManager* myInputManager;
 	SpriteFactory* mySpriteFactory;
@@ -68,14 +66,11 @@ private:
 	TimerController myTimerController;
 	GBPhysX* myGBPhysX;
 
-	V3F myLatestCheckpointPos;
-
-	GAMEMETRIC(float, myLockedCameraSpeed, LOCKEDCAMERASPEED, 0.3f);
-
 #if USEIMGUI
 	void SearchForFiles();
 	std::map<std::string, std::vector<std::string>> myFoundFiles;
-#endif // !_RETAIL
+#endif
+
 #if USEFILEWATHCER
 	Tools::FileWatcher myWatcher;
 	Tools::FileWatcher::UniqueID myMetricHandle;

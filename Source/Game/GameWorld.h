@@ -21,20 +21,22 @@ public:
 	GameWorld();
 	~GameWorld();
 
+	virtual void RecieveMessage(const Message& aMessage) override;
+
 	void Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework);
 	void SystemLoad(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader);
 	
-	void Update(CommonUtilities::InputHandler& aInputHandler, float aDeltatime);
+	void Update(CommonUtilities::InputHandler& aInputHandler, float aDeltaTime);
 
 #if USEIMGUI
 	void ImGuiNode();
-#endif // !_RETAIL
-
-	virtual void RecieveMessage(const Message& aMessage) override;
+#endif
 
 private:
 
-	Entity* myPlayer;
+	void FreecamMovement(CommonUtilities::InputHandler& aInputHandler, float aDeltaTime);
+
+	Entity myPlayer;
 
 
 	CommonUtilities::Vector2<float> myWindowSize;

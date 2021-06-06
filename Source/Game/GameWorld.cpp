@@ -126,6 +126,92 @@ void GameWorld::RecieveMessage(const Message& aMessage)
 {
 }
 
+void GameWorld::FreecamMovement(CommonUtilities::InputHandler& aInputHandler, float aDeltaTime)
+{
+	if (aInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key_Alt))
+	{
+		Camera* mainCam = Scene::GetInstance().GetMainCamera();
+
+		static Point lastmp = aInputHandler.GetMousePosition();
+		Point mp = aInputHandler.GetMousePosition();
+		if (aInputHandler.IsMouseDown(CommonUtilities::InputHandler::Mouse::Mouse_Right))
+		{
+			const static float speed = 0.001f;
+
+			float totalDiff = 1 / (1 + (mp.x - lastmp.x) * speed) * 1 / (1 + (mp.y - lastmp.y) * speed);
+			mainCam->SetPosition(mainCam->GetPosition() * totalDiff);
+		}
+		else if (aInputHandler.IsMouseDown(CommonUtilities::InputHandler::Mouse::Mouse_Left))
+		{
+			V3F pos = mainCam->GetPosition();
+			float length = pos.Length();
+			pos += mainCam->GetRight() * length * -static_cast<float>(mp.x - lastmp.x) * 0.001f;
+			pos += mainCam->GetUp() * length * static_cast<float>(mp.y - lastmp.y) * 0.001f;
+			pos = pos.GetNormalized() * length;
+
+			mainCam->SetPosition(pos);
+			mainCam->LookAt(V3F(0, 0, 0));
+		}
+		else
+		{
+			lastmp = aInputHandler.GetMousePosition();
+		}
+		lastmp = mp;
+	}
+	else
+	{
+		CommonUtilities::Vector3<float> movement = { 0.f, 0.f, 0.f };
+		CommonUtilities::Vector3<float> rotation = { 0.f, 0.f, 0.f };
+		if (aInputHandler.IsKeyDown(aInputHandler.Key_W))
+		{
+			movement.z += myFreecamSpeed * aDeltaTime;
+		}
+		if (aInputHandler.IsKeyDown(aInputHandler.Key_S))
+		{
+			movement.z -= myFreecamSpeed * aDeltaTime;
+		}
+
+		if (aInputHandler.IsKeyDown(aInputHandler.Key_D))
+		{
+			movement.x += myFreecamSpeed * aDeltaTime;
+		}
+		if (aInputHandler.IsKeyDown(aInputHandler.Key_A))
+		{
+			movement.x -= myFreecamSpeed * aDeltaTime;
+		}
+
+		if (aInputHandler.IsKeyDown(aInputHandler.Key_Space))
+		{
+			movement.y += myFreecamSpeed * aDeltaTime;
+		}
+		if (aInputHandler.IsKeyDown(aInputHandler.Key_Shift))
+		{
+			movement.y -= myFreecamSpeed * aDeltaTime;
+		}
+
+		if (aInputHandler.IsKeyDown(aInputHandler.Key_Q))
+		{
+			rotation.y -= myFreecamRotationSpeed * aDeltaTime;
+		}
+		if (aInputHandler.IsKeyDown(aInputHandler.Key_E))
+		{
+			rotation.y += myFreecamRotationSpeed * aDeltaTime;
+		}
+		if (aInputHandler.IsKeyDown(aInputHandler.Key_Z))
+		{
+			rotation.x -= myFreecamRotationSpeed * aDeltaTime;
+		}
+		if (aInputHandler.IsKeyDown(aInputHandler.Key_X))
+		{
+			rotation.x += myFreecamRotationSpeed * aDeltaTime;
+		}
+		Camera* mainCam = Scene::GetInstance().GetMainCamera();
+
+		mainCam->Move(movement);
+		mainCam->Rotate(rotation);
+	}
+}
+
 #if USEIMGUI
 void GameWorld::ImGuiNode()
 {
@@ -133,14 +219,14 @@ void GameWorld::ImGuiNode()
 
 #endif // !_RETAIL
 
-void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDeltatime)
+void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDeltaTime)
 {
 	PerlinNoise noise;
 	float now = Tools::GetTotalTime();
 	WindSystem::GetInstance().SetBaseWind(V3F((noise.noise(now * 2, now * PI, 5) - 0.5) * 10000, 0, (noise.noise(now * 2, now * PI, 10) - 0.5) * 10000));
 
 #if USEIMGUI
-	static bool gameIsPaused = false;
+	static bool freeCam = false;
 	static bool showBoundingBoxes = false;
 	static bool pauseAnimations = false;
 	static bool snapCameraOnLoad = true;
@@ -154,112 +240,23 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 	WindowControl::Window("GameWorld", [&]()
 		{
 			ImGui::Checkbox("Show Bounding Boxes", &showBoundingBoxes);
-			ImGui::Checkbox("Pause Game", &gameIsPaused);
+			ImGui::Checkbox("Free Camera", &freeCam);
 		});
 
-	bool isRunningStandard = !gameIsPaused;
-
-	if (isRunningStandard)
+	if (freeCam)
+	{
+		FreecamMovement(aInputHandler, aDeltaTime);
+	}
+	else
 #endif // !USEIMGUI
 	{
 		{
 			EnvironmentLight* env = Scene::GetInstance().GetEnvironmentLight();
 			if (env)
 			{
-				env->myShadowCorePosition = V3F(0, 0, 0);
+				env->myShadowCorePosition = myPlayer.GetPosition();
 			}
 		}
-	}
-#if USEIMGUI
-	else
-	{
-#pragma region Cameracontrols
-		if (aInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key_Alt))
-		{
-			Camera* mainCam = Scene::GetInstance().GetMainCamera();
-
-			static Point lastmp = aInputHandler.GetMousePosition();
-			Point mp = aInputHandler.GetMousePosition();
-			if (aInputHandler.IsMouseDown(CommonUtilities::InputHandler::Mouse::Mouse_Right))
-			{
-				const static float speed = 0.001f;
-
-				float totalDiff = 1 / (1 + (mp.x - lastmp.x) * speed) * 1 / (1 + (mp.y - lastmp.y) * speed);
-				mainCam->SetPosition(mainCam->GetPosition() * totalDiff);
-			}
-			else if (aInputHandler.IsMouseDown(CommonUtilities::InputHandler::Mouse::Mouse_Left))
-			{
-				V3F pos = mainCam->GetPosition();
-				float length = pos.Length();
-				pos += mainCam->GetRight() * length * -static_cast<float>(mp.x - lastmp.x) * 0.001f;
-				pos += mainCam->GetUp() * length * static_cast<float>(mp.y - lastmp.y) * 0.001f;
-				pos = pos.GetNormalized() * length;
-
-				mainCam->SetPosition(pos);
-				mainCam->LookAt(V3F(0, 0, 0));
-			}
-			else
-			{
-				lastmp = aInputHandler.GetMousePosition();
-			}
-			lastmp = mp;
-		}
-#pragma endregion
-	}
-#endif
-
-
-	CommonUtilities::Vector3<float> movement = { 0.f, 0.f, 0.f };
-	CommonUtilities::Vector3<float> rotation = { 0.f, 0.f, 0.f };
-
-	{
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_W))
-		{
-			movement.z += myFreecamSpeed * aDeltatime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_S))
-		{
-			movement.z -= myFreecamSpeed * aDeltatime;
-		}
-
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_D))
-		{
-			movement.x += myFreecamSpeed * aDeltatime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_A))
-		{
-			movement.x -= myFreecamSpeed * aDeltatime;
-		}
-
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_Space))
-		{
-			movement.y += myFreecamSpeed * aDeltatime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_Shift))
-		{
-			movement.y -= myFreecamSpeed * aDeltatime;
-		}
-
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_Q))
-		{
-			rotation.y -= myFreecamRotationSpeed * aDeltatime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_E))
-		{
-			rotation.y += myFreecamRotationSpeed * aDeltatime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_Z))
-		{
-			rotation.x -= myFreecamRotationSpeed * aDeltatime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_X))
-		{
-			rotation.x += myFreecamRotationSpeed * aDeltatime;
-		}
-		Camera* mainCam = Scene::GetInstance().GetMainCamera();
-
-		mainCam->Move(movement);
-		mainCam->Rotate(rotation);
 	}
 }
 

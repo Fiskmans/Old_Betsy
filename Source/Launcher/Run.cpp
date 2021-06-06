@@ -83,8 +83,6 @@ int Run()
 				return -1;
 			}
 
-			Button::SetSpriteFactory(&engine.GetSpriteFactory());
-
 			Game* game = new Game();
 
 			AudioManager audioManager;

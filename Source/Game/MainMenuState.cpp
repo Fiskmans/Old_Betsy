@@ -5,7 +5,7 @@
 #include "SpriteInstance.h"
 #include <Xinput.h>
 #include "AssetManager.h"
-
+#include "GamlaBettan\Scene.h"
 
 MainMenuState::MainMenuState(bool aShouldDeleteOnPop) :
 	BaseState(aShouldDeleteOnPop),
@@ -17,18 +17,20 @@ MainMenuState::MainMenuState(bool aShouldDeleteOnPop) :
 {
 	SetUpdateThroughEnabled(false);
 	SetDrawThroughEnabled(false);
-	myIntroHasPlayed = false;
-	myGameTitleImage = nullptr;
+	myBackground = nullptr;
 	myMousePointer = nullptr;
-	myShouldRemoveVideo = true;
 }
 
 MainMenuState::~MainMenuState()
 {
 	Deactivate();
-
+	for (Button* button : myButtons)
+	{
+		delete button;
+	}
+	myButtons.clear();
 	delete myMousePointer;
-	delete myGameTitleImage;
+	delete myBackground;
 
 	WIPE(*this);
 }
@@ -64,10 +66,7 @@ bool MainMenuState::Init(InputManager* aInputManager, SpriteFactory* aSpritefact
 {
 	myIsMain = true;
 
-	if (!myMousePointer)
-	{
-		myMousePointer = aSpritefactory->CreateSprite("ui/mouse.dds");
-	}
+	myMousePointer = aSpritefactory->CreateSprite("ui/mouse.dds");
 
 	myStateInitData.myFrameWork = aFramework;
 	myStateInitData.myInputManager = aInputManager;
@@ -83,30 +82,29 @@ bool MainMenuState::Init(InputManager* aInputManager, SpriteFactory* aSpritefact
 
 void MainMenuState::Render(CGraphicsEngine* aGraphicsEngine)
 {
-	std::vector<SpriteInstance*> sprites;
-	sprites.push_back(myGameTitleImage);
-
-	sprites.push_back(myPlayButton.GetCurrentSprite());
-	sprites.push_back(myExitButton.GetCurrentSprite());
-	sprites.push_back(myCreditButton.GetCurrentSprite());
-	//sprites.push_back(myOptionsButton.GetCurrentSprite());
-
-	sprites.push_back(myMousePointer);
-
-	aGraphicsEngine->RenderMovie(sprites);
+	aGraphicsEngine->RenderFrame();
 }
 
 void MainMenuState::Activate()
 {
-	myIsActive = true;
-	myShouldRemoveVideo = true;
+	for (Button* button : myButtons)
+	{
+		button->Enable();
+	}
 
-	PostMaster::GetInstance().SendMessages(MessageType::MainMenuStateActivated);
+	Scene::GetInstance().AddToScene(myMousePointer);
+	Scene::GetInstance().AddToScene(myBackground);
 }
 
 void MainMenuState::Deactivate()
 {
-	myIsActive = false;
+	for (Button* button : myButtons)
+	{
+		button->Disable();
+	}
+
+	Scene::GetInstance().RemoveFromScene(myMousePointer);
+	Scene::GetInstance().RemoveFromScene(myBackground);
 }
 
 void MainMenuState::Unload()
@@ -119,24 +117,25 @@ void MainMenuState::InitLayout(SpriteFactory* aSpritefactory)
 
 	std::string imagesPath = root["ImagesPath"].Get<std::string>();
 
-	myGameTitleImage = aSpritefactory->CreateSprite(imagesPath + "\\" + root["GameTitleImage"]["name"].Get<std::string>());
-	myGameTitleImage->SetPosition({ root["GameTitleImage"]["PosX"].Get<float>(),  root["GameTitleImage"]["PosY"].Get<float>() });
-	myGameTitleImage->SetUVMinMaxInTexels(V2f(0, 0), V2f(1920.f, 1080.f));
-	myGameTitleImage->SetSize(V2f(1, 1));
+	myBackground = aSpritefactory->CreateSprite(imagesPath + "\\" + root["GameTitleImage"]["name"].Get<std::string>());
+	myBackground->SetPosition({ root["GameTitleImage"]["PosX"].Get<float>(),  root["GameTitleImage"]["PosY"].Get<float>() });
+	myBackground->SetUVMinMaxInTexels(V2f(0, 0), V2f(1920.f, 1080.f));
+	myBackground->SetDepth(1.f);
+	myBackground->SetSize(V2f(1, 1));
 
+	Button* playButton = new Button();
+	Button* exitButton = new Button();
 
-	myPlayButton.Init(imagesPath, root["StartButton"]["name"].Get<std::string>(), { root["StartButton"]["PosX"].Get<float>(),  root["StartButton"]["PosY"].Get<float>() }, V2f(0.545f, 1.f), aSpritefactory);
-	myExitButton.Init(imagesPath, root["ExitButton"]["name"].Get<std::string>(), { root["ExitButton"]["PosX"].Get<float>(),  root["ExitButton"]["PosY"].Get<float>() }, V2f(0.545f, 1.f), aSpritefactory);
-	myCreditButton.Init(imagesPath, root["CreditsButton"]["name"].Get<std::string>(), { root["CreditsButton"]["PosX"].Get<float>(),  root["CreditsButton"]["PosY"].Get<float>() }, V2f(0.545f, 1.f), aSpritefactory);
-	//myOptionsButton.Init(imagesPath, mainMenuDoc["OptionsButton"]["name"].GetString(), { mainMenuDoc["OptionsButton"]["PosX"].GetFloat(),  mainMenuDoc["OptionsButton"]["PosY"].GetFloat() }, V2f(0.545f, 1.f), aSpritefactory);
-
+	playButton->Init(imagesPath, root["StartButton"]["name"].Get<std::string>(), { root["StartButton"]["PosX"].Get<float>(),  root["StartButton"]["PosY"].Get<float>() }, V2f(0.545f, 1.f), aSpritefactory);
+	exitButton->Init(imagesPath, root["ExitButton"]["name"].Get<std::string>(), { root["ExitButton"]["PosX"].Get<float>(),  root["ExitButton"]["PosY"].Get<float>() }, V2f(0.545f, 1.f), aSpritefactory);
+	
 
 	if (!myGameStateToStart)
 	{
 		myGameStateToStart = CreateGameState(0);
 	}
 
-	myPlayButton.SetOnPressedFunction([this]() -> void
+	playButton->SetOnPressedFunction([this]() -> void
 		{
 			Message message;
 			message.myMessageType = MessageType::PushState;
@@ -153,11 +152,14 @@ void MainMenuState::InitLayout(SpriteFactory* aSpritefactory)
 			PostMaster::GetInstance().SendMessages(message);
 		});
 
-	myExitButton.SetOnPressedFunction([this]() -> void
+	exitButton->SetOnPressedFunction([this]() -> void
 		{
 			bool mainState = true;
 			PostMaster::GetInstance().SendMessages(MessageType::PopState,&mainState);
 		});
+
+	myButtons.push_back(playButton);
+	myButtons.push_back(exitButton);
 }
 
 GameState* MainMenuState::CreateGameState(const int& aStartLevel)

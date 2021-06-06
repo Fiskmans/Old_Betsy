@@ -5,8 +5,6 @@
 #include "GamlaBettan\SpriteFactory.h"
 #include "PostMaster.hpp"
 
-SpriteFactory* Button::ourSpriteFactoryPtr = nullptr;
-
 Button::Button() 
 	: Observer(
 		{
@@ -21,15 +19,18 @@ Button::Button()
 	mySprites[ButtonState::Normal] = nullptr;
 	mySprites[ButtonState::Hover] = nullptr;
 	mySprites[ButtonState::Pressed] = nullptr;
-	mySprites[ButtonState::Disabled] = nullptr;
 	myBounds = { 0,0,0,0 };
 	myPosition = { 0,0 };
 	myScreenSize = { 1600.f, 900.f };
-	myIsListening = false;
+	myIsEnabled = true;
 }
 
 Button::~Button()
 {
+	if (myIsEnabled)
+	{
+		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
+	}
 }
 
 void Button::SetOnPressedFunction(const std::function<void(void)> aOnPressed)
@@ -39,7 +40,7 @@ void Button::SetOnPressedFunction(const std::function<void(void)> aOnPressed)
 
 void Button::TriggerOnPressed()
 {
-	if (myOnPressed != nullptr)
+	if (myOnPressed)
 	{
 		myOnPressed();
 	}
@@ -54,10 +55,8 @@ SpriteInstance* Button::GetCurrentSprite()
 	return nullptr;
 }
 
-void Button::SetActive()
+void Button::SetHovered()
 {
-	
-
 	if (myState != ButtonState::Hover)
 	{
 		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
@@ -90,28 +89,6 @@ void Button::SetToNormal()
 	myState = ButtonState::Normal;
 }
 
-void Button::ActuallyEnable()
-{
-	if (!myIsListeningToClick)
-	{
-		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, ButtonState::Disabled)]);
-		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Normal)]);
-		myIsListeningToClick = true;
-		myState = ButtonState::Normal;
-	}
-}
-
-void Button::ActuallyDisable()
-{
-	if (myIsListeningToClick)
-	{
-		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
-		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Disabled)]);
-		myIsListeningToClick = false;
-		myState = ButtonState::Disabled;
-	}
-}
-
 bool Button::CheckHover(const V2f& aPosition)
 {
 	if (aPosition.x >= myBounds.x && aPosition.x <= myBounds.z)
@@ -124,35 +101,6 @@ bool Button::CheckHover(const V2f& aPosition)
 	return false;
 }
 
-bool Button::Init(const std::string& aNormalPath, const std::string& aHoveredPath, const std::string& aPressedPath, const std::string& aDisabledPath, const CommonUtilities::Vector2<float>& aPosition,
-	const V2f& aHitBoxSize, SpriteFactory* aSpriteFactory)
-{
-	myPosition = aPosition;
-	myState = ButtonState::Normal;
-
-	mySprites[ButtonState::Normal] = aSpriteFactory->CreateSprite(aNormalPath);
-	mySprites[ButtonState::Normal]->SetPivot(V2f(0.5f, 0.5f));
-	mySprites[ButtonState::Normal]->SetPosition(myPosition);
-
-	mySprites[ButtonState::Hover] = aSpriteFactory->CreateSprite(aHoveredPath);
-	mySprites[ButtonState::Hover]->SetPivot(V2f(0.5f, 0.5f));
-	mySprites[ButtonState::Hover]->SetPosition(myPosition);
-
-	mySprites[ButtonState::Pressed] = aSpriteFactory->CreateSprite(aPressedPath);
-	mySprites[ButtonState::Pressed]->SetPivot(V2f(0.5f, 0.5f));
-	mySprites[ButtonState::Pressed]->SetPosition(myPosition);
-
-	mySprites[ButtonState::Disabled] = aSpriteFactory->CreateSprite(aDisabledPath);
-	mySprites[ButtonState::Disabled]->SetPivot(V2f(0.5f, 0.5f));
-	mySprites[ButtonState::Disabled]->SetPosition(myPosition);
-
-	mySize = aHitBoxSize;
-
-	SetupBounds();
-
-	return true;
-}
-
 bool Button::Init(const std::string& aFolderPath, const std::string& aButtonName, const CommonUtilities::Vector2<float>& aPosition,
 	const V2f& aHitBoxSize, SpriteFactory* aSpriteFactory)
 {
@@ -162,14 +110,18 @@ bool Button::Init(const std::string& aFolderPath, const std::string& aButtonName
 	mySprites[ButtonState::Normal] = aSpriteFactory->CreateSprite(path + " button off.dds");
 	mySprites[ButtonState::Normal]->SetPivot(V2f(0.5f, 0.5f));
 	mySprites[ButtonState::Normal]->SetPosition(myPosition);
+	mySprites[ButtonState::Normal]->SetDepth(0.5f);
+	Scene::GetInstance().AddToScene(mySprites[ButtonState::Normal]);
 
 	mySprites[ButtonState::Hover] = aSpriteFactory->CreateSprite(path + " button hover.dds");
 	mySprites[ButtonState::Hover]->SetPivot(V2f(0.5f, 0.5f));
 	mySprites[ButtonState::Hover]->SetPosition(myPosition);
+	mySprites[ButtonState::Hover]->SetDepth(0.5f);
 
 	mySprites[ButtonState::Pressed] = aSpriteFactory->CreateSprite(path + " button on.dds");
 	mySprites[ButtonState::Pressed]->SetPivot(V2f(0.5f, 0.5f));
 	mySprites[ButtonState::Pressed]->SetPosition(myPosition);
+	mySprites[ButtonState::Pressed]->SetDepth(0.5f);
 
 	mySize = aHitBoxSize;
 
@@ -178,7 +130,7 @@ bool Button::Init(const std::string& aFolderPath, const std::string& aButtonName
 	return true;
 }
 
-bool Button::IsActive()
+bool Button::IsHovered()
 {
 	if (myState == ButtonState::Hover)
 	{
@@ -196,25 +148,42 @@ bool Button::IsPressed()
 	return false;
 }
 
+void Button::Disable()
+{
+	if (myIsEnabled)
+	{
+		myIsEnabled = false;
+		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
+	}
+}
+
+void Button::Enable()
+{
+	if(!myIsEnabled);
+	{
+		myIsEnabled = true;
+		Scene::GetInstance().AddToScene(mySprites[CAST(int, myState)]);
+	}
+}
+
 void Button::RecieveMessage(const Message& aMessage)
 {
+	if (!myIsEnabled)
+	{
+		return;
+	}
+
 	if (aMessage.myMessageType == MessageType::InputMouseMoved)
 	{
-		if (IsPressed() == false)
+		if (!IsPressed())
 		{
 			if (CheckHover(*reinterpret_cast<const V2f*>(aMessage.myData)))
 			{
-				if (!IsActive())
-				{
-					SetActive();
-				}
+				SetHovered();
 			}
 			else
 			{
-				if (IsActive())
-				{
-					SetToNormal();
-				}
+				SetToNormal();
 			}
 		}
 
@@ -222,16 +191,16 @@ void Button::RecieveMessage(const Message& aMessage)
 	else if (aMessage.myMessageType == MessageType::InputLeftMouseReleased)
 	{
 		PERFORMANCETAG("MouseReleasedInButton");
-		if (IsPressed() == true)
+		if (IsPressed())
 		{
-			SetActive();
+			SetHovered();
 			TriggerOnPressed();
 		}
 	}
 	else if (aMessage.myMessageType == MessageType::InputLeftMouseHit)
 	{
 		PERFORMANCETAG("MouseHitInButton");
-		if (IsActive() == true)
+		if (IsHovered())
 		{
 			SetPressed();
 		}
@@ -248,25 +217,6 @@ void Button::RecieveMessage(const Message& aMessage)
 
 	}
 }
-
-void Button::SetSpriteFactory(SpriteFactory* aSpriteFactory)
-{
-	ourSpriteFactoryPtr = aSpriteFactory;
-}
-
-void Button::RemoveAllSprites()
-{
-	Scene::GetInstance().RemoveFromScene(mySprites[ButtonState::Hover]);
-	Scene::GetInstance().RemoveFromScene(mySprites[ButtonState::Normal]);
-	Scene::GetInstance().RemoveFromScene(mySprites[ButtonState::Pressed]);
-	Scene::GetInstance().RemoveFromScene(mySprites[ButtonState::Disabled]);
-}
-
-SpriteFactory* Button::GetSpriteFactory()
-{
-	return ourSpriteFactoryPtr;
-}
-
 void Button::SetupBounds()
 {
 	CommonUtilities::Vector2<float> imageSize;

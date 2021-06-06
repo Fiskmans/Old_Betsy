@@ -74,8 +74,6 @@ enum class MessageType
 
 	PlayIntro,
 
-	MainMenuStateActivated,
-
 	//LEVEL
 	StartLoading,
 	UnloadLevel,

@@ -27,7 +27,6 @@ AudioManager::AudioManager():
 			MessageType::RespawnTrader,
 			MessageType::PlayIntro,
 			MessageType::SpawnItem,
-			MessageType::MainMenuStateActivated
 		})
 {
 }
@@ -129,15 +128,6 @@ void AudioManager::RecieveMessage(const Message& aMessage)
 	case MessageType::SpawnItem:
 	{
 		myWwiseFramework->PostEvent(AK::EVENTS::ADD_ITEM, my2DMasterObjectID);
-	}
-	break;
-	case MessageType::MainMenuStateActivated:
-	{
-		myWwiseFramework->PostEvent(AK::EVENTS::INTRO_STOP, my2DMasterObjectID);
-		myWwiseFramework->PostEvent(AK::EVENTS::AMBIENCE_MORNING_STOP, my2DMasterObjectID);
-		myWwiseFramework->PostEvent(AK::EVENTS::AMBIENCE_WIND_STOP, my2DMasterObjectID);
-		myWwiseFramework->PostEvent(AK::EVENTS::MUSIC1_STOP, my2DMasterObjectID);
-		myWwiseFramework->PostEvent(AK::EVENTS::AMBIENCE_NIGHT_STOP, my2DMasterObjectID);
 	}
 	break;
 	}

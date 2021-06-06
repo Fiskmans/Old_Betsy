@@ -19,10 +19,10 @@ public:
 		LightLoader* aLightLoader, DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);
 	virtual void Render(CGraphicsEngine* aGraphicsEngine) override;
 
-	virtual void Activate()override;
-	virtual void Deactivate()override;
+	virtual void Activate() override;
+	virtual void Deactivate() override;
 
-	virtual void Unload()override;
+	virtual void Unload() override;
 
 private:
 
@@ -40,20 +40,10 @@ private:
 		AudioManager* myAudioManager;
 		SpriteRenderer* mySpriteRenderer;
 	} myStateInitData;
-	Button myPlayButton;
-	Button myOptionsButton;
-	Button myExitButton;
-	Button myCreditButton;
 
-	int selectionIndex = 0;
-	int levelSelectionIndex = 0;
+	std::vector<Button*> myButtons;
 
-	SpriteInstance* myGameTitleImage;
+	SpriteInstance* myBackground;
 	SpriteInstance* myMousePointer;
-
-	bool myIsActive = false;
-	bool myShouldRemoveVideo;
-
-	bool myIntroHasPlayed;
 };
 

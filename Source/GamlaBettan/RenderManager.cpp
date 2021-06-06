@@ -339,23 +339,11 @@ void RenderManager::Render()
 
 	RenderSelection(modelsToHighlight, Scene::GetInstance().GetMainCamera());
 
-
 	RenderSprites(sprites);
 	RenderText(Scene::GetInstance().GetText());
 }
 
-void RenderManager::RenderMovie(const std::vector<SpriteInstance*>& aSpriteList)
-{
-	myTextures[static_cast<int>(Textures::BackBuffer)].SetAsActiveTarget();
-
-	myStateManerger.SetBlendState(RenderStateManager::BlendState::AlphaBlend);
-	myStateManerger.SetSamplerState(RenderStateManager::SamplerState::Trilinear);
-	mySpriteRenderer.Render(aSpriteList);
-	myStateManerger.SetBlendState(RenderStateManager::BlendState::Disable);
-
-}
-
-void RenderManager::RenderSprites(const std::vector<SpriteInstance*>& aSpriteList, const bool aShouldRenderExtraSprites)
+void RenderManager::RenderSprites(const std::vector<SpriteInstance*>& aSpriteList)
 {
 	if (aSpriteList.size() == 0)
 	{
@@ -367,11 +355,6 @@ void RenderManager::RenderSprites(const std::vector<SpriteInstance*>& aSpriteLis
 	myStateManerger.SetDepthStencilState(RenderStateManager::DepthStencilState::Default);
 
 	mySpriteRenderer.Render(aSpriteList);
-
-	if (aShouldRenderExtraSprites && myExtraSpritesToRenderThisFrame.size() > 0)
-	{
-		mySpriteRenderer.Render(myExtraSpritesToRenderThisFrame);
-	}
 
 	myStateManerger.SetBlendState(RenderStateManager::BlendState::Disable);
 	myStateManerger.SetRasterizerState(RenderStateManager::RasterizerState::Default);
