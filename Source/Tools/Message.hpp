@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
 
-class Entity;
-
 enum class MessageType
 {
 	None,

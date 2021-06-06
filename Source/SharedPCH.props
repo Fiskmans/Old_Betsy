@@ -2,15 +2,17 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup>
+    <_PropertySheetDisplayName>Precompiled</_PropertySheetDisplayName>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <ProgramDataBaseFileName>$(SolutionDir)pch\vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <AdditionalIncludeDirectories>$(solutiondir)precompiled/;$(solutionDir)Tools/;$(solutionDir)CommonUtilities/CommonUtilities/;$(solutionDir)GamlaBettan/;$(Solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(solutionDir)Game/;$(solutionDir)GBPhysX/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(solutiondir)Workbed\$(ProjectName)\pch.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>$(solutiondir)Workbed\Precompiled\pch.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

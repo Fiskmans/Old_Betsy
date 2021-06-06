@@ -1,11 +1,20 @@
 #pragma once
 
-#include "GamlaBettan\ComponentSystem.h"
+#include "CommonUtilities\Singleton.hpp"
 
-class ComponentManager
+#include "GamlaBettan\Component.h"
+
+class ComponentSystemBase;
+
+class ComponentManager : public CommonUtilities::Singleton<ComponentManager>
 {
 public:
 
 	void RegisterSystem(ComponentSystemBase* aSystem);
+
+	void Update(const Component::FrameData& aFrameData);
+
+private:
+	std::vector<ComponentSystemBase*> mySystems;
 };
 

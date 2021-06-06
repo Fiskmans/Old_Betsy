@@ -24,7 +24,7 @@ public:
 	}
 
 private:
-	struct ID3D11DeviceContext* myContext = nullptr; //TODO: Handle pointer so no leak
+	struct ID3D11DeviceContext* myContext = nullptr;
 	struct ID3D11Texture2D* myTexture = nullptr;
 	struct ID3D11RenderTargetView* myRenderTarget = nullptr;
 	struct ID3D11DepthStencilView* myDepth = nullptr;

@@ -11,8 +11,6 @@
 #endif // !_RETAIL
 
 #include "AudioManager.h"
-
-
 #include <GraphicEngine.h>
 
 
@@ -44,6 +42,7 @@ void LoadOrDefaultImGuiStyle()
 
 int Run()
 {
+
 	{
 #if BOOTUPDIAGNOSTIC
 		long long startTime = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();

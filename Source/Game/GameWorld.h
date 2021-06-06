@@ -1,6 +1,5 @@
 #pragma once
 #include "MetricValue.h"
-#include "CommonUtilities\ObjectPool.hpp"
 
 
 namespace CommonUtilities

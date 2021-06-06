@@ -13,7 +13,6 @@ namespace physx
 class GBPhysX;
 class GBPhysXActor;
 class StaticMeshCooker;
-class Entity;
 
 namespace GBPhysXFilters
 {
@@ -67,8 +66,6 @@ public:
 	void SleepActor();
 
 	void SetGBPhysXPtr(GBPhysX* aGBPhysXPtr);
-	void SetEntity(Entity* aEntity);
-	Entity* GetEntity();
 
 	void SetShapeName(const std::string& aName);
 
@@ -86,7 +83,6 @@ protected:
 	physx::PxRigidActor* myRigidActor = nullptr;
 	bool myActorHasBeenReleased = false;
 private:
-	Entity* myEntity = nullptr;
 	bool myIsKinematic = false;
 	bool myIsHitBox = false;
 };

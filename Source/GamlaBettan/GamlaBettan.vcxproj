@@ -189,8 +189,8 @@
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="ComponentManager.cpp" />
-    <ClCompile Include="ComponentSystem.cpp" />
     <ClCompile Include="DecalFactory.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="LevelLoader.cpp" />
     <ClCompile Include="NavMeshLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -249,10 +249,12 @@
     <ClInclude Include="AssetImportHelpers.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="AudioManager.h" />
+    <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentManager.h" />
     <ClInclude Include="ComponentSystem.h" />
     <ClInclude Include="Decal.h" />
     <ClInclude Include="DecalFactory.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="NavMeshLoader.h" />
     <ClInclude Include="Camera.h" />
@@ -310,9 +312,6 @@
     <ClInclude Include="WindSystem.h" />
     <ClInclude Include="WwiseFramework.h" />
     <ClInclude Include="Wwise_IDs.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="GamlaBettan.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

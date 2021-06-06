@@ -174,4 +174,4 @@ GameState* MainMenuState::CreateGameState(const int& aStartLevel)
 	state->LoadLevel(aStartLevel);
 
 	return state;
-	}
+}

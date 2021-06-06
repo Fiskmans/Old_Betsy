@@ -966,23 +966,6 @@ void GBPhysXActor::SetGBPhysXPtr(GBPhysX* aGBPhysXPtr)
 	myGBPhysX = aGBPhysXPtr;
 }
 
-void GBPhysXActor::SetEntity(Entity* aEntity)
-{
-	myEntity = aEntity;
-}
-
-Entity* GBPhysXActor::GetEntity()
-{
-	if (myEntity)
-	{
-		return myEntity;
-	}
-	else
-	{
-		return nullptr;
-	}
-}
-
 void GBPhysXActor::SetShapeName(const std::string& aName)
 {
 	physx::PxShape* buffer[128];

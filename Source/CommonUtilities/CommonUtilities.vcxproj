@@ -36,8 +36,7 @@
     <ClInclude Include="Matrix3x3.hpp" />
     <ClInclude Include="Matrix4x4.hpp" />
     <ClInclude Include="NonCopyable.hpp" />
-    <ClInclude Include="ObjectPool.hpp" />
-    <ClInclude Include="ObjectPoolComplex.hpp" />
+    <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="Plane.hpp" />
     <ClInclude Include="PlaneVolume.hpp" />
     <ClInclude Include="PrototypeFactory.hpp" />

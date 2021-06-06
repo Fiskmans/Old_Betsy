@@ -1,10 +1,4 @@
 #pragma once
-#include <ShaderCompiler.h>
-
-#if __INTELLISENSE__
-#include <pch.h>
-#endif // __INTELLISENSE__
-
 
 struct Decal
 {

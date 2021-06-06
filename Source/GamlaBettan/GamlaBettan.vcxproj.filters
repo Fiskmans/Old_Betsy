@@ -137,8 +137,6 @@
     </ClCompile>
     <ClCompile Include="DecalFactory.cpp" />
     <ClCompile Include="SpriteFontInclude.cpp" />
-    <ClCompile Include="AssetManager.cpp" />
-    <ClCompile Include="Asset.cpp" />
     <ClCompile Include="AudioManager.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
@@ -170,25 +168,33 @@
       <Filter>Lights</Filter>
     </ClCompile>
     <ClCompile Include="LevelLoader.cpp">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClCompile>
     <ClCompile Include="LightLoader.cpp">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClCompile>
     <ClCompile Include="ModelLoader.cpp">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClCompile>
     <ClCompile Include="TextureLoader.cpp">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClCompile>
     <ClCompile Include="AnimationLoader.cpp">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClCompile>
     <ClCompile Include="NavMeshLoader.cpp">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClCompile>
-    <ClCompile Include="ComponentManager.cpp" />
-    <ClCompile Include="ComponentSystem.cpp" />
+    <ClCompile Include="Asset.cpp">
+      <Filter>Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager.cpp">
+      <Filter>Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="ComponentManager.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -338,8 +344,6 @@
     <ClInclude Include="SpriteFontInclude.h">
       <Filter>Text</Filter>
     </ClInclude>
-    <ClInclude Include="AssetManager.h" />
-    <ClInclude Include="Asset.h" />
     <ClInclude Include="AudioManager.h">
       <Filter>Sound</Filter>
     </ClInclude>
@@ -359,25 +363,39 @@
       <Filter>Lights</Filter>
     </ClInclude>
     <ClInclude Include="LevelLoader.h">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="LightLoader.h">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="ModelLoader.h">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="TextureLoader.h">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="AnimationLoader.h">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="NavMeshLoader.h">
-      <Filter>Loaders</Filter>
+      <Filter>Asset\Loaders</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentManager.h" />
-    <ClInclude Include="ComponentSystem.h" />
+    <ClInclude Include="ComponentSystem.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentManager.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
@@ -419,14 +437,8 @@
     <Filter Include="Models">
       <UniqueIdentifier>{6f918c4d-192b-4e66-97e8-e6181c37e1b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Script">
-      <UniqueIdentifier>{91bac902-4b8d-4a33-934f-5352e7d9f1a2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Path finding">
       <UniqueIdentifier>{21ee1966-1da9-4b2e-939e-9a66d9101c90}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Loaders">
-      <UniqueIdentifier>{8992d15b-50c6-4ae6-8e0e-50ae349df2f6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sound">
       <UniqueIdentifier>{3f666db8-d49c-4334-bf59-8d76f4a28784}</UniqueIdentifier>
@@ -437,8 +449,14 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{97ccdb02-eb23-4d5b-a7f5-897e10f814d1}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="GamlaBettan.rc" />
+    <Filter Include="Components">
+      <UniqueIdentifier>{e5f44a20-10a6-4d52-8e9a-27b16fdbb48b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Asset">
+      <UniqueIdentifier>{ced7b3ae-f37c-4f60-bc34-73c6af6edc06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Asset\Loaders">
+      <UniqueIdentifier>{8992d15b-50c6-4ae6-8e0e-50ae349df2f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

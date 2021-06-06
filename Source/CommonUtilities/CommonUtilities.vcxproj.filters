@@ -81,12 +81,6 @@
     <ClInclude Include="NonCopyable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectPool.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectPoolComplex.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Plane.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -115,6 +109,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StaticArray.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

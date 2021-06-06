@@ -33,6 +33,7 @@
 #include <queue>
 #include <filesystem>
 #include <bitset>
+#include <concepts>
 
 //C
 #include <cassert>
@@ -41,6 +42,7 @@
 //CommonUtilities
 #include "CommonUtilities\Matrix.hpp"
 #include "CommonUtilities\Vector.hpp"
+#include "CommonUtilities\ObjectPool.h"
 
 //TOOLS
 #include "Tools\Logger.h"
@@ -64,6 +66,7 @@
 #include "GamlaBettan\Asset.h"
 #include "GamlaBettan\DebugDrawer.h"
 #include "GamlaBettan\WindowControl.h"
+#include "GamlaBettan\ComponentManager.h"
 
 //Literals
 #include "Precompiled\Literals.h"
