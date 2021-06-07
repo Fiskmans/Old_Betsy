@@ -20,6 +20,7 @@
 - use fixed dt physx stepping in GameState::Update
 - Don't set skybox in forward renderer every frame
 - ParticleInstance ownership
+- ModelLoader get accumulate offset during node traversal and set in modelData
 
 ## Improve
 - Rework asset loading to allow easier asset loading
