@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include "Asset.h"
 
 class HighlightRenderer
@@ -10,7 +9,7 @@ public:
 
 	bool Init(class DirectX11Framework* aFramework);
 
-	void Render(const std::vector<class ModelInstance*>& aModels,class Camera* aCamera, std::unordered_map<ModelInstance*, short>& aBoneMapping);
+	void Render(const std::vector<ModelInstance*>& aModels, Camera* aCamera, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping);
 
 private:
 	long long myCreateTime = 0;

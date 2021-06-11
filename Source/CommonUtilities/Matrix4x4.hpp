@@ -62,7 +62,7 @@ namespace CommonUtilities
 
 		Matrix4x4<T> operator-(void);
 
-		Vector4<T> Row(size_t aIndex) const;
+		Vector4<T>& Row(size_t aIndex);
 		void AssignRow(size_t aIndex,const Vector4<T>& aVector);
 		Vector4<T> Column(size_t aIndex) const;
 		void AssignColumn(size_t aIndex, const Vector4<T>& aVector);
@@ -104,10 +104,10 @@ namespace CommonUtilities
 
 
 	template<class T>
-	inline Vector4<T> Matrix4x4<T>::Row(size_t aIndex) const
+	inline Vector4<T>& Matrix4x4<T>::Row(size_t aIndex)
 	{
 		assert(aIndex < 4 && "accessing row out of range");
-		return Vector4<T>(myData[aIndex][0], myData[aIndex][1], myData[aIndex][2], myData[aIndex][3]);
+		return *reinterpret_cast<Vector4<T>*>(myData[aIndex]);
 	}
 
 	template<class T>

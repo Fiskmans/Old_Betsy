@@ -162,6 +162,9 @@
     <ClInclude Include="perlin_noise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ExecuteOnDestruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileWatcher.cpp">
@@ -242,9 +245,6 @@
     <ClCompile Include="Random.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="FoldNumbers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Fourier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -270,6 +270,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="perlin_noise.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ExecuteOnDestruct.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

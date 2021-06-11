@@ -32,6 +32,33 @@ namespace CommonUtilities
 
 class ModelLoader
 {
+public:
+	ModelLoader(ID3D11Device* aDevice, const std::string& aDefaultPixelShader);
+	~ModelLoader();
+
+	_NODISCARD Asset* LoadModel(const std::string& aFilePath);
+	_NODISCARD Asset* LoadSkybox(const std::string& aFilePath);
+
+
+private:
+
+
+	ID3D11Device* myDevice;
+	bool myWarnAboutTrash = false;
+
+	void PrepareModel(Model* aModel, const std::string& aPath);
+
+	void LoadLoop();
+
+	void LoadModel_Internal(Model* aModel,const std::string& aFilePath);
+
+	void LoadNode(const aiScene* aScene, const aiNode* aNode, aiMatrix4x4 aTransform, Model* aModel, std::unordered_map<std::string, std::string>& aInOutAttributes, const std::string& aFilePath);
+	void LoadMesh(const aiScene* aScene, const aiNode* aNode, aiMatrix4x4 aTransform, const aiMesh* aMesh, Model* aModel, std::unordered_map<std::string, std::string>& aInOutAttributes, const std::string& aFilePath);
+	void LoadAttributes(const aiNode* aNode, const aiMaterial* aMaterial, std::unordered_map<std::string, std::string>& aInOutAttributes, std::unordered_map<std::string,V3F>& aInOutColors);
+
+	void QueueLoad(Model* aModel, std::string aFilePath);
+
+
 	static const size_t myHandoverSlots = 40;
 	struct LoadPackage
 	{
@@ -50,24 +77,8 @@ class ModelLoader
 
 	} myHandovers[myHandoverSlots];
 
-public:
-	ModelLoader(ID3D11Device* aDevice);
-	~ModelLoader();
 
-	_NODISCARD Asset* LoadModel(const std::string& aFilePath);
-	_NODISCARD Asset* LoadSkybox(const std::string& aFilePath);
-
-
-private:
-	ID3D11Device* myDevice;
-	bool myWarnAboutTrash = false;
-
-	void PrepareModel(Model* aModel, const std::string& aPath);
-
-	void LoadLoop();
-
-	void QueueLoad(Model* aModel, std::string aFilePath);
-
+	std::string myDefaultPixelShader;
 	bool myIsRunning = true;
 
 	std::thread myWorkHorse;

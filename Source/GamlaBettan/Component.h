@@ -1,10 +1,11 @@
 #pragma once
-
-class Entity;
+#include "GamlaBettan\EntityID.h"
 
 class Component
 {
 public:
+	struct UseDefaults {};
+
 	struct FrameData
 	{
 		float myDeltaTime;
@@ -13,6 +14,11 @@ public:
 
 	virtual ~Component() = default;
 
-	virtual void Update(const FrameData& aFrameData, Entity* aEntity) = 0;
+	virtual void Update(const FrameData& aFrameData, EntityID aEntityID) = 0;
+
+#if USEIMGUI
+	virtual void ImGui(EntityID aEntityID) = 0;
+#endif
+
 };
 

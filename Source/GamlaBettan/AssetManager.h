@@ -14,6 +14,8 @@ public:
 
 	void Init(ID3D11Device* aDevice, const std::string& aBaseFolder, const std::string& aBakeFolder);
 
+	void Preload();
+
 	void FlushChanges();
 
 	AssetHandle GetTexture(const std::string& aPath);
@@ -47,6 +49,7 @@ public:
 
 private:
 
+
 	AssetHandle GetTextureInternal(const std::string& aPath, bool aFailSilenty);
 	AssetHandle GetJSONInternal(const std::string& aPath);
 	AssetHandle GetAnimationInternal(const std::string& aPath);
@@ -72,9 +75,9 @@ private:
 	std::unordered_map<std::string, Asset*> myCachedNavMeshes;
 	std::unordered_map<std::string, Asset*> myCachedAnimations;
 
-	std::unordered_map<std::string, std::unordered_map<ShaderFlags,Asset*>> myCachedPixelShaders;
-	std::unordered_map<std::string, std::unordered_map<ShaderFlags,Asset*>> myCachedVertexShaders;
-	std::unordered_map<std::string, std::unordered_map<ShaderFlags,Asset*>> myCachedGeometryShaders;
+	std::unordered_map<std::string, std::unordered_map<ShaderFlags, Asset*>> myCachedPixelShaders;
+	std::unordered_map<std::string, std::unordered_map<ShaderFlags, Asset*>> myCachedVertexShaders;
+	std::unordered_map<std::string, std::unordered_map<ShaderFlags, Asset*>> myCachedGeometryShaders;
 
 	std::vector<Asset*> myCustomAssets;
 };

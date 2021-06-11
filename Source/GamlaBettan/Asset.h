@@ -45,7 +45,7 @@ public:
 private:
 	friend class AssetManager;
 	std::string myFileName;
-	Tools::FileWatcher::UniqueID myFileHandle;
+	Tools::FileWatcherUniqueID myFileHandle;
 };
 
 

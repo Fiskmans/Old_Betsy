@@ -1,42 +1,42 @@
 
+#if HAS_BONES && (BONESPERVERTEX == 0)
+#error "Invalid flags, has no bones"
+#endif
+
+#if HAS_UV_SETS && (UV_SETS_COUNT == 0)
+#error "Invalid flags, has no uv sets"
+#endif
 
 struct VertexInput
 {
-	float4 myPosition		:	POSITION;
-	float4 myNormal			:	NORMAL;
-	float4 myTangent		:	TANGENT;
-	float4 myBiTangent		:	BITANGENT;
+	float4 myPosition					:	POSITION;
+	float4 myNormal						:	NORMAL;
+	float4 myTangent					:	TANGENT;
+	float4 myBiTangent					:	BITANGENT;
 #ifdef VERTEXCOLOR
-	float4 myColor			:	COLOR;
+	float4 myColor						:	COLOR;
 #endif
-	float2 myUV				:	UV0;
-#ifdef MULTIPLE_UV
-	float2 myUV1			:	UV1;
-	float2 myUV2			:	UV2;
+#if HAS_UV_SETS
+	float2 myUV[UV_SETS_COUNT]			:	UV;
 #endif
 #ifdef HAS_BONES
-	uint myBones[BONESPERVERTEX]			:	BONES;
+	uint myBones[BONESPERVERTEX]		:	BONES;
 	float myBoneWeights[BONESPERVERTEX]	:	BONEWEIGHTS;
-#if BONESPERVERTEX == 0
-#error "uhmm model has no bones"
-#endif // BONESPERVERTEX == 0
 #endif
 };
 
 struct VertexToPixel
 {
-	float4 myPosition	:	SV_POSITION;
-	float4 myWorldPos	:	POSITION;
-	float4 myNormal		:	NORMAL;
-	float4 myTangent	:	TANGENT;
-	float4 myBiTangent	:	BITANGENT;
-	float2 myUV			:	UV0;
-#ifdef VERTEXCOLOR
-	float4 myColor		:	COLOR;
+	float4 myPosition					:	SV_POSITION;
+	float4 myWorldPos					:	POSITION;
+	float4 myNormal						:	NORMAL;
+	float4 myTangent					:	TANGENT;
+	float4 myBiTangent					:	BITANGENT;
+#if HAS_UV_SETS
+	float2 myUV[UV_SETS_COUNT]			:	UV;
 #endif
-#ifdef MULTIPLE_UV
-	float2 myUV1		:	UV1;
-	float2 myUV2		:	UV2;
+#ifdef VERTEXCOLOR
+	float4 myColor						:	COLOR;
 #endif
 };
 
@@ -76,12 +76,9 @@ cbuffer objectData : register(b1)
 	uint myBoneOffsetIndex;
 	uint numOfUsedPointLights;
 	float objectLifeTime;
-	float objectExpectedLifeTime;
-    float TimeSinceLastInteraction; // -1.0 if never
-    int AlarmEventStatus; // 0 if of 1 if on
 	uint objectSeed;
-
-    float trash;
+    float3 diffuseColor;
+	float trash;
 };
 
 cbuffer BoneBuffer : register(b2)

@@ -11,13 +11,9 @@
 #include "Camera.h"
 #endif // !_RETAIL
 
-int ModelInstance::myGlobalEventStatus = 0;
 
 ModelInstance::ModelInstance(const AssetHandle& aModel) : myGaphicBoundsModifier(1.f)
 {
-	static unsigned int ids;
-	myFriendlyName = "[" + std::to_string(ids++) + "] ";
-
 	if (aModel.GetType() != Asset::AssetType::Model && aModel.GetType() != Asset::AssetType::SkyBox)
 	{
 		SYSCRASH("Asset was not a model");
@@ -26,11 +22,8 @@ ModelInstance::ModelInstance(const AssetHandle& aModel) : myGaphicBoundsModifier
 	myScale = { 1.0f,1.0f,1.0f };
 	myAnimator = nullptr;
 	myTint = V4F(0.0f, 0.0f, 0.0f, 1.0f);
-	myShouldBeDrawnThroughWalls = false;
-	myUsePlayerThroughWallShader = false;
 	myShouldRender = true;
 	SetCastsShadows(true);
-	myExpectedLifeTime = 0.0f;
 	ResetSpawnTime();
 }
 
@@ -138,16 +131,6 @@ void ModelInstance::SetTransform(const M44f& aTransform)
 	myTransform = aTransform;
 }
 
-void ModelInstance::SetShouldBeDrawnThroughWalls(const bool aFlag)
-{
-	myShouldBeDrawnThroughWalls = aFlag;
-}
-
-void ModelInstance::SetUsePlayerThroughWallShader(const bool aFlag)
-{
-	myUsePlayerThroughWallShader = aFlag;
-}
-
 void ModelInstance::SetShouldRender(const bool aFlag)
 {
 	myShouldRender = aFlag;
@@ -165,7 +148,7 @@ void ModelInstance::SetGBPhysXCharacter(GBPhysXCharacter* aGBPhysXCharacter)
 
 bool ModelInstance::HasAnimations()
 {
-	return !!(myModel.GetAsModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones);
+	return !!(myModel.GetAsModel()->GetModelData()[0]->myshaderTypeFlags & ShaderFlags::HasBones);
 }
 
 void ModelInstance::SetTint(V4F aTint)
@@ -178,34 +161,19 @@ V4F ModelInstance::GetTint()
 	return myTint;
 }
 
-bool ModelInstance::ShouldBeDrawnThroughWalls() const
-{
-	return myShouldBeDrawnThroughWalls;
-}
-
-bool ModelInstance::IsUsingPlayerThroughWallShader() const
-{
-	return myUsePlayerThroughWallShader;
-}
-
 bool ModelInstance::ShouldRender() const
 {
 	return myShouldRender;
 }
 
-const CommonUtilities::Vector4<float>& ModelInstance::GetV4FPosition() const
+const V4F& ModelInstance::GetV4FPosition()
 {
 	return myTransform.Row(3);
 }
 
-CommonUtilities::Vector3<float> ModelInstance::GetPosition() const
+V3F ModelInstance::GetPosition()
 {
-	return CommonUtilities::Vector3<float>(myTransform.Row(3));
-}
-
-const std::string ModelInstance::GetFriendlyName()
-{
-	return myFriendlyName + myModel.GetAsModel()->GetFriendlyName();
+	return V3F(myTransform.Row(3));
 }
 
 void ModelInstance::SetupanimationMatrixes(std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES>& aMatrixes)
@@ -219,7 +187,7 @@ void ModelInstance::SetupanimationMatrixes(std::array<CommonUtilities::Matrix4x4
 		static bool onetimeWarning = true;
 		if (onetimeWarning)
 		{
-			SYSWARNING("Model instance with bones tried to animate without an attached controller", myModel.GetAsModel()->GetModelData()->myFilePath);
+			SYSWARNING("Model instance with bones tried to animate without an attached controller", myModel.GetAsModel()->myFilePath);
 			onetimeWarning = false;
 		}
 	}
@@ -321,26 +289,6 @@ const float ModelInstance::GetSpawnTime()
 	return mySpawnTime;
 }
 
-void ModelInstance::SetExpectedLifeTime(float aLifeTime)
-{
-	myExpectedLifeTime = aLifeTime;
-}
-
-const float ModelInstance::GetExpectedLifeTime()
-{
-	return myExpectedLifeTime;
-}
-
-void ModelInstance::SetCustomPixelData(float aData[MODELSAMOUNTOFCUSTOMDATA])
-{
-	memcpy(myCustomData + MODELSAMOUNTOFCUSTOMDATA, aData, MODELSAMOUNTOFCUSTOMDATA);
-}
-
-void ModelInstance::SetCustomVertexData(float aData[MODELSAMOUNTOFCUSTOMDATA])
-{
-	memcpy(myCustomData, aData, MODELSAMOUNTOFCUSTOMDATA);
-}
-
 void ModelInstance::SetIsHighlighted(bool aState)
 {
 	myIsHighlighted = aState;
@@ -352,32 +300,9 @@ bool ModelInstance::GetIsHighlighted()
 }
 
 
-void ModelInstance::Interact()
-{
-	myLastInteraction = Tools::GetTotalTime();
-}
-
-float ModelInstance::GetLastInteraction()
-{
-	return myLastInteraction;
-}
-
 void ModelInstance::AttachToBone(ModelInstance* aParentModel, size_t aBone)
 {
 	myIsAttachedToBone = true;
 	myAttachedToModel = aParentModel;
 	myBoneIndex = aBone;
-}
-void ModelInstance::SetGlobalEventStart()
-{
-	myGlobalEventStatus = 1;
-}
-void ModelInstance::SetGlobalEventEnd()
-{
-	myGlobalEventStatus = 0;
-}
-
-int ModelInstance::GetEventStatus()
-{
-	return myGlobalEventStatus;
 }

@@ -54,6 +54,7 @@
 #include "Tools\PostMaster.hpp"
 #include "Tools\Observer.hpp"
 #include "Tools\Random.h"
+#include "Tools\ExecuteOnDestruct.h"
 
 #if USEFILEWATHCER
 #include "Tools\FileWatcher.h"

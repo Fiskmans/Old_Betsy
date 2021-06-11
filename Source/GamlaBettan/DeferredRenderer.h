@@ -21,12 +21,14 @@ public:
 
 	bool Init(DirectX11Framework* aFramework,AssetHandle aPerlinHandle, DepthRenderer* aShadowRenderer);
 
-	std::vector<ModelInstance*> GenerateGBuffer(Camera* aCamera, std::vector<ModelInstance*>& aModelList, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer,GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer,FullscreenTexture* aDepth,BoneTextureCPUBuffer& aBoneTextureBuffer);
+	std::vector<ModelInstance*> GenerateGBuffer(Camera* aCamera, std::vector<ModelInstance*>& aModelList, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer,GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer,FullscreenTexture* aDepth,BoneTextureCPUBuffer& aBoneTextureBuffer);
 
-	void Render(FullscreenRenderer& aFullscreenRenderer, std::vector<PointLight*>& aPointLightList, std::vector<SpotLight*>& aSpotLightList, RenderStateManager* aRenderStateManager, std::unordered_map<ModelInstance*, short>& aBoneMapping);
+	void Render(FullscreenRenderer& aFullscreenRenderer, std::vector<PointLight*>& aPointLightList, std::vector<SpotLight*>& aSpotLightList, RenderStateManager* aRenderStateManager, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping);
 
 	void MapEnvLightBuffer();
 private:
+	bool OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize);
+
 	AssetHandle& GetPixelShader(size_t flags);
 
 	DepthRenderer* myShadowRenderer = nullptr;

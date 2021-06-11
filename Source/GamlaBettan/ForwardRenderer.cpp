@@ -30,7 +30,7 @@ ForwardRenderer::~ForwardRenderer()
 	SAFE_RELEASE(myObjectBuffer);
 }
 
-bool ForwardRenderer::Init(DirectX11Framework* aFramework, const std::string& aThroughWallPSName, const std::string& aEnemyThroughWallPSName, AssetHandle aPerlinHandle, DepthRenderer* aDepthRenderer)
+bool ForwardRenderer::Init(DirectX11Framework* aFramework, AssetHandle aPerlinHandle, DepthRenderer* aDepthRenderer)
 {
 	if (!aFramework)
 	{
@@ -78,9 +78,6 @@ bool ForwardRenderer::Init(DirectX11Framework* aFramework, const std::string& aT
 		return false;
 	}
 
-	myThroughWallShader = AssetManager::GetInstance().GetPixelShader(aThroughWallPSName);
-	myEnemyThroughWallShader = AssetManager::GetInstance().GetPixelShader(aEnemyThroughWallPSName);
-
 	myPerlinHandle = aPerlinHandle;
 	myDepthRender = aDepthRenderer;
 
@@ -127,9 +124,6 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 		modelsAndLightsList.insert(modelsAndLightsList.begin(), ModelAndLights(myskybox, { nullptr }));
 	}
 
-	std::vector<ModelAndLights*> modelsToDrawAgain;
-	modelsToDrawAgain.reserve(100);
-
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE bufferData;
 
@@ -139,10 +133,12 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 
 	WIPE(fData);
 
-	fData.myWorldToCamera = CommonUtilities::Matrix4x4<float>::Transpose(CommonUtilities::Matrix4x4<float>::GetFastInverse(aCamera->GetTransform()));
+	fData.myWorldToCamera = M44f::Transpose(M44f::GetFastInverse(aCamera->GetTransform()));
 	fData.myCameraPosition = aCamera->GetPosition();
 	fData.myCameraDirection = aCamera->GetForward();
 	fData.myTotalTime = RenderManager::GetTotalTime();
+	fData.myCameraToProjection = M44f::Transpose(aCamera->GetProjection());
+
 	EnvironmentLight* envoLight = Scene::GetInstance().GetEnvironmentLight();
 
 	if (envoLight)
@@ -195,79 +191,27 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 		ONETIMEWARNING("Rendering without a skybox set","");
 	}
 
-	Model* model = nullptr;
-	for (size_t i = 0; i < modelsAndLightsList.size(); i++)
+	for (ModelAndLights& modelAndLight : modelsAndLightsList)
 	{
-		model = modelsAndLightsList[i].first->GetModelAsset().GetAsModel();
+		Model* model = modelAndLight.first->GetModelAsset().GetAsModel();
 		if (!model->ShouldRender())
 		{
 			continue;
 		}
 
-		if (modelsAndLightsList[i].first->ShouldBeDrawnThroughWalls())
-		{
-			modelsToDrawAgain.push_back(&modelsAndLightsList[i]);
-			continue;
-		}
-
-
 		result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
 		if (FAILED(result))
 		{
 			SYSERROR("Could not map frame buffer");
 			return;
 		}
-		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
 		memcpy(bufferData.pData, &fData, sizeof(fData));
 		myContext->Unmap(myFrameBuffer, 0);
 
-		myContext->PSSetShader(model->GetModelData()->myPixelShader.GetAsPixelShader(), nullptr, 0);
-		RenderModel(modelsAndLightsList[i].first, modelsAndLightsList[i].second, aBoneMapping, bufferData, aCamera, aBoneBuffer);
+		RenderModel(modelAndLight.first, modelAndLight.second, aBoneMapping, bufferData, aCamera, aBoneBuffer);
 	}
 
 	aStateManager.SetDepthStencilState(RenderStateManager::DepthStencilState::OnlyCovered);
-	myContext->PSSetShader(myEnemyThroughWallShader.GetAsPixelShader(), nullptr, 0);
-	for (size_t i = 0; i < modelsToDrawAgain.size(); i++)
-	{
-		if (modelsToDrawAgain[i]->first->IsUsingPlayerThroughWallShader())
-		{
-			myContext->PSSetShader(myThroughWallShader.GetAsPixelShader(), nullptr, 0);
-			RenderModel(modelsToDrawAgain[i]->first, modelsToDrawAgain[i]->second, aBoneMapping, bufferData, aCamera, aBoneBuffer);
-			myContext->PSSetShader(myEnemyThroughWallShader.GetAsPixelShader(), nullptr, 0);
-			continue;
-		}
-
-
-		result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
-		if (FAILED(result))
-		{
-			SYSERROR("Could not map frame buffer");
-			return;
-		}
-		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
-		memcpy(bufferData.pData, &fData, sizeof(fData));
-		myContext->Unmap(myFrameBuffer, 0);
-		RenderModel(modelsToDrawAgain[i]->first, modelsToDrawAgain[i]->second, aBoneMapping, bufferData, aCamera, aBoneBuffer);
-	}
-	aStateManager.SetDepthStencilState(RenderStateManager::DepthStencilState::Default);
-
-	for (size_t i = 0; i < modelsToDrawAgain.size(); i++)
-	{
-		model = modelsToDrawAgain[i]->first->GetModelAsset().GetAsModel();
-		myContext->PSSetShader(model->GetModelData()->myPixelShader.GetAsPixelShader(), nullptr, 0);
-
-
-		result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
-		if (FAILED(result))
-		{
-			SYSERROR("Could not map frame buffer");
-			return;
-		}
-		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
-		memcpy(bufferData.pData, &fData, sizeof(fData));
-		myContext->Unmap(myFrameBuffer, 0);
-		RenderModel(modelsToDrawAgain[i]->first, modelsToDrawAgain[i]->second, aBoneMapping, bufferData, aCamera, aBoneBuffer);
-	}
 }
 
 void ForwardRenderer::SetSkyboxTexture(AssetHandle aTexture)
@@ -277,103 +221,92 @@ void ForwardRenderer::SetSkyboxTexture(AssetHandle aTexture)
 
 void ForwardRenderer::SetSkybox(ModelInstance* aSkyBox)
 {
-	SetSkyboxTexture(aSkyBox->GetModelAsset().GetAsSkybox()->GetModelData()->myTextures[0]);
+	SetSkyboxTexture(aSkyBox->GetModelAsset().GetAsSkybox()->GetModelData()[0]->myTextures[0]);
 	myskybox = aSkyBox;
 }
 
-inline void ForwardRenderer::RenderModel(ModelInstance* aModelInstance, std::array<PointLight*, NUMBEROFPOINTLIGHTS>* aLightList, std::unordered_map<ModelInstance*, short>& aBoneMapping, D3D11_MAPPED_SUBRESOURCE& aBuffer, const Camera* aCamera, BoneTextureCPUBuffer& aBoneBuffer)
+inline void ForwardRenderer::RenderModel(
+	ModelInstance* aModelInstance, std::array<PointLight*, NUMBEROFPOINTLIGHTS>* aLightList, std::unordered_map<ModelInstance*, short>& aBoneMapping, 
+	D3D11_MAPPED_SUBRESOURCE& aBuffer, const Camera* aCamera, BoneTextureCPUBuffer& aBoneBuffer)
 {
-	static Model::ModelData* modelData = nullptr;
-	static Model* model = nullptr;
-	static ObjectBufferData oData;
 	static HRESULT result;
 	float now = Tools::GetTotalTime();
 
-	model = aModelInstance->GetModelAsset().GetAsModel();
+	Model* model = aModelInstance->GetModelAsset().GetAsModel();
 
-	modelData = model->GetModelData();
+	for (Model::ModelData* modelData : model->GetModelData())
+	{
 
-	oData.myModelToWorldSpace = CommonUtilities::Matrix4x4<float>::Transpose(aModelInstance->GetModelToWorldTransformWithPotentialBoneAttachement(aBoneBuffer,aBoneMapping));
-	oData.myTint = aModelInstance->GetTint();
-	oData.myIsEventActive = ModelInstance::GetEventStatus();
-	float lastinteract = aModelInstance->GetLastInteraction();
-	if (CLOSEENUF(lastinteract,-1.f))
-	{
-		oData.myTimeSinceLastInteraction = -1.f;
-	}
-	else
-	{
-		oData.myTimeSinceLastInteraction = now - lastinteract;
-	}
+		ObjectBufferData oData;
+		WIPE(oData);
+		oData.myModelToWorldSpace =
+			M44f::Transpose(aModelInstance->GetModelToWorldTransformWithPotentialBoneAttachement(aBoneBuffer, aBoneMapping))
+			* modelData->myOffset;
+		oData.myTint = aModelInstance->GetTint();
+		oData.myDiffuseColor = modelData->myDiffuseColor;
 
-	if (modelData->myshaderTypeFlags & ShaderFlags::HasBones)
-	{
-		oData.myBoneOffsetIndex = aBoneMapping[aModelInstance];
-	}
-
-	if (aLightList)
-	{
-		for (size_t i = 0; i < NUMBEROFPOINTLIGHTS; i++)
+		if (modelData->myshaderTypeFlags & ShaderFlags::HasBones)
 		{
-			if ((*aLightList)[i])
+			oData.myBoneOffsetIndex = aBoneMapping[aModelInstance];
+		}
+
+		if (aLightList)
+		{
+			for (size_t i = 0; i < NUMBEROFPOINTLIGHTS; i++)
 			{
-				oData.myPointLights[i].position = (*aLightList)[i]->position;
-				oData.myPointLights[i].intensity = (*aLightList)[i]->intensity;
-				oData.myPointLights[i].color = (*aLightList)[i]->color;
-				oData.myPointLights[i].range = (*aLightList)[i]->range;
-			}
-			else
-			{
-				oData.myNumOfUsedPointLights = static_cast<unsigned int>(i);
-				break;
+				if ((*aLightList)[i])
+				{
+					oData.myPointLights[i].position = (*aLightList)[i]->position;
+					oData.myPointLights[i].intensity = (*aLightList)[i]->intensity;
+					oData.myPointLights[i].color = (*aLightList)[i]->color;
+					oData.myPointLights[i].range = (*aLightList)[i]->range;
+				}
+				else
+				{
+					oData.myNumOfUsedPointLights = static_cast<unsigned int>(i);
+					break;
+				}
 			}
 		}
-	}
 
-	oData.myObjectId = Math::FoldPointer(aModelInstance);
-	oData.myObjectLifeTime = Tools::GetTotalTime() - aModelInstance->GetSpawnTime();
-	oData.myObjectExpectedLifeTime = aModelInstance->GetExpectedLifeTime();
+		oData.myObjectId = Math::BinaryFold(aModelInstance);
+		oData.myObjectLifeTime = Tools::GetTotalTime() - aModelInstance->GetSpawnTime();
 
-	WIPE(aBuffer);
-	result = myContext->Map(myObjectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &aBuffer);
+		WIPE(aBuffer);
+		result = myContext->Map(myObjectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &aBuffer);
 
-	if (FAILED(result))
-	{
-		SYSERROR("Could not map object buffer");
-		return;
-	}
+		if (FAILED(result))
+		{
+			SYSERROR("Could not map object buffer");
+			return;
+		}
 
-	memcpy(aBuffer.pData, &oData, sizeof(oData));
-	myContext->Unmap(myObjectBuffer, 0);
+		memcpy(aBuffer.pData, &oData, sizeof(oData));
+		myContext->Unmap(myObjectBuffer, 0);
 
-	myContext->IASetPrimitiveTopology(modelData->myPrimitiveTopology);
-	myContext->IASetInputLayout(modelData->myInputLayout);
+		myContext->IASetPrimitiveTopology(modelData->myPrimitiveTopology);
+		myContext->IASetInputLayout(modelData->myInputLayout);
 
 
-	myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
-	myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
+		myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
+		myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
+		myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
+		myContext->PSSetShader(modelData->myPixelShader.GetAsPixelShader(), nullptr, 0);
 
-	myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
 
-	ID3D11ShaderResourceView* resources[3] =
-	{
-		nullptr,
-		nullptr,
-		nullptr
-	};
-	if(modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].GetAsTexture(); }
-	if(modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].GetAsTexture(); }
-	if(modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].GetAsTexture(); }
+		ID3D11ShaderResourceView* resources[3] = { nullptr };
 
-	myContext->PSSetShaderResources(0, 3, resources);
-	myContext->VSSetShaderResources(0, 3, resources);
+		if (modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].GetAsTexture(); }
+		if (modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].GetAsTexture(); }
+		if (modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].GetAsTexture(); }
 
-	Model::LodLevel* lodlevel = model->GetOptimalLodLevel(aModelInstance->GetPosition().DistanceSqr(aCamera->GetPosition()));
-	if (lodlevel)
-	{
-		myContext->IASetVertexBuffers(0, lodlevel->myVertexBufferCount, lodlevel->myVertexBuffer, &modelData->myStride, &modelData->myOffset);
-		myContext->IASetIndexBuffer(lodlevel->myIndexBuffer, modelData->myIndexBufferFormat, 0);
-		myContext->DrawIndexed(lodlevel->myNumberOfIndexes, 0, 0);
+		myContext->PSSetShaderResources(0, 3, resources);
+		myContext->VSSetShaderResources(0, 3, resources);
 
+		UINT bufferOffset = 0;
+
+		myContext->IASetVertexBuffers(0, 1, &modelData->myVertexBuffer, &modelData->myStride, &bufferOffset);
+		myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
+		myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
 	}
 }

@@ -37,12 +37,17 @@ struct Vertex
 	float u, v;
 };
 
-bool LoadVerticies(aiMesh* fbxMesh, char** aVertexBuffer, size_t* aVertexCount, size_t aFlags, std::unordered_map<std::string, unsigned int>& aBoneIndexMap, std::vector<BoneInfo>& aBoneInfo)
+bool LoadVerticies(const aiMesh* fbxMesh, char** aVertexBuffer, size_t* aVertexCount, size_t aFlags, std::unordered_map<std::string, unsigned int>& aBoneIndexMap, std::vector<BoneInfo>& aBoneInfo)
 {
 	SYSVERBOSE("Loading model with flags: " + ShaderTypes::PostfixFromFlags(aFlags));
-	if (!(fbxMesh->HasPositions() && fbxMesh->HasTextureCoords(0) && fbxMesh->HasNormals() && fbxMesh->HasTangentsAndBitangents()))
+	if (!fbxMesh->HasPositions())
 	{
-		SYSERROR("Model does not have all required data");
+		SYSERROR("Model does not have positions");
+		return false;
+	}
+	if(!fbxMesh->HasNormals())
+	{
+		SYSERROR("Model does not have normals");
 		return false;
 	}
 
@@ -72,7 +77,7 @@ bool LoadVerticies(aiMesh* fbxMesh, char** aVertexBuffer, size_t* aVertexCount, 
 				std::string BoneName(fbxMesh->mBones[i]->mName.C_Str());
 				if (aBoneIndexMap.find(BoneName) == aBoneIndexMap.end())
 				{
-					BoneIndex = CAST(unsigned int, aBoneIndexMap.size());
+					BoneIndex = static_cast<unsigned int>(aBoneIndexMap.size());
 					BoneInfo bi;
 					aBoneInfo.push_back(bi);
 
@@ -106,32 +111,57 @@ bool LoadVerticies(aiMesh* fbxMesh, char** aVertexBuffer, size_t* aVertexCount, 
 
 		for (unsigned int i = offset; i < fbxMesh->mNumVertices; i += NUMTHREADS)
 		{
-			memcpy(&(buffer[(offsets.size * i + offsets.position)]), &(fbxMesh->mVertices[i]), sizeof(float) * 3);
-			memcpy(&(buffer[(offsets.size * i + offsets.position + 3 * sizeof(float))]), &one, sizeof(float) * 1);
+			memcpy(buffer + (offsets.size * i + offsets.position), &(fbxMesh->mVertices[i]), sizeof(float) * 3);
+			memcpy(buffer + (offsets.size * i + offsets.position + 3 * sizeof(float)), &one, sizeof(float) * 1);
 
-			memcpy(&(buffer[(offsets.size * i + offsets.normal)]), &fbxMesh->mNormals[i], sizeof(float) * 3);
-			memcpy(&(buffer[(offsets.size * i + offsets.normal + 3 * sizeof(float))]), &zero, sizeof(float) * 1);
-
-			memcpy(&(buffer[(offsets.size * i + offsets.tangent)]), &fbxMesh->mTangents[i], sizeof(float) * 3);
-			memcpy(&(buffer[(offsets.size * i + offsets.tangent + 3 * sizeof(float))]), &zero, sizeof(float) * 1);
-			memcpy(&(buffer[(offsets.size * i + offsets.bitanget)]), &fbxMesh->mBitangents[i], sizeof(float) * 3);
-			memcpy(&(buffer[(offsets.size * i + offsets.bitanget + 3 * sizeof(float))]), &zero, sizeof(float) * 1);
-
-			memcpy(&(buffer[(offsets.size * i + offsets.uv)]), &fbxMesh->mTextureCoords[0][i], sizeof(float) * 2);
+			memcpy(buffer + (offsets.size * i + offsets.normal), &fbxMesh->mNormals[i], sizeof(float) * 3);
+			memcpy(buffer + (offsets.size * i + offsets.normal + 3 * sizeof(float)), &zero, sizeof(float) * 1);
+		}
+		if (fbxMesh->HasTangentsAndBitangents())
+		{
+			for (unsigned int i = offset; i < fbxMesh->mNumVertices; i += NUMTHREADS)
+			{
+				memcpy(buffer + (offsets.size * i + offsets.tangent), &fbxMesh->mTangents[i], sizeof(float) * 3);
+				memcpy(buffer + (offsets.size * i + offsets.tangent + 3 * sizeof(float)), &zero, sizeof(float) * 1);
+				memcpy(buffer + (offsets.size * i + offsets.bitanget), &fbxMesh->mBitangents[i], sizeof(float) * 3);
+				memcpy(buffer + (offsets.size * i + offsets.bitanget + 3 * sizeof(float)), &zero, sizeof(float) * 1);
+			}
+		}
+		else
+		{
+			for (unsigned int i = offset; i < fbxMesh->mNumVertices; i += NUMTHREADS)
+			{
+				V4F* normal = reinterpret_cast<V4F*>(buffer + (offsets.size * i + offsets.normal));
+				V4F* tangent = reinterpret_cast<V4F*>(buffer + (offsets.size * i + offsets.tangent));
+				V4F* biTangent = reinterpret_cast<V4F*>(buffer + (offsets.size * i + offsets.bitanget));
+				if ((*normal) == V4F(0,1,0,1))
+				{
+					*tangent = V4F(1, 0, 0, 1);
+					*biTangent = V4F(0, 0, 1, 1);
+				}
+				else
+				{
+					*tangent = V4F(V3F(*normal).Cross({ 0, 1, 0 }).GetNormalized(), 1);
+					*biTangent = V4F(V3F(*normal).Cross(V3F(*tangent)).GetNormalized(), 1);
+				}
+			}
+		}
+		if (aFlags & ShaderFlags::HasUvSets)
+		{
+			size_t numberOfUvSets = ShaderTypes::BonePerVertexCountFromFlags(aFlags);
+			for (unsigned int i = offset; i < fbxMesh->mNumVertices; i += NUMTHREADS)
+			{
+				for (size_t uvIndex = 0; uvIndex < numberOfUvSets; uvIndex++)
+				{
+					memcpy(buffer + (offsets.size * i + offsets.uv + uvIndex * sizeof(float) * 2), &fbxMesh->mTextureCoords[uvIndex][i], sizeof(float) * 2);
+				}
+			}
 		}
 		if (aFlags & ShaderFlags::HasVertexColors)
 		{
 			for (unsigned int i = offset; i < fbxMesh->mNumVertices; i += NUMTHREADS)
 			{
-				memcpy(&(buffer[(offsets.size * i + offsets.vertexcolor)]), &fbxMesh->mColors[0][i], sizeof(float) * 4);
-			}
-		}
-		if (aFlags & ShaderFlags::HasUvSets)
-		{
-			for (unsigned int i = offset; i < fbxMesh->mNumVertices; i += NUMTHREADS)
-			{
-				memcpy(&(buffer[(offsets.size * i + offsets.uv1)]), &fbxMesh->mTextureCoords[1][i], sizeof(float) * 2);
-				memcpy(&(buffer[(offsets.size * i + offsets.uv2)]), &fbxMesh->mTextureCoords[2][i], sizeof(float) * 2);
+				memcpy(buffer + (offsets.size * i + offsets.vertexcolor), &fbxMesh->mColors[0][i], sizeof(float) * 4);
 			}
 		}
 		if (aFlags & ShaderFlags::HasBones)
@@ -139,8 +169,8 @@ bool LoadVerticies(aiMesh* fbxMesh, char** aVertexBuffer, size_t* aVertexCount, 
 			size_t numberofBones = ShaderTypes::BonePerVertexCountFromFlags(aFlags);
 			for (unsigned int i = offset; i < fbxMesh->mNumVertices; i += NUMTHREADS)
 			{
-				memcpy(&(buffer[(offsets.size * i + offsets.bones)]), &collectedBoneData[i].IDs, sizeof(UINT) * numberofBones);
-				memcpy(&(buffer[(offsets.size * i + offsets.boneweights)]), &collectedBoneData[i].Weights, sizeof(float) * numberofBones);
+				memcpy(buffer + (offsets.size * i + offsets.bones), &collectedBoneData[i].IDs, sizeof(UINT) * numberofBones);
+				memcpy(buffer + (offsets.size * i + offsets.boneweights), &collectedBoneData[i].Weights, sizeof(float) * numberofBones);
 			}
 		}
 	};
@@ -165,12 +195,11 @@ bool LoadVerticies(aiMesh* fbxMesh, char** aVertexBuffer, size_t* aVertexCount, 
 	return true;
 }
 
-
-
-ModelLoader::ModelLoader(ID3D11Device* aDevice)
+ModelLoader::ModelLoader(ID3D11Device* aDevice, const std::string& aDefaultPixelShader)
 {
-	myWorkHorse = std::thread(std::bind(&ModelLoader::LoadLoop, this));
+	myDefaultPixelShader = aDefaultPixelShader;
 	myDevice = aDevice;
+	myWorkHorse = std::thread(std::bind(&ModelLoader::LoadLoop, this));
 }
 
 ModelLoader::~ModelLoader()
@@ -179,286 +208,17 @@ ModelLoader::~ModelLoader()
 	myWorkHorse.join();
 }
 
-struct LodToLoad
-{
-	size_t myLevel;
-	aiNode* myNode;
-	Model* myModel;
-	const aiScene* myScene;
-};
-
-class CompareLevelInverse
-{
-public:
-	bool operator()(const LodToLoad& a, const LodToLoad& b)
-	{
-		return a.myLevel > b.myLevel;
-	}
-};
-class CompareVertexCountInverse
-{
-public:
-	bool operator()(const LodToLoad& a, const LodToLoad& b)
-	{
-		SYSERROR("This should not be called until the FPS");
-		return false;
-	}
-};
-
 void ModelLoader::LoadLoop()
 {
 	NAMETHREAD(L"ModelLoader-Workhorse");
-	LoadPackage package;
-
-
-	std::priority_queue<LodToLoad, std::vector<LodToLoad>, CompareLevelInverse> lodQueue;
-	std::unordered_set<const aiScene*> loadedScenes;
-
-	auto LoadQueuedLods = [&]()
-	{
-		struct Index
-		{
-			UINT index;
-		} *indexes = nullptr;
-		while (!lodQueue.empty())
-		{
-			LodToLoad current = lodQueue.top();
-			lodQueue.pop();
-
-			ID3D11Buffer* vertexBuffer;
-			ID3D11Buffer* indexBuffer;
-			UINT indexCount = 0;
-			size_t vertexCount = 0;
-
-			char* verticies = nullptr;
-
-			std::queue<const aiNode*> queue;
-			queue.push(current.myNode);
-			while (!queue.empty())
-			{
-				const aiNode* currentNode = queue.front();
-				queue.pop();
-				for (size_t i = 0; i < currentNode->mNumChildren; i++)
-				{
-					queue.push(currentNode->mChildren[i]);
-				}
-
-				for (size_t i = 0; i < currentNode->mNumMeshes; i++)
-				{
-					aiMesh* mesh = current.myScene->mMeshes[currentNode->mMeshes[i]];
-					LoadVerticies(mesh, &verticies, &vertexCount, current.myModel->GetModelData()->myshaderTypeFlags, current.myModel->myBoneNameLookup, current.myModel->myBoneData);
-
-					size_t count = indexCount;
-					for (size_t j = 0; j < mesh->mNumFaces; j++)
-					{
-						indexCount += mesh->mFaces[j].mNumIndices;
-					}
-
-					Index* p = reinterpret_cast<Index*>(realloc(indexes, sizeof(Index) * indexCount));
-
-					if (!p)
-					{
-						free(indexes);
-					}
-
-					indexes = p;
-
-					for (unsigned int j = 0; j < mesh->mNumFaces; j++)
-					{
-						memcpy(indexes + count, mesh->mFaces[j].mIndices, mesh->mFaces[j].mNumIndices * sizeof(Index));
-						count += mesh->mFaces[j].mNumIndices;
-					}
-				}
-			}
-
-
-
-#if DEBUGBONES
-			std::unordered_map <std::string, aiNode*> nodeNameLookup;
-			std::stack<aiNode*> myQueue;
-			myQueue.push(current.myScene->mRootNode);
-			while (!myQueue.empty())
-			{
-				aiNode* node = myQueue.top();
-				myQueue.pop();
-				for (size_t i = 0; i < node->mNumChildren; i++)
-				{
-					myQueue.push(node->mChildren[i]);
-				}
-				nodeNameLookup[node->mName.C_Str()] = node;
-			}
-
-			V4F rootbone;
-			for (auto& i : current.myModel->myBoneData)
-			{
-				if (nodeNameLookup.count(i.myName) != 0)
-				{
-					aiNode* parent = nodeNameLookup[i.myName]->mParent;
-
-					V4F pos{ 0,0,0,1 };
-					while (parent)
-					{
-						if (i.parent == -1 && current.myModel->myBoneNameLookup.count(parent->mName.C_Str()) != 0)
-						{
-							i.parent = current.myModel->myBoneNameLookup[parent->mName.C_Str()];
-						}
-						pos = pos * M44f::GetFastInverse(M44f::Transpose(AiHelpers::ConvertToEngineMatrix44(parent->mTransformation)));
-						//pos = pos * M44f::GetFastInverse(M44f::Transpose(AiHelpers::ConvertToEngineMatrix44(nodeNameLookup[i.myName]->mTransformation)));
-
-						parent = parent->mParent;
-					}
-					if (i.parent == -1)
-					{
-						rootbone = pos;
-					}
-					i.BonePosition = pos;
-				}
-			}
-			for (auto& i : current.myModel->myBoneData)
-			{
-				i.BonePosition -= rootbone;
-				i.BonePosition.y = -i.BonePosition.y;
-				i.BonePosition.RotateY(-PI / 2.f);
-				i.BonePosition.RotateZ(PI / 2.f);
-				i.BonePosition -= rootbone;
-			}
-
-
-#endif // DEBUGBONES
-
-
-#ifndef _RETAIL
-			unsigned int LodFaceLimits[] =
-			{
-				20000,
-				15000,
-				12500,
-				10000,
-				7000,
-				5000,
-				3000,
-				2000
-			};
-
-			unsigned int HardLodFaceLimits[] =
-			{
-				40000,
-				30000,
-				25000,
-				20000,
-				14000,
-				10000,
-				6000,
-				4000
-			};
-			size_t faceCount = indexCount / 3;
-			if (faceCount > HardLodFaceLimits[current.myLevel])
-			{
-				SYSERROR("Model has way too many faces in lod level " + std::to_string(current.myLevel) + " (" + std::to_string(faceCount) + " faceslimit: " + std::to_string(LodFaceLimits[current.myLevel]) + ")", current.myModel->GetFriendlyName());
-				SYSERROR("Wont load model due to way to many faces", package.myFilePath);
-				continue;
-			}
-
-			if (faceCount > LodFaceLimits[current.myLevel])
-			{
-				SYSWARNING("Model has too many faces in lod level " + std::to_string(current.myLevel) + " (" + std::to_string(faceCount) + " faces limit: " + std::to_string(LodFaceLimits[current.myLevel]) + ")", current.myModel->GetFriendlyName());
-			}
-#endif // !_RETAIL
-			ShaderTypes::Offsets offsets = ShaderTypes::OffsetsFromFlags(current.myModel->GetModelData()->myshaderTypeFlags);
-			CD3D11_BUFFER_DESC vertexBufferDescription;
-			WIPE(vertexBufferDescription);
-			vertexBufferDescription.ByteWidth = CAST(UINT, offsets.size * vertexCount);
-			vertexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-			vertexBufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-			D3D11_SUBRESOURCE_DATA vertexSubresourceData;
-			WIPE(vertexSubresourceData);
-			vertexSubresourceData.pSysMem = verticies;
-
-			DirectX11Framework::AddGraphicsMemoryUsage(vertexBufferDescription.ByteWidth,std::filesystem::path(current.myModel->GetModelData()->myFilePath).filename().string(),"Model Vertex Buffer");
-
-			HRESULT result = myDevice->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, &vertexBuffer);
-			if (FAILED(result))
-			{
-				SYSERROR("Couldn not create vertex buffer for model ", package.myFilePath);
-				free(verticies);
-				continue;
-			}
-
-#ifdef _DEBUG
-			if (indexCount % 3 != 0)
-			{
-				SYSERROR("Indexcount for model is not a multiple of three", package.myFilePath);
-				free(verticies);
-				continue;
-			}
-#endif // _DEBUG
-
-
-
-
-
-			CD3D11_BUFFER_DESC indexBufferDescription;
-			WIPE(indexBufferDescription);
-			indexBufferDescription.ByteWidth = indexCount * sizeof(Index);
-			indexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-			indexBufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-			D3D11_SUBRESOURCE_DATA indexSubresourceData;
-			ZeroMemory(&indexSubresourceData, sizeof(indexSubresourceData));
-			indexSubresourceData.pSysMem = indexes;
-
-			DirectX11Framework::AddGraphicsMemoryUsage(indexBufferDescription.ByteWidth, std::filesystem::path(current.myModel->GetModelData()->myFilePath).filename().string(), "Model Index Buffer");
-
-
-			result = myDevice->CreateBuffer(&indexBufferDescription, &indexSubresourceData, &indexBuffer);
-			if (FAILED(result))
-			{
-				SYSERROR("Could not create index buffer for", package.myFilePath);
-				free(verticies);
-				free(indexes);
-				continue;
-			}
-			float graphicSize = 0;
-			for (size_t i = 0; i < vertexCount; i++)
-			{
-				graphicSize = MAX(graphicSize, reinterpret_cast<V3F*>(&verticies[i * offsets.size + offsets.position])->LengthSqr());
-			}
-			delete[] verticies;
-
-			Model::LodLevel* level = new Model::LodLevel;
-#ifndef _RETAIL
-			if (level)
-			{
-#endif // !_RETAIL
-				level->myIndexBuffer = indexBuffer;
-				level->myVertexBuffer = new ID3D11Buffer*(vertexBuffer);
-				level->myNumberOfIndexes = indexCount;
-				current.myModel->ApplyLodLevel(level, current.myLevel, sqrt(graphicSize));
-#ifndef _RETAIL
-			}
-			else
-			{
-				SYSERROR("Skipping model loading due to lack of memory");
-				continue;
-			}
-#endif // !_RETAIL
-
-		}
-		for (auto& i : loadedScenes)
-		{
-			aiReleaseImport(i);
-		}
-		loadedScenes.clear();
-		free(indexes);
-	};
 
 	while (myIsRunning)
 	{
+		LoadPackage package;
 		package.myEmpty = true;
 		for (size_t i = 0; i < myHandoverSlots; i++)
 		{
-			if (!myHandovers[i].myEmpty && myHandovers[i].myModel->ShouldLoad())
+			if (!myHandovers[i].myEmpty)
 			{
 				package = myHandovers[i];
 				myHandovers[i].myEmpty = true;
@@ -467,269 +227,279 @@ void ModelLoader::LoadLoop()
 		}
 		if (package.myEmpty)
 		{
-			LoadQueuedLods();
 			std::this_thread::yield();
 			continue;
 		}
 
+		LoadModel_Internal(package.myModel, package.myFilePath);
+	}
+}
 
+void ModelLoader::LoadAttributes(const aiNode* aNode, const aiMaterial* aMaterial, std::unordered_map<std::string, std::string>& aInOutValues, std::unordered_map<std::string, V3F>& aInOutColors)
+{
+	const aiNode* node = aNode;
 
-		HRESULT result;
-
-#pragma region BufferSetup
-
-
-		static_assert(CHAR_BIT == 8, "i mean what!?");
-		static_assert(sizeof(float) * CHAR_BIT == 32, "Things are fucked beyond comprehension");
-		static_assert(sizeof(UINT) * CHAR_BIT == 32, "you get the point");
-
-		const aiScene* scene = NULL;
-
-		if (!Tools::FileExists(package.myFilePath))
+	std::stack<const aiNode*> stack;
+	while (node)
+	{
+		stack.push(node);
+		node = node->mParent;
+	}
+	while (!stack.empty())
+	{
+		node = stack.top();
+		stack.pop();
+		if (node->mMetaData)
 		{
-			SYSERROR("File not found", package.myFilePath);
-			continue;
-		}
-		scene = aiImportFile(package.myFilePath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_ConvertToLeftHanded);
-
-		SYSINFO("Loading model: " + package.myFilePath);
-
-		if (!scene)
-		{
-			SYSERROR(aiGetErrorString(), package.myFilePath);
-			continue;
-		}
-		if ((scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) != 0)
-		{
-			SYSERROR("FBX is corrupt (Scene incomplete)", package.myFilePath);
-			aiReleaseImport(scene);
-			continue;
-		}
-		if (!scene->HasMeshes())
-		{
-			SYSERROR("FBX is corrupt (Has no meshes)", package.myFilePath);
-			aiReleaseImport(scene);
-			continue;
-		}
-		ShaderFlags flags = ShaderTypes::FlagsFromMesh(scene->mMeshes[0]);
-		for (size_t i = 0; i < scene->mNumMeshes; i++)
-		{
-			ShaderFlags flags2 = ShaderTypes::FlagsFromMesh(scene->mMeshes[i]);
-			if (flags != flags2)
+			aiMetadata* data = node->mMetaData;
+			for (size_t i = 0; i < data->mNumProperties; i++)
 			{
-				SYSERROR("FBX is corrupt (inconsistent vertex types) [" + ShaderTypes::PostfixFromFlags(flags) + "] != [" + ShaderTypes::PostfixFromFlags(flags2) + "]", package.myFilePath);
-				aiReleaseImport(scene);
-				continue;
-			}
-		}
-
-
-		loadedScenes.insert(scene);
-
-#pragma endregion
-
-		//////////////////////////////////////////////
-
-#pragma region Shaders
-
-		std::string vertexShaderPath = "Model.hlsl";
-		std::string pixelShaderPath = "fullscreen_deferred/ToonShader.hlsl";
-		std::string AlbedoPath = "material.dds";
-		std::string NormalPath = "normal.dds";
-		std::string MaterialPath = "material.dds";
-		std::string AnimationPath = "animations.json";
-		std::unordered_map<std::string, std::string*> attributeMapping;
-		attributeMapping["VertexShader"] = &vertexShaderPath;
-		attributeMapping["PixelShader"] = &pixelShaderPath;
-
-		bool forceForward = false;
-
-		if (scene->mNumMaterials == 0)
-		{
-			SYSWARNING("Model has no materials skipping", package.myFilePath);
-			continue;
-		}
-		if (scene->mNumMaterials > 1)
-		{
-			SYSWARNING("Model has more than 1 material only first will be used", package.myFilePath);
-		}
-
-		aiMaterial* mat = scene->mMaterials[0];
-
-		aiString path;
-		if (mat->Get(AI_MATKEY_TEXTURE_DIFFUSE(0), path) == aiReturn::aiReturn_SUCCESS)
-		{
-			AlbedoPath = path.C_Str();
-		}
-		if (mat->Get(AI_MATKEY_TEXTURE_NORMALS(0), path) == aiReturn::aiReturn_SUCCESS)
-		{
-			NormalPath = path.C_Str();
-		}
-
-
-		SYSVERBOSE("Mapping attributes for: " + package.myFilePath);
-		std::queue<aiNode*> queue;
-		queue.push(scene->mRootNode);
-		while (!queue.empty())
-		{
-			aiNode* node = queue.front();
-			queue.pop();
-			for (size_t i = 0; i < node->mNumChildren; i++)
-			{
-				queue.push(node->mChildren[i]);
-			}
-			if (node->mMetaData)
-			{
-				aiMetadata* data = node->mMetaData;
-				for (size_t i = 0; i < data->mNumProperties; i++)
+				if (data->mValues[i].mType == aiMetadataType::AI_AISTRING && strlen(((aiString*)data->mValues[i].mData)->C_Str()) > 1)
 				{
-					if (data->mValues[i].mType == aiMetadataType::AI_AISTRING && strlen(((aiString*)data->mValues[i].mData)->C_Str()) > 1)
-					{
-						auto it = attributeMapping.find(data->mKeys[i].C_Str());
-						if (it != attributeMapping.end())
-						{
-							*(it->second) = ((aiString*)data->mValues[i].mData)->C_Str();
-						}
-					}
+					aInOutValues[data->mKeys[i].C_Str()] = ((aiString*)data->mValues[i].mData)->C_Str();
 				}
 			}
 		}
-
-		if (pixelShaderPath != "fullscreen_deferred/ToonShader.hlsl")
-		{
-			forceForward = true;
-		}
-
-		AssetHandle vertexShader = AssetManager::GetInstance().GetVertexShader(vertexShaderPath, flags);
-		AssetHandle pixelShader = AssetManager::GetInstance().GetPixelShader(pixelShaderPath, flags);
-
-		if (!vertexShader.IsValid() || !pixelShader.IsValid())
-		{
-			continue;
-		}
-
-#pragma endregion
-#pragma region Layout
-
-		size_t layoutElements;
-		D3D11_INPUT_ELEMENT_DESC* layout = ShaderTypes::InputLayoutFromFlags(flags, layoutElements);
-
-		ID3D11InputLayout* inputLayout;
-		result = myDevice->CreateInputLayout(layout, CAST(UINT, layoutElements), vertexShader.GetVertexShaderblob().data(), vertexShader.GetVertexShaderblob().size(), &inputLayout);
-		if (FAILED(result))
-		{
-			SYSERROR("Could not create inputlayout for: ", package.myFilePath);
-			continue;
-		}
-#pragma endregion
-
-		//////////////////////////////////////////////
-
-#pragma region Model
-
-		Model::ModelData modelData;
-		modelData.myshaderTypeFlags = flags;
-		modelData.myStride = CAST(UINT, ShaderTypes::OffsetsFromFlags(flags).size);
-		modelData.myOffset = 0;
-		modelData.myVertexShader = vertexShader;
-		modelData.myPixelShader = pixelShader;
-		modelData.myPrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		modelData.myInputLayout = inputLayout;
-		modelData.myIndexBufferFormat = DXGI_FORMAT_R32_UINT;
-		modelData.myTextures[0] = AssetManager::GetInstance().GetTextureRelative(package.myFilePath, AlbedoPath, true);
-		modelData.myTextures[1] = AssetManager::GetInstance().GetTextureRelative(package.myFilePath, NormalPath, true);
-		modelData.myTextures[2] = AssetManager::GetInstance().GetTextureRelative(package.myFilePath, MaterialPath, true);
-		modelData.myFilePath = package.myFilePath;
-		modelData.myForceForward = forceForward;
-
-		if (flags & ShaderFlags::HasBones)
-		{
-			modelData.myAnimations = AssetManager::GetInstance().GetJSONRelative(package.myFilePath, AnimationPath);
-		}
-
-
-		package.myModel->Init(modelData, this, pixelShaderPath, vertexShaderPath, package.myFilePath, package.myFilePath);
-
-#pragma endregion
-
-		int lodCount = 0;
-
-		for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; i++)
-		{
-			aiNode* child = scene->mRootNode->mChildren[i];
-			std::string name = child->mName.C_Str();
-
-			if (name.substr(0, 4) == std::string("lod1"))
-			{
-				LodToLoad lod;
-				lod.myNode = child;
-				lod.myModel = package.myModel;
-				lod.myScene = scene;
-				lod.myLevel = 0;
-				lodQueue.push(lod);
-				++lodCount;
-			}
-			else if (name.substr(0, 4) == std::string("lod2"))
-			{
-				LodToLoad lod;
-				lod.myNode = child;
-				lod.myModel = package.myModel;
-				lod.myScene = scene;
-				lod.myLevel = 1;
-				lodQueue.push(lod);
-				++lodCount;
-			}
-			else if (name.substr(0, 4) == std::string("lod3"))
-			{
-				LodToLoad lod;
-				lod.myNode = child;
-				lod.myModel = package.myModel;
-				lod.myScene = scene;
-				lod.myLevel = 2;
-				lodQueue.push(lod);
-				++lodCount;
-			}
-			else
-			{
-				std::set < std::string> commonTrash = 
-				{
-					"Camera",
-					"Light"
-				};
-
-				if (commonTrash.count(name) == 0)
-				{
-					SYSWARNING("lod name not recognized", name);
-				}
-				else if(myWarnAboutTrash)
-				{
-					SYSWARNING("uneccesary data detected: " + name, package.myFilePath);
-				}
-			}
-		}
-		if (lodCount == 0)
-		{
-			SYSERROR("Model has no LOD Level(s)", package.myFilePath);
-
-
-			LodToLoad lod;
-			lod.myNode = scene->mRootNode;
-			lod.myModel = package.myModel;
-			lod.myScene = scene;
-			lod.myLevel = 0;
-			lodQueue.push(lod);
-			++lodCount;
-
-			package.myModel->myIsMissNamed = true;
-		}
-		else if (lodCount < 2)
-		{
-			SYSWARNING("Model only has " + std::to_string(lodCount) + " LOD Level(s)", package.myFilePath);
-		}
-
-
 	}
 
+	aiString path;
+	if (aMaterial->Get(AI_MATKEY_TEXTURE_DIFFUSE(0), path) == aiReturn::aiReturn_SUCCESS)
+	{
+		aInOutValues["Diffuse"] = path.C_Str();
+	}
+	if (aMaterial->Get(AI_MATKEY_TEXTURE_NORMALS(0), path) == aiReturn::aiReturn_SUCCESS)
+	{
+		aInOutValues["Normal"] = path.C_Str();
+	}
+	if (aMaterial->Get(AI_MATKEY_TEXTURE_REFLECTION(0), path) == aiReturn::aiReturn_SUCCESS)
+	{
+		aInOutValues["Reflection"] = path.C_Str();
+	}
+	if (aMaterial->Get(AI_MATKEY_TEXTURE_SHININESS(0), path) == aiReturn::aiReturn_SUCCESS)
+	{
+		aInOutValues["Shinyness"] = path.C_Str();
+	}
+	if (aMaterial->Get(AI_MATKEY_TEXTURE_SPECULAR(0), path) == aiReturn::aiReturn_SUCCESS)
+	{
+		aInOutValues["Specular"] = path.C_Str();
+	}
+
+	aiColor3D color;
+	if (aMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color) == aiReturn::aiReturn_SUCCESS)
+	{
+		aInOutColors["Diffuse"] = V3F(color.r, color.g, color.b);
+	}
+}
+
+void ModelLoader::LoadModel_Internal(Model* aModel, const std::string& aFilePath)
+{
+	static_assert(CHAR_BIT == 8, "Byte is not expected size");
+	static_assert(sizeof(float) * CHAR_BIT == 32, "float is not 32bit");
+	static_assert(sizeof(UINT) * CHAR_BIT == 32, "uint is not 32 bit");
+
+	SYSINFO("Loading model: " + aFilePath);
+
+
+#pragma region Importing
+
+	if (!Tools::FileExists(aFilePath))
+	{
+		SYSERROR("File not found", aFilePath);
+		return;
+	}
+	const aiScene* scene = aiImportFile(aFilePath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_ConvertToLeftHanded);
+
+	if (!scene)
+	{
+		SYSERROR(aiGetErrorString(), aFilePath);
+		return;
+	}
+
+	Tools::ExecuteOnDestruct releaseScene = Tools::ExecuteOnDestruct([scene]() -> void {aiReleaseImport(scene); });
+
+	if ((scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) != 0)
+	{
+		SYSERROR("FBX is corrupt (Scene incomplete)", aFilePath);
+		return;
+	}
+	if (!scene->HasMeshes())
+	{
+		SYSERROR("FBX has no meshes", aFilePath);
+		return;
+	}
+#pragma endregion
+
+	std::unordered_map<std::string, std::string> attributes;
+	attributes["Animations"] = "animations.json";
+
+	LoadNode(scene, scene->mRootNode, aiMatrix4x4(), aModel, attributes, aFilePath);
+
+	bool hasAnimation = false;
+	for (Model::ModelData* modelData : aModel->GetModelData())
+	{
+		if (modelData->myshaderTypeFlags & ShaderFlags::HasBones)
+		{
+			hasAnimation = true;
+			break;
+		}
+	}
+	if (hasAnimation)
+	{
+		aModel->myAnimations = AssetManager::GetInstance().GetJSONRelative(aFilePath, attributes["Animations"]);
+	}
+	aModel->MarkLoaded();
+}
+
+
+void ModelLoader::LoadNode(const aiScene* aScene, const aiNode* aNode, aiMatrix4x4 aTransform, Model* aModel, std::unordered_map<std::string, std::string>& aInOutAttributes, const std::string& aFilePath)
+{
+	for (size_t i = 0; i < aNode->mNumChildren; i++)
+	{
+		LoadNode(aScene, aNode->mChildren[i], aTransform, aModel, aInOutAttributes, aFilePath);
+	}
+
+	for (size_t i = 0; i < aNode->mNumMeshes; i++)
+	{
+		LoadMesh(aScene, aNode, aTransform * aNode->mTransformation, aScene->mMeshes[aNode->mMeshes[i]], aModel, aInOutAttributes, aFilePath);
+	}
+}
+
+void ModelLoader::LoadMesh(const aiScene* aScene, const aiNode* aNode, aiMatrix4x4 aTransform, const aiMesh* aMesh, Model* aModel, std::unordered_map<std::string, std::string>& aInOutAttributes, const std::string& aFilePath)
+{
+	HRESULT result;
+
+	ShaderFlags flags = ShaderTypes::FlagsFromMesh(aMesh);
+
+	aInOutAttributes["VertexShader"] = "Model.hlsl";
+	aInOutAttributes["PixelShader"] = myDefaultPixelShader;
+	aInOutAttributes["Diffuse"] = "diffuse.dds";
+	aInOutAttributes["Normal"] = "normal.dds";
+	aInOutAttributes["Material"] = "material.dds";
+	aInOutAttributes["Animations"] = "animations.json";
+
+	std::unordered_map<std::string, V3F> colorMappings;
+
+	LoadAttributes(aNode, aScene->mMaterials[aMesh->mMaterialIndex], aInOutAttributes, colorMappings);
+
+	AssetHandle vertexShader = AssetManager::GetInstance().GetVertexShader(aInOutAttributes["VertexShader"], flags);
+	AssetHandle pixelShader = AssetManager::GetInstance().GetPixelShader(aInOutAttributes["PixelShader"], flags);
+
+	if (!vertexShader.IsValid() || !pixelShader.IsValid())
+	{
+		return;
+	}
+
+	size_t vertexCount = 0;
+	char* verticies = nullptr;
+	Tools::ExecuteOnDestruct freeVerticies = Tools::ExecuteOnDestruct([verticies]() { free(verticies); });
+
+	LoadVerticies(aMesh, &verticies, &vertexCount, flags, aModel->myBoneNameLookup, aModel->myBoneData);
+
+
+	size_t indexCount = aMesh->mNumFaces * 3;
+
+	UINT* indexes = reinterpret_cast<UINT*>(malloc(sizeof(UINT) * indexCount));
+	assert(indexes);
+	Tools::ExecuteOnDestruct freeIndexes = Tools::ExecuteOnDestruct([indexes]() { free(indexes); });
+
+	size_t count = 0;
+	for (unsigned int j = 0; j < aMesh->mNumFaces; j++)
+	{
+		if (aMesh->mFaces[j].mNumIndices != 3)
+		{
+			SYSERROR("Ngon detected", aFilePath);
+			return;
+		}
+
+		memcpy(indexes + count, aMesh->mFaces[j].mIndices, 3 * sizeof(UINT));
+		count += 3;
+	}
+
+
+	ID3D11Buffer* vertexBuffer;
+	ID3D11Buffer* indexBuffer;
+
+	ShaderTypes::Offsets offsets = ShaderTypes::OffsetsFromFlags(flags);
+	CD3D11_BUFFER_DESC vertexBufferDescription;
+	WIPE(vertexBufferDescription);
+	vertexBufferDescription.ByteWidth = static_cast<UINT>(offsets.size * vertexCount);
+	vertexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+	vertexBufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+	D3D11_SUBRESOURCE_DATA vertexSubresourceData;
+	WIPE(vertexSubresourceData);
+	vertexSubresourceData.pSysMem = verticies;
+
+	result = myDevice->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, &vertexBuffer);
+	if (FAILED(result))
+	{
+		SYSERROR("Couldn not create vertex buffer", aFilePath);
+		return;
+	}
+
+	Tools::ExecuteOnDestruct releaseVertexBuffer = Tools::ExecuteOnDestruct([vertexBuffer]() { vertexBuffer->Release(); });
+
+	CD3D11_BUFFER_DESC indexBufferDescription;
+	WIPE(indexBufferDescription);
+	indexBufferDescription.ByteWidth = indexCount * sizeof(UINT);
+	indexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+	indexBufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+	D3D11_SUBRESOURCE_DATA indexSubresourceData;
+	ZeroMemory(&indexSubresourceData, sizeof(indexSubresourceData));
+	indexSubresourceData.pSysMem = indexes;
+
+	result = myDevice->CreateBuffer(&indexBufferDescription, &indexSubresourceData, &indexBuffer);
+	if (FAILED(result))
+	{
+		SYSERROR("Could not create index buffer", aFilePath);
+		return;
+	}
+	Tools::ExecuteOnDestruct releaseIndexBuffer = Tools::ExecuteOnDestruct([indexBuffer]() { indexBuffer->Release(); });
+
+
+	D3D11_INPUT_ELEMENT_DESC layout[ShaderTypes::MaxInputElementSize];
+	UINT layoutElements = ShaderTypes::InputLayoutFromFlags(layout, flags);
+
+	ID3D11InputLayout* inputLayout;
+	result = myDevice->CreateInputLayout(layout, layoutElements, vertexShader.GetVertexShaderblob().data(), vertexShader.GetVertexShaderblob().size(), &inputLayout);
+	if (FAILED(result))
+	{
+		SYSERROR("Could not create inputlayout", aFilePath);
+		return;
+	}
+	Tools::ExecuteOnDestruct releaseInputLayout= Tools::ExecuteOnDestruct([inputLayout]() { inputLayout->Release(); });
+
+	Model::ModelData* modelData = new Model::ModelData();
+	modelData->myshaderTypeFlags = flags;
+	modelData->myStride = static_cast<UINT>(offsets.size);
+	modelData->myOffset = 
+	{
+		aTransform.a1,aTransform.a2,aTransform.a3,aTransform.a4,
+		aTransform.b1,aTransform.b2,aTransform.b3,aTransform.b4,
+		aTransform.c1,aTransform.c2,aTransform.c3,aTransform.c4,
+		aTransform.d1,aTransform.d2,aTransform.d3,aTransform.d4
+	};
+	modelData->myVertexShader = vertexShader;
+	modelData->myPixelShader = pixelShader;
+	modelData->myPrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	modelData->myIndexBufferFormat = DXGI_FORMAT_R32_UINT;
+	modelData->myTextures[0] = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Diffuse"], true);
+	modelData->myTextures[1] = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Normal"], true);
+	modelData->myTextures[2] = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Reflection"], true);
+	modelData->myUseForwardRenderer = (aInOutAttributes["PixelShader"] != myDefaultPixelShader);
+	modelData->myNumberOfIndexes = indexCount;
+	modelData->myDiffuseColor = colorMappings["Diffuse"];
+
+	modelData->myVertexBuffer = vertexBuffer;
+	modelData->myIndexBuffer = indexBuffer;
+	modelData->myInputLayout = inputLayout;
+
+	aModel->AddModelPart(modelData);
+
+	releaseVertexBuffer.Disable();
+	releaseIndexBuffer.Disable();
+	releaseInputLayout.Disable();
 }
 
 void ModelLoader::QueueLoad(Model* aModel, std::string aFilePath)
@@ -869,11 +639,11 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 
 #pragma region Layout
 
-	size_t layoutelements;
-	D3D11_INPUT_ELEMENT_DESC* layout = ShaderTypes::InputLayoutFromFlags(0, layoutelements);
+	D3D11_INPUT_ELEMENT_DESC layout[ShaderTypes::MaxInputElementSize];
+	UINT layoutelements = ShaderTypes::InputLayoutFromFlags(layout, ShaderFlags::HasUvSets);
 
 	ID3D11InputLayout* inputLayout;
-	result = myDevice->CreateInputLayout(layout, CAST(UINT, layoutelements), vertexShader.GetVertexShaderblob().data(), vertexShader.GetVertexShaderblob().size(), &inputLayout);
+	result = myDevice->CreateInputLayout(layout, layoutelements, vertexShader.GetVertexShaderblob().data(), vertexShader.GetVertexShaderblob().size(), &inputLayout);
 	if (FAILED(result))
 	{
 		SYSERROR("could not create input layout", aFilePath);
@@ -885,32 +655,26 @@ Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
 
 #pragma region Model
 	Model* model = new Model();
-	if (!model)
-	{
-		return nullptr;
-	}
 
-	Model::LodLevel* level = new Model::LodLevel();
-	level->myNumberOfIndexes = indexCount;
-	level->myVertexBuffer = new ID3D11Buffer * (vertexBuffer);
-	level->myIndexBuffer = indexBuffer;
+	Model::ModelData* modelData = new Model::ModelData();
+	modelData->myStride = sizeof(Vertex);
+	modelData->myOffset = M44f::Identity();
+	modelData->myVertexShader = vertexShader;
+	modelData->myPixelShader = pixelShader;
+	modelData->myPrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	modelData->myIndexBufferFormat = DXGI_FORMAT_R32_UINT;
+	modelData->myTextures[0] = AssetManager::GetInstance().GetCubeTexture(aFilePath);
+	modelData->myTextures[1] = nullptr;
+	modelData->myTextures[2] = nullptr;
+	modelData->myNumberOfIndexes = indexCount;
 
-
-	Model::ModelData modelData;
-	modelData.myStride = sizeof(Vertex);
-	modelData.myOffset = 0;
-	modelData.myVertexShader = vertexShader;
-	modelData.myPixelShader = pixelShader;
-	modelData.myPrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	modelData.myInputLayout = inputLayout;
-	modelData.myIndexBufferFormat = DXGI_FORMAT_R32_UINT;
-	modelData.myTextures[0] = AssetManager::GetInstance().GetCubeTexture(aFilePath);
-	modelData.myTextures[1] = nullptr;
-	modelData.myTextures[2] = nullptr;
+	modelData->myInputLayout = inputLayout;
+	modelData->myVertexBuffer = vertexBuffer;
+	modelData->myIndexBuffer = indexBuffer;
 
 
-	model->Init(modelData, this, "Skybox.hlsl", "Skybox.hlsl", "", "SkyBox: " + std::string(aFilePath.begin(), aFilePath.end()));
-	model->ApplyLodLevel(level, 0);
+	model->AddModelPart(modelData);
+	model->MarkLoaded();
 
 	return new SkyboxAsset(model);
 }

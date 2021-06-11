@@ -245,7 +245,7 @@ namespace NavMeshLoader_Private
 			fileTypeMapping[".fbx"] = std::bind(&FBXLoader, std::placeholders::_1, std::placeholders::_2);
 			fileTypeMapping[".obj"] = std::bind(&OBJLoader, std::placeholders::_1, std::placeholders::_2);
 		}
-		std::string extension = std::experimental::filesystem::path(aPath).extension().string();
+		std::string extension = std::filesystem::path(aPath).extension().string();
 		if (fileTypeMapping.count(extension) != 0)
 		{
 			PERFORMANCETAG("Loading");

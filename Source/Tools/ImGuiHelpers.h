@@ -19,6 +19,8 @@ namespace Tools
 
 	bool EditPosition(const char* aName, V3F& aVector, V3F* aAdditionalInput = nullptr, const char* aAdditionalInputName = nullptr);
 
+	void EditPosition(const char* aName, float* aData);
+
 	std::string PadOrTrimTo(const std::string& aString, int aLength);
 
 	void DrawTimeTree(Tools::TimeTree* aTree);

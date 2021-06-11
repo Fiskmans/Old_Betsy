@@ -66,14 +66,9 @@ private:
 	TimerController myTimerController;
 	GBPhysX* myGBPhysX;
 
-#if USEIMGUI
-	void SearchForFiles();
-	std::map<std::string, std::vector<std::string>> myFoundFiles;
-#endif
-
 #if USEFILEWATHCER
 	Tools::FileWatcher myWatcher;
-	Tools::FileWatcher::UniqueID myMetricHandle;
+	Tools::FileWatcherUniqueID myMetricHandle;
 #endif
 
 	std::string myCurrentLevel;

@@ -190,6 +190,7 @@
     <ClInclude Include="ClipBoardHelper.h" />
     <ClInclude Include="Complex.h" />
     <ClInclude Include="CurlHelper.h" />
+    <ClInclude Include="ExecuteOnDestruct.h" />
     <ClInclude Include="FileHelpers.h" />
     <ClInclude Include="FileWatcher.h" />
     <ClInclude Include="FiskJSON.h" />
@@ -234,11 +235,11 @@
     <ClCompile Include="CatmullRom.cpp" />
     <ClCompile Include="ClipBoardHelper.cpp" />
     <ClCompile Include="CurlHelper.cpp" />
+    <ClCompile Include="ExecuteOnDestruct.cpp" />
     <ClCompile Include="FastSqr.cpp" />
     <ClCompile Include="FileHelpers.cpp" />
     <ClCompile Include="FileWatcher.cpp" />
     <ClCompile Include="FiskJSON.cpp" />
-    <ClCompile Include="FoldNumbers.cpp" />
     <ClCompile Include="Fourier.cpp" />
     <ClCompile Include="ImGuiHelpers.cpp" />
     <ClCompile Include="imgui\backend\imgui_impl_dx11.cpp" />

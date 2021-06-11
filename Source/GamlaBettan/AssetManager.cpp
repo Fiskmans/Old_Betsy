@@ -22,15 +22,30 @@
 
 #define BAKED_SHADER_FOLDER "/shaders/"
 
+#define DEFAULT_PIXEL_SHADER "fullscreen_deferred/ToonShader.hlsl"
+
 void AssetManager::Init(ID3D11Device* aDevice, const std::string& aBaseFolder, const std::string& aBakeFolder)
 {
     myBaseFolder = aBaseFolder;
     myDevice = aDevice;
     myTextureLoader = new TextureLoader(aDevice);
-    myModelLoader = new ModelLoader(aDevice);
+    myModelLoader = new ModelLoader(aDevice, DEFAULT_PIXEL_SHADER);
     myShaderCompiler = new ShaderCompiler(aDevice, aBakeFolder + BAKED_SHADER_FOLDER);;
 
     myErrorTexture = myTextureLoader->LoadTexture(aBaseFolder + TEXTURE_FOLDER + "engine/error.dds");
+}
+
+void AssetManager::Preload()
+{
+    std::filesystem::recursive_directory_iterator iter = std::filesystem::recursive_directory_iterator(myBaseFolder + MODEL_FOLDER);
+    while (iter != std::filesystem::recursive_directory_iterator())
+    {
+        if (iter->path().extension() == ".fbx")
+        {
+            GetModel(iter->path().string().substr((myBaseFolder + MODEL_FOLDER).length()));
+        }
+        iter++;
+    }
 }
 
 void AssetManager::FlushChanges()
@@ -105,7 +120,7 @@ AssetHandle AssetManager::GetPixelShader(const std::string& aPath, ShaderFlags a
         myCachedPixelShaders[aPath][aFlags] = shader;
 
 #if USEFILEWATHCER
-        Tools::CallbackFunction callback = std::bind(
+        Tools::FileWatcher::CallbackFunction callback = std::bind(
             &ShaderCompiler::ReloadShader,
             myShaderCompiler,
             shader,
@@ -114,7 +129,7 @@ AssetHandle AssetManager::GetPixelShader(const std::string& aPath, ShaderFlags a
             aFlags,
             std::placeholders::_1);
 
-        myFileWatcher.RegisterCallback(myBaseFolder + PIXELSHADER_FOLDER + aPath, callback);
+        shader->myFileHandle = myFileWatcher.RegisterCallback(myBaseFolder + PIXELSHADER_FOLDER + aPath, callback);
 #endif
 
         return AssetHandle(shader);
@@ -132,10 +147,11 @@ AssetHandle AssetManager::GetVertexShader(const std::string& aPath, ShaderFlags 
         {
             SYSERROR("Failed to load pixelShader", aPath);
         }
+
         myCachedVertexShaders[aPath][aFlags] = shader;
 
 #if USEFILEWATHCER
-        Tools::CallbackFunction callback = std::bind(
+        Tools::FileWatcher::CallbackFunction callback = std::bind(
             &ShaderCompiler::ReloadShader,
             myShaderCompiler,
             shader,
@@ -144,7 +160,7 @@ AssetHandle AssetManager::GetVertexShader(const std::string& aPath, ShaderFlags 
             aFlags,
             std::placeholders::_1);
 
-        myFileWatcher.RegisterCallback(myBaseFolder + VERTEXSHADER_FOLDER + aPath, callback);
+        shader->myFileHandle = myFileWatcher.RegisterCallback(myBaseFolder + VERTEXSHADER_FOLDER + aPath, callback);
 #endif
         return AssetHandle(shader);
     }
@@ -161,9 +177,11 @@ AssetHandle AssetManager::GetGeometryShader(const std::string& aPath, ShaderFlag
         {
             SYSERROR("Failed to load pixelShader", aPath);
         }
+
         myCachedGeometryShaders[aPath][aFlags] = shader;
+
 #if USEFILEWATHCER
-        Tools::CallbackFunction callback = std::bind(
+        Tools::FileWatcher::CallbackFunction callback = std::bind(
             &ShaderCompiler::ReloadShader,
             myShaderCompiler,
             shader,
@@ -172,7 +190,7 @@ AssetHandle AssetManager::GetGeometryShader(const std::string& aPath, ShaderFlag
             aFlags,
             std::placeholders::_1);
 
-        myFileWatcher.RegisterCallback(myBaseFolder + GEOMETRYSHADER_FOLDER + aPath, callback);
+        shader->myFileHandle = myFileWatcher.RegisterCallback(myBaseFolder + GEOMETRYSHADER_FOLDER + aPath, callback);
 #endif
         return AssetHandle(shader);
     }
@@ -263,7 +281,62 @@ void AssetManager::ImGui()
 {
     WindowControl::Window("AssetManager", [this]()
         {
-            
+            if (ImGui::TreeNode("Shaders"))
+            {
+                ImGui::Button("Reload", ImVec2(60, 40));
+                if (ImGui::BeginDragDropTarget())
+                {
+                    const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Select_Pixelshader");
+                    if (payload)
+                    {
+                        std::string path = std::string(reinterpret_cast<const char*>(payload->Data), payload->DataSize);
+                    
+                        myShaderCompiler->ForceRecompile();
+                        if (myCachedPixelShaders.count(path) != 0)
+                        {
+                            for (auto& i : myCachedPixelShaders[path])
+                            {
+                                myFileWatcher.Trigger(i.second->myFileHandle);
+                            }
+                        }
+                        myShaderCompiler->DontForceRecompile();
+                    }
+
+                    ImGui::EndDragDropTarget();
+                }
+
+                for (auto& ShaderList : myCachedPixelShaders)
+                {
+                    ImGui::Button(ShaderList.first.c_str());
+                    if (ImGui::BeginDragDropSource())
+                    {
+                        ImGui::SetDragDropPayload("Select_Pixelshader", ShaderList.first.c_str(), ShaderList.first.length(), ImGuiCond_Once);
+
+                        ImGui::Text(ShaderList.first.c_str());
+
+                        ImGui::EndDragDropSource();
+                    }
+                }
+
+                ImGui::TreePop();
+            }
+
+            if (ImGui::TreeNode("Models"))
+            {
+                for (auto& model : myCachedModels)
+                {
+                    ImGui::Button(model.first.c_str());
+                    if (ImGui::BeginDragDropSource())
+                    {
+                        ImGui::SetDragDropPayload("Asset", &model.second, sizeof(Asset*), ImGuiCond_Once);
+
+                        ImGui::Text(model.first.c_str());
+
+                        ImGui::EndDragDropSource();
+                    }
+                }
+                ImGui::TreePop();
+            }
         });
 }
 

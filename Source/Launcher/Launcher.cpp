@@ -75,16 +75,15 @@ std::wstring CreateMiniDump(EXCEPTION_POINTERS* aExceptionPointers)
 
 		//wsprintfA(nameEnd - strlen(".exe"),"_%02d-%02d_%02d%02d.dmp",t.wMonth, t.wDay, t.wHour, t.wMinute);
 	}
-	using namespace std::experimental;
-	filesystem::path path = name;
+	std::filesystem::path path = name;
 	SYSTEMTIME t;
 	GetLocalTime(&t);
 
-	filesystem::path outPath;
-	filesystem::path::iterator it = path.begin();
+	std::filesystem::path outPath;
+	std::filesystem::path::iterator it = path.begin();
 	while (it != path.end())
 	{
-		filesystem::path::iterator next(it);
+		std::filesystem::path::iterator next(it);
 		++next;
 		if (next != path.end())
 		{
@@ -93,7 +92,7 @@ std::wstring CreateMiniDump(EXCEPTION_POINTERS* aExceptionPointers)
 		it++;
 	}
 	it--;
-	filesystem::path file = *it;
+	std::filesystem::path file = *it;
 
 	char days[7 * 4] =
 		"Mon\0"
@@ -108,7 +107,7 @@ std::wstring CreateMiniDump(EXCEPTION_POINTERS* aExceptionPointers)
 	outPath /= "crashdumps";
 	outPath /= DumpName;
 	system(("mkdir \"" + outPath.string() + "\"").c_str());
-	std::experimental::filesystem::path dumpPath = outPath;
+	std::filesystem::path dumpPath = outPath;
 	dumpPath /= "dump.dmp";
 
 
@@ -134,7 +133,7 @@ std::wstring CreateMiniDump(EXCEPTION_POINTERS* aExceptionPointers)
 
 	CloseHandle(hFile);
 
-	std::experimental::filesystem::path screenshotPath = outPath;
+	std::filesystem::path screenshotPath = outPath;
 	screenshotPath /= "screenshot.dds";
 	ScreenShot(screenshotPath.wstring().c_str());
 

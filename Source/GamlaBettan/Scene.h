@@ -49,9 +49,9 @@ public:
 	Camera*				GetMainCamera();
 	EnvironmentLight*	GetEnvironmentLight();
 
-	std::vector<ModelInstance*> Cull(Camera* aCamera, bool aShouldSort = true);
-	std::vector<ModelInstance*> Cull(Camera* aCamera, std::vector<ModelInstance*>& aSelection, bool aShouldSort = true, float aRangeModifier = 1.f);
-	std::vector<ModelInstance*> Cull(const CommonUtilities::PlaneVolume<float>& aPlaneVolume, std::vector<ModelInstance*>& aSelection, const V3F& aCameraPos, bool aShouldSort = true, float aRangeModifier = 1.f);
+	std::vector<ModelInstance*> Cull(Camera* aCamera);
+	std::vector<ModelInstance*> Cull(Camera* aCamera, std::vector<ModelInstance*>& aSelection, float aRangeModifier = 1.f);
+	std::vector<ModelInstance*> Cull(const CommonUtilities::PlaneVolume<float>& aPlaneVolume, std::vector<ModelInstance*>& aSelection, const V3F& aCameraPos, float aRangeModifier = 1.f);
 	std::vector<ModelInstance*> Cull(const CommonUtilities::Sphere<float>& aBoundingSphere);
 
 	std::array<PointLight*, NUMBEROFPOINTLIGHTS> CullPointLights(ModelInstance* aModel);

@@ -29,16 +29,12 @@ ShaderTypes::Offsets ShaderTypes::OffsetsFromFlags(size_t aFlags)
 		at += sizeof(float) * 4;
 	}
 
-	out.uv = at;
 	at += sizeof(float) * 2;
 
 	if (aFlags & ShaderFlags::HasUvSets)
 	{
-		out.uv1 = at;
-		at += sizeof(float) * 2;
-
-		out.uv2 = at;
-		at += sizeof(float) * 2;
+		out.uv = at;
+		at += sizeof(float) * UvSetsCountFromFlags(aFlags) * 2;
 	}
 
 	if (aFlags & ShaderFlags::HasBones)
@@ -54,7 +50,7 @@ ShaderTypes::Offsets ShaderTypes::OffsetsFromFlags(size_t aFlags)
 	return out;
 }
 
-ShaderFlags ShaderTypes::FlagsFromMesh(aiMesh* aMesh)
+ShaderFlags ShaderTypes::FlagsFromMesh(const aiMesh* aMesh)
 {
 	std::underlying_type_t<ShaderFlags> result = 0;
 
@@ -62,9 +58,12 @@ ShaderFlags ShaderTypes::FlagsFromMesh(aiMesh* aMesh)
 	{
 		result |= ShaderFlags::HasVertexColors;
 	}
-	if (aMesh->HasTextureCoords(1) && aMesh->HasTextureCoords(2))
+	if (aMesh->HasTextureCoords(0))
 	{
 		result |= ShaderFlags::HasUvSets;
+		size_t count = 0;
+		while (aMesh->HasTextureCoords(++count)){ }
+		result |= (ShaderFlags::UvMask & ((count-1) << ShaderFlags::NumUvSetsOffset));
 	}
 	if (aMesh->HasBones())
 	{
@@ -84,7 +83,8 @@ ShaderFlags ShaderTypes::FlagsFromMesh(aiMesh* aMesh)
 		{
 			numberofBones = MAX(numberofBones, i);
 		}
-		result |= (0xF & numberofBones) << ShaderFlags::NumBonesOffset;
+		numberofBones--;
+		result |= (ShaderFlags::BoneMask & (numberofBones << ShaderFlags::NumBonesOffset));
 	}
 
 	return static_cast<ShaderFlags>(result);
@@ -96,7 +96,7 @@ std::string ShaderTypes::PostfixFromFlags(size_t aFlags)
 
 	if (aFlags & ShaderFlags::HasUvSets)
 	{
-		out += "_uv3";
+		out += "_uv" + std::to_string(UvSetsCountFromFlags(aFlags));
 	}
 	if (aFlags & ShaderFlags::HasVertexColors)
 	{
@@ -109,92 +109,79 @@ std::string ShaderTypes::PostfixFromFlags(size_t aFlags)
 	return out;
 }
 
-D3D11_INPUT_ELEMENT_DESC* ShaderTypes::InputLayoutFromFlags(size_t aFlags, size_t& aElements)
+UINT ShaderTypes::InputLayoutFromFlags(D3D11_INPUT_ELEMENT_DESC* aOutDesc, size_t aFlags)
 {
-#pragma warning(push)
-#pragma warning(disable : 26812)
-	static D3D11_INPUT_ELEMENT_DESC buffer[64];
+	UINT count = 0;
 
-	WIPE(buffer);
-	aElements = 0;
-
-	buffer[aElements++] = { "POSITION" , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-	buffer[aElements++] = { "NORMAL"   , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-	buffer[aElements++] = { "TANGENT"  , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-	buffer[aElements++] = { "BITANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+	aOutDesc[count++]			= { "POSITION",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+	aOutDesc[count++]			= { "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+	aOutDesc[count++]			= { "TANGENT",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+	aOutDesc[count++]			= { "BITANGENT",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	if (aFlags & ShaderFlags::HasVertexColors)
 	{
-		buffer[aElements++] = { "COLOR"	, 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+		aOutDesc[count++]		= { "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	}
-	buffer[aElements++] = { "UV"		, 0, DXGI_FORMAT_R32G32_FLOAT		 , 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	if (aFlags & ShaderFlags::HasUvSets)
 	{
-		buffer[aElements++] = { "UV"		,1, DXGI_FORMAT_R32G32_FLOAT		 ,0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,0 };
-		buffer[aElements++] = { "UV"		,2, DXGI_FORMAT_R32G32_FLOAT		 ,0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,0 };
+		size_t numUvSets = UvSetsCountFromFlags(aFlags);
+		for (UINT i = 0; i < numUvSets; i++)
+		{
+			aOutDesc[count++]	= { "UV",			i, DXGI_FORMAT_R32G32_FLOAT,			0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+		}
 	}
 	if (aFlags & ShaderFlags::HasBones)
 	{
 		size_t numBones = BonePerVertexCountFromFlags(aFlags);
 		for (UINT i = 0; i < numBones; i++)
 		{
-			buffer[aElements++] = { "BONES"		,i,DXGI_FORMAT_R32_UINT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0 };
+			aOutDesc[count++]	= { "BONES",		i,DXGI_FORMAT_R32_UINT,					0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 		}
 		for (UINT i = 0; i < numBones; i++)
 		{
-			buffer[aElements++] = { "BONEWEIGHTS",i,DXGI_FORMAT_R32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0 };
+			aOutDesc[count++]	= { "BONEWEIGHTS",	i,DXGI_FORMAT_R32_FLOAT,				0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 		}
 	}
-	return buffer;
-#pragma warning(pop)
+	return count;
 }
 
 size_t ShaderTypes::BonePerVertexCountFromFlags(size_t aFlags)
 {
-	return (aFlags & ShaderFlags::BoneMask) >> ShaderFlags::NumBonesOffset;
+	return ((aFlags & ShaderFlags::BoneMask) >> ShaderFlags::NumBonesOffset) + 1;
 }
 
-const _D3D_SHADER_MACRO* ShaderTypes::DefinesFromFlags(size_t aFlags)
+size_t ShaderTypes::UvSetsCountFromFlags(size_t aFlags)
 {
-	static _D3D_SHADER_MACRO buffer[128];
-	WIPE(buffer);
+	return ((aFlags & ShaderFlags::UvMask) >> ShaderFlags::NumUvSetsOffset) + 1;
+}
+
+void ShaderTypes::DefinesFromFlags(_D3D_SHADER_MACRO* aBuffer, size_t aFlags)
+{
+	static const char* numberLookup[] =
+	{
+		"0", "1",  "2",  "3",  "4",  "5",  "6",  "7",
+		"8", "9", "10", "11", "12", "13", "14", "15"
+	};
+
 	size_t at = 0;
 
-	buffer[at++] = _D3D_SHADER_MACRO{ STRING(NUMBEROFPOINTLIGHTS), STRINGVALUE(NUMBEROFPOINTLIGHTS) };
-	buffer[at++] = _D3D_SHADER_MACRO{ STRING(NUMBEROFANIMATIONBONES), STRINGVALUE(NUMBEROFANIMATIONBONES) };
-	buffer[at++] = _D3D_SHADER_MACRO{ STRING(MODELSAMOUNTOFCUSTOMDATA), STRINGVALUE(MODELSAMOUNTOFCUSTOMDATA) };
+	aBuffer[at++] = _D3D_SHADER_MACRO{ STRING(NUMBEROFPOINTLIGHTS), STRINGVALUE(NUMBEROFPOINTLIGHTS) };
+	aBuffer[at++] = _D3D_SHADER_MACRO{ STRING(NUMBEROFANIMATIONBONES), STRINGVALUE(NUMBEROFANIMATIONBONES) };
+	aBuffer[at++] = _D3D_SHADER_MACRO{ STRING(MODELSAMOUNTOFCUSTOMDATA), STRINGVALUE(MODELSAMOUNTOFCUSTOMDATA) };
 
-
-	if (aFlags & ShaderFlags::HasUvSets)
-	{
-		buffer[at++] = _D3D_SHADER_MACRO{ "MULTIPLE_UV", "true" };
-	}
 	if (aFlags & ShaderFlags::HasVertexColors)
 	{
-		buffer[at++] = _D3D_SHADER_MACRO{ "VERTEXCOLOR", "true" };
+		aBuffer[at++] = _D3D_SHADER_MACRO{ "VERTEXCOLOR", "true" };
+	}
+	aBuffer[at++] = _D3D_SHADER_MACRO{ "HAS_UV_SETS", (aFlags & ShaderFlags::HasUvSets) ? "true" : "false" };
+	
+	if (aFlags & ShaderFlags::HasUvSets)
+	{
+		aBuffer[at++] = _D3D_SHADER_MACRO{ "UV_SETS_COUNT", numberLookup[UvSetsCountFromFlags(aFlags)] };
 	}
 	if (aFlags & ShaderFlags::HasBones)
 	{
-		buffer[at++] = _D3D_SHADER_MACRO{ "HAS_BONES", "true" };
-		static const char* fuckIt[] =		// >:'C
-		{
-			"0",
-			"1",
-			"2",
-			"3",
-			"4",
-			"5",
-			"6",
-			"7",
-			"8",
-			"9",
-			"10",
-			"11",
-			"12",
-			"13",
-			"14",
-			"15"
-		};
-		buffer[at++] = _D3D_SHADER_MACRO{ "BONESPERVERTEX", fuckIt[BonePerVertexCountFromFlags(aFlags)] };
+		aBuffer[at++] = _D3D_SHADER_MACRO{ "HAS_BONES", "true" };
+		aBuffer[at++] = _D3D_SHADER_MACRO{ "BONESPERVERTEX", numberLookup[BonePerVertexCountFromFlags(aFlags)] };
 	}
-	return buffer;
+	WIPE(aBuffer[at]);
 }

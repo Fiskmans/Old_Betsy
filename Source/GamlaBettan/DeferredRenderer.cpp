@@ -143,19 +143,13 @@ bool DeferredRenderer::Init(DirectX11Framework* aFramework, AssetHandle aPerlinH
 	return true;
 }
 
-std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, std::vector<class ModelInstance*>& aModelList, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer, GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer, FullscreenTexture* aDepth, BoneTextureCPUBuffer& aBoneTextureBuffer)
+std::vector<ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, std::vector<ModelInstance*>& aModelList, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer, GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer, FullscreenTexture* aDepth, BoneTextureCPUBuffer& aBoneTextureBuffer)
 {
 
-	std::vector<class ModelInstance*> filtered;
-	std::vector<class ModelInstance*> drawn;
-	Model* model = nullptr;
-	Model::ModelData* modelData = nullptr;
-
+	std::vector<ModelInstance*> filtered;
+	std::vector<ModelInstance*> drawn;
 
 	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE bufferData;
-
-	WIPE(bufferData);
 
 	FrameBufferData fData;
 	WIPE(fData);
@@ -164,6 +158,9 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 	fData.myCameraPosition = aCamera->GetPosition();
 	fData.myCameraDirection = aCamera->GetForward();
 	fData.myTotalTime = RenderManager::GetTotalTime();
+	fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
+
+	if (!OverWriteBuffer(myFrameBuffer, &fData, sizeof(fData))) { return {}; }
 
 	ID3D11ShaderResourceView* resource[1] =
 	{
@@ -172,110 +169,84 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 
 	myContext->VSSetConstantBuffers(0, 1, &myFrameBuffer);
 	myContext->PSSetConstantBuffers(0, 1, &myFrameBuffer);
+
 	myContext->VSSetShaderResources(7, 1, resource);
 	myContext->PSSetShaderResources(7, 1, resource);
+
 	myContext->GSSetShader(nullptr, nullptr, 0);
 
 	aGBuffer->SetAsActiveTarget(aDepth);
-	ObjectBufferData oData;
-	PERFORMANCETAG("standard");
 	{
-
-		for (size_t i = 0; i < aModelList.size(); i++)
+		PERFORMANCETAG("standard");
+		for (ModelInstance* modelInstance : aModelList)
 		{
-			model = aModelList[i]->GetModelAsset().GetAsModel();
+			Model* model = modelInstance->GetModelAsset().GetAsModel();
 			if (!model->ShouldRender())
 			{
 				continue;
 			}
-			modelData = model->GetModelData();
-			myContext->PSSetShader(GetPixelShader(modelData->myshaderTypeFlags).GetAsPixelShader(), nullptr, 0);
-
-
-			result = myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
-			if (FAILED(result))
+			if (model->ShouldRenderWithForwardRenderer())
 			{
-				SYSERROR("Could not map frame buffer");
-				return aModelList;
-			}
-			fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
-			memcpy(bufferData.pData, &fData, sizeof(fData));
-			myContext->Unmap(myFrameBuffer, 0);
-
-			oData.myModelToWorldSpace = CommonUtilities::Matrix4x4<float>::Transpose(aModelList[i]->GetModelToWorldTransformWithPotentialBoneAttachement(aBoneTextureBuffer, aBoneMapping));
-			oData.myTint = aModelList[i]->GetTint();
-			oData.myObjectId = Math::FoldPointer(aModelList[i]);
-			if (modelData->myshaderTypeFlags & ShaderFlags::HasBones)
-			{
-				oData.myBoneOffsetIndex = aBoneMapping[aModelList[i]];
-			}
-			if (modelData->myForceForward || aModelList[i]->ShouldBeDrawnThroughWalls() || oData.myTint != V4F(0, 0, 0, 1))
-			{
-				filtered.push_back(aModelList[i]);
+				filtered.push_back(modelInstance);
 				continue;
 			}
-			drawn.push_back(aModelList[i]);
-			oData.myIsEventActive = ModelInstance::GetEventStatus();
-
-			oData.myObjectLifeTime = Tools::GetTotalTime() - aModelList[i]->GetSpawnTime();
-			oData.myObjectExpectedLifeTime = aModelList[i]->GetExpectedLifeTime();
-			float lastinteract = aModelList[i]->GetLastInteraction();
-			if (CLOSEENUF(lastinteract, -1.f))
+			if (modelInstance->GetTint() != V4F(0, 0, 0, 1))
 			{
-				oData.myTimeSinceLastInteraction = -1.f;
-			}
-			else
-			{
-				oData.myTimeSinceLastInteraction = Tools::GetTotalTime() - lastinteract;
+				filtered.push_back(modelInstance);
+				continue;
 			}
 
-			WIPE(bufferData);
-			result = myContext->Map(myObjectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
-
-			if (FAILED(result))
+			for (Model::ModelData* modelData : model->GetModelData())
 			{
-				SYSERROR("Could not map object buffer");
-				return aModelList;
+				ObjectBufferData oData;
+				WIPE(oData);
+				oData.myModelToWorldSpace =
+					M44f::Transpose(modelInstance->GetModelToWorldTransformWithPotentialBoneAttachement(aBoneTextureBuffer, aBoneMapping))
+					* modelData->myOffset;
+				oData.myTint = V4F(0, 0, 0, 1);
+				oData.myObjectId = Math::BinaryFold(modelInstance);
+				oData.myDiffuseColor = modelData->myDiffuseColor;
+
+				if (modelData->myshaderTypeFlags & ShaderFlags::HasBones)
+				{
+					oData.myBoneOffsetIndex = aBoneMapping[modelInstance];
+				}
+				else
+				{
+					oData.myBoneOffsetIndex = 0;
+				}
+
+				oData.myObjectLifeTime = Tools::GetTotalTime() - modelInstance->GetSpawnTime();
+
+
+				if (!OverWriteBuffer(myObjectBuffer, &oData, sizeof(oData))) { return {}; }
+
+				myContext->IASetPrimitiveTopology(modelData->myPrimitiveTopology);
+				myContext->IASetInputLayout(modelData->myInputLayout);
+
+				myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
+				myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
+
+				myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
+				myContext->PSSetShader(GetPixelShader(modelData->myshaderTypeFlags).GetAsPixelShader(), nullptr, 0);
+
+
+				ID3D11ShaderResourceView* resources[3] = { nullptr };
+
+				if (modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].GetAsTexture(); }
+				if (modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].GetAsTexture(); }
+				if (modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].GetAsTexture(); }
+
+				myContext->PSSetShaderResources(0, 3, resources);
+				myContext->VSSetShaderResources(0, 3, resources);
+
+				UINT vertexOffset = 0;
+
+				myContext->IASetVertexBuffers(0, 1, &modelData->myVertexBuffer, &modelData->myStride, &vertexOffset);
+				myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
+				myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
 			}
-
-			memcpy(bufferData.pData, &oData, sizeof(oData));
-			myContext->Unmap(myObjectBuffer, 0);
-
-
-
-			myContext->IASetPrimitiveTopology(modelData->myPrimitiveTopology);
-			myContext->IASetInputLayout(modelData->myInputLayout);
-
-
-			myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
-			myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
-
-			myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
-
-			ID3D11ShaderResourceView* resources[3] =
-			{
-				nullptr,
-				nullptr,
-				nullptr
-			};
-			if (modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].GetAsTexture(); }
-			if (modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].GetAsTexture(); }
-			if (modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].GetAsTexture(); }
-
-			myContext->PSSetShaderResources(0, 3, resources);
-			myContext->VSSetShaderResources(0, 3, resources);
-
-			Model::LodLevel* lodlevel = model->GetOptimalLodLevel(aModelList[i]->GetPosition().DistanceSqr(aCamera->GetPosition()));
-			if (lodlevel)
-			{
-				myContext->IASetVertexBuffers(0, lodlevel->myVertexBufferCount, lodlevel->myVertexBuffer, &modelData->myStride, &modelData->myOffset);
-				myContext->IASetIndexBuffer(lodlevel->myIndexBuffer, modelData->myIndexBufferFormat, 0);
-				myContext->DrawIndexed(lodlevel->myNumberOfIndexes, 0, 0);
-			}
-			else
-			{
-				ONETIMEWARNING("Rendered without any loaded lod levels");
-			}
+			drawn.push_back(modelInstance);
 		}
 	}
 
@@ -287,62 +258,47 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 		myContext->PSSetShader(myBackFaceShader.GetAsPixelShader(), nullptr, 0);
 
 
-		for (size_t i = 0; i < drawn.size(); i++)
+		for (ModelInstance* modelInstance : drawn)
 		{
-			model = drawn[i]->GetModelAsset().GetAsModel();
-			modelData = model->GetModelData();
-
-			oData.myModelToWorldSpace = CommonUtilities::Matrix4x4<float>::Transpose(drawn[i]->GetModelToWorldTransform());
-			if (modelData->myshaderTypeFlags & ShaderFlags::HasBones)
+			Model* model = modelInstance->GetModelAsset().GetAsModel();
+			for (Model::ModelData* modelData : model->GetModelData())
 			{
-				oData.myBoneOffsetIndex = aBoneMapping[drawn[i]];
-			}
 
-			oData.myObjectLifeTime = Tools::GetTotalTime() - drawn[i]->GetSpawnTime();
-			oData.myObjectExpectedLifeTime = drawn[i]->GetExpectedLifeTime();
+				ObjectBufferData oData;
+				oData.myModelToWorldSpace =
+					M44f::Transpose(modelInstance->GetModelToWorldTransformWithPotentialBoneAttachement(aBoneTextureBuffer, aBoneMapping))
+					* modelData->myOffset;
+				if (modelData->myshaderTypeFlags & ShaderFlags::HasBones)
+				{
+					oData.myBoneOffsetIndex = aBoneMapping[modelInstance];
+				}
 
-			WIPE(bufferData);
-			result = myContext->Map(myObjectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
+				oData.myObjectLifeTime = Tools::GetTotalTime() - modelInstance->GetSpawnTime();
 
-			if (FAILED(result))
-			{
-				SYSERROR("Could not map object buffer");
-				return aModelList;
-			}
+				if (!OverWriteBuffer(myObjectBuffer, &oData, sizeof(oData))) { return {}; }
 
-			memcpy(bufferData.pData, &oData, sizeof(oData));
-			myContext->Unmap(myObjectBuffer, 0);
-
-
-			myContext->IASetPrimitiveTopology(modelData->myPrimitiveTopology);
-			myContext->IASetInputLayout(modelData->myInputLayout);
+				myContext->IASetPrimitiveTopology(modelData->myPrimitiveTopology);
+				myContext->IASetInputLayout(modelData->myInputLayout);
 
 
-			myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
-			myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
+				myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
+				myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
 
-			myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
+				myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
 
-			ID3D11ShaderResourceView* resources[3] =
-			{
-				nullptr,
-				nullptr,
-				nullptr
-			};
-			if (modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].GetAsTexture(); }
-			if (modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].GetAsTexture(); }
-			if (modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].GetAsTexture(); }
+				ID3D11ShaderResourceView* resources[3] = { nullptr };
+				if (modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].GetAsTexture(); }
+				if (modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].GetAsTexture(); }
+				if (modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].GetAsTexture(); }
 
-			myContext->PSSetShaderResources(0, 3, resources);
-			myContext->VSSetShaderResources(0, 3, resources);
+				myContext->PSSetShaderResources(0, 3, resources);
+				myContext->VSSetShaderResources(0, 3, resources);
 
+				UINT vertexOffset = 0;
 
-			Model::LodLevel* lodlevel = model->GetOptimalLodLevel(drawn[i]->GetPosition().DistanceSqr(aCamera->GetPosition()));
-			if (lodlevel)
-			{
-				myContext->IASetVertexBuffers(0, lodlevel->myVertexBufferCount, lodlevel->myVertexBuffer, &modelData->myStride, &modelData->myOffset);
-				myContext->IASetIndexBuffer(lodlevel->myIndexBuffer, modelData->myIndexBufferFormat, 0);
-				myContext->DrawIndexed(lodlevel->myNumberOfIndexes, 0, 0);
+				myContext->IASetVertexBuffers(0, 1, &modelData->myVertexBuffer, &modelData->myStride, &vertexOffset);
+				myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
+				myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
 			}
 		}
 	}
@@ -367,7 +323,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 				myContext->PSGetShaderResources(0, 16, oldShaderResources);
 				myContext->RSGetViewports(&oldPortCount, oldPort);
 				myContext->OMGetRenderTargets(8, oldView, &oldDepth);
-				i->myDepth = myShadowRenderer->RenderDecalDepth(i, aBoneMapping);
+				i->myDepth = myShadowRenderer->RenderDecalDepth(i, aBoneBuffer, aBoneMapping);
 				myContext->OMSetRenderTargets(8, oldView, oldDepth);
 				myContext->RSSetViewports(oldPortCount, oldPort);
 				myContext->PSSetShaderResources(0, 16, oldShaderResources);
@@ -411,16 +367,8 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 			fData.myLifeTime = now - i->myTimestamp;
 			fData.myCustomData = i->myCustomData;
 
-			WIPE(bufferData);
-			result = myContext->Map(myDecalBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
+			if (!OverWriteBuffer(myDecalBuffer, &fData, sizeof(fData))) { return {}; }
 
-			if (FAILED(result))
-			{
-				SYSERROR("Could not map object buffer");
-			}
-
-			memcpy(bufferData.pData, &fData, sizeof(fData));
-			myContext->Unmap(myDecalBuffer, 0);
 			myContext->PSSetConstantBuffers(0, 1, &myDecalBuffer);
 			aRenderStateManager->SetBlendState(RenderStateManager::BlendState::AlphaBlend);
 			aRenderStateManager->SetRasterizerState(RenderStateManager::RasterizerState::Default);
@@ -435,7 +383,7 @@ std::vector<class ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCam
 	return filtered;
 }
 
-void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vector<PointLight*>& aPointLightList, std::vector<SpotLight*>& aSpotLightList, RenderStateManager* aRenderStateManager, std::unordered_map<ModelInstance*, short>& aBoneMapping)
+void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vector<PointLight*>& aPointLightList, std::vector<SpotLight*>& aSpotLightList, RenderStateManager* aRenderStateManager, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping)
 {
 
 	HRESULT result;
@@ -461,7 +409,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 		myContext->PSGetShaderResources(0, 16, oldShaderResources);
 		myContext->RSGetViewports(&oldPortCount, oldPort);
 		myContext->OMGetRenderTargets(1, &oldView, &oldDepth);
-		myShadowRenderer->RenderEnvironmentDepth(Scene::GetInstance().GetEnvironmentLight(), aBoneMapping);
+		myShadowRenderer->RenderEnvironmentDepth(Scene::GetInstance().GetEnvironmentLight(), aBoneBuffer, aBoneMapping);
 		myContext->OMSetRenderTargets(1, &oldView, oldDepth);
 		myContext->RSSetViewports(oldPortCount, oldPort);
 		myContext->PSSetShaderResources(0, 16, oldShaderResources);
@@ -506,7 +454,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 				myContext->PSGetShaderResources(0, 16, oldShaderResources);
 				myContext->RSGetViewports(&oldPortCount, oldPort);
 				myContext->OMGetRenderTargets(1, &oldView, &oldDepth);
-				myShadowRenderer->Render(i, aBoneMapping);
+				myShadowRenderer->Render(i, aBoneBuffer, aBoneMapping);
 				myContext->OMSetRenderTargets(1, &oldView, oldDepth);
 				myContext->RSSetViewports(oldPortCount, oldPort);
 				myContext->PSSetShaderResources(0, 16, oldShaderResources);
@@ -569,7 +517,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 				myContext->PSGetShaderResources(0, 16, oldShaderResources);
 				myContext->RSGetViewports(&oldPortCount, oldPort);
 				myContext->OMGetRenderTargets(1, &oldView, &oldDepth);
-				myShadowRenderer->RenderSpotLightDepth(i, aBoneMapping);
+				myShadowRenderer->RenderSpotLightDepth(i, aBoneBuffer, aBoneMapping);
 				myContext->PSSetShaderResources(0, 16, clearResources);
 				myContext->OMSetRenderTargets(1, &oldView, oldDepth);
 				myContext->RSSetViewports(oldPortCount, oldPort);
@@ -650,6 +598,25 @@ void DeferredRenderer::MapEnvLightBuffer()
 
 	myContext->Unmap(myPixelEnvLightBuffer, 0);
 	myContext->PSSetConstantBuffers(0, 1, &myPixelEnvLightBuffer);
+}
+
+bool DeferredRenderer::OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize)
+{
+	D3D11_MAPPED_SUBRESOURCE bufferData;
+	WIPE(bufferData);
+
+	HRESULT result = myContext->Map(aBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
+
+	if (FAILED(result))
+	{
+		SYSERROR("Could not map buffer");
+		return false;
+	}
+
+	memcpy(bufferData.pData, aData, aSize);
+	myContext->Unmap(aBuffer, 0);
+
+	return true;
 }
 
 AssetHandle& DeferredRenderer::GetPixelShader(size_t flags)

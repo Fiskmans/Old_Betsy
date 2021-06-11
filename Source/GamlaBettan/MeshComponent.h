@@ -5,11 +5,16 @@
 class MeshComponent : public Component
 {
 public:
+	MeshComponent(const UseDefaults&);
 	MeshComponent(const std::string& aModelname);
+	MeshComponent(AssetHandle aModelAsset);
 	~MeshComponent();
 
-	// Inherited via Component
-	virtual void Update(const FrameData& aFrameData, Entity* aEntity) override;
+	void Update(const FrameData& aFrameData, EntityID aEntityID) override;
+
+#if USEIMGUI
+	void ImGui(EntityID aEntityID) override;
+#endif
 
 private:
 	ModelInstance* myInstance;

@@ -38,6 +38,8 @@
 
 #include "GamlaBettan\ModelInstance.h"
 #include "GamlaBettan\Scene.h"
+#include "GamlaBettan\MeshComponent.h"
+#include "GamlaBettan\EntityManager.h"
 
 GameWorld::GameWorld() :
 	myParticleFactory(nullptr),
@@ -75,7 +77,7 @@ GameWorld::~GameWorld()
 	SAFE_DELETE(myGBPhysXColliderFactory);
 }
 
-void GameWorld::SystemLoad(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader)
+bool GameWorld::Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader)
 {
 	myWindowSize.x = 1920;
 	myWindowSize.y = 1080;
@@ -85,45 +87,23 @@ void GameWorld::SystemLoad(SpriteFactory* aSpriteFactory, DirectX11Framework* aF
 	aAudioManager->Register2DMasterObject(0);
 
 	myParticleFactory = new ParticleFactory;
-
+	if (!myParticleFactory->Init(aFramework))
+	{
+		return false;
+	}
 	myGBPhysXPtr = aGBPhysX;
 
-
-	myParticleFactory->Init(aFramework);
+	SetupWorld();
 }
-
-void GameWorld::Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework)
-{
-	mySpriteFactory = aSpriteFactory;
-}
-
-V3F ClosestPointOnLine(V3F aLineStart, V3F aLineEnd, V3F aPoint)
-{
-	V3F AB = aLineEnd - aLineStart;
-	V3F AP = aPoint - aLineStart;
-
-	float magnitudeAB = AB.LengthSqr();
-	float ABAPproduct = AP.Dot(AB);
-	float distance = ABAPproduct / magnitudeAB;
-
-	V3F pos;
-	if (distance < 0)
-	{
-		return aLineStart;
-	}
-	else if (distance > 1)
-	{
-		return aLineEnd;
-	}
-	else
-	{
-		return aLineStart + AB * distance;
-	}
-}
-
 
 void GameWorld::RecieveMessage(const Message& aMessage)
 {
+}
+
+void GameWorld::SetupWorld()
+{
+	myPlayer = EntityManager::GetInstance().Get();
+	EntityManager::GetInstance().Retrieve(myPlayer)->AddComponent<MeshComponent>("Quaternius/Medieval/Buildings/House_1.fbx");
 }
 
 void GameWorld::FreecamMovement(CommonUtilities::InputHandler& aInputHandler, float aDeltaTime)
@@ -247,15 +227,14 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 	{
 		FreecamMovement(aInputHandler, aDeltaTime);
 	}
-	else
 #endif // !USEIMGUI
+
+
 	{
+		EnvironmentLight* env = Scene::GetInstance().GetEnvironmentLight();
+		if (env)
 		{
-			EnvironmentLight* env = Scene::GetInstance().GetEnvironmentLight();
-			if (env)
-			{
-				env->myShadowCorePosition = myPlayer.GetPosition();
-			}
+			env->myShadowCorePosition = EntityManager::GetInstance().Retrieve(myPlayer)->GetPosition();
 		}
 	}
 }

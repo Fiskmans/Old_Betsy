@@ -86,7 +86,8 @@ void ShaderCompiler::ReloadShader(Asset* aAsset, const std::string& aBaseFolder,
 	}
 		break;
 	case Asset::AssetType::VertexShader:
-		newShader = GetPixelShader(aBaseFolder, aShader, aFlags);
+	{
+		newShader = GetVertexShader(aBaseFolder, aShader, aFlags);
 		if (newShader)
 		{
 			reinterpret_cast<VertexShaderAsset*>(aAsset)->myShader->Release();
@@ -95,9 +96,11 @@ void ShaderCompiler::ReloadShader(Asset* aAsset, const std::string& aBaseFolder,
 			reinterpret_cast<VertexShaderAsset*>(newShader)->myShader = nullptr;
 			delete newShader;
 		}
+	}
 		break;
 	case Asset::AssetType::GeometryShader:
-		newShader = GetPixelShader(aBaseFolder, aShader, aFlags);
+	{
+		newShader = GetGeometryShader(aBaseFolder, aShader, aFlags);
 		if (newShader)
 		{
 			reinterpret_cast<GeometryShaderAsset*>(aAsset)->myShader->Release();
@@ -105,11 +108,22 @@ void ShaderCompiler::ReloadShader(Asset* aAsset, const std::string& aBaseFolder,
 			reinterpret_cast<GeometryShaderAsset*>(newShader)->myShader = nullptr;
 			delete newShader;
 		}
+	}
 		break;
 	default:
 		SYSERROR("Reloadign shader that isn't a shader", aFileChanged);
 		return;
 	}
+}
+
+void ShaderCompiler::ForceRecompile()
+{
+	myForceRecompile = true;
+}
+
+void ShaderCompiler::DontForceRecompile()
+{
+	myForceRecompile = false;
 }
 
 std::vector<char> ShaderCompiler::LoadOrCompileFromFile(const std::string& aBaseFolder, const std::string& aFilePath, const std::string& aEntryPoint, const std::string& aCompiler, ShaderFlags aFlags)
@@ -119,7 +133,7 @@ std::vector<char> ShaderCompiler::LoadOrCompileFromFile(const std::string& aBase
 	std::string binaryPath = myBakedFolderPath + aCompiler + "/" + aFilePath.substr(0, aFilePath.size() - std::filesystem::path(aFilePath).extension().string().size()) + ShaderTypes::PostfixFromFlags(aFlags) + ".cso";;
 	std::string filePath = aBaseFolder + aFilePath;
 
-	if (std::filesystem::exists(binaryPath))
+	if (!myForceRecompile && std::filesystem::exists(binaryPath))
 	{
 		time_t binAge = Tools::FileLastModified(binaryPath);
 		time_t rawAge = Tools::FileLastModified(filePath);
@@ -142,7 +156,7 @@ std::vector<char> ShaderCompiler::LoadOrCompileFromFile(const std::string& aBase
 					}
 				}
 			}
-			catch (const std::exception& e)
+			catch (const std::exception&)
 			{
 				SYSERROR("Couldn't open baked shader", binaryPath);
 			}
@@ -161,9 +175,12 @@ std::vector<char> ShaderCompiler::LoadOrCompileFromFile(const std::string& aBase
 		D3DCOMPILE_OPTIMIZATION_LEVEL3 |
 		D3DCOMPILE_WARNINGS_ARE_ERRORS;
 
+	D3D_SHADER_MACRO macros[ShaderTypes::MaxDefineSize];
+	ShaderTypes::DefinesFromFlags(macros, aFlags);
+
 	HRESULT result = D3DCompileFromFile(
 		(std::wstring(filePath.begin(), filePath.end())).c_str(),
-		ShaderTypes::DefinesFromFlags(aFlags),
+		macros,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		aEntryPoint.c_str(),
 		aCompiler.c_str(),

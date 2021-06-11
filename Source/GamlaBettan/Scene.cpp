@@ -103,9 +103,8 @@ void Scene::RemoveFromScene(ModelInstance* aModel)
 	}
 	else
 	{
-		//SYSWARNING("Trying to remove model that is not currently in the scene");
+		SYSWARNING("Trying to remove model that is not currently in the scene");
 	}
-
 }
 
 void Scene::SetMainCamera(Camera* aCamera)
@@ -242,17 +241,17 @@ std::vector<ModelInstance*> Scene::Cull(const CommonUtilities::Sphere<float>& aB
 	return filtered;
 }
 
-std::vector<ModelInstance*> Scene::Cull(Camera* aCamera, bool aShouldSort)
+std::vector<ModelInstance*> Scene::Cull(Camera* aCamera)
 {
-	return Cull(aCamera, myModels, aShouldSort, 2.f);
+	return Cull(aCamera, myModels, 2.f);
 }
 
-std::vector<ModelInstance*> Scene::Cull(Camera* aCamera, std::vector<ModelInstance*>& aSelection, bool aShouldSort, float aRangeModifier)
+std::vector<ModelInstance*> Scene::Cull(Camera* aCamera, std::vector<ModelInstance*>& aSelection, float aRangeModifier)
 {
-	return Cull(aCamera->GenerateFrustum(), aSelection, aCamera->GetPosition(), aShouldSort, aRangeModifier);
+	return Cull(aCamera->GenerateFrustum(), aSelection, aCamera->GetPosition(), aRangeModifier);
 }
 
-std::vector<ModelInstance*> Scene::Cull(const CommonUtilities::PlaneVolume<float>& aPlaneVolume, std::vector<ModelInstance*>& aSelection, const V3F& aCameraPos, bool aShouldSort, float aRangeModifier)
+std::vector<ModelInstance*> Scene::Cull(const CommonUtilities::PlaneVolume<float>& aPlaneVolume, std::vector<ModelInstance*>& aSelection, const V3F& aCameraPos, float aRangeModifier)
 {
 	static std::vector<ModelInstance*> culledModels;
 	culledModels.clear();
@@ -264,24 +263,6 @@ std::vector<ModelInstance*> Scene::Cull(const CommonUtilities::PlaneVolume<float
 		{
 			culledModels.push_back(aSelection[i]);
 		}
-	}
-
-	if (aShouldSort)
-	{
-		PERFORMANCETAG("Sorting");
-		struct
-		{
-			bool operator()(const ModelInstance* lhs, const ModelInstance* rhs)
-			{
-				return (lhs->GetPosition().DistanceSqr(cameraPos) < rhs->GetPosition().DistanceSqr(cameraPos));
-			}
-
-			V3F cameraPos;
-		} sort;
-
-		sort.cameraPos = aCameraPos;
-
-		std::sort(culledModels.begin(), culledModels.end(), sort);
 	}
 
 	return culledModels;

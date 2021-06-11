@@ -1,47 +1,29 @@
 #pragma once
 
-#include <unordered_map>
-#include <string>
-#include <functional>
-#include <vector>
-#include <thread>
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
-#include <atomic>
-
 namespace Tools
 {
-	using CallbackFunction = std::function<void(const std::string&)>;
-
-	class FileHandle : public std::string
+	class FileWatcherUniqueID : public std::string
 	{
 	public:
-		size_t GetGUID() const { return myGUID; }
-		bool GetHasStarted() const { return myFileLastChanged != 0; }
-		FileHandle() : myFileLastChanged(0), myFileName(""), myHash(0), myGUID(0) {}
-		FileHandle(const std::string& aString);
-		bool CheckChanged() const; // NOT Const, hacky solution to allow using filehandle as key in std::map/std::unordered map and still be able to use it as normal
-		bool operator==(const FileHandle& aOther) { return myHash == aOther.myHash && myGUID == aOther.myGUID && static_cast<std::string>(*this) == static_cast<std::string>(aOther); }
-
-		private:
-		time_t myFileLastChanged;
-		std::string myFileName;
-		size_t myHash;
-		size_t myGUID;
-		static size_t GUIDCounter;
+		FileWatcherUniqueID() = default;
+		~FileWatcherUniqueID() = default;
+		FileWatcherUniqueID(const FileWatcherUniqueID&) = default;
+		operator bool() { return !(*this == std::string()); } // returns whether the id is a valid id
+	private:
+		FileWatcherUniqueID(const std::string& aString) : std::string(aString) {}
+		friend class FileWatcher;
 	};
 }
-
-//Hashing functions
 
 namespace std
 {
 	template<>
-	struct hash<Tools::FileHandle>
+	class hash<Tools::FileWatcherUniqueID>
 	{
-		std::size_t operator()(const Tools::FileHandle& k) const
+	public:
+		size_t operator()(const Tools::FileWatcherUniqueID& id) const
 		{
-			return hash<std::string>()(k) + ~std::hash<size_t>()(k.GetGUID());
+			return hash<string>()(id);
 		}
 	};
 }
@@ -51,28 +33,16 @@ namespace Tools
 	class FileWatcher
 	{
 	public:
-		class UniqueID : public std::string
-		{
-		public:
-			UniqueID() = default;
-			~UniqueID() = default;
-			UniqueID(const UniqueID&) = default;
-			operator bool() { return !(*this == std::string()); } // returns whether the id is a valid id
-		private:
-			UniqueID(const std::string& aString) : std::string(aString) {}
-			friend FileWatcher;
-		};
-
-
+		typedef std::function<void(const std::string&)> CallbackFunction;
 
 		///Constructors
 		FileWatcher();
 		~FileWatcher();
 
 		///Registers a filewatch with a callback, if using the callimmediately flag the function being called needs to be thread safe
-		UniqueID RegisterCallback(std::string aFile, Tools::CallbackFunction aCallback, bool aCallImmediately = false);
+		FileWatcherUniqueID RegisterCallback(std::string aFile, CallbackFunction aCallback, bool aCallImmediately = false);
 		///Registers a file to manually watch, updates needs to be resolved using GetChangedFile
-		UniqueID RegisterFile(std::string aFile);
+		FileWatcherUniqueID RegisterFile(std::string aFile);
 
 		///Gets a changed file if there is one, returns whether there was one
 		bool GetChangedFile(std::string& aOutFile);
@@ -81,11 +51,33 @@ namespace Tools
 		void FlushChanges();
 
 		///Unregisters a FileWatch
-		bool UnRegister(UniqueID& aID);
+		bool UnRegister(FileWatcherUniqueID& aID);
+
+		void Trigger(FileWatcherUniqueID& aID);
 
 		///Resets the filewatcher
 		void UnRegisterAll();
 	private:
+
+		class FileHandle : public std::string
+		{
+		public:
+			FileHandle() : myFileLastChanged(0), myFileName("") { CheckChanged(); }
+			FileHandle(const std::string& aString);
+			bool CheckChanged();
+
+		private:
+			time_t myFileLastChanged;
+			std::string myFileName;
+		};
+
+		struct RegisteredFile
+		{
+			FileHandle myHandle;
+			CallbackFunction myFunction;
+		};
+
+
 		//Looping ThreadFunction
 		void CheckFiles();
 
@@ -104,8 +96,8 @@ namespace Tools
 
 	
 		//Registered files
-		std::unordered_map <FileHandle, Tools::CallbackFunction> myCallbackMap;
-		std::unordered_map <FileHandle, Tools::CallbackFunction> myThreadSafeMap;
+		std::unordered_map <FileWatcherUniqueID, RegisteredFile> myCallbackMap;
+		std::unordered_map <FileWatcherUniqueID, RegisteredFile> myThreadSafeMap;
 		std::vector<FileHandle> mySelfHandleMap;
 
 		//This filewatcher is using a lossy check with a single handover-point for simplicity,
@@ -117,5 +109,4 @@ namespace Tools
 
 		std::thread myWorkHorse; //needs to be last because it uses the above resources
 	};
-
 }

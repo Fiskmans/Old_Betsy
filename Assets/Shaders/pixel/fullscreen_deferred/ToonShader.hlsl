@@ -124,9 +124,6 @@ PixelOutput pixelShader(VertexToPixel input)
 	float3 albedo = resource2.Sample(defaultSampler, input.myUV).rgb;
 	float3 normal = resource3.Sample(defaultSampler, input.myUV).rgb;
 
-    returnValue.myColor = float4(albedo, 1);
-    return returnValue;
-
 	float2 camUV = camProjection.xy;
 	camUV *= 0.5;
 	camUV += float2(0.5, 0.5);
@@ -171,7 +168,7 @@ PixelOutput pixelShader(VertexToPixel input)
 		color = float4(1.0, 1.0, 1.0, 1.0) * color;
 	else
 		color = float4(0.9, 0.9, 0.9, 1.0) * color;
-	returnValue.myColor = lerp(color,color * float4(0.4,0.4,0.7,1), fuzzyOcclusion);
+    returnValue.myColor = lerp(color, color * float4(0.4, 0.4, 0.7, 1), fuzzyOcclusion);
 
 	return returnValue;
 }

@@ -23,8 +23,7 @@ public:
 
 	virtual void RecieveMessage(const Message& aMessage) override;
 
-	void Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework);
-	void SystemLoad(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader);
+	bool Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader);
 	
 	void Update(CommonUtilities::InputHandler& aInputHandler, float aDeltaTime);
 
@@ -34,10 +33,11 @@ public:
 
 private:
 
+	void SetupWorld();
+
 	void FreecamMovement(CommonUtilities::InputHandler& aInputHandler, float aDeltaTime);
 
-	Entity myPlayer;
-
+	EntityID myPlayer;
 
 	CommonUtilities::Vector2<float> myWindowSize;
 	GAMEMETRIC(float, myFreecamSpeed, FREECAMSPEED, 0.3f);

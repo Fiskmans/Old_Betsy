@@ -70,7 +70,7 @@ bool RenderManager::Init(DirectX11Framework* aFramework)
 	}
 	myPerlinView = AssetManager::GetInstance().GetPerlinTexture({ 1024,1024 }, { 2,2 }, 2);
 
-	if (!myForwardRenderer.Init(aFramework, "ThroughWall.hlsl", "ThroughWallEnemy.hlsl", myPerlinView, &myShadowRenderer))
+	if (!myForwardRenderer.Init(aFramework, myPerlinView, &myShadowRenderer))
 	{
 		return false;
 	}
@@ -188,7 +188,7 @@ void RenderManager::Render()
 		PERFORMANCETAG("BoneTexture Generation");
 		static std::vector<ModelInstance*> buffer;
 		buffer.clear();
-		std::copy_if(Scene::GetInstance().begin(), Scene::GetInstance().end(), std::back_inserter(buffer), [](ModelInstance* aInstance) { return !!(aInstance->GetModelAsset().GetAsModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones); });
+		std::copy_if(Scene::GetInstance().begin(), Scene::GetInstance().end(), std::back_inserter(buffer), [](ModelInstance* aInstance) { return !!(aInstance->GetModelAsset().GetAsModel()->myAnimations.IsValid()); });
 		SetupBoneTexture(buffer);
 	}
 
@@ -207,7 +207,7 @@ void RenderManager::Render()
 		UnbindResources();
 		myStateManerger.SetDepthStencilState(RenderStateManager::DepthStencilState::Default);
 		myFrameworkPtr->GetContext()->VSSetShaderResources(5, 1, &myBoneTextureView);
-		modelsLeftToRender = myDeferredRenderer.GenerateGBuffer(Scene::GetInstance().GetMainCamera(), modelsLeftToRender, myBoneOffsetMap, &myTextures[static_cast<int>(Textures::BackFaceBuffer)], &myStateManerger, Scene::GetInstance().GetDecals(), &myGBuffer, &myBufferGBuffer, myFullscreenRenderer, &myTextures[ENUM_CAST(Textures::IntermediateDepth)], myBoneBuffer);
+		modelsLeftToRender = myDeferredRenderer.GenerateGBuffer(Scene::GetInstance().GetMainCamera(), modelsLeftToRender, myBoneBuffer, myBoneOffsetMap, &myTextures[static_cast<int>(Textures::BackFaceBuffer)], &myStateManerger, Scene::GetInstance().GetDecals(), &myGBuffer, &myBufferGBuffer, myFullscreenRenderer, &myTextures[ENUM_CAST(Textures::IntermediateDepth)], myBoneBuffer);
 		myStateManerger.SetAllStates();
 	}
 
@@ -249,7 +249,7 @@ void RenderManager::Render()
 		myTextures[ENUM_CAST(Textures::IntermediateDepth)].SetAsResourceOnSlot(15);
 		myStateManerger.SetSamplerState(RenderStateManager::SamplerState::Point);
 		myStateManerger.SetRasterizerState(RenderStateManager::RasterizerState::Default);
-		myDeferredRenderer.Render(myFullscreenRenderer, Scene::GetInstance().GetPointLights(), Scene::GetInstance().GetSpotLights(), &myStateManerger, myBoneOffsetMap);
+		myDeferredRenderer.Render(myFullscreenRenderer, Scene::GetInstance().GetPointLights(), Scene::GetInstance().GetSpotLights(), &myStateManerger, myBoneBuffer, myBoneOffsetMap);
 		myStateManerger.SetSamplerState(RenderStateManager::SamplerState::Trilinear);
 	}
 
@@ -416,7 +416,7 @@ void RenderManager::SetupBoneTexture(const std::vector<ModelInstance*>& aModelLi
 		{
 			break;
 		}
-		if (model->GetModelAsset().GetAsModel()->ShouldRender() && model->GetModelAsset().GetAsModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones)
+		if (model->GetModelAsset().GetAsModel()->ShouldRender() && model->GetModelAsset().GetAsModel()->myAnimations.IsValid())
 		{
 			std::array<M44f, NUMBEROFANIMATIONBONES>& matrixes = myBoneBuffer[boneIndexOffset];
 			for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)
@@ -468,7 +468,7 @@ void RenderManager::RenderSelection(const std::vector<ModelInstance*>& aModelsTo
 	myStateManerger.SetBlendState(RenderStateManager::BlendState::Disable);
 	//return;
 	myTextures[static_cast<int>(Textures::Selection)].SetAsActiveTarget();
-	myHighlightRenderer.Render(aModelsToHighlight, aCamera, myBoneOffsetMap);
+	myHighlightRenderer.Render(aModelsToHighlight, aCamera, myBoneBuffer, myBoneOffsetMap);
 
 	FullscreenPass({ Textures::Selection }, Textures::SelectionScaleDown1, FullscreenRenderer::Shader::COPY);
 	FullscreenPass({ Textures::SelectionScaleDown1 }, Textures::SelEdgesHalf, FullscreenRenderer::Shader::GAUSSIANVERTICAL);

@@ -243,6 +243,11 @@ namespace Tools
 #endif
 	}
 
+	void EditPosition(const char* aName, float* aData)
+	{
+		ImGui::InputFloat3(aName, aData);
+	}
+
 	ImVec4 GetColor(int aDepth)
 	{
 		static std::vector<ImVec4> colors = {

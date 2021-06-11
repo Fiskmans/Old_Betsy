@@ -133,7 +133,7 @@ PixelOutput pixelShader(VertexToPixel input)
     {
         float localDepth = ShadowMapping.Sample(defaultSampler, camUV + PoissonSamples[i] * sampleSize).r;
 
-        float localDelta = abs(camProjection.z - localDepth);
+        float localDelta = camProjection.z - localDepth;
         fuzzyOcclusion += localDelta > bias;
     }
     fuzzyOcclusion /= 64;
@@ -154,7 +154,7 @@ PixelOutput pixelShader(VertexToPixel input)
 
 
 
-	returnValue.myColor.rgb =  lerp(float3(0, 0, 0), pow(abs(radiance), 1.0 / 2.2),  (1- occlusion)*(1- fuzzyOcclusion));
+    returnValue.myColor.rgb = float3(0, 1, 0);// lerp(float3(0, 0, 0), pow(abs(radiance), 1.0 / 2.2), (1 - occlusion) * (1 - fuzzyOcclusion));
 	returnValue.myColor.a = 0;
 
 	return returnValue;

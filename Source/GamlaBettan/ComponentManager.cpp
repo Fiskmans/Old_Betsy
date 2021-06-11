@@ -15,3 +15,39 @@ void ComponentManager::Update(const Component::FrameData& aFrameData)
 		system->Update(aFrameData);
 	}
 }
+
+void ComponentManager::RemoveAllComponents(EntityID aEntityID)
+{
+	for (ComponentSystemBase* componentSystem : mySystems)
+	{
+		componentSystem->Return(aEntityID);
+	}
+}
+
+void ComponentManager::RunImGuiFor(EntityID aEntityID)
+{
+	for (ComponentSystemBase* componentSystem : mySystems)
+	{
+		componentSystem->RunImGuiFor(aEntityID);
+	}
+}
+
+void ComponentManager::ImGui()
+{
+	size_t colums = ImGui::GetWindowWidth() / 150;
+	colums = MIN(colums, mySystems.size());
+	if (colums > 0)
+	{
+		ImGui::BeginChild("ComponentManager",ImVec2(0,40*(mySystems.size() / colums) + 10), true);
+		ImGui::Columns(colums);
+		for (size_t i = 0; i < colums; i++)
+		{
+			for (size_t j = i; j < mySystems.size(); j += colums)
+			{
+				mySystems[j]->ImGui();
+			}
+			ImGui::NextColumn();
+		}
+		ImGui::EndChild();
+	}
+}

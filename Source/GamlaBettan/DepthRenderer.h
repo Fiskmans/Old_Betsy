@@ -18,16 +18,16 @@ public:
 	const Camera* GetEnvirontmentCamera();
 	void BindshadowsToSlots(int aSlot);
 	void BindShadowDensityToSlot(int aSlot);
-	void Render(PointLight* aLight, std::unordered_map<ModelInstance*, short>& aBoneMapping);
-	void RenderSpotLightDepth(SpotLight* aSpotlight, std::unordered_map<ModelInstance*, short>& aBoneMapping);
-	void RenderEnvironmentDepth(EnvironmentLight* aLight, std::unordered_map<ModelInstance*, short>& aBoneMapping, std::function<void()> aPreRenderFunction = []() {});
-	ID3D11ShaderResourceView* RenderDecalDepth(Decal* aSpotlight, std::unordered_map<ModelInstance*, short>& aBoneMapping);
+	void Render(PointLight* aLight, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping);
+	void RenderSpotLightDepth(SpotLight* aSpotlight, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping);
+	void RenderEnvironmentDepth(EnvironmentLight* aLight, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping, std::function<void()> aPreRenderFunction = []() {});
+	ID3D11ShaderResourceView* RenderDecalDepth(Decal* aSpotlight, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping);
 
 private:
 	
 	ID3D11ShaderResourceView* myLastDepthView = { nullptr };
 
-	void Render(Camera* aCamera, const std::vector<ModelInstance*>& aModelList, std::unordered_map<ModelInstance*, short>& aBoneMapping);
+	void Render(Camera* aCamera, const std::vector<ModelInstance*>& aModelList, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping);
 	struct ID3D11Buffer* myFrameBuffer = nullptr;
 	struct ID3D11Buffer* myObjectBuffer = nullptr;
 	ID3D11DeviceContext* myContext;

@@ -156,11 +156,21 @@ bool DirectX11Framework::Init()
 	desc.SampleDesc.Count = 1;
 	desc.Windowed = true;
 
+	UINT flags = 0;
+#ifdef _DEBUG
+	GetAsyncKeyState(VK_LSHIFT);
+	if (GetAsyncKeyState(VK_LSHIFT))
+	{
+		flags |= D3D11_CREATE_DEVICE_DEBUG;
+	}
+#endif // _DEBUG
+
+
 	HRESULT result = D3D11CreateDeviceAndSwapChain(
 		nullptr, 
 		D3D_DRIVER_TYPE_HARDWARE, 
 		nullptr, 
-		0, 
+		flags, 
 		nullptr, 
 		0, 
 		D3D11_SDK_VERSION,

@@ -96,6 +96,11 @@ bool CGraphicsEngine::InitInternal()
 	}
 
 	AssetManager::GetInstance().Init(myFrameWork->GetDevice(), "../assets", "../baked");
+#ifdef _DEBUG
+	AssetManager::GetInstance().Preload();
+#endif // _DEBUG
+
+
 	CCameraFactory::Init(NEARPLANE, FARPLANE);
 
 	if (!mySpriteFactory.Init(myFrameWork))

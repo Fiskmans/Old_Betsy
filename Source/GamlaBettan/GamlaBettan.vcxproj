@@ -191,6 +191,7 @@
     <ClCompile Include="ComponentManager.cpp" />
     <ClCompile Include="DecalFactory.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="LevelLoader.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="NavMeshLoader.cpp" />
@@ -256,6 +257,8 @@
     <ClInclude Include="Decal.h" />
     <ClInclude Include="DecalFactory.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityID.h" />
+    <ClInclude Include="EntityManager.h" />
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="NavMeshLoader.h" />

@@ -19,7 +19,13 @@ public:
 
 	void ReloadShader(Asset* aAsset, const std::string& aBaseFolder, const std::string& aShader, ShaderFlags aFlags, const std::string& aFileChanged);
 
+	void ForceRecompile();
+	void DontForceRecompile();
+
 private:
+
+	bool myForceRecompile = false;
+
 	std::vector<char> LoadOrCompileFromFile(const std::string& aBBaseFolder, const std::string& aFilePath, const std::string& aEntryPoint, const std::string& aCompiler, ShaderFlags aFlags);
 
 	ID3D11Device* myDevice;

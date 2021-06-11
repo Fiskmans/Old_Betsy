@@ -475,7 +475,7 @@ void DebugDrawer::DrawProgress(V3F at, float aSize, float aProgress)
 
 void DebugDrawer::DrawSkeleton(ModelInstance* aInstance)
 {
-#if USEDEBUGLINES
+#if USEDEBUGLINES && false
 	SetColor(V4F(0, 1, 0, 1));
 	if (aInstance->GetModelAsset().GetAsModel()->GetModelData()->myshaderTypeFlags & ShaderFlags::HasBones)
 	{
