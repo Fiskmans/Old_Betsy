@@ -22,7 +22,7 @@
 
 #define BAKED_SHADER_FOLDER "/shaders/"
 
-#define DEFAULT_PIXEL_SHADER "fullscreen_deferred/ToonShader.hlsl"
+#define DEFAULT_PIXEL_SHADER "deferred/Deferred.hlsl"
 
 void AssetManager::Init(ID3D11Device* aDevice, const std::string& aBaseFolder, const std::string& aBakeFolder)
 {
@@ -110,6 +110,9 @@ AssetHandle AssetManager::GetSkybox(const std::string& aPath)
 
 AssetHandle AssetManager::GetPixelShader(const std::string& aPath, ShaderFlags aFlags)
 {
+    static std::mutex mutex;
+    std::lock_guard lock(mutex);
+
     if (myCachedPixelShaders[aPath].count(aFlags) == 0)
     {
         Asset* shader = myShaderCompiler->GetPixelShader(myBaseFolder + PIXELSHADER_FOLDER,aPath,aFlags);
@@ -140,6 +143,9 @@ AssetHandle AssetManager::GetPixelShader(const std::string& aPath, ShaderFlags a
 
 AssetHandle AssetManager::GetVertexShader(const std::string& aPath, ShaderFlags aFlags)
 {
+    static std::mutex mutex;
+    std::lock_guard lock(mutex);
+
     if (myCachedVertexShaders[aPath].count(aFlags) == 0)
     {
         Asset* shader = myShaderCompiler->GetVertexShader(myBaseFolder + VERTEXSHADER_FOLDER, aPath, aFlags);
@@ -170,6 +176,9 @@ AssetHandle AssetManager::GetVertexShader(const std::string& aPath, ShaderFlags 
 
 AssetHandle AssetManager::GetGeometryShader(const std::string& aPath, ShaderFlags aFlags)
 {
+    static std::mutex mutex;
+    std::lock_guard lock(mutex);
+
     if (myCachedGeometryShaders[aPath].count(aFlags) == 0)
     {
         Asset* shader = myShaderCompiler->GetGeometryShader(myBaseFolder + GEOMETRYSHADER_FOLDER, aPath, aFlags);

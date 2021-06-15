@@ -38,7 +38,8 @@ void ComponentManager::ImGui()
 	colums = MIN(colums, mySystems.size());
 	if (colums > 0)
 	{
-		ImGui::BeginChild("ComponentManager",ImVec2(0,40*(mySystems.size() / colums) + 10), true);
+		size_t height = ((mySystems.size()-1) / colums) + 1;
+		ImGui::BeginChild("ComponentManager",ImVec2(0,37 * height + 7), true);
 		ImGui::Columns(colums);
 		for (size_t i = 0; i < colums; i++)
 		{

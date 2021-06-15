@@ -15,13 +15,12 @@ class AudioManager;
 class GBPhysX;
 class GBPhysXColliderFactory;
 
-class GameWorld : public Observer
+class GameWorld
 {
 public:
 	GameWorld();
 	~GameWorld();
 
-	virtual void RecieveMessage(const Message& aMessage) override;
 
 	bool Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader);
 	
@@ -34,8 +33,6 @@ public:
 private:
 
 	void SetupWorld();
-
-	void FreecamMovement(CommonUtilities::InputHandler& aInputHandler, float aDeltaTime);
 
 	EntityID myPlayer;
 

@@ -228,7 +228,7 @@ std::vector<ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, s
 				myContext->PSSetConstantBuffers(1, 1, &myObjectBuffer);
 
 				myContext->VSSetShader(modelData->myVertexShader.GetAsVertexShader(), nullptr, 0);
-				myContext->PSSetShader(GetPixelShader(modelData->myshaderTypeFlags).GetAsPixelShader(), nullptr, 0);
+				myContext->PSSetShader(modelData->myPixelShader.GetAsPixelShader(), nullptr, 0);
 
 
 				ID3D11ShaderResourceView* resources[3] = { nullptr };
@@ -617,13 +617,4 @@ bool DeferredRenderer::OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_
 	myContext->Unmap(aBuffer, 0);
 
 	return true;
-}
-
-AssetHandle& DeferredRenderer::GetPixelShader(size_t flags)
-{
-	if (myPixelShaders.count(flags) == 0)
-	{
-		myPixelShaders[flags] = AssetManager::GetInstance().GetPixelShader("deferred/Deferred.hlsl");
-	}
-	return myPixelShaders[flags];
 }

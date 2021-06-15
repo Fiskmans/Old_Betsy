@@ -15,18 +15,10 @@ AudioManager::AudioManager():
 	Observer({
 			MessageType::StartLoading,
 			MessageType::UnloadLevel,
-			MessageType::InputPauseHit,
 			MessageType::SetMasterVolume,
 			MessageType::StartInGameAudio,
-			MessageType::MenuButtonActive,
-			MessageType::MenuButtonHit,
-			MessageType::DialogueStarted,
 			MessageType::ChangedItem,
-			MessageType::NewDay,
-			MessageType::UpdateTime,
-			MessageType::RespawnTrader,
-			MessageType::PlayIntro,
-			MessageType::SpawnItem,
+			MessageType::PlayIntro
 		})
 {
 }
@@ -56,29 +48,9 @@ void AudioManager::RecieveMessage(const Message& aMessage)
 		myWwiseFramework->PostEvent(AK::EVENTS::AMBIENCE_WIND_STOP, my2DMasterObjectID);
 	}
 	break;
-	case MessageType::InputPauseHit:
-	{
-		PostMaster::GetInstance().SendMessages(MessageType::CurrentMasterVolume,&myMasterVolume);
-	}
-	break;
 	case MessageType::SetMasterVolume:
 	{
 		SetMasterVolume(*reinterpret_cast<const int*>(aMessage.myData));
-	}
-	break;
-	case MessageType::MenuButtonActive:
-	{
-		myWwiseFramework->PostEvent(AK::EVENTS::BUTTON_HOVER, my2DMasterObjectID);
-	}
-	break;
-	case MessageType::MenuButtonHit:
-	{
-		myWwiseFramework->PostEvent(AK::EVENTS::BUTTON_KLICK, my2DMasterObjectID);
-	}
-	break;
-	case MessageType::DialogueStarted:
-	{
-		myWwiseFramework->PostEvent(AK::EVENTS::INTERACT, my2DMasterObjectID);
 	}
 	break;
 	case MessageType::ChangedItem:
@@ -86,48 +58,9 @@ void AudioManager::RecieveMessage(const Message& aMessage)
 		myWwiseFramework->PostEvent(AK::EVENTS::CHANGE_ITEM, my2DMasterObjectID);
 	}
 	break;
-	case MessageType::NewDay:
-	{
-		myWwiseFramework->PostEvent(AK::EVENTS::AMBIENCE_WIND_STOP, my2DMasterObjectID);
-		myWwiseFramework->PostEvent(AK::EVENTS::AMBIENCE_NIGHT_STOP, my2DMasterObjectID);
-
-		myWwiseFramework->PostEvent(AK::EVENTS::AMBIENCE_MORNING_PLAY, my2DMasterObjectID);
-		myWwiseFramework->PostEvent(AK::EVENTS::AMBIENCE_WIND_PLAY, my2DMasterObjectID);
-
-		myWwiseFramework->PostEvent(AK::EVENTS::MUSIC1_STOP, my2DMasterObjectID);
-		myWwiseFramework->PostEvent(AK::EVENTS::MUSIC1_PLAY, my2DMasterObjectID);
-
-		myDayTime = 0;
-	}
-	break;
-	case MessageType::UpdateTime:
-	{
-		const MessageStructs::UpdateTimeData& data = *reinterpret_cast<const MessageStructs::UpdateTimeData*>(aMessage.myData);
-		if (data.myHour == 19 && myDayTime != 19)
-		{
-			myDayTime = 19;
-
-			myWwiseFramework->PostEvent(AK::EVENTS::AMBIENCE_WIND_STOP, my2DMasterObjectID);
-			myWwiseFramework->PostEvent(AK::EVENTS::AMBIENCE_NIGHT_STOP, my2DMasterObjectID);
-
-			myWwiseFramework->PostEvent(AK::EVENTS::AMBIENCE_NIGHT_PLAY, my2DMasterObjectID);
-			myWwiseFramework->PostEvent(AK::EVENTS::MUSIC1_STOP, my2DMasterObjectID);
-		}
-	}
-	break;
-	case MessageType::RespawnTrader:
-	{
-		myWwiseFramework->PostEvent(AK::EVENTS::TRADER_ENTERED, my2DMasterObjectID);
-	}
-	break;
 	case MessageType::PlayIntro:
 	{
 		myWwiseFramework->PostEvent(AK::EVENTS::INTRO_PLAY, my2DMasterObjectID);
-	}
-	break;
-	case MessageType::SpawnItem:
-	{
-		myWwiseFramework->PostEvent(AK::EVENTS::ADD_ITEM, my2DMasterObjectID);
 	}
 	break;
 	}

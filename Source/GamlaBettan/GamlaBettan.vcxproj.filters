@@ -199,6 +199,12 @@
       <Filter>Components\EngineComponents</Filter>
     </ClCompile>
     <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="FreeCam.cpp">
+      <Filter>Components\EngineComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -405,6 +411,12 @@
     </ClInclude>
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="EntityID.h" />
+    <ClInclude Include="FreeCam.h">
+      <Filter>Components\EngineComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
@@ -469,6 +481,9 @@
     </Filter>
     <Filter Include="Components\EngineComponents">
       <UniqueIdentifier>{3943631e-a3ad-48e4-93b4-1751bc9df08e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Terrain">
+      <UniqueIdentifier>{f422ca03-cd24-4ed0-8215-5352674c7413}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

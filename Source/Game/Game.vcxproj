@@ -192,12 +192,14 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BounceComponent.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="GameWorld.h" />
     <ClInclude Include="MainMenuState.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BounceComponent.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="GameWorld.cpp" />

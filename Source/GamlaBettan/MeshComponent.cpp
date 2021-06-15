@@ -35,40 +35,27 @@ void MeshComponent::Update(const FrameData& aFrameData, EntityID aEntityID)
 void MeshComponent::ImGui(EntityID aEntityID)
 {
 	myInstance->SetIsHighlighted(ImGui::IsWindowHovered());
-	bool open = ImGui::TreeNode("Mesh");
-
-	if(ImGui::BeginDragDropSource())
+	ImGui::Button("Drop Zone",ImVec2(100,50));
+	if (ImGui::BeginDragDropTarget())
 	{
-		ImGui::SetDragDropPayload("EntityID", &aEntityID, sizeof(aEntityID));
-		ImGui::EndDragDropSource();
-	}
-
-	if (open)
-	{
-		ImGui::Button("Drop Zone",ImVec2(100,50));
-		if (ImGui::BeginDragDropTarget())
+		const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset");
+		if (payload)
 		{
-			const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset");
-			if (payload)
+			AssetHandle asset = *static_cast<Asset**>(payload->Data);
+			if (asset.GetType() == Asset::AssetType::Model)
 			{
-				AssetHandle asset = *static_cast<Asset**>(payload->Data);
-				if (asset.GetType() == Asset::AssetType::Model)
-				{
-					Scene::GetInstance().RemoveFromScene(myInstance);
-					delete myInstance;
+				Scene::GetInstance().RemoveFromScene(myInstance);
+				delete myInstance;
 
-					myInstance = asset.InstansiateModel();
-					Scene::GetInstance().AddToScene(myInstance);
-				}
-				else
-				{
-					SYSWARNING("asset dropped on meshComponent is not a model");
-				}
+				myInstance = asset.InstansiateModel();
+				Scene::GetInstance().AddToScene(myInstance);
 			}
-
-			ImGui::EndDragDropTarget();
+			else
+			{
+				SYSWARNING("asset dropped on meshComponent is not a model");
+			}
 		}
 
-		ImGui::TreePop();
+		ImGui::EndDragDropTarget();
 	}
 }

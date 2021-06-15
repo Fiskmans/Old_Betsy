@@ -6,7 +6,7 @@ namespace CommonUtilities
 	class InputHandler;
 }
 
-class InputManager :  public Observer
+class InputManager
 {
 public:
 
@@ -19,8 +19,6 @@ public:
 	float GetMouseNomalizedX() const;
 	float GetMouseNomalizedY() const;
 
-	void RecieveMessage(const Message& aMessage) override;
-
 	//Only for debug
 	inline CommonUtilities::InputHandler* GetInputHandler() const;
 
@@ -32,7 +30,6 @@ private:
 
 	bool myIsPaused;
 	bool myMouseIsMoving;
-	bool myGameExists;
 
 	std::vector<Secret> mySecrets;
 };

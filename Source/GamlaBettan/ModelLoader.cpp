@@ -495,11 +495,11 @@ void ModelLoader::LoadMesh(const aiScene* aScene, const aiNode* aNode, aiMatrix4
 	modelData->myIndexBuffer = indexBuffer;
 	modelData->myInputLayout = inputLayout;
 
-	aModel->AddModelPart(modelData);
-
 	releaseVertexBuffer.Disable();
 	releaseIndexBuffer.Disable();
 	releaseInputLayout.Disable();
+
+	aModel->AddModelPart(modelData);
 }
 
 void ModelLoader::QueueLoad(Model* aModel, std::string aFilePath)

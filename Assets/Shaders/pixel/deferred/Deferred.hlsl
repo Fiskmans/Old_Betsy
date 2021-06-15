@@ -17,5 +17,4 @@ GBufferOutput pixelShader(VertexToPixel input)
 	output.myAmbientOcclusion = sampleData.ambientOcclusion;
 	output.myEmissive = sampleData.emissive;
 	return output;
-
 }

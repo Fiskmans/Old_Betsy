@@ -126,7 +126,17 @@ inline void ComponentSystem<ComponentType>::RunImGuiFor(EntityID aEntityID)
 	Component* comp = Retreive(aEntityID);
 	if (comp)
 	{
-		comp->ImGui(aEntityID);
+		bool open = ImGui::TreeNode(myName.c_str());
+		if (ImGui::BeginDragDropSource())
+		{
+			ImGui::SetDragDropPayload("EntityID", &aEntityID, sizeof(aEntityID));
+			ImGui::EndDragDropSource();
+		}
+		if (open)
+		{
+			comp->ImGui(aEntityID);
+			ImGui::TreePop();
+		}
 	}
 }
 

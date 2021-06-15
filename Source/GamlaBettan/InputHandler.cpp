@@ -32,12 +32,12 @@ namespace CommonUtilities
 			break;
 
 		case WM_KEYDOWN:
-			index = static_cast<int>(std::floor<int>(static_cast<int>(aWParam) / 64));
-			myNewKeys[index] |= 1LL << (static_cast<int>(aWParam) % 64);
+			index = static_cast<int>(static_cast<int>(aWParam) / CHAR_BIT);
+			myNewKeys[index] |= BIT(static_cast<int>(aWParam) % CHAR_BIT);
 			break;
 		case WM_KEYUP:   
-			index = static_cast<int>(std::floor<int>(static_cast<int>(aWParam) / 64));
-			myNewKeys[index] &= ~(1LL << (static_cast<int>(aWParam) % 64));
+			index = static_cast<int>(static_cast<int>(aWParam) / CHAR_BIT);
+			myNewKeys[index] &= ~BIT(static_cast<int>(aWParam) % CHAR_BIT);
 			break;
 		default:
 			return false;
@@ -59,9 +59,6 @@ namespace CommonUtilities
 		myWheelDelta = 0;
 	}
 
-	/**
-	 * \brief Has partial support as defined by the CommonUtilities::Key:: enum
-	 */
 	bool InputHandler::IsKeyDown(const Key aKey) const
 	{
 #if USEIMGUI
@@ -70,13 +67,9 @@ namespace CommonUtilities
 			return false;
 		}
 #endif
-		const int index = static_cast<int>(std::floor(aKey / 64));
-		return (myNewKeys[index] & (1LL << (aKey % 64)));
+		return !!(myNewKeys[static_cast<size_t>(aKey) / CHAR_BIT] & BIT(static_cast<size_t>(aKey) % CHAR_BIT));
 	}
 	
-	/**
-	 * \brief Has partial support as defined by the CommonUtilities::Key:: enum
-	 */
 	bool InputHandler::IsKeyUp(const Key aKey) const
 	{
 #if USEIMGUI
@@ -85,13 +78,9 @@ namespace CommonUtilities
 			return false;
 		}
 #endif
-		const int index = static_cast<int>(std::floor(aKey / 64));
-		return !(myNewKeys[index] & (1LL << (aKey % 64)));
+		return !(myNewKeys[static_cast<size_t>(aKey) / CHAR_BIT] & BIT(static_cast<size_t>(aKey) % CHAR_BIT));
 	}
 	
-	/**
-	 * \brief Has partial support as defined by the CommonUtilities::Key:: enum
-	 */
 	bool InputHandler::IsKeyHit(const Key aKey) const
 	{
 #if USEIMGUI
@@ -103,13 +92,9 @@ namespace CommonUtilities
 			}
 		}
 #endif
-		const int index = static_cast<int>(std::floor(aKey / 64));
-		return (myNewKeys[index] & (1LL << (aKey % 64))) && !(myOldKeys[index] & (1LL << (aKey % 64)));
+		return IsKeyDown(aKey) && !(myOldKeys[static_cast<size_t>(aKey) / CHAR_BIT] & BIT(static_cast<size_t>(aKey) % CHAR_BIT));
 	}
 	
-	/**
-	* \brief Has partial support as defined by the CommonUtilities::Key:: enum
-	*/
 	bool InputHandler::IsKeyReleased(const Key aKey) const
 	{
 #if USEIMGUI
@@ -121,14 +106,9 @@ namespace CommonUtilities
 			}
 		}
 #endif
-		const int index = static_cast<int>(std::floor(aKey / 64));
-		return !(myNewKeys[index] & (1LL << (aKey % 64))) && (myOldKeys[index] & (1LL << (aKey % 64)));
+		return !IsKeyDown(aKey) && !!(myOldKeys[static_cast<size_t>(aKey) / CHAR_BIT] & BIT(static_cast<size_t>(aKey) % CHAR_BIT));
 	}
 	
-	/**
-	 * \brief Has full support for all VK_* as defined in the <winuser> header
-	 * \param aKey A VK_* macro found in the <winuser> header. Use char literals for a-z and 0-9
-	 */
 	bool InputHandler::IsKeyDown(const WPARAM aKey) const
 	{
 #if USEIMGUI
@@ -144,10 +124,6 @@ namespace CommonUtilities
 		return (myNewKeys[index] & (1LL << (aKey % 64)));
 	}
 	
-	/**
-	 * \brief Has full support for all VK_* as defined in the <winuser> header
-	 * \param aKey A VK_* macro found in the <winuser> header. Use char literals for a-z and 0-9
-	 */
 	bool InputHandler::IsKeyUp(const WPARAM aKey) const
 	{
 #if USEIMGUI
@@ -163,10 +139,6 @@ namespace CommonUtilities
 		return !(myNewKeys[index] & (1LL << (aKey % 64)));
 	} 
 	
-	/**
-	 * \brief Has full support for all VK_* as defined in the <winuser> header
-	 * \param aKey A VK_* macro found in the <winuser> header. Use char literals for a-z and 0-9
-	 */
 	bool InputHandler::IsKeyHit(const WPARAM aKey) const
 	{
 #if USEIMGUI
@@ -182,10 +154,6 @@ namespace CommonUtilities
 		return (myNewKeys[index] & (1LL << (aKey % 64))) && !(myOldKeys[index] & (1LL << (aKey % 64)));
 	}
 	
-	/**
-	 * \brief Has full support for all VK_* as defined in the <winuser> header
-	 * \param aKey A VK_* macro found in the <winuser> header. Use char literals for a-z and 0-9
-	 */
 	bool InputHandler::IsKeyReleased(const WPARAM aKey) const
 	{
 #if USEIMGUI
@@ -200,50 +168,6 @@ namespace CommonUtilities
 		const int index =static_cast<int>(std::floor(aKey / 64));
 		return !(myNewKeys[index] & (1LL << (aKey % 64))) && (myOldKeys[index] & (1LL << (aKey % 64)));
 	}
-
-#ifdef _DEBUG
-	std::string InputHandler::GetPressedHistory() const
-	{
-		static std::string string = "";
-		
-		for (auto value : ourKeyToStringMap)
-		{
-			if (IsKeyHit(value.first))
-				string += "Hit: " + value.second + " ";
-			if (IsKeyReleased(value.first))
-				string += "Released: " + value.second + " ";
-		}
-
-		return string;
-	}
-
-	std::string InputHandler::GetDownHistory() const
-	{
-		static std::vector<std::string> history;
-
-		std::string string = "";
-
-		for (auto value : ourKeyToStringMap)
-		{
-			if (IsKeyDown(value.first) && std::find(history.begin(), history.end(), value.second) == history.end())
-			{
-				history.push_back(value.second);
-			}
-
-			if (IsKeyUp(value.first))
-			{
-				auto iter = std::find(history.begin(), history.end(), value.second);
-				if (iter != history.end())
-					history.erase(iter);
-			}
-		}
-
-		for (auto s : history)
-			string += s + " ";
-
-		return string;
-	}
-#endif
 
 	int InputHandler::GetMouseX() const
 	{
@@ -475,92 +399,4 @@ namespace CommonUtilities
 		return (myNewMouseState & aKey) != aKey && (myOldMouseState & aKey) == aKey;
 	}
 
-#ifdef _DEBUG
-	std::unordered_map<WPARAM, std::string> InputHandler::ourKeyToStringMap =
-	{
-	{ Key_0        , "0"},
-	{ Key_1		   , "1"},
-	{ Key_2		   , "2"},
-	{ Key_3		   , "3"},
-	{ Key_4		   , "4"},
-	{ Key_5		   , "5"},
-	{ Key_6		   , "6"},
-	{ Key_7		   , "7"},
-	{ Key_8		   , "8"},
-	{ Key_9		   , "9"},
-	{ Key_A		   , "A"},
-	{ Key_B		   , "B"},
-	{ Key_C		   , "C"},
-	{ Key_D		   , "D"},
-	{ Key_E		   , "E"},
-	{ Key_F		   , "F"},
-	{ Key_G		   , "G"},
-	{ Key_H		   , "H"},
-	{ Key_I		   , "I"},
-	{ Key_J		   , "J"},
-	{ Key_K		   , "K"},
-	{ Key_L		   , "L"},
-	{ Key_M		   , "M"},
-	{ Key_N		   , "N"},
-	{ Key_O		   , "O"},
-	{ Key_P		   , "P"},
-	{ Key_Q		   , "Q"},
-	{ Key_R		   , "R"},
-	{ Key_S		   , "S"},
-	{ Key_T		   , "T"},
-	{ Key_U		   , "U"},
-	{ Key_V		   , "V"},
-	{ Key_W		   , "W"},
-	{ Key_X		   , "X"},
-	{ Key_Y		   , "Y"},
-	{ Key_Z		   , "Z"},
-	{ Key_F1	   , "F1"},
-	{ Key_F2	   , "F2"},
-	{ Key_F3	   , "F3"},
-	{ Key_F4	   , "F4"},
-	{ Key_F5	   , "F5"},
-	{ Key_F6	   , "F6"},
-	{ Key_F7	   , "F7"},
-	{ Key_F8	   , "F8"},
-	{ Key_F9	   , "F9"},
-	{ Key_F10	   , "F10"},
-	{ Key_F11	   , "F11"},
-	{ Key_F12	   , "F12"},
-	{ Key_Numpad0  , "Numpad0"},
-	{ Key_Numpad1  , "Numpad1"},
-	{ Key_Numpad2  , "Numpad2"},
-	{ Key_Numpad3  , "Numpad3"},
-	{ Key_Numpad4  , "Numpad4"},
-	{ Key_Numpad5  , "Numpad5"},
-	{ Key_Numpad6  , "Numpad6"},
-	{ Key_Numpad7  , "Numpad7"},
-	{ Key_Numpad8  , "Numpad8"},
-	{ Key_Numpad9  , "Numpad9"},
-	{ Key_Multiply , "Multiply"},
-	{ Key_Add	   , "Add"},
-	{ Key_Seperator, "Seperator"},
-	{ Key_Subtract , "Subtract"},
-	{ Key_Decimal  , "Decimal"},
-	{ Key_Divide   , "Divide"},
-	{ Key_Left	   , "Left"},
-	{ Key_Up	   , "Up"},
-	{ Key_Right	   , "Right"},
-	{ Key_Down	   , "Down"},
-	{ Key_Shift	   , "Shift"},
-	{ Key_Control  , "Control"},
-	{ Key_Alt	   , "Alt"},
-	{ Key_Tab	   , "Tab"},
-	{ Key_Enter	   , "Enter"},
-	{ Key_Space	   , "Space"},
-	{ Key_BackSpace, "BackSpace"},
-	{ Key_Insert   , "Insert"},
-	{ Key_Delete   , "Delete"},
-	{ Key_Home	   , "Home"},
-	{ Key_End	   , "End"},
-	{ Key_CapsLock , "CapsLock"},
-	{ Key_Escape   , "Escape"},
-	{ Key_PageUp   , "PageUp"},
-	{ Key_PageDown , "PageDown"}
-	};
-#endif
 }

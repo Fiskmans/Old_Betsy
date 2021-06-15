@@ -130,8 +130,8 @@ PixelOutput pixelShader(VertexToPixel input)
 	camUV.y *= -1;
 	camUV.y += 1;
 
-	float sampleSize = 0.0004;
-	float bias = 0.002;
+	const float sampleSize = 0.0004;
+	const float bias = 0.0009;
 	float fuzzyOcclusion = 0;
 
     float delta = 0.0;

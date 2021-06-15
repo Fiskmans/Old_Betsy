@@ -29,8 +29,6 @@ public:
 private:
 	bool OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize);
 
-	AssetHandle& GetPixelShader(size_t flags);
-
 	DepthRenderer* myShadowRenderer = nullptr;
 
 	GAMEMETRIC(float, myCloudIntensity, CLOUDINTENSITY, 0.3f);
@@ -38,7 +36,6 @@ private:
 	long long myCreateTime = 0;
 	struct ID3D11DeviceContext* myContext = nullptr;
 	struct ID3D11Device* myDevice = nullptr;
-	std::map<size_t, AssetHandle> myPixelShaders;
 	AssetHandle myBackFaceShader;
 	ID3D11Buffer* myFrameBuffer = nullptr;
 	ID3D11Buffer* myObjectBuffer = nullptr;

@@ -31,7 +31,7 @@ namespace CommonUtilities
 	class InputHandler
 	{
 	public:
-		enum Key
+		enum class Key
 		{
 			Key_0 = 0x30,
 			Key_1 = 0x31,
@@ -143,10 +143,6 @@ namespace CommonUtilities
 		bool IsKeyHit(WPARAM aKey) const;
 		bool IsKeyReleased(WPARAM aKey) const;
 
-#ifdef _DEBUG
-		std::string GetPressedHistory() const;
-		std::string GetDownHistory() const;
-#endif
 
 		int GetMouseX() const;
 		int GetMouseY() const;
@@ -180,8 +176,8 @@ namespace CommonUtilities
 		HWNDPTR myWindowHandle;
 		Rect myWindowRect;
 
-		__int64 myNewKeys[4]{ 0, 0, 0, 0 };
-		__int64 myOldKeys[4]{ 0, 0, 0, 0 };
+		unsigned char myNewKeys[0x100 / CHAR_BIT];
+		unsigned char myOldKeys[0x100 / CHAR_BIT];
 
 		WPARAM myNewMouseState, myOldMouseState;
 		int myMouseNewX, myMouseNewY = 0;
@@ -190,9 +186,5 @@ namespace CommonUtilities
 		short myWheelValue = 0;
 		short myOldWheelValue = 0;
 
-
-#ifdef _DEBUG
-		static std::unordered_map<WPARAM, std::string> ourKeyToStringMap;
-#endif
 	};
 }

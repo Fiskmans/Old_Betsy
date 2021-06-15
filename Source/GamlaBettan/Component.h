@@ -1,5 +1,6 @@
 #pragma once
 #include "GamlaBettan\EntityID.h"
+#include "GamlaBettan\InputHandler.h"
 
 class Component
 {
@@ -8,6 +9,7 @@ public:
 
 	struct FrameData
 	{
+		CommonUtilities::InputHandler& myInputHandler;
 		float myDeltaTime;
 		float myTotalTime;
 	};

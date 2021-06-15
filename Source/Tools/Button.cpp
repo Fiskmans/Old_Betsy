@@ -63,8 +63,6 @@ void Button::SetHovered()
 		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Hover)]);
 	}
 	myState = ButtonState::Hover;
-	
-	PostMaster::GetInstance().SendMessages(MessageType::MenuButtonActive);
 }
 
 void Button::SetPressed()
@@ -75,8 +73,6 @@ void Button::SetPressed()
 		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Pressed)]);
 	}
 	myState = ButtonState::Pressed;
-
-	PostMaster::GetInstance().SendMessages(MessageType::MenuButtonHit);
 }
 
 void Button::SetToNormal()

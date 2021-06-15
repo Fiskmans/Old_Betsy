@@ -38,34 +38,19 @@
 
 #include "GamlaBettan\ModelInstance.h"
 #include "GamlaBettan\Scene.h"
-#include "GamlaBettan\MeshComponent.h"
 #include "GamlaBettan\EntityManager.h"
+
+#include "GamlaBettan\MeshComponent.h"
+#include "GamlaBettan\FreeCam.h"
+
+
+#include "Game\BounceComponent.h"
 
 GameWorld::GameWorld() :
 	myParticleFactory(nullptr),
 	myGBPhysXPtr(nullptr),
 	myGBPhysXColliderFactory(nullptr),
-	mySpriteFactory(nullptr),
-	Observer(
-		{
-			MessageType::NewLevelLoaded,
-			MessageType::WindowResize,
-			MessageType::EnemyDied,
-			MessageType::TriggerEvent,
-			MessageType::FadeInComplete,
-			MessageType::StartDialogue,
-			MessageType::DialogueOver,
-			MessageType::RespawnTrader,
-			MessageType::DespawnTrader,
-			MessageType::RiverCreated,
-			MessageType::FadeOut,
-			MessageType::FadeOutComplete,
-			MessageType::CreateSeed,
-			MessageType::RequestUISetupPtrs,
-			MessageType::StartInGameAudio,
-			MessageType::DialogueOver
-		}
-	)
+	mySpriteFactory(nullptr)
 {
 }
 
@@ -96,100 +81,12 @@ bool GameWorld::Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramewo
 	SetupWorld();
 }
 
-void GameWorld::RecieveMessage(const Message& aMessage)
-{
-}
-
 void GameWorld::SetupWorld()
 {
 	myPlayer = EntityManager::GetInstance().Get();
 	EntityManager::GetInstance().Retrieve(myPlayer)->AddComponent<MeshComponent>("Quaternius/Medieval/Buildings/House_1.fbx");
-}
-
-void GameWorld::FreecamMovement(CommonUtilities::InputHandler& aInputHandler, float aDeltaTime)
-{
-	if (aInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key_Alt))
-	{
-		Camera* mainCam = Scene::GetInstance().GetMainCamera();
-
-		static Point lastmp = aInputHandler.GetMousePosition();
-		Point mp = aInputHandler.GetMousePosition();
-		if (aInputHandler.IsMouseDown(CommonUtilities::InputHandler::Mouse::Mouse_Right))
-		{
-			const static float speed = 0.001f;
-
-			float totalDiff = 1 / (1 + (mp.x - lastmp.x) * speed) * 1 / (1 + (mp.y - lastmp.y) * speed);
-			mainCam->SetPosition(mainCam->GetPosition() * totalDiff);
-		}
-		else if (aInputHandler.IsMouseDown(CommonUtilities::InputHandler::Mouse::Mouse_Left))
-		{
-			V3F pos = mainCam->GetPosition();
-			float length = pos.Length();
-			pos += mainCam->GetRight() * length * -static_cast<float>(mp.x - lastmp.x) * 0.001f;
-			pos += mainCam->GetUp() * length * static_cast<float>(mp.y - lastmp.y) * 0.001f;
-			pos = pos.GetNormalized() * length;
-
-			mainCam->SetPosition(pos);
-			mainCam->LookAt(V3F(0, 0, 0));
-		}
-		else
-		{
-			lastmp = aInputHandler.GetMousePosition();
-		}
-		lastmp = mp;
-	}
-	else
-	{
-		CommonUtilities::Vector3<float> movement = { 0.f, 0.f, 0.f };
-		CommonUtilities::Vector3<float> rotation = { 0.f, 0.f, 0.f };
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_W))
-		{
-			movement.z += myFreecamSpeed * aDeltaTime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_S))
-		{
-			movement.z -= myFreecamSpeed * aDeltaTime;
-		}
-
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_D))
-		{
-			movement.x += myFreecamSpeed * aDeltaTime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_A))
-		{
-			movement.x -= myFreecamSpeed * aDeltaTime;
-		}
-
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_Space))
-		{
-			movement.y += myFreecamSpeed * aDeltaTime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_Shift))
-		{
-			movement.y -= myFreecamSpeed * aDeltaTime;
-		}
-
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_Q))
-		{
-			rotation.y -= myFreecamRotationSpeed * aDeltaTime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_E))
-		{
-			rotation.y += myFreecamRotationSpeed * aDeltaTime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_Z))
-		{
-			rotation.x -= myFreecamRotationSpeed * aDeltaTime;
-		}
-		if (aInputHandler.IsKeyDown(aInputHandler.Key_X))
-		{
-			rotation.x += myFreecamRotationSpeed * aDeltaTime;
-		}
-		Camera* mainCam = Scene::GetInstance().GetMainCamera();
-
-		mainCam->Move(movement);
-		mainCam->Rotate(rotation);
-	}
+	EntityManager::GetInstance().Retrieve(myPlayer)->AddComponent<BounceComponent>();
+	EntityManager::GetInstance().Retrieve(myPlayer)->AddComponent<FreeCam>();
 }
 
 #if USEIMGUI
@@ -206,7 +103,6 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 	WindSystem::GetInstance().SetBaseWind(V3F((noise.noise(now * 2, now * PI, 5) - 0.5) * 10000, 0, (noise.noise(now * 2, now * PI, 10) - 0.5) * 10000));
 
 #if USEIMGUI
-	static bool freeCam = false;
 	static bool showBoundingBoxes = false;
 	static bool pauseAnimations = false;
 	static bool snapCameraOnLoad = true;
@@ -220,13 +116,8 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 	WindowControl::Window("GameWorld", [&]()
 		{
 			ImGui::Checkbox("Show Bounding Boxes", &showBoundingBoxes);
-			ImGui::Checkbox("Free Camera", &freeCam);
 		});
 
-	if (freeCam)
-	{
-		FreecamMovement(aInputHandler, aDeltaTime);
-	}
 #endif // !USEIMGUI
 
 
