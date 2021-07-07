@@ -165,6 +165,9 @@
     <ClInclude Include="ExecuteOnDestruct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Handover.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileWatcher.cpp">

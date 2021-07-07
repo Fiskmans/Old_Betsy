@@ -4,10 +4,10 @@
 
 std::mt19937& random()
 {
-	static std::random_device seed;
 #ifdef _DEBUG
 	static std::mt19937 rng(1337);
 #else
+	static std::random_device seed;
 	static std::mt19937 rng(seed());
 #endif // _DEBUG
 	return rng;

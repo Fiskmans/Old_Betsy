@@ -34,6 +34,7 @@ namespace Tools
 			globalTextureFactory = aFactory;
 		}
 	}
+	thread_local bool dummy = false;
 
 
 	void ZoomableImGuiImage(void* aTexture, ImVec2 aSize)
@@ -166,86 +167,13 @@ namespace Tools
 		ZoomableImGuiImage(CopyTexture(aTexture), aSize);
 	}
 
-	bool EditPosition(const char* aName, V3F& aVector, V3F* aAdditionalInput, const char* aAdditionalInputName)
+	bool EditPosition(const char* aName, float* aData, bool& hovered)
 	{
-#if USEIMGUI
-		ImGui::PushID(aName);
-		bool hovered = false;
-		ImGui::InputFloat3(aName, aVector.begin());
+		bool changed = false;
+		hovered = false;
+		changed |= ImGui::InputFloat3(aName, aData);
 		hovered |= ImGui::IsItemHovered();
-#ifdef _DEBUG
-		static ImGuiID PickingID;
-		ImGuiID thisId = ImGui::GetID("Picker");
-
-
-		ImGui::SameLine();
-		if (ImGui::Button("Camera"))
-		{
-			aVector = DebugTools::myCamera->GetPosition();
-		}
-		hovered |= ImGui::IsItemHovered();
-		ImGui::SameLine();
-		bool shouldPopColor = false;
-		if (PickingID == thisId)
-		{
-			hovered |= true;
-			shouldPopColor = true;
-			ImGui::PushStyleColor(ImGuiCol_Border, ImGui::GetStyle().Colors[ImGuiCol_BorderShadow]);
-			if (GetAsyncKeyState(VK_LBUTTON) && !ImGui::GetIO().WantCaptureMouse)
-			{
-				aVector = PathFinder::GetInstance().FindPoint(*DebugTools::LastKnownMouseRay);
-				PickingID = ImGuiID();
-			}
-		}
-		if (ImGui::Button("Pick"))
-		{
-			PickingID = thisId;
-		}
-		if (shouldPopColor)
-		{
-			ImGui::PopStyleColor(1);
-		}
-		hovered |= ImGui::IsItemHovered();
-		ImGui::SameLine();
-		if (ImGui::Button("Goto"))
-		{
-			DebugTools::myCamera->SetPosition(aVector);
-		}
-		hovered |= ImGui::IsItemHovered();
-		ImGui::SameLine();
-		if (ImGui::Button("Gizmo"))
-		{
-			DebugTools::AttachToGizmo(aVector);
-		}
-		hovered |= ImGui::IsItemHovered();
-		hovered |= DebugTools::IsGizmo(aVector);
-#endif // _DEBUG
-		if (aAdditionalInput)
-		{
-			ImGui::SameLine();
-			if (ImGui::Button(aAdditionalInputName))
-			{
-				aVector = *aAdditionalInput;
-			}
-			hovered |= ImGui::IsItemHovered();
-		}
-
-
-
-		if (hovered)
-		{
-			DebugDrawer::GetInstance().DrawCross(aVector, 50);
-		}
-		ImGui::PopID();
-		return hovered;
-#else
-		return false;
-#endif
-	}
-
-	void EditPosition(const char* aName, float* aData)
-	{
-		ImGui::InputFloat3(aName, aData);
+		return changed;
 	}
 
 	ImVec4 GetColor(int aDepth)

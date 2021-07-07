@@ -10,16 +10,15 @@ namespace Tools
 		void ResetCounter();
 		void Setup(ID3D11Device* aDevice, ID3D11DeviceContext* aContext, FullscreenRenderer* aRenderer, FullscreenTextureFactory* aFactory);
 	}
-
+	extern thread_local bool dummy;
 
 	struct TimeTree;
 	void ZoomableImGuiImage(void* aTexture,ImVec2 aSize);
 
 	void ZoomableImGuiSnapshot(void* aTexture, ImVec2 aSize);
 
-	bool EditPosition(const char* aName, V3F& aVector, V3F* aAdditionalInput = nullptr, const char* aAdditionalInputName = nullptr);
 
-	void EditPosition(const char* aName, float* aData);
+	bool EditPosition(const char* aName, float* aData, bool& hovered = dummy);
 
 	std::string PadOrTrimTo(const std::string& aString, int aLength);
 

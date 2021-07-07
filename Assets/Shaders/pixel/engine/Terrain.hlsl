@@ -12,7 +12,11 @@ GBufferOutput pixelShader(TerrainVertexToPixel input)
 {
 	GBufferOutput output;
 	output.myWorldPosition = float4(input.myWorldPos,1);
-	output.myAlbedo.rgba = lerp(float4(0.7, 0.7, 0.7, 1), float4(0.3, 0.3, 0.3, 1), abs(cos(input.myPrimitiveIndex)));
+	output.myAlbedo.rgba = float4(
+		lerp(0.7, 0.3, abs(cos(input.myPrimitiveIndex))),
+		lerp(0.7, 0.3, abs(cos(input.myPrimitiveIndex*11))),
+		lerp(0.7, 0.3, abs(cos(input.myPrimitiveIndex*53))),
+		1.0);
 	//dont think about it
 	output.myNormal = float4(input.myNormal, 0);
 	output.myVertexNormal = float4(input.myNormal, 0);

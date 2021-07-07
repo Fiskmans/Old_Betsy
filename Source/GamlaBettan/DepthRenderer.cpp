@@ -347,8 +347,6 @@ void DepthRenderer::RenderEnvironmentDepth(EnvironmentLight* aLight, BoneTexture
 	myEnvironmentCamera->SetPosition(aLight->myShadowCorePosition + aLight->myDirection * ENVIRONMENCAMEREASIZE*0.5f);
 	myEnvironmentCamera->LookAt(aLight->myShadowCorePosition);
 
-	DebugDrawer::GetInstance().DrawFrustum(myEnvironmentCamera->GenerateFrustum());
-
 	std::vector<class ModelInstance*> filtered;
 	{
 		PERFORMANCETAG("Culling");

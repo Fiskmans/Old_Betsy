@@ -197,6 +197,7 @@
     <ClInclude Include="FoldNumbers.h" />
     <ClInclude Include="Fourier.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="Handover.h" />
     <ClInclude Include="Imaginary.h" />
     <ClInclude Include="ImGuiHelpers.h" />
     <ClInclude Include="imgui\backend\imgui_impl_dx11.h" />

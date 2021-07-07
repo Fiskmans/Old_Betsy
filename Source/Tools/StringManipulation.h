@@ -8,6 +8,8 @@ namespace Tools
 {
 
 	std::string PathWithoutFile(const std::string& aFilePath);
+	std::string ExtensionFromPath(const std::string& aFilePath);
+	std::string PrintByteSize(size_t aAmount);
 
 	// trim from start (in place)
 	static inline void ltrim(std::string& s) {

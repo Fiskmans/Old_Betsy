@@ -1,5 +1,6 @@
 #pragma once
 #include "GamlaBettan\Model.h"
+#include "Tools\Handover.h"
 
 class Terrain : public CommonUtilities::Singleton<Terrain>
 {
@@ -17,14 +18,31 @@ private:
 
 	static const size_t MaxTriCount = 1 << 20; // ~13mb of graphics memory
 
+	void FromFile(const std::string& aFilePath);
+
+	void FromFBX(const std::string aFilePath);
+	void FromTER(const std::string aFilePath);
+
+	void ToFile(const std::string& aFilePath);
+
+	void GenerateVertexInfo();
+
 	void Setup();
 	void SetupGraphicsResources();
 	void SetupAllNormals();
 	void SetupNormals(UINT aVertexThatChanged);
 	void SetupNormals(std::vector<UINT> aVertexesAffected);
+	float Area(UINT aTri);
+	float Triangleness(UINT aTri);
 
 	void TestMesh();
 
+	void MoveVertex(UINT aIndex, V3F aTargetPosition);
+	void Tesselate(UINT aTri);
+	void SwapVertex(UINT aTri, UINT aOriginal, UINT aTarget);
+	UINT XorAllVerticies(UINT aTri);
+	UINT AddVertex(V3F aPosition);
+	UINT AddTri(UINT aA, UINT aB, UINT aC);
 
 	bool OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize);
 	
@@ -52,7 +70,6 @@ private:
 		UINT myC;
 	};
 
-
 	DirectX11Framework* myFramework;
 
 	std::vector<Vertex> myVertexes;
@@ -66,5 +83,7 @@ private:
 	Asset* myModelAsset;
 	AssetHandle myModelHandle;
 	ModelInstance* myModelInstance;
+
+
 };
 
