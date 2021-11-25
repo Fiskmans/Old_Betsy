@@ -130,8 +130,11 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\Wwise\lib\;$(OutputPath)PhysX_Debug\;$(solutiondir)libs\;$(solutiondir)ExternalLibs\;$(SolutionDir)Audio\Wwise\Wwise\Profile(StaticCRT)\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>pch.lib;GBPhysX_$(Configuration).lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;imgui_$(Configuration).lib;imgui_canvas_$(Configuration).lib;imgui_node_editor_$(Configuration).lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pch.lib;GBPhysX_$(Configuration).lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command />
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
     <ClCompile>

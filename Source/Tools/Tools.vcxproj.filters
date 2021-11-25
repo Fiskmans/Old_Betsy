@@ -84,9 +84,6 @@
     <ClInclude Include="CurlHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SSLHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Base64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -222,9 +219,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CurlHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SSLHelpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Base64.cpp">

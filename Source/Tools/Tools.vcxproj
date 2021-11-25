@@ -219,7 +219,6 @@
     <ClInclude Include="PostMaster.hpp" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="Secret.h" />
-    <ClInclude Include="SSLHelpers.h" />
     <ClInclude Include="StringManipulation.h" />
     <ClInclude Include="StateStack.h" />
     <ClInclude Include="ThreadPool.hpp" />
@@ -258,7 +257,6 @@
     <ClCompile Include="PostMaster.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="Secret.cpp" />
-    <ClCompile Include="SSLHelpers.cpp" />
     <ClCompile Include="StringManipulation.cpp" />
     <ClCompile Include="StateStack.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
