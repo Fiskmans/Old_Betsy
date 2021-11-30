@@ -75,7 +75,15 @@ double PerlinNoise::noise(double x, double y, double z) {
 	int BB = p[B + 1] + Z;
 
 	// Add blended results from 8 corners of cube
-	double res = lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z), grad(p[BA], x-1, y, z)), lerp(u, grad(p[AB], x, y-1, z), grad(p[BB], x-1, y-1, z))),	lerp(v, lerp(u, grad(p[AA+1], x, y, z-1), grad(p[BA+1], x-1, y, z-1)), lerp(u, grad(p[AB+1], x, y-1, z-1),	grad(p[BB+1], x-1, y-1, z-1))));
+	double res = 
+		lerp(w, 
+			lerp(v, 
+				lerp(u, grad(p[AA], x, y, z),		grad(p[BA], x-1, y, z)), 
+				lerp(u, grad(p[AB], x, y-1, z),		grad(p[BB], x-1, y-1, z))),	
+			lerp(v, 
+				lerp(u, grad(p[AA+1], x, y, z-1),	grad(p[BA+1], x-1, y, z-1)), 
+				lerp(u, grad(p[AB+1], x, y-1, z-1),	grad(p[BB+1], x-1, y-1, z-1))));
+
 	return (res + 1.0)/2.0;
 }
 
@@ -89,7 +97,7 @@ double PerlinNoise::lerp(double t, double a, double b) {
 
 double PerlinNoise::grad(int hash, double x, double y, double z) {
 	int h = hash & 15;
-	// Convert lower 4 bits of hash inot 12 gradient directions
+	// Convert lower 4 bits of hash into 12 gradient directions
 	double u = h < 8 ? x : y,
 		   v = h < 4 ? y : h == 12 || h == 14 ? x : z;
 	return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
