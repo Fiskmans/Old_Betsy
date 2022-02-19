@@ -1,6 +1,6 @@
 #pragma once
 #include <initializer_list>
-#include "../../Tools/Logger.h"
+#include "Tools/Logger.h"
 #include <math.h>
 
 #define V4F CommonUtilities::Vector4<float>
@@ -308,7 +308,6 @@ namespace CommonUtilities
 		default:
 			throw std::exception("index out of range");
 		}
-		return x;
 	}
 
 	template<class T>
@@ -327,7 +326,6 @@ namespace CommonUtilities
 		default:
 			throw std::exception("index out of range");
 		}
-		return x;
 	}
 
 	template<class T>

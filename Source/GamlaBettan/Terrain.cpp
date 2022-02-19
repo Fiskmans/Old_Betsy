@@ -4,43 +4,85 @@
 #include "GamlaBettan\DirectX11Framework.h"
 #include "GamlaBettan\AssetManager.h"
 #include "GamlaBettan\Model.h"
-#include "GamlaBettan\Scene.h"
+#include "GamlaBettan\RenderScene.h"
+#include "MarchingCubes.h"
 
 #define TERRAIN_FILE_VERSION (1)
 
-Terrain::Terrain()
-	: myFramework(nullptr)
-	, myModelAsset(nullptr)
-	, myModelInstance(nullptr)
-{
-}
-
-void Terrain::Init(DirectX11Framework* aFramework)
+Terrain::Terrain(DirectX11Framework* aFramework, GBPhysX* aPhysx, const CommonUtilities::Vector3<size_t>& aResolution, const V3F aSize)
 {
 	myFramework = aFramework;
-	TestMesh();
+	myPhysx = aPhysx;
+
+	myResolution = aResolution;
+	myIndexing = { 1, myResolution.x * myResolution.y, myResolution.x };
+	myTerrainData.resize(myResolution.Volume());
+
+	MaxTriCount = (myResolution - CommonUtilities::Vector3<size_t>{ 1, 1, 1 }).Volume() * 5;
+	mySize = aSize;
 	Setup();
-	SetupAllNormals();
+	GenerateTerrain();
 }
 
 void Terrain::Update()
 {
-	bool isDirty = true;
+	float now = Tools::GetTotalTime();
 
-
-	if (isDirty)
+	if (myIsDirty && now > myLastRebake + myRebakeInterval)
 	{
+		myVertexes.clear();
+		uint32_t baseSeed = 0;
+		uint32_t seed = 0;
+		for (auto& tri : math::MarchingCubes(myTerrainData.begin(), myIndexing, myResolution, -1.f))
+		{
+
+			V3F a = tri.myA * mySize;
+			V3F b = tri.myB * mySize;
+			V3F c = tri.myC * mySize;
+
+			V3F ab = a - b;
+			V3F ac = a - c;
+			V3F normal = -ab.Cross(ac).GetNormalized();
+
+			V3F middle = (a + b + c) / 3.f;
+			uint32_t s = static_cast<uint32_t>(((middle / mySize * myResolution.As<float>()).As<size_t>() * myIndexing).Sum() * 5);
+			if (baseSeed != s)
+			{
+				baseSeed = s;
+				seed = s;
+			}
+			else
+			{
+				seed++;
+			}
+
+			myVertexes.push_back(Vertex{ a, normal, seed });
+			myVertexes.push_back(Vertex{ b, normal, seed });
+			myVertexes.push_back(Vertex{ c, normal, seed });
+		}
+
+		myLastRebake = now;
+
 		if (!OverWriteBuffer(myModelData->myVertexBuffer, myVertexes.data(), myVertexes.size() * sizeof(Vertex)))
 		{
-			Scene::GetInstance().RemoveFromScene(myModelInstance);
+			RenderScene::GetInstance().RemoveFromScene(myModelInstance);
 			return;
 		}
-		if (!OverWriteBuffer(myModelData->myIndexBuffer, myTris.data(), myTris.size() * sizeof(Tri)))
+		myModelData->myNumberOfVertexes = static_cast<UINT>(myVertexes.size());
+
+		if (myActor)
 		{
-			Scene::GetInstance().RemoveFromScene(myModelInstance);
-			return;
+			myActor->RemoveFromScene();
+			myActor->Release();
+			delete myActor;
 		}
-		myModelData->myNumberOfIndexes = myTris.size() * 3;
+
+		myActor = myPhysx->GBCreateTriangleMesh(
+			reinterpret_cast<const char*>(myVertexes.data()),
+			sizeof(Vertex),
+			myVertexes.size());
+
+		myIsDirty = false;
 	}
 }
 
@@ -48,188 +90,378 @@ void Terrain::Update()
 void Terrain::Imgui()
 {
 	WindowControl::Window("Terrain", [this]()
+	{
+		ImguiContent();
+	});
+}
+
+void Terrain::ImguiContent()
+{
+	static bool showNormals;
+
+	const static V4F colors[3] =
+	{
+		V4F(1.f,0.2f,0.2f,1.f),
+		V4F(0.2f,1.f,0.2f,1.f),
+		V4F(0.2f,0.2f,1.f,1.f),
+	};
+
+	if (ImGui::Button("Generate"))
+	{
+		GenerateTerrain();
+	}
+
+	ImGui::Checkbox("Show Normals", &showNormals);
+	ImGui::Button("+");
+	if (ImGui::IsItemHovered() && ImGui::GetIO().MouseDown[0])
+	{
+		for (Vertex& vertex : myVertexes)
 		{
-			static bool showNormals;
+			vertex.myPosition *= 1.01f;
+		}
+		myIsDirty = true;
+	}
+	ImGui::SameLine();
+	ImGui::Button("-");
+	if (ImGui::IsItemHovered() && ImGui::GetIO().MouseDown[0])
+	{
+		for (Vertex& vertex : myVertexes)
+		{
+			vertex.myPosition /= 1.01f;
+		}
+		myIsDirty = true;
+	}
+	//UINT selectedTri = static_cast<UINT>(-1);
 
-			const static V4F colors[3] =
+	static bool EPressed = false;
+	if (EPressed)
+	{
+		if (!GetAsyncKeyState('E'))
+		{
+			EPressed = false;
+		}
+	}
+	else
+	{
+		if (GetAsyncKeyState('E'))
+		{
+			HitResult report = myPhysx->RayCast(Input::GetInstance().MouseRay(), 50_m);
+			if (report.actor == myActor)
 			{
-				V4F(1,0.2,0.2,1),
-				V4F(0.2,1,0.2,1),
-				V4F(0.2,0.2,1,1),
-			};
-
-			ImGui::Text("Total volume change: %f", myTotalVolumeDiscrepancy);
-			ImGui::Checkbox("Show Normals", &showNormals);
-			if (ImGui::Button("Tesselate biggest"))
-			{
-				float minSize = 0.f;
-				UINT selected = 0;
-				for (UINT i = 0; i < myTris.size(); i++)
-				{
-					float size = Area(i);
-					if (size > minSize)
-					{
-						minSize = size;
-						selected = i;
-					}
-				}
-				Tesselate(selected);
+				Dig(report.position, 100);
 			}
 
-			if (ImGui::TreeNode("Mesh"))
+			EPressed = true;
+		}
+	}
+	static FRay ray = Input::GetInstance().MouseRay();
+	if (GetAsyncKeyState('K'))
+	{
+		ray = Input::GetInstance().MouseRay();
+	}
+	DebugDrawer::GetInstance().DrawDirection(ray.Position(), ray.Direction(), 5_m);
+
+	ImGui::Checkbox("isDirty", &myIsDirty);
+
+	static std::vector<int> badTris;
+	if (ImGui::TreeNode("bad tris"))
+	{
+		if (ImGui::Button("Isolate bad"))
+		{
+			for (UINT i = 0; i < myVertexes.size(); i += 3)
 			{
-				if (ImGui::TreeNode("Tris"))
+				GBPhysXActor* actor = myPhysx->GBCreateTriangleMesh(
+					reinterpret_cast<const char*>(myVertexes.data() + i),
+					sizeof(Vertex),
+					3);
+
+				if (!actor)
 				{
-					for (size_t i = 0; i < myTris.size(); i++)
-					{
-						Tri& tri = myTris[i];
-
-						ImGui::PushID(i);
-						bool open = ImGui::TreeNode("tri", "Tri #%d", i);
-						if (ImGui::IsItemHovered())
-						{
-							DebugDrawer::GetInstance().SetColor(colors[0]);
-							DebugDrawer::GetInstance().DrawCross(myVertexes[tri.myA].myPosition, 10_cm);
-							DebugDrawer::GetInstance().DrawLine(myVertexes[tri.myA].myPosition, myVertexes[tri.myC].myPosition);
-							for (VertexInfo::Edge& edge : myVertexInfo[tri.myA].myEdges)
-							{
-								if (edge.myOtherVertex == tri.myC)
-								{
-									UINT other = tri.myA ^ tri.myC ^ myTris[edge.myTri].myA ^ myTris[edge.myTri].myB ^ myTris[edge.myTri].myC;
-									V3F center = (myVertexes[tri.myA].myPosition + myVertexes[tri.myC].myPosition) / 2.f;
-									DebugDrawer::GetInstance().DrawDirection(
-										center,
-										myVertexes[other].myPosition - center,
-										20_cm
-									);
-								}
-							}
-
-							DebugDrawer::GetInstance().SetColor(colors[1]);
-							DebugDrawer::GetInstance().DrawCross(myVertexes[tri.myB].myPosition, 10_cm);
-							DebugDrawer::GetInstance().DrawLine(myVertexes[tri.myB].myPosition, myVertexes[tri.myA].myPosition);
-							for (VertexInfo::Edge& edge : myVertexInfo[tri.myB].myEdges)
-							{
-								if (edge.myOtherVertex == tri.myA)
-								{
-									UINT other = tri.myB ^ tri.myA ^ myTris[edge.myTri].myA ^ myTris[edge.myTri].myB ^ myTris[edge.myTri].myC;
-									V3F center = (myVertexes[tri.myB].myPosition + myVertexes[tri.myA].myPosition) / 2.f;
-									DebugDrawer::GetInstance().DrawDirection(
-										center,
-										myVertexes[other].myPosition - center,
-										20_cm
-									);
-								}
-							}
-
-							DebugDrawer::GetInstance().SetColor(colors[2]);
-							DebugDrawer::GetInstance().DrawCross(myVertexes[tri.myC].myPosition, 10_cm);
-							DebugDrawer::GetInstance().DrawLine(myVertexes[tri.myC].myPosition, myVertexes[tri.myB].myPosition);
-							for (VertexInfo::Edge& edge : myVertexInfo[tri.myC].myEdges)
-							{
-								if (edge.myOtherVertex == tri.myB)
-								{
-									UINT other = tri.myC ^ tri.myB ^ myTris[edge.myTri].myA ^ myTris[edge.myTri].myB ^ myTris[edge.myTri].myC;
-									V3F center = (myVertexes[tri.myC].myPosition + myVertexes[tri.myB].myPosition) / 2.f;
-									DebugDrawer::GetInstance().DrawDirection(
-										center,
-										myVertexes[other].myPosition - center,
-										20_cm
-									);
-								}
-							}
-						}
-						if (open)
-						{
-							ImGui::Text("Area: %f", Area(i));
-							ImGui::Text("Vertcies %d %d %d", tri.myA, tri.myB, tri.myC);
-							if (ImGui::Button("Tesselate"))
-							{
-								Tesselate(i);
-							}
-
-							ImGui::TreePop();
-						}
-
-						ImGui::PopID();
-					}
-					ImGui::TreePop();
+					SYSERROR("Triangle is bad ", std::to_string(i / 3));
+					badTris.push_back(i / 3);
 				}
-				if (ImGui::TreeNode("Verticies"))
-				{
-					for (size_t i = 0; i < myVertexes.size(); i++)
-					{
-						ImGui::PushID(i);
-
-						V3F pos = myVertexes[i].myPosition;
-						bool hovered = false;
-						if (Tools::EditPosition("Vertex", &pos.x, hovered))
-						{
-							MoveVertex(i, pos);
-						}
-
-						if (hovered)
-						{
-							static V4F colors[] =
-							{
-								Tools::RandomRange(V4F(0.4f, 0.4f, 0.4f, 1.f), V4F(1.f, 1.f, 1.f, 1.f)),
-								Tools::RandomRange(V4F(0.4f, 0.4f, 0.4f, 1.f), V4F(1.f, 1.f, 1.f, 1.f)),
-								Tools::RandomRange(V4F(0.4f, 0.4f, 0.4f, 1.f), V4F(1.f, 1.f, 1.f, 1.f)),
-								Tools::RandomRange(V4F(0.4f, 0.4f, 0.4f, 1.f), V4F(1.f, 1.f, 1.f, 1.f)),
-								Tools::RandomRange(V4F(0.4f, 0.4f, 0.4f, 1.f), V4F(1.f, 1.f, 1.f, 1.f)),
-								Tools::RandomRange(V4F(0.4f, 0.4f, 0.4f, 1.f), V4F(1.f, 1.f, 1.f, 1.f)),
-								Tools::RandomRange(V4F(0.4f, 0.4f, 0.4f, 1.f), V4F(1.f, 1.f, 1.f, 1.f)),
-								Tools::RandomRange(V4F(0.4f, 0.4f, 0.4f, 1.f), V4F(1.f, 1.f, 1.f, 1.f)),
-								Tools::RandomRange(V4F(0.4f, 0.4f, 0.4f, 1.f), V4F(1.f, 1.f, 1.f, 1.f))
-							};
-
-							DebugDrawer::GetInstance().SetColor(V4F(1.f, 0.f, 0.f, 1.f));
-							DebugDrawer::GetInstance().DrawCross(myVertexes[i].myPosition, 20_cm);
-
-							for (size_t edgeIndex = 0; edgeIndex < myVertexInfo[i].myEdges.size(); edgeIndex++)
-							{
-								DebugDrawer::GetInstance().SetColor(colors[edgeIndex % C_ARRAY_SIZE(colors)]);
-
-								VertexInfo::Edge& edge = myVertexInfo[i].myEdges[edgeIndex];
-								DebugDrawer::GetInstance().DrawArrow(myVertexes[i].myPosition, myVertexes[edge.myOtherVertex].myPosition);
-								DebugDrawer::GetInstance().DrawCross(
-									(myVertexes[myTris[edge.myTri].myA].myPosition +
-										myVertexes[myTris[edge.myTri].myB].myPosition +
-										myVertexes[myTris[edge.myTri].myC].myPosition) / 3.f,
-									10_cm );
-							}
-
-						}
-
-						ImGui::PopID();
-					}
-					ImGui::TreePop();
-				}
+			}
+		}
+		if (ImGui::Button("Clear"))
+		{
+			badTris.clear();
+		}
+		for (int& b : badTris)
+		{
+			if (ImGui::TreeNode(std::to_string(b).c_str()))
+			{
+				ImGui::InputFloat3("a", &(myVertexes[b * 3 + 0].myPosition.x));
+				ImGui::InputFloat3("b", &(myVertexes[b * 3 + 1].myPosition.x));
+				ImGui::InputFloat3("c", &(myVertexes[b * 3 + 2].myPosition.x));
 				ImGui::TreePop();
 			}
 
-			if (showNormals)
+			DebugDrawer::GetInstance().DrawLine(myVertexes[b * 3 + 0].myPosition, myVertexes[b * 3 + 1].myPosition);
+			DebugDrawer::GetInstance().DrawLine(myVertexes[b * 3 + 0].myPosition, myVertexes[b * 3 + 2].myPosition);
+			DebugDrawer::GetInstance().DrawLine(myVertexes[b * 3 + 1].myPosition, myVertexes[b * 3 + 2].myPosition);
+
+			DebugDrawer::GetInstance().DrawDirection((myVertexes[b * 3 + 0].myPosition + myVertexes[b * 3 + 1].myPosition + myVertexes[b * 3 + 2].myPosition) / 3.f, myVertexes[b * 3 + 0].myNormal, 5_dm);
+
+		}
+		ImGui::TreePop();
+	}
+
+
+	if (ImGui::TreeNode("Mesh"))
+	{
+		ImGui::Button("hover for unit cube");
+		if (ImGui::IsItemHovered())
+		{
+			DebugDrawer::GetInstance().DrawLine({ 0,0,0 }, { 0,0,1 });
+			DebugDrawer::GetInstance().DrawLine({ 0,0,0 }, { 0,1,0 });
+			DebugDrawer::GetInstance().DrawLine({ 0,0,0 }, { 1,0,0 });
+
+			DebugDrawer::GetInstance().DrawLine({ 0,0,1 }, { 0,1,1 });
+			DebugDrawer::GetInstance().DrawLine({ 0,0,1 }, { 1,0,1 });
+
+			DebugDrawer::GetInstance().DrawLine({ 0,1,0 }, { 1,1,0 });
+			DebugDrawer::GetInstance().DrawLine({ 0,1,0 }, { 0,1,1 });
+
+			DebugDrawer::GetInstance().DrawLine({ 1,0,0 }, { 1,1,0 });
+			DebugDrawer::GetInstance().DrawLine({ 1,0,0 }, { 1,0,1 });
+
+			DebugDrawer::GetInstance().DrawLine({ 1,1,1 }, { 1,1,0 });
+			DebugDrawer::GetInstance().DrawLine({ 1,1,1 }, { 1,0,1 });
+			DebugDrawer::GetInstance().DrawLine({ 1,1,1 }, { 0,1,1 });
+		}
+
+		ImGui::Button("hover for scaled unit cube");
+		if (ImGui::IsItemHovered())
+		{
+			DebugDrawer::GetInstance().DrawLine(V3F{ 0,0,0 } *mySize, V3F{ 0,0,1 } *mySize);
+			DebugDrawer::GetInstance().DrawLine(V3F{ 0,0,0 } *mySize, V3F{ 0,1,0 } *mySize);
+			DebugDrawer::GetInstance().DrawLine(V3F{ 0,0,0 } *mySize, V3F{ 1,0,0 } *mySize);
+
+			DebugDrawer::GetInstance().DrawLine(V3F{ 0,0,1 } *mySize, V3F{ 0,1,1 } *mySize);
+			DebugDrawer::GetInstance().DrawLine(V3F{ 0,0,1 } *mySize, V3F{ 1,0,1 } *mySize);
+
+			DebugDrawer::GetInstance().DrawLine(V3F{ 0,1,0 } *mySize, V3F{ 1,1,0 } *mySize);
+			DebugDrawer::GetInstance().DrawLine(V3F{ 0,1,0 } *mySize, V3F{ 0,1,1 } *mySize);
+
+			DebugDrawer::GetInstance().DrawLine(V3F{ 1,0,0 } *mySize, V3F{ 1,1,0 } *mySize);
+			DebugDrawer::GetInstance().DrawLine(V3F{ 1,0,0 } *mySize, V3F{ 1,0,1 } *mySize);
+
+			DebugDrawer::GetInstance().DrawLine(V3F{ 1,1,1 } *mySize, V3F{ 1,1,0 } *mySize);
+			DebugDrawer::GetInstance().DrawLine(V3F{ 1,1,1 } *mySize, V3F{ 1,0,1 } *mySize);
+			DebugDrawer::GetInstance().DrawLine(V3F{ 1,1,1 } *mySize, V3F{ 0,1,1 } *mySize);
+		}
+
+
+		if (ImGui::TreeNode("Vertexes"))
+		{
+			ImGui::Text("count: %u", myVertexes.size());
+			ImGui::Separator();
+			for (Vertex& vertex : myVertexes)
 			{
-				DebugDrawer::GetInstance().SetColor(V4F(0, 0.5, 0, 1));
-				for (Vertex& vertex : myVertexes)
-				{
-					DebugDrawer::GetInstance().DrawDirection(vertex.myPosition, vertex.myNormal);
-				}
+				ImGui::PushID(&vertex);
+				ImGui::InputFloat3("pos", &vertex.myPosition.x);
+				ImGui::PopID();
 			}
-		});
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Tris"))
+		{
+			size_t triCount = myVertexes.size() / 3;
+			ImGui::Text("count: %u", triCount);
+			ImGui::Separator();
+			for (size_t i = 0; i < triCount; i++)
+			{
+				DebugDrawer::GetInstance().DrawLine(myVertexes[i * 3 + 0].myPosition, myVertexes[i * 3 + 1].myPosition);
+				DebugDrawer::GetInstance().DrawLine(myVertexes[i * 3 + 0].myPosition, myVertexes[i * 3 + 2].myPosition);
+				DebugDrawer::GetInstance().DrawLine(myVertexes[i * 3 + 1].myPosition, myVertexes[i * 3 + 2].myPosition);
+
+				DebugDrawer::GetInstance().DrawDirection((myVertexes[i * 3 + 0].myPosition + myVertexes[i * 3 + 1].myPosition + myVertexes[i * 3 + 2].myPosition) / 3.f, myVertexes[i * 3 + 0].myNormal, 5_dm);
+			}
+
+			ImGui::TreePop();
+		}
+
+		ImGui::TreePop();
+	}
+
+
+	/*
+	if (selectedTri != -1)
+	{
+		ImGui::Text("Debugging tri: %d", selectedTri);
+		Tri& tri = myTris[selectedTri];
+		DebugDrawer::GetInstance().SetColor(colors[0]);
+		DebugDrawer::GetInstance().DrawCross(myVertexes[tri.myA].myPosition, 10_cm);
+		DebugDrawer::GetInstance().DrawLine(myVertexes[tri.myA].myPosition, myVertexes[tri.myC].myPosition);
+		for (VertexInfo::Edge& edge : myVertexInfo[tri.myA].myEdges)
+		{
+			if (edge.myOtherVertex == tri.myC)
+			{
+				UINT other = tri.myA ^ tri.myC ^ myTris[edge.myTri].myA ^ myTris[edge.myTri].myB ^ myTris[edge.myTri].myC;
+				V3F center = (myVertexes[tri.myA].myPosition + myVertexes[tri.myC].myPosition) / 2.f;
+				DebugDrawer::GetInstance().DrawDirection(
+					center,
+					myVertexes[other].myPosition - center,
+					20_cm
+				);
+			}
+		}
+
+		DebugDrawer::GetInstance().SetColor(colors[1]);
+		DebugDrawer::GetInstance().DrawCross(myVertexes[tri.myB].myPosition, 10_cm);
+		DebugDrawer::GetInstance().DrawLine(myVertexes[tri.myB].myPosition, myVertexes[tri.myA].myPosition);
+		for (VertexInfo::Edge& edge : myVertexInfo[tri.myB].myEdges)
+		{
+			if (edge.myOtherVertex == tri.myA)
+			{
+				UINT other = tri.myB ^ tri.myA ^ myTris[edge.myTri].myA ^ myTris[edge.myTri].myB ^ myTris[edge.myTri].myC;
+				V3F center = (myVertexes[tri.myB].myPosition + myVertexes[tri.myA].myPosition) / 2.f;
+				DebugDrawer::GetInstance().DrawDirection(
+					center,
+					myVertexes[other].myPosition - center,
+					20_cm
+				);
+			}
+		}
+
+		DebugDrawer::GetInstance().SetColor(colors[2]);
+		DebugDrawer::GetInstance().DrawCross(myVertexes[tri.myC].myPosition, 10_cm);
+		DebugDrawer::GetInstance().DrawLine(myVertexes[tri.myC].myPosition, myVertexes[tri.myB].myPosition);
+		for (VertexInfo::Edge& edge : myVertexInfo[tri.myC].myEdges)
+		{
+			if (edge.myOtherVertex == tri.myB)
+			{
+				UINT other = tri.myC ^ tri.myB ^ myTris[edge.myTri].myA ^ myTris[edge.myTri].myB ^ myTris[edge.myTri].myC;
+				V3F center = (myVertexes[tri.myC].myPosition + myVertexes[tri.myB].myPosition) / 2.f;
+				DebugDrawer::GetInstance().DrawDirection(
+					center,
+					myVertexes[other].myPosition - center,
+					20_cm
+				);
+			}
+		}
+	}
+	*/
+
+	if (showNormals)
+	{
+		DebugDrawer::GetInstance().SetColor(V4F(0.f, 0.5f, 0.f, 1.f));
+		for (Vertex& vertex : myVertexes)
+		{
+			DebugDrawer::GetInstance().DrawDirection(vertex.myPosition, vertex.myNormal);
+		}
+	}
 }
 #endif
+
+Terrain::DigResult Terrain::Dig(V3F aPosition, size_t aPower)
+{
+	const CommonUtilities::Vector3<float> center = aPosition / mySize * myResolution.As<float>();
+
+	const float range = std::pow(static_cast<float>(aPower), 1.f / 3.f) * 3_dm;
+	const V3F spheroidScale = myResolution.As<float>() / mySize * range;
+
+	DigResult result;
+
+	float zMin = center.z - spheroidScale.z;
+	float zMax = center.z + spheroidScale.z;
+
+	for (float z = std::max(zMin, 0.f); z < zMax && z < myResolution.z; z += 1.f)
+	{
+		float zloss = std::cos(INVERSELERP(center.z, center.z + spheroidScale.z, z) * PI_F);
+		float yMin = center.y - spheroidScale.y * zloss;
+		float yMax = center.y + spheroidScale.y * zloss;
+
+		for (float y = std::max(yMin, 0.f); y < yMax && y < myResolution.y; y += 1.f)
+		{
+			float yloss = std::cos(INVERSELERP(center.y, center.y + spheroidScale.y, y) * PI_F);
+			float xMin = center.x - spheroidScale.x * zloss * yloss;
+			float xMax = center.x + spheroidScale.x * zloss * yloss;
+
+			for (float x = std::max(xMin, 0.f); x < xMax && x < myResolution.y; x += 1.f)
+			{
+				const V3F point{ x, y, z };
+				const size_t power = static_cast<size_t>(std::ceil(1.f / (point - center).LengthSqr() * static_cast<float>(aPower)));
+
+				TerrainNode& node = myTerrainData[(CommonUtilities::Vector3<int>{1, static_cast<int>(myResolution.x), static_cast<int>(myResolution.x* myResolution.y) } *point.As<int>()).Sum()];
+				node.AttemptDig(result, aPower);
+			}
+		}
+	}
+
+	if (!result.Empty())
+	{
+		myIsDirty = true;
+	}
+
+	return result;
+}
+
+void Terrain::GenerateTerrain()
+{
+	for (size_t x = 0; x < myResolution.x; x++)
+	{
+		for (size_t z = 0; z < myResolution.z; z++)
+		{
+			float genY = 0.9f;
+			float scaledY = genY * myResolution.y;
+			size_t wholePart = static_cast<size_t>(scaledY);
+			uint8_t fraction = static_cast<uint8_t>((scaledY - wholePart) * std::numeric_limits<uint8_t>::max());
+
+			for (size_t y = 0; y < wholePart; y++)
+			{
+				TerrainNode& node = myTerrainData[(CommonUtilities::Vector3<size_t>{1, myResolution.x, myResolution.x * myResolution.y } * CommonUtilities::Vector3<size_t>{ x, y, z }).Sum()];
+
+				node.myDirt = std::numeric_limits<decltype(node.myDirt)>::max();
+				node.myRock = std::numeric_limits<decltype(node.myDirt)>::min();
+				node.myIron = std::numeric_limits<decltype(node.myDirt)>::min();
+				node.myGold = std::numeric_limits<decltype(node.myDirt)>::min();
+			}
+
+			{
+				TerrainNode& node = myTerrainData[(CommonUtilities::Vector3<size_t>{1, myResolution.x, myResolution.x * myResolution.y } * CommonUtilities::Vector3<size_t>{ x, wholePart, z }).Sum()];
+
+				node.myDirt = fraction;
+				node.myRock = std::numeric_limits<decltype(node.myDirt)>::min();
+				node.myIron = std::numeric_limits<decltype(node.myDirt)>::min();
+				node.myGold = std::numeric_limits<decltype(node.myDirt)>::min();
+			}
+
+			for (size_t y = wholePart + 1; y < myResolution.y; y++)
+			{
+				TerrainNode& node = myTerrainData[(CommonUtilities::Vector3<size_t>{1, myResolution.x, myResolution.x * myResolution.y } * CommonUtilities::Vector3<size_t>{ x, y, z }).Sum()];
+
+				node.myDirt = std::numeric_limits<decltype(node.myDirt)>::min();
+				node.myRock = std::numeric_limits<decltype(node.myDirt)>::min();
+				node.myIron = std::numeric_limits<decltype(node.myDirt)>::min();
+				node.myGold = std::numeric_limits<decltype(node.myDirt)>::min();
+			}
+		}
+	}
+	
+	for (size_t x = 0; x < myResolution.x; x++)
+	{
+		for (size_t y = 0; y < myResolution.y; y++)
+		{
+			for (size_t z = 0; z < myResolution.z; z++)
+			{
+				if (x == 0 || x == myResolution.x - 1 || y == 0 || y == myResolution.y - 1 || z == 0 || z == myResolution.z - 1)
+				{
+					myTerrainData[(CommonUtilities::Vector3<size_t>{1, myResolution.x, myResolution.x* myResolution.y } *CommonUtilities::Vector3<size_t>{ x, y, z }).Sum()] = TerrainNode{};
+				}
+			}
+		}
+	}
+	
+
+	myIsDirty = true;
+}
 
 void Terrain::FromFile(const std::string& aFilePath)
 {
 	std::string ext = Tools::ExtensionFromPath(aFilePath);
 
-	if (ext == ".fbx")
-	{
-		FromFBX(aFilePath);
-		return;
-	}
-	else if (ext == ".ter")
+	if (ext == ".ter")
 	{
 		FromTER(aFilePath);
 		return;
@@ -238,10 +470,6 @@ void Terrain::FromFile(const std::string& aFilePath)
 	{
 		SYSERROR("Terrain does not know how to load files of this type", aFilePath);
 	}
-}
-
-void Terrain::FromFBX(const std::string aFilePath)
-{
 }
 
 void Terrain::FromTER(const std::string aFilePath)
@@ -271,9 +499,6 @@ void Terrain::FromTER(const std::string aFilePath)
 		return;
 	}
 
-	myTotalVolumeDiscrepancy = *reinterpret_cast<float*>(fileContent.data() + offset);
-	offset += sizeof(myTotalVolumeDiscrepancy);
-
 	if (fileContent.size() < offset + sizeof(uint32_t))
 	{
 		SYSERROR("Terrian file corrupt", aFilePath);
@@ -299,56 +524,17 @@ void Terrain::FromTER(const std::string aFilePath)
 		return;
 	}
 
-	uint32_t triCount = *reinterpret_cast<uint32_t*>(fileContent.data() + offset);
-	offset += sizeof(triCount);
-
-	if (fileContent.size() < offset + sizeof(Tri) * triCount)
-	{
-		SYSERROR("Terrian file corrupt", aFilePath);
-		return;
-	}
-
-	myTris.resize(triCount);
-	memcpy(myTris.data(), fileContent.data() + offset, sizeof(Tri) * triCount);
-	offset += sizeof(Tri) * triCount;
-
 	if (offset < fileContent.size())
 	{
 		SYSWARNING("Unconsumed data in terrain file", aFilePath, Tools::PrintByteSize(fileContent.size() - offset));
 	}
-
-
-	GenerateVertexInfo();
-	SetupAllNormals();
 }
 
-void Terrain::GenerateVertexInfo()
-{
-	myVertexInfo.resize(0);
-	myVertexInfo.resize(myVertexes.size());
-	for (UINT i = 0; i < myTris.size(); i++)
-	{
-		Tri& tri = myTris[i];
-	
-		myVertexInfo[tri.myA].myEdges.push_back({
-				tri.myB,
-				i
-			});
-
-		myVertexInfo[tri.myB].myEdges.push_back({
-				tri.myC,
-				i
-			});
-
-		myVertexInfo[tri.myC].myEdges.push_back({
-				tri.myA,
-				i
-			});
-	}
-}
 
 void Terrain::Setup()
 {
+	myIsDirty = true;
+
 	Model* model = new Model();
 	myModelData = new Model::ModelData();
 
@@ -367,16 +553,17 @@ void Terrain::Setup()
 	myModelData->myNumberOfIndexes = 0;
 
 	myModelData->myUseForwardRenderer = false;
+	myModelData->myIsIndexed = false;
 
 	model->AddModelPart(myModelData);
-	myModelAsset = new ModelAsset(model);
+	myModelAsset = new ModelAsset(model, "");
 	myModelHandle = AssetHandle(myModelAsset);
 
 	model->MarkLoaded();
 
 	myModelInstance = myModelHandle.InstansiateModel();
 
-	Scene::GetInstance().AddToScene(myModelInstance);
+	RenderScene::GetInstance().AddToScene(myModelInstance);
 }
 
 void Terrain::SetupGraphicsResources()
@@ -384,7 +571,6 @@ void Terrain::SetupGraphicsResources()
 	ID3D11Device* device = myFramework->GetDevice();
 
 	ID3D11Buffer* vertexBuffer;
-	ID3D11Buffer* indexBuffer;
 
 	CD3D11_BUFFER_DESC vertexBufferDescription;
 	WIPE(vertexBufferDescription);
@@ -401,444 +587,32 @@ void Terrain::SetupGraphicsResources()
 		return;
 	}
 
-	Tools::ExecuteOnDestruct releaseVertexBuffer = Tools::ExecuteOnDestruct([vertexBuffer]() { vertexBuffer->Release(); });
+	Tools::ExecuteOnDestruct releaseVertexBuffer([vertexBuffer]() { vertexBuffer->Release(); });
 
-	CD3D11_BUFFER_DESC indexBufferDescription;
-	WIPE(indexBufferDescription);
-	indexBufferDescription.ByteWidth = MaxTriCount * sizeof(Tri);
-	indexBufferDescription.Usage = D3D11_USAGE_DYNAMIC;
-	indexBufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDescription.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-	result = device->CreateBuffer(&indexBufferDescription, nullptr, &indexBuffer);
-	if (FAILED(result))
-	{
-		SYSERROR("Could not create index buffer", "Terrain");
-		return;
-	}
-	Tools::ExecuteOnDestruct releaseIndexBuffer = Tools::ExecuteOnDestruct([indexBuffer]() { indexBuffer->Release(); });
-
-
-	D3D11_INPUT_ELEMENT_DESC layout[2] =
+	D3D11_INPUT_ELEMENT_DESC layout[3] =
 	{
 		{ "SV_POSITION",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL",				0, DXGI_FORMAT_R32G32B32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "NORMAL",				0, DXGI_FORMAT_R32G32B32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "RANDOM_SEED",		0, DXGI_FORMAT_R32_UINT,			0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	ID3D11InputLayout* inputLayout;
-	result = device->CreateInputLayout(layout, 2, myModelData->myVertexShader.GetVertexShaderblob().data(), myModelData->myVertexShader.GetVertexShaderblob().size(), &inputLayout);
+	result = device->CreateInputLayout(layout, 3, myModelData->myVertexShader.GetVertexShaderblob().data(), myModelData->myVertexShader.GetVertexShaderblob().size(), &inputLayout);
 	if (FAILED(result))
 	{
 		SYSERROR("Could not create inputlayout", "Terrain");
 		return;
 	}
-	Tools::ExecuteOnDestruct releaseInputLayout = Tools::ExecuteOnDestruct([inputLayout]() { inputLayout->Release(); });
+	Tools::ExecuteOnDestruct releaseInputLayout([inputLayout]() { inputLayout->Release(); });
 
 
 	myModelData->myVertexBuffer = vertexBuffer;
-	myModelData->myIndexBuffer = indexBuffer;
 	myModelData->myInputLayout = inputLayout;
 
 	releaseVertexBuffer.Disable();
-	releaseIndexBuffer.Disable();
 	releaseInputLayout.Disable();
 }
 
-void Terrain::SetupAllNormals()
-{
-	std::vector<UINT> changed = {  };
-	for (UINT i = 0; i < myVertexes.size(); i++)
-	{
-		changed.push_back(i);
-	}
-	SetupNormals(changed);
-}
-
-void Terrain::SetupNormals(UINT aVertexThatChanged)
-{
-	std::vector<UINT> changed = { aVertexThatChanged };
-	for (auto& edge : myVertexInfo[aVertexThatChanged].myEdges)
-	{
-		changed.push_back(edge.myOtherVertex);
-	}
-	SetupNormals(changed);
-}
-
-void Terrain::SetupNormals(std::vector<UINT> aVertexesAffected)
-{
-	for (UINT& index : aVertexesAffected)
-	{
-		V3F totalNormal = V3F(0, 0, 0);
-		for (VertexInfo::Edge& edge : myVertexInfo[index].myEdges)
-		{
-			Tri& tri = myTris[edge.myTri];
-			totalNormal +=
-				(myVertexes[tri.myA].myPosition - myVertexes[tri.myB].myPosition).Cross(
-					(myVertexes[tri.myA].myPosition - myVertexes[tri.myC].myPosition)
-				).GetNormalized();
-		}
-		myVertexes[index].myNormal = totalNormal.GetNormalized();
-	}
-}
-
-float Terrain::Area(UINT aTri)
-{
-	Tri& tri = myTris[aTri];
-	return (myVertexes[tri.myA].myPosition - myVertexes[tri.myB].myPosition).Cross(
-		(myVertexes[tri.myA].myPosition - myVertexes[tri.myC].myPosition)).Length() / 2.f;
-}
-
-float Terrain::Triangleness(UINT aTri)
-{
-	return 0.0f;
-}
-
-void Terrain::TestMesh()
-{
-	const float size = 5_m;
-	myVertexes =
-	{
-		{ V3F(-size / 2,	 0,		 size / 2),	V3F(-1,  0,  0) }, // left
-		{ V3F(size / 2,	 0,		 size / 2),	V3F(1,  0,  0) }, // right
-		{ V3F(0,			 0,		-size / 2), V3F(0,  0, -1) }, // front
-		{ V3F(0,			-size,   0),		V3F(0, -1,  0) }  // down
-	};
-
-	myTris =
-	{
-		{ 0, 1, 2 },
-		{ 1, 0, 3 },
-		{ 3, 2, 1 },
-		{ 2, 3, 0 }
-	};
-
-	myTotalVolumeDiscrepancy = 0;
-
-	GenerateVertexInfo();
-}
-
-void Terrain::MoveVertex(UINT aIndex, V3F aTargetPosition)
-{
-	V3F delta = aTargetPosition - myVertexes[aIndex].myPosition;
-	float totalDiff = 0;
-	for (VertexInfo::Edge& edge : myVertexInfo[aIndex].myEdges)
-	{
-		Tri& tri = myTris[edge.myTri];
-		V3F cross = (myVertexes[tri.myA].myPosition - myVertexes[tri.myB].myPosition).Cross(
-			(myVertexes[tri.myA].myPosition - myVertexes[tri.myC].myPosition));
-
-		totalDiff += delta.Dot(cross);
-	}
-	const float scale = 1.f / (1_m * 1_m * 1_m * 6);
-	myTotalVolumeDiscrepancy += totalDiff * scale;
-
-	myVertexes[aIndex].myPosition = aTargetPosition;
-	SetupNormals(aIndex);
-}
-
-void Terrain::Tesselate(UINT aTri)
-{
-	Tri& tri = myTris[aTri];
-	std::vector<UINT> dirtyVerticies = 
-	{
-		tri.myA,
-		tri.myB,
-		tri.myC,
-		AddVertex((myVertexes[tri.myA].myPosition + myVertexes[tri.myC].myPosition) / 2.f),
-		AddVertex((myVertexes[tri.myB].myPosition + myVertexes[tri.myA].myPosition) / 2.f),
-		AddVertex((myVertexes[tri.myC].myPosition + myVertexes[tri.myB].myPosition) / 2.f),
-		0,
-		0,
-		0
-	};
-
-
-	tri.myA = dirtyVerticies[3];
-	tri.myB = dirtyVerticies[4];
-	tri.myC = dirtyVerticies[5];
-
-	Tri triCopy = tri;
-
-	UINT newTris[6] =
-	{
-		AddTri(triCopy.myA, triCopy.myC, dirtyVerticies[2]),
-		AddTri(triCopy.myB, triCopy.myA, dirtyVerticies[0]),
-		AddTri(triCopy.myC, triCopy.myB, dirtyVerticies[1]),
-		0,
-		0,
-		0
-	};
-
-	UINT oldTris[3] =
-	{
-		0,
-		0,
-		0
-	};
-
-
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[0]].myEdges)
-	{
-		if (edge.myOtherVertex == dirtyVerticies[2])
-		{
-			oldTris[0] = edge.myTri;
-			dirtyVerticies[6] = dirtyVerticies[0] ^ dirtyVerticies[2] ^ XorAllVerticies(edge.myTri);
-			newTris[3] = AddTri(dirtyVerticies[3], dirtyVerticies[2], dirtyVerticies[6]);
-			break;
-		}
-	}
-
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[1]].myEdges)
-	{
-		if (edge.myOtherVertex == dirtyVerticies[0])
-		{
-			oldTris[1] = edge.myTri;
-			dirtyVerticies[7] = dirtyVerticies[1] ^ dirtyVerticies[0] ^ XorAllVerticies(edge.myTri);
-			newTris[4] = AddTri(dirtyVerticies[4], dirtyVerticies[0], dirtyVerticies[7]);
-			break;
-		}
-	}
-
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[2]].myEdges)
-	{
-		if (edge.myOtherVertex == dirtyVerticies[1])
-		{
-			oldTris[2] = edge.myTri;
-			dirtyVerticies[8] = dirtyVerticies[2] ^ dirtyVerticies[1] ^ XorAllVerticies(edge.myTri);
-			newTris[5] = AddTri(dirtyVerticies[5], dirtyVerticies[1], dirtyVerticies[8]);
-			break;
-		}
-	}
-
-
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[0]].myEdges)
-	{
-		if (edge.myTri == oldTris[1])
-		{
-			edge.myTri = newTris[4];
-			break;
-		}
-	}
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[1]].myEdges)
-	{
-		if (edge.myTri == oldTris[2])
-		{
-			edge.myTri = newTris[5];
-			break;
-		}
-	}
-
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[2]].myEdges)
-	{
-		if (edge.myTri == oldTris[0])
-		{
-			edge.myTri = newTris[3];
-			break;
-		}
-	}
-
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[0]].myEdges)
-	{
-		if (edge.myOtherVertex == dirtyVerticies[2])
-		{
-			SwapVertex(edge.myTri, dirtyVerticies[2], dirtyVerticies[3]);
-			edge.myOtherVertex = dirtyVerticies[3];
-			break;
-		}
-	}
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[2]].myEdges)
-	{
-		if (edge.myOtherVertex == dirtyVerticies[0])
-		{
-			edge.myOtherVertex = dirtyVerticies[3];
-			edge.myTri = newTris[0];
-			break;
-		}
-	}
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[1]].myEdges)
-	{
-		if (edge.myOtherVertex == dirtyVerticies[0])
-		{
-			SwapVertex(edge.myTri, dirtyVerticies[0], dirtyVerticies[4]);
-			edge.myOtherVertex = dirtyVerticies[4];
-			break;
-		}
-	}
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[0]].myEdges)
-	{
-		if (edge.myOtherVertex == dirtyVerticies[1])
-		{
-			edge.myOtherVertex = dirtyVerticies[4];
-			edge.myTri = newTris[1];
-			break;
-		}
-	}
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[2]].myEdges)
-	{
-		if (edge.myOtherVertex == dirtyVerticies[1])
-		{
-			SwapVertex(edge.myTri, dirtyVerticies[1], dirtyVerticies[5]);
-			edge.myOtherVertex = dirtyVerticies[5];
-			break;
-		}
-	}
-	for (VertexInfo::Edge& edge : myVertexInfo[dirtyVerticies[1]].myEdges)
-	{
-		if (edge.myOtherVertex == dirtyVerticies[2])
-		{
-			edge.myOtherVertex = dirtyVerticies[5];
-			edge.myTri = newTris[2];
-			break;
-		}
-	}
-
-	myVertexInfo[dirtyVerticies[6]].myEdges.push_back(
-		{
-			dirtyVerticies[3],
-			newTris[3]
-		}
-	);
-	myVertexInfo[dirtyVerticies[7]].myEdges.push_back(
-		{
-			dirtyVerticies[4],
-			newTris[4]
-		}
-	);
-	myVertexInfo[dirtyVerticies[8]].myEdges.push_back(
-		{
-			dirtyVerticies[5],
-			newTris[5]
-		}
-	);
-
-	myVertexInfo[dirtyVerticies[3]].myEdges =
-	{
-		{
-			dirtyVerticies[6],
-			oldTris[0]
-		},
-		{
-			dirtyVerticies[0],
-			newTris[1]
-		},
-		{
-			dirtyVerticies[4],
-			aTri
-		},
-		{
-			dirtyVerticies[5],
-			newTris[0]
-		},
-		{
-			dirtyVerticies[2],
-			newTris[3]
-		}
-	};
-
-	myVertexInfo[dirtyVerticies[4]].myEdges =
-	{
-		{
-			dirtyVerticies[7],
-			oldTris[1]
-		},
-		{
-			dirtyVerticies[1],
-			newTris[2]
-		},
-		{
-			dirtyVerticies[5],
-			aTri
-		},
-		{
-			dirtyVerticies[3],
-			newTris[1]
-		},
-		{
-			dirtyVerticies[0],
-			newTris[4]
-		}
-	};
-
-	myVertexInfo[dirtyVerticies[5]].myEdges =
-	{
-		{
-			dirtyVerticies[8],
-			oldTris[2]
-		},
-		{
-			dirtyVerticies[2],
-			newTris[0]
-		},
-		{
-			dirtyVerticies[3],
-			aTri
-		},
-		{
-			dirtyVerticies[4],
-			newTris[2]
-		},
-		{
-			dirtyVerticies[1],
-			newTris[5]
-		}
-	};
-
-	SetupNormals(dirtyVerticies);
-}
-
-void Terrain::SwapVertex(UINT aTri, UINT aOriginal, UINT aTarget)
-{
-	Tri& tri = myTris[aTri];
-
-	if (tri.myA == aOriginal)
-	{
-		tri.myA = aTarget;
-		return;
-	}
-	if (tri.myB == aOriginal)
-	{
-		tri.myB = aTarget;
-		return;
-	}
-	if (tri.myC == aOriginal)
-	{
-		tri.myC = aTarget;
-		return;
-	}
-	throw std::exception("Original vertex was not part of tri");
-}
-
-UINT Terrain::XorAllVerticies(UINT aTri)
-{
-	Tri& tri = myTris[aTri];
-	return tri.myA ^ tri.myB ^ tri.myC;
-}
-
-UINT Terrain::AddVertex(V3F aPosition)
-{
-	UINT number = myVertexes.size();
-	myVertexes.push_back(
-		{
-			aPosition,
-			V3F()
-		}
-	);
-	myVertexInfo.push_back({});
-	return number;
-}
-
-UINT Terrain::AddTri(UINT aA, UINT aB, UINT aC)
-{
-	UINT number = myTris.size();
-	myTris.push_back(
-		{
-			aA,
-			aB,
-			aC
-		}
-	);
-	return number;
-}
 
 bool Terrain::OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize)
 {
@@ -857,4 +631,23 @@ bool Terrain::OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize)
 	myFramework->GetContext()->Unmap(aBuffer, 0);
 
 	return true;
+}
+
+Terrain::TerrainNode::operator float()
+{
+	if (Empty()) { return 0.f; }
+
+	float sum = static_cast<float>(myDirt + myRock + myIron + myGold)/256.f;
+	return 1.f + 100.f / (std::pow(2.f, (1.f - sum) * 14.f));
+}
+
+void Terrain::TerrainNode::AttemptDig(DigResult& aInOutResult, size_t aPower)
+{
+	for (size_t i = 0; i < aPower && !Empty(); i++)
+	{
+		if (myDirt > 0) { aInOutResult.myDirt++; myDirt--; }
+		if (myRock > 0) { aInOutResult.myRock++; myRock--; }
+		if (myIron > 0) { aInOutResult.myIron++; myIron--; }
+		if (myGold > 0) { aInOutResult.myGold++; myGold--; }
+	}
 }

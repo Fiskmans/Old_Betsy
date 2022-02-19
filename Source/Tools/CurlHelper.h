@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 
-typedef void CURL;
+typedef void CommonUtilitiesRL;
 
 namespace Tools
 {
-	std::string SimpleAuthOp(CURL* aCurl, const std::string& aUrl, std::string& aCurrentToken);
+	std::string SimpleAuthOp(CommonUtilitiesRL* aCurl, const std::string& aUrl, std::string& aCurrentToken);
 }

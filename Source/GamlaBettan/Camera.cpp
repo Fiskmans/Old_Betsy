@@ -32,11 +32,6 @@ bool Camera::Init(float aFoV, V2ui aResolution, float aNear, float aFar, const b
 	myProjection(3, 4) = 1;
 
 
-	myProjection2(3, 3) = aFar / (aFar - aNear);
-	myProjection2(4, 3) = (-aFar * aNear) / (aFar - aNear);
-	myProjection2(4, 4) = 0;
-	myProjection2(3, 4) = 1;
-
 	if (aShouldAdaptToWindowRes)
 	{
 		myIsListening = true;
@@ -62,7 +57,7 @@ bool Camera::Init(CommonUtilities::Vector3<float> aBoundingBox)
 
 void Camera::SetFov(const float aFov)
 {
-	float calculatedFoV = 1.f / (tan((aFov / 2) * (PI / 180.f)));
+	float calculatedFoV = 1.f / (tan((aFov / 2.f) * (PI_F / 180.f)));
 
 	myProjection(1, 1) = calculatedFoV;
 	myProjection(2, 2) = calculatedFoV * (static_cast<float>(myResolution.x) / static_cast<float>(myResolution.y));
@@ -103,9 +98,9 @@ void Camera::SetRotation(CommonUtilities::Vector3<float> aRotation)
 {
 	CommonUtilities::Vector3<float> position = { myTransform(4,1),myTransform(4,2),myTransform(4,3) };
 
-	myTransform = CU::Matrix4x4<float>::CreateRotationAroundPointX(aRotation.x, { position.x, position.y, position.z, 1 });
-	myTransform *= CU::Matrix4x4<float>::CreateRotationAroundPointY(aRotation.y, { position.x, position.y, position.z, 1 });
-	myTransform *= CU::Matrix4x4<float>::CreateRotationAroundPointZ(aRotation.z, { position.x, position.y, position.z, 1 });
+	myTransform = CommonUtilities::Matrix4x4<float>::CreateRotationAroundPointX(aRotation.x, { position.x, position.y, position.z, 1 });
+	myTransform *= CommonUtilities::Matrix4x4<float>::CreateRotationAroundPointY(aRotation.y, { position.x, position.y, position.z, 1 });
+	myTransform *= CommonUtilities::Matrix4x4<float>::CreateRotationAroundPointZ(aRotation.z, { position.x, position.y, position.z, 1 });
 
 	//myTransform.RotateAroundPointX(aRotation.x, { position.x, position.y, position.z, 1 }); //Matrices multiplied in diffrerent order from above??? Not sure which is correct
 	//myTransform.RotateAroundPointY(aRotation.y, { position.x, position.y, position.z, 1 });
@@ -210,6 +205,23 @@ void Camera::LookAt(CommonUtilities::Vector3<float> aTarget)
 	myTransform = mat;
 }
 
+FRay Camera::GetRay(V2f aPosition)
+{
+	V2f pos = aPosition * V2f(2.f, -2.f) + V2f(-1, 1);
+	V4F start(pos.x, pos.y, 0, 1);
+	V4F end(pos.x, pos.y, 1, 1);
+
+	M44f unProj = M44f::GetRealInverse(M44f::GetRealInverse(myTransform) * myProjection);
+	start = start * unProj;
+	end = end * unProj;
+
+	start /= start.w;
+	end /= end.w;
+
+	V3F dir = end - start;
+	return FRay(start, dir.GetNormalized());
+}
+
 CommonUtilities::Matrix4x4<float> Camera::GetTransform() const 
 {
 	return myTransform;
@@ -263,25 +275,25 @@ CommonUtilities::PlaneVolume<float> Camera::GenerateFrustum() const
 		V3F forward = GetForward();
 		V3F right = GetRight();
 		V3F up = GetUp();
-		V3F point = GetPosition() + (forward * myOrthoBounds.z / 2.f);
-		plane.InitWithPointAndNormal(point - right * myOrthoBounds.x/2.0f,-right);
+		V3F center = GetPosition() + (forward * myOrthoBounds.z / 2.f);
+		plane.InitWithPointAndNormal(center - right * myOrthoBounds.x / 2.0f, -right);
 		frustum.AddPlane(plane);
 
-		plane.InitWithPointAndNormal(point + right * myOrthoBounds.x / 2.0f, right);
-		frustum.AddPlane(plane);
-
-
-		plane.InitWithPointAndNormal(point - up * myOrthoBounds.x / 2.0f, -up);
-		frustum.AddPlane(plane);
-
-		plane.InitWithPointAndNormal(point + up * myOrthoBounds.x / 2.0f, up);
+		plane.InitWithPointAndNormal(center + right * myOrthoBounds.x / 2.0f, right);
 		frustum.AddPlane(plane);
 
 
-		plane.InitWithPointAndNormal(point - forward * myOrthoBounds.x / 2.0f, -forward);
+		plane.InitWithPointAndNormal(center - up * myOrthoBounds.x / 2.0f, -up);
 		frustum.AddPlane(plane);
 
-		plane.InitWithPointAndNormal(point + forward * myOrthoBounds.x / 2.0f, forward);
+		plane.InitWithPointAndNormal(center + up * myOrthoBounds.x / 2.0f, up);
+		frustum.AddPlane(plane);
+
+
+		plane.InitWithPointAndNormal(center - forward * myOrthoBounds.x / 2.0f, -forward);
+		frustum.AddPlane(plane);
+
+		plane.InitWithPointAndNormal(center + forward * myOrthoBounds.x / 2.0f, forward);
 		frustum.AddPlane(plane);
 		return frustum;
 	}
@@ -289,7 +301,7 @@ CommonUtilities::PlaneVolume<float> Camera::GenerateFrustum() const
 	//https://docs.google.com/spreadsheets/d/13mytbFfr5WlF_QbJZcT4Zgctssh2ZbVmEWf1PjjlTIA/edit#gid=0
 	float m = 1.00423f;
 	float b = 0.031647f;
-	float x = myResolution.x / myResolution.y;
+	float x = static_cast<float>(myResolution.x) / static_cast<float>(myResolution.y);
 
 	float yfov = (m / x + b) * myFOV;
 

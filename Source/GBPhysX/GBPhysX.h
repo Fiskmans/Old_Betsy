@@ -40,12 +40,12 @@ enum class GBPhysXGeometryType
 	None
 };
 
-struct BulletHitReport
+struct HitResult
 {
 	GBPhysXActor* actor = nullptr;
+	int faceIndex = 0;
 	V3F position;
 	V3F normal;
-	V3F incomingAngle;
 };
 
 class GBPhysXActor
@@ -146,11 +146,13 @@ public:
 	GBPhysXActor* GBCreateStaticCube(V3F aPosition, float aHalfSize);
 	GBPhysXActor* GBCreatePlayerBlockBox(V3F aPosition, V3F aSize, V3F aRotation);
 	GBPhysXActor* GBCreateKinematicBox(V3F aPosition, V3F aSize, V3F aForce, float aDensity);
+	GBPhysXActor* GBCreateTriangleMesh(const char* aVertexData, size_t aVertexStride, size_t aVertexCount);
+
 	std::vector<GBPhysXActor*> GBCreateChain(V3F aPosition, V3F aSize, int aLength, float aSeparation);
 
 	GBPhysXCharacter* GBCreateCapsuleController(V3F aPosition, V3F aRotation, float aHeight, float aRadius, bool aIsPlayer);
 
-	BulletHitReport RayPickActor(V3F aOrigin, V3F aDirection, bool aIsBullet = true);
+	HitResult RayCast(FRay aRay, float aRange = 10_m);
 
 	void GBCreateNavMesh(int aNumberOfVerts, std::vector<V3F> someVerts, int aNumberOfTriangles, std::vector<int> someIndices);
 	void GBInitPhysics(bool aInteractive);
@@ -178,6 +180,6 @@ private:
 	void SetGBPhysXActive(bool aActive);
 	bool myIsActive = false;
 	float myDeltaTime = 0;
-	StaticMeshCooker* myStaticMeshCooker;
+	StaticMeshCooker* myStaticMeshCooker = nullptr;
 	std::vector<HitBox> myZombieHitBoxes;
 };

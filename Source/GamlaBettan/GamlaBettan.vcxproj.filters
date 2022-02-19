@@ -1,30 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="CameraFactory.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectX11Framework.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicEngine.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="InputHandler.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowHandler.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Spline.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteFactory.cpp" />
     <ClCompile Include="SpriteInstance.cpp" />
@@ -38,20 +14,8 @@
     <ClCompile Include="ParticleInstance.cpp">
       <Filter>Particles</Filter>
     </ClCompile>
-    <ClCompile Include="ForwardRenderer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleRenderer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
     <ClCompile Include="ParticleFactory.cpp">
       <Filter>Particles</Filter>
-    </ClCompile>
-    <ClCompile Include="FullscreenRenderer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="DeferredRenderer.cpp">
-      <Filter>Renderers</Filter>
     </ClCompile>
     <ClCompile Include="MathFunc.cpp">
       <Filter>InternetCode</Filter>
@@ -61,9 +25,6 @@
     </ClCompile>
     <ClCompile Include="Animator.cpp">
       <Filter>Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteRenderer.cpp">
-      <Filter>Sprites</Filter>
     </ClCompile>
     <ClCompile Include="SpriteInstance.cpp">
       <Filter>Sprites</Filter>
@@ -80,20 +41,20 @@
     <ClCompile Include="TextFactory.cpp">
       <Filter>Text</Filter>
     </ClCompile>
-    <ClCompile Include="FullscreenTexture.cpp">
+    <ClCompile Include="Texture.cpp">
       <Filter>Textures</Filter>
     </ClCompile>
-    <ClCompile Include="FullscreenTextureFactory.cpp">
+    <ClCompile Include="TextureFactory.cpp">
       <Filter>Textures</Filter>
     </ClCompile>
     <ClCompile Include="RenderStateManager.cpp">
-      <Filter>Renderers</Filter>
+      <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="RenderManager.cpp">
-      <Filter>Renderers</Filter>
+      <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="DebugDrawer.cpp">
-      <Filter>Renderers</Filter>
+      <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="ShaderTypes.cpp">
       <Filter>Shaders</Filter>
@@ -113,14 +74,7 @@
     <ClCompile Include="AssetImportHelpers.cpp">
       <Filter>Models</Filter>
     </ClCompile>
-    <ClCompile Include="GBuffer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
     <ClCompile Include="SpriteRenderer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="WindSystem.cpp" />
-    <ClCompile Include="TextRenderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
     <ClCompile Include="PathFinder.cpp">
@@ -129,14 +83,6 @@
     <ClCompile Include="PointLight.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
-    <ClCompile Include="HighlightRenderer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="DepthRenderer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="DecalFactory.cpp" />
-    <ClCompile Include="SpriteFontInclude.cpp" />
     <ClCompile Include="AudioManager.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
@@ -144,9 +90,6 @@
       <Filter>Sound</Filter>
     </ClCompile>
     <ClCompile Include="AK\SoundEngine\Win32\AkDefaultIOHookDeferred.cpp">
-      <Filter>AK</Filter>
-    </ClCompile>
-    <ClCompile Include="AK\SoundEngine\Win32\stdafx.cpp">
       <Filter>AK</Filter>
     </ClCompile>
     <ClCompile Include="AK\SoundEngine\Win32\AkDefaultIOHookBlocking.cpp">
@@ -191,49 +134,84 @@
     <ClCompile Include="AssetManager.cpp">
       <Filter>Asset</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="ComponentManager.cpp">
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="MeshComponent.cpp">
       <Filter>Components\EngineComponents</Filter>
     </ClCompile>
-    <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="FreeCam.cpp">
       <Filter>Components\EngineComponents</Filter>
     </ClCompile>
     <ClCompile Include="Terrain.cpp">
       <Filter>Terrain</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Entity.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityManager.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferredRenderer.cpp">
+      <Filter>Rendering\Renderes</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthRenderer.cpp">
+      <Filter>Rendering\Renderes</Filter>
+    </ClCompile>
+    <ClCompile Include="ForwardRenderer.cpp">
+      <Filter>Rendering\Renderes</Filter>
+    </ClCompile>
+    <ClCompile Include="FullscreenRenderer.cpp">
+      <Filter>Rendering\Renderes</Filter>
+    </ClCompile>
+    <ClCompile Include="HighlightRenderer.cpp">
+      <Filter>Rendering\Renderes</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleRenderer.cpp">
+      <Filter>Rendering\Renderes</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteRenderer.cpp">
+      <Filter>Rendering\Renderes</Filter>
+    </ClCompile>
+    <ClCompile Include="TextRenderer.cpp">
+      <Filter>Rendering\Renderes</Filter>
+    </ClCompile>
+    <ClCompile Include="GBuffer.cpp">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClCompile>
+    <ClCompile Include="DecalFactory.cpp">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteFontInclude.cpp">
+      <Filter>Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraFactory.cpp">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderScene.cpp">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectX11Framework.cpp">
+      <Filter>Adapters</Filter>
+    </ClCompile>
+    <ClCompile Include="InputHandler.cpp">
+      <Filter>Adapters</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowHandler.cpp">
+      <Filter>Adapters</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicEngine.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="ParentComponent.cpp">
+      <Filter>Components\EngineComponents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="CameraFactory.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectX11Framework.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicEngine.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="InputHandler.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowHandler.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Spline.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="NameThread.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="PointLight.h">
       <Filter>Lights</Filter>
     </ClInclude>
@@ -253,20 +231,8 @@
     <ClInclude Include="ParticleInstance.h">
       <Filter>Particles</Filter>
     </ClInclude>
-    <ClInclude Include="ForwardRenderer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleRenderer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
     <ClInclude Include="ParticleFactory.h">
       <Filter>Particles</Filter>
-    </ClInclude>
-    <ClInclude Include="FullscreenRenderer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="DeferredRenderer.h">
-      <Filter>Renderers</Filter>
     </ClInclude>
     <ClInclude Include="MathFunc.h">
       <Filter>InternetCode</Filter>
@@ -276,9 +242,6 @@
     </ClInclude>
     <ClInclude Include="Animator.h">
       <Filter>Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteRenderer.h">
-      <Filter>Sprites</Filter>
     </ClInclude>
     <ClInclude Include="SpriteInstance.h">
       <Filter>Sprites</Filter>
@@ -295,20 +258,20 @@
     <ClInclude Include="TextFactory.h">
       <Filter>Text</Filter>
     </ClInclude>
-    <ClInclude Include="FullscreenTexture.h">
+    <ClInclude Include="Texture.h">
       <Filter>Textures</Filter>
     </ClInclude>
-    <ClInclude Include="FullscreenTextureFactory.h">
+    <ClInclude Include="TextureFactory.h">
       <Filter>Textures</Filter>
     </ClInclude>
     <ClInclude Include="RenderStateManager.h">
-      <Filter>Renderers</Filter>
+      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="RenderManager.h">
-      <Filter>Renderers</Filter>
+      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="DebugDrawer.h">
-      <Filter>Renderers</Filter>
+      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="ShaderTypes.h">
       <Filter>Shaders</Filter>
@@ -325,32 +288,15 @@
     <ClInclude Include="Model.h">
       <Filter>Models</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderBuffers.h" />
     <ClInclude Include="AssetImportHelpers.h">
       <Filter>Models</Filter>
     </ClInclude>
-    <ClInclude Include="GBuffer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
     <ClInclude Include="SpriteRenderer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="WindSystem.h" />
-    <ClInclude Include="TextRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
     <ClInclude Include="PathFinder.h">
       <Filter>Path finding</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="HighlightRenderer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="DepthRenderer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="Decal.h" />
-    <ClInclude Include="DecalFactory.h" />
     <ClInclude Include="SpriteFontInclude.h">
       <Filter>Text</Filter>
     </ClInclude>
@@ -405,26 +351,91 @@
     <ClInclude Include="Component.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.h" />
     <ClInclude Include="MeshComponent.h">
       <Filter>Components\EngineComponents</Filter>
     </ClInclude>
-    <ClInclude Include="EntityManager.h" />
-    <ClInclude Include="EntityID.h" />
     <ClInclude Include="FreeCam.h">
       <Filter>Components\EngineComponents</Filter>
     </ClInclude>
     <ClInclude Include="Terrain.h">
       <Filter>Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="ComponentBase.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityManager.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityID.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="NameThread.h" />
+    <ClInclude Include="DeferredRenderer.h">
+      <Filter>Rendering\Renderes</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthRenderer.h">
+      <Filter>Rendering\Renderes</Filter>
+    </ClInclude>
+    <ClInclude Include="ForwardRenderer.h">
+      <Filter>Rendering\Renderes</Filter>
+    </ClInclude>
+    <ClInclude Include="FullscreenRenderer.h">
+      <Filter>Rendering\Renderes</Filter>
+    </ClInclude>
+    <ClInclude Include="HighlightRenderer.h">
+      <Filter>Rendering\Renderes</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleRenderer.h">
+      <Filter>Rendering\Renderes</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteRenderer.h">
+      <Filter>Rendering\Renderes</Filter>
+    </ClInclude>
+    <ClInclude Include="TextRenderer.h">
+      <Filter>Rendering\Renderes</Filter>
+    </ClInclude>
+    <ClInclude Include="GBuffer.h">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClInclude>
+    <ClInclude Include="DecalFactory.h">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraFactory.h">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Decal.h">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderBuffers.h">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderScene.h">
+      <Filter>Rendering\Datatypes</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectX11Framework.h">
+      <Filter>Adapters</Filter>
+    </ClInclude>
+    <ClInclude Include="InputHandler.h">
+      <Filter>Adapters</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowHandler.h">
+      <Filter>Adapters</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicEngine.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="ParentComponent.h">
+      <Filter>Components\EngineComponents</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Headers">
-      <UniqueIdentifier>{99546279-e651-492b-908c-e31bcf7d998a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source">
-      <UniqueIdentifier>{fabcc3e8-f63a-4e05-abb7-2c74046ae919}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Lights">
       <UniqueIdentifier>{3fb11d20-d5cc-4719-ad54-66b62989c4d4}</UniqueIdentifier>
     </Filter>
@@ -433,9 +444,6 @@
     </Filter>
     <Filter Include="Particles">
       <UniqueIdentifier>{ed9b4a54-ae85-49a2-be39-c409b9c0b46c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderers">
-      <UniqueIdentifier>{5e05b2e5-178e-4a62-a361-02c1befc1806}</UniqueIdentifier>
     </Filter>
     <Filter Include="InternetCode">
       <UniqueIdentifier>{af663ab4-daf9-4f88-a338-91069ec66180}</UniqueIdentifier>
@@ -484,6 +492,21 @@
     </Filter>
     <Filter Include="Terrain">
       <UniqueIdentifier>{f422ca03-cd24-4ed0-8215-5352674c7413}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entity">
+      <UniqueIdentifier>{6bc92f4f-6449-498f-a187-5f25c3e08b67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{5e05b2e5-178e-4a62-a361-02c1befc1806}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Renderes">
+      <UniqueIdentifier>{944e96e6-ff11-4dda-b5c3-e9cc257fa85f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Datatypes">
+      <UniqueIdentifier>{8ae2f6a4-4fce-4b26-bf01-44cf9109cf7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adapters">
+      <UniqueIdentifier>{d48e64a9-d15a-4b68-8d00-b0ec11ff394e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

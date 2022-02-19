@@ -35,7 +35,7 @@ Camera* CCameraFactory::CreateCamera(float aFoV, const bool aShouldAdaptToWindow
 	return camera;
 }
 
-Camera* CCameraFactory::CreateCamera(Camera::CameraType aType)
+Camera* CCameraFactory::CreateCamera()
 {
 	Camera* camera = new Camera();
 	camera->Init(V3F(ENVIRONMENCAMEREASIZE, ENVIRONMENCAMEREASIZE, ENVIRONMENCAMEREASIZE));

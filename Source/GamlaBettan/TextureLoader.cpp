@@ -39,10 +39,10 @@ Asset* TextureLoader::GeneratePerlin(V2ui aSize, V2f aScale, unsigned int aSeed)
 	{
 		for (size_t x = 0; x < aSize.x; x++)
 		{
-			color[y * aSize.x + x].x = generators[0].noise(x / aScale.x / aSize.x * 255.0f, y / aScale.y / aSize.y * 255.0f, 0.0f);
-			color[y * aSize.x + x].y = generators[1].noise(x / aScale.x / aSize.x * 255.0f, y / aScale.y / aSize.y * 255.0f, 1.0f);
-			color[y * aSize.x + x].z = generators[2].noise(x / aScale.x / aSize.x * 255.0f, y / aScale.y / aSize.y * 255.0f, 2.0f);
-			color[y * aSize.x + x].w = 0;
+			color[y * aSize.x + x].x = static_cast<float>(generators[0].noise(x / aScale.x / aSize.x * 255.0f, y / aScale.y / aSize.y * 255.0f, 0.0f));
+			color[y * aSize.x + x].y = static_cast<float>(generators[1].noise(x / aScale.x / aSize.x * 255.0f, y / aScale.y / aSize.y * 255.0f, 1.0f));
+			color[y * aSize.x + x].z = static_cast<float>(generators[2].noise(x / aScale.x / aSize.x * 255.0f, y / aScale.y / aSize.y * 255.0f, 2.0f));
+			color[y * aSize.x + x].w = 0.f;
 		}
 	}
 	D3D11_TEXTURE2D_DESC desc;
@@ -109,7 +109,7 @@ Asset* TextureLoader::LoadTextureInternal(const std::string& aFile, D3D11_RESOUR
 		D3D11_TEXTURE2D_DESC desc;
 		tex2d->GetDesc(&desc);
 		tex2d->Release();
-		DirectX11Framework::AddGraphicsMemoryUsage(desc.Width * desc.Height * DirectX11Framework::FormatToSizeLookup[desc.Format], aFile, "Texture2d");
+		DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(desc.Width * desc.Height * DirectX11Framework::FormatToSizeLookup[desc.Format]), aFile, "Texture2d");
 	}
 
 	ID3D11Texture3D* tex3d;
@@ -119,7 +119,7 @@ Asset* TextureLoader::LoadTextureInternal(const std::string& aFile, D3D11_RESOUR
 		D3D11_TEXTURE3D_DESC desc;
 		tex3d->GetDesc(&desc);
 		tex3d->Release();
-		DirectX11Framework::AddGraphicsMemoryUsage(desc.Width * desc.Height * desc.Depth * DirectX11Framework::FormatToSizeLookup[desc.Format], aFile, "Texture3d");
+		DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(desc.Width * desc.Height * desc.Depth * DirectX11Framework::FormatToSizeLookup[desc.Format]), aFile, "Texture3d");
 	}
 	res->Release();
 

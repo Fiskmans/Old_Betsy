@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "DebugTools.h"
-#include "Scene.h"
+#include "RenderScene.h"
 #include "ModelInstance.h"
 
 #include "AssetManager.h"
@@ -33,7 +33,7 @@ void DebugTools::UpdateGizmo()
 		{
 			for (size_t i = 0; i < 6; i++)
 			{
-				Scene::GetInstance().AddToScene(gizmoParts[i]);
+				RenderScene::GetInstance().AddToScene(gizmoParts[i]);
 			}
 			myGizmoInScene = true;
 		}
@@ -152,7 +152,7 @@ void DebugTools::UpdateGizmo()
 		{
 			for (size_t i = 0; i < 6; i++)
 			{
-				Scene::GetInstance().RemoveFromScene(gizmoParts[i]);
+				RenderScene::GetInstance().RemoveFromScene(gizmoParts[i]);
 			}
 			myGizmoInScene = false;
 		}

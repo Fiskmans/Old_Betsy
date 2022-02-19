@@ -539,7 +539,7 @@ namespace AK
 			virtual AKRESULT BatchRead(
 				AkUInt32				in_uNumTransfers,		///< Number of transfers to process
 				BatchIoTransferItem*	in_pTransferItems,		///< List of transfer items to process
-				AkBatchIOCallback		in_pBatchIoCallback,	///< Callback to execute to handle completion of multiple items simultaneously
+				AkBatchIOCallback		/*in_pBatchIoCallback*/,	///< Callback to execute to handle completion of multiple items simultaneously
 				AKRESULT*				io_pDispatchResults		///< Output result codes to indicate if a transfer was successfully dispatched
 			)
 			{
@@ -557,7 +557,7 @@ namespace AK
 			virtual AKRESULT BatchWrite(
 				AkUInt32				in_uNumTransfers,		///< Number of transfers to process
 				BatchIoTransferItem*	in_pTransferItems,		///< List of transfer items to process
-				AkBatchIOCallback		in_pBatchIoCallback,	///< Callback to execute to handle completion of multiple items simultaneously
+				AkBatchIOCallback		/*in_pBatchIoCallback*/,	///< Callback to execute to handle completion of multiple items simultaneously
 				AKRESULT*				io_pDispatchResults		///< Output result codes to indicate if a transfer was successfully dispatched
 			)
 			{

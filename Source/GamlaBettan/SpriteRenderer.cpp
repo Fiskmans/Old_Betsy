@@ -88,8 +88,8 @@ void SpriteRenderer::Render(/*const Camera* aCamera,*/ const std::vector<SpriteI
 			ImGui::PushID(StateStack::ourCurrentStateIdentifier);
 			ImGui::Checkbox("Debug layout", &debug);
 			ImGui::Separator();
-			size_t counter = 0;
-			for (auto& SpriteInstance : aSpriteList)
+			int counter = 0;
+			for (SpriteInstance* SpriteInstance : aSpriteList)
 			{
 				ImGui::PushID(counter);
 				if (ImGui::TreeNode("node", "Sprite: " PFSIZET, counter))
@@ -132,8 +132,8 @@ void SpriteRenderer::Render(/*const Camera* aCamera,*/ const std::vector<SpriteI
 		{
 			static_assert(sizeof(size_t) == sizeof(void*));
 			size_t seed = std::hash<size_t>()(reinterpret_cast<size_t>(spriteData));
-			srand(seed);
-			myObjectBufferData.myColor = V4F(rand() / double(RAND_MAX), rand() / double(RAND_MAX), rand() / double(RAND_MAX), 0.5f);
+			srand(static_cast<int>(seed));
+			myObjectBufferData.myColor = V4F(static_cast<float>(rand() / double(RAND_MAX)), static_cast<float>(rand() / double(RAND_MAX)), static_cast<float>(rand() / double(RAND_MAX)), 0.5f);
 		}
 #endif // 
 #endif // _DEBUG

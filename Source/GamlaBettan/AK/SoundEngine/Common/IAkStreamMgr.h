@@ -31,6 +31,8 @@ the specific language governing permissions and limitations under the License.
 #ifndef _IAK_STREAM_MGR_H_
 #define _IAK_STREAM_MGR_H_
 
+#pragma warning(disable : 26495)
+#pragma warning(disable : 26812)
 #include <AK/SoundEngine/Common/AkMemoryMgr.h>
 
 //-----------------------------------------------------------------------------

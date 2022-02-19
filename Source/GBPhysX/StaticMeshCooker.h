@@ -31,6 +31,8 @@ public:
 	// Inherited via Observer
 	virtual void RecieveMessage(const Message& aMessage) override;
 private:
+	friend class GBPhysX;
+
 	struct FileData
 	{
 		std::string path;

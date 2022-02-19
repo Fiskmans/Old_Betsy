@@ -6,7 +6,7 @@
 
 class LightLoader;
 class ModelInstance;
-class Scene;
+class RenderScene;
 class Camera;
 
 class DebugTools

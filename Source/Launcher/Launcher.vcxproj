@@ -5,16 +5,8 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Development|x64">
-      <Configuration>Development</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Retail|x64">
-      <Configuration>Retail</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -32,20 +24,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
@@ -61,18 +40,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\ExeBuild.props" />
     <Import Project="..\Cxx17.props" />
-    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
-    <Import Project="..\OpenSSLDepend.props" />
-    <Import Project="..\SharedPCH.props" />
-    <Import Project="..\ZmSwitch.props" />
-    <Import Project="..\Includes.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\ExeBuild.props" />
-    <Import Project="..\Cxx17.props" />
-    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
-    <Import Project="..\OpenSSLDepend.props" />
     <Import Project="..\SharedPCH.props" />
     <Import Project="..\ZmSwitch.props" />
     <Import Project="..\Includes.props" />
@@ -81,18 +48,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\ExeBuild.props" />
     <Import Project="..\Cxx17.props" />
-    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
-    <Import Project="..\OpenSSLDepend.props" />
-    <Import Project="..\SharedPCH.props" />
-    <Import Project="..\ZmSwitch.props" />
-    <Import Project="..\Includes.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\ExeBuild.props" />
-    <Import Project="..\Cxx17.props" />
-    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
-    <Import Project="..\OpenSSLDepend.props" />
     <Import Project="..\SharedPCH.props" />
     <Import Project="..\ZmSwitch.props" />
     <Import Project="..\Includes.props" />
@@ -101,62 +56,35 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(Solutiondir)..\Bin\</OutDir>
-    <IntDir>$(SolutionDir)Workbed\$(Projectname)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
-    <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(Solutiondir)..\Bin\</OutDir>
-    <IntDir>$(SolutionDir)Workbed\$(Projectname)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(Solutiondir)..\Bin\</OutDir>
-    <IntDir>$(SolutionDir)Workbed\$(Projectname)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(Solutiondir)..\Bin\</OutDir>
-    <IntDir>$(SolutionDir)Workbed\$(Projectname)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\Wwise\lib\;$(OutputPath)PhysX_Debug\;$(solutiondir)libs\;$(solutiondir)ExternalLibs\;$(SolutionDir)Audio\Wwise\Wwise\Profile(StaticCRT)\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>pch.lib;GBPhysX_$(Configuration).lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;imgui_$(Configuration).lib;imgui_canvas_$(Configuration).lib;imgui_node_editor_$(Configuration).lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
-    <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\Wwise\lib\;$(solutiondir)libs\;$(SolutionDir)Audio\FMOD\studio\lib\x64\;$(SolutionDir)Audio\FMOD\core\lib\x64\;$(solutiondir)ExternalLibs\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>pch.lib;GBPhysX_$(Configuration).lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;Wwise_$(Configuration).lib;imgui_$(Configuration).lib;imgui_canvas_$(Configuration).lib;imgui_node_editor_$(Configuration).lib;Ws2_32.lib;TClient_$(Configuration).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pch.lib;GBPhysX_$(Configuration).lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_RELEASE;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -164,35 +92,15 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\Wwise\lib\;$(solutiondir)libs\;$(SolutionDir)Audio\Wwise\Wwise\Profile(StaticCRT)\lib\;$(SolutionDir)Audio\Wwise\Wwise\Release(StaticCRT)\lib\;$(solutiondir)ExternalLibs\;$(OutputPath)PhysX_Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>pch.lib;GBPhysX_$(Configuration).lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;Wwise_$(Configuration).lib;imgui_$(Configuration).lib;imgui_canvas_$(Configuration).lib;imgui_node_editor_$(Configuration).lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pch.lib;GBPhysX_$(Configuration).lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;Wwise_$(Configuration).lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>COPY "C:\Program Files\OpenSSL-Win64\bin\*.dll" "$(outdir)" /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">
-    <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_RETAIL;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\Wwise\lib\;$(solutiondir)libs\;$(SolutionDir)Audio\Wwise\Wwise\Profile(StaticCRT)\lib\;$(OutputPath)PhysX_Release\;$(solutiondir)ExternalLibs\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>pch.lib;GBPhysX_release.lib;GamlaBettan_$(Configuration).lib;Game_$(Configuration).lib;Tools_$(Configuration).lib;Wwise_release.lib;imgui_release.lib;imgui_canvas_release.lib;imgui_node_editor_release.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h" />
     <ClInclude Include="resource1.h" />
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>

@@ -30,7 +30,7 @@ public:
 	{
 		~ModelData();
 
-		ShaderFlags myshaderTypeFlags;
+		ShaderFlags myshaderTypeFlags = ShaderFlags::None;
 		UINT myStride = 0;
 
 #pragma warning(push)
@@ -44,14 +44,16 @@ public:
 		AssetHandle myTextures[3];
 		std::vector<AssetHandle> myCustomTextures;
 
+		bool myIsIndexed = true;
 		UINT myNumberOfIndexes = 0;
+		UINT myNumberOfVertexes = 0;
 		ID3D11Buffer* myIndexBuffer = nullptr;
 		ID3D11Buffer* myVertexBuffer = nullptr;
 		ID3D11InputLayout* myInputLayout = nullptr;
 
 		bool myUseForwardRenderer = false;
 
-		V3F myDiffuseColor = V3F(0.8,0.4,0.75);
+		V3F myDiffuseColor = V3F(0.8f, 0.4f, 0.75f);
 
 		M44f myOffset;
 	};

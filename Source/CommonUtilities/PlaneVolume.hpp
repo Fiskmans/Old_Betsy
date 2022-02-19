@@ -57,7 +57,7 @@ namespace CommonUtilities
 	template<typename T>
 	inline int PlaneVolume<T>::Size() const
 	{
-		return myData.size();
+		return static_cast<int>(myData.size());
 	}
 
 	template<typename T>

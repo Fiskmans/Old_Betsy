@@ -7,9 +7,9 @@
 #include "ShaderFlags.h"
 #include "GamlaBettan\Decal.h"
 
-class Scene;
+class RenderScene;
 class RenderStateManager;
-class FullscreenTexture;
+class Texture;
 class DepthRenderer;
 class Texture;
 
@@ -21,7 +21,7 @@ public:
 
 	bool Init(DirectX11Framework* aFramework,AssetHandle aPerlinHandle, DepthRenderer* aShadowRenderer);
 
-	std::vector<ModelInstance*> GenerateGBuffer(Camera* aCamera, std::vector<ModelInstance*>& aModelList, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer,GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer,FullscreenTexture* aDepth,BoneTextureCPUBuffer& aBoneTextureBuffer);
+	std::vector<ModelInstance*> GenerateGBuffer(Camera* aCamera, std::vector<ModelInstance*>& aModelList, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping, Texture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer,GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer,Texture* aDepth,BoneTextureCPUBuffer& aBoneTextureBuffer);
 
 	void Render(FullscreenRenderer& aFullscreenRenderer, std::vector<PointLight*>& aPointLightList, std::vector<SpotLight*>& aSpotLightList, RenderStateManager* aRenderStateManager, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping);
 

@@ -16,7 +16,7 @@ struct VertexInput
 #ifdef VERTEXCOLOR
 	float4 myColor						:	COLOR;
 #endif
-#if HAS_UV_SETS
+#ifdef HAS_UV_SETS
 	float2 myUV[UV_SETS_COUNT]			:	UV;
 #endif
 #ifdef HAS_BONES
@@ -32,7 +32,7 @@ struct VertexToPixel
 	float4 myNormal						:	NORMAL;
 	float4 myTangent					:	TANGENT;
 	float4 myBiTangent					:	BITANGENT;
-#if HAS_UV_SETS
+#ifdef HAS_UV_SETS
 	float2 myUV[UV_SETS_COUNT]			:	UV;
 #endif
 #ifdef VERTEXCOLOR

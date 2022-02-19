@@ -45,8 +45,46 @@ namespace CommonUtilities
 				return true;
 			}
 		}
+	}
 
-		return false;
+	template<typename T>
+	bool IntersectionPlaneRay(const Plane<T>& aPlane, const Ray<T>& aRay, T& aOutIntersectionDistance)
+	{
+		if (aPlane.Normal().Dot(aRay.Position() - aPlane.Point()) == 0)
+		{
+			return true;
+		}
+		if (aRay.Direction().Dot(aPlane.Normal()) == 0)
+		{
+			return false;
+		}
+
+		if (aPlane.Inside(aRay.Position()))
+		{
+			if (aPlane.Normal().Dot(aRay.Direction()) >= 0)
+			{
+				const T t = (aPlane.Point() - aRay.Position()).Dot(aPlane.Normal()) / aRay.Direction().Dot(aPlane.Normal());
+				aOutIntersectionDistance = t;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (aPlane.Normal().Dot(aRay.Direction()) >= 0)
+			{
+				return false;
+			}
+			else
+			{
+				const T t = (aPlane.Point() - aRay.Position()).Dot(aPlane.Normal()) / aRay.Direction().Dot(aPlane.Normal());
+				aOutIntersectionDistance = t;
+				return true;
+			}
+		}
 	}
 
 	template<typename T>
@@ -73,8 +111,8 @@ namespace CommonUtilities
 		T t5 = (minCorner.z - origin.z) * dirInverse.z;
 		T t6 = (maxCorner.z - origin.z) * dirInverse.z;
 
-		T tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
-		T tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
+		T tmin = std::max(std::max(std::min(t1, t2), std::min(t3, t4)), std::min(t5, t6));
+		T tmax = std::min(std::min(std::max(t1, t2), std::max(t3, t4)), std::max(t5, t6));
 
 		aOutDistance = tmin;
 		return !(tmax < 0) && !(tmin > tmax);

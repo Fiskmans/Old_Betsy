@@ -1,6 +1,6 @@
 #include <pch.h>
 #include "Button.h"
-#include "GamlaBettan\Scene.h"
+#include "GamlaBettan\RenderScene.h"
 #include "GamlaBettan\SpriteInstance.h"
 #include "GamlaBettan\SpriteFactory.h"
 #include "PostMaster.hpp"
@@ -29,7 +29,7 @@ Button::~Button()
 {
 	if (myIsEnabled)
 	{
-		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
+		RenderScene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
 	}
 }
 
@@ -59,8 +59,8 @@ void Button::SetHovered()
 {
 	if (myState != ButtonState::Hover)
 	{
-		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
-		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Hover)]);
+		RenderScene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
+		RenderScene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Hover)]);
 	}
 	myState = ButtonState::Hover;
 }
@@ -69,8 +69,8 @@ void Button::SetPressed()
 {
 	if (myState != ButtonState::Pressed)
 	{
-		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
-		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Pressed)]);
+		RenderScene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
+		RenderScene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Pressed)]);
 	}
 	myState = ButtonState::Pressed;
 }
@@ -79,8 +79,8 @@ void Button::SetToNormal()
 {
 	if (myState != ButtonState::Normal)
 	{
-		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
-		Scene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Normal)]);
+		RenderScene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
+		RenderScene::GetInstance().AddToScene(mySprites[CAST(int, ButtonState::Normal)]);
 	}
 	myState = ButtonState::Normal;
 }
@@ -107,7 +107,7 @@ bool Button::Init(const std::string& aFolderPath, const std::string& aButtonName
 	mySprites[ButtonState::Normal]->SetPivot(V2f(0.5f, 0.5f));
 	mySprites[ButtonState::Normal]->SetPosition(myPosition);
 	mySprites[ButtonState::Normal]->SetDepth(0.5f);
-	Scene::GetInstance().AddToScene(mySprites[ButtonState::Normal]);
+	RenderScene::GetInstance().AddToScene(mySprites[ButtonState::Normal]);
 
 	mySprites[ButtonState::Hover] = aSpriteFactory->CreateSprite(path + " button hover.dds");
 	mySprites[ButtonState::Hover]->SetPivot(V2f(0.5f, 0.5f));
@@ -149,16 +149,16 @@ void Button::Disable()
 	if (myIsEnabled)
 	{
 		myIsEnabled = false;
-		Scene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
+		RenderScene::GetInstance().RemoveFromScene(mySprites[CAST(int, myState)]);
 	}
 }
 
 void Button::Enable()
 {
-	if(!myIsEnabled);
+	if(!myIsEnabled)
 	{
 		myIsEnabled = true;
-		Scene::GetInstance().AddToScene(mySprites[CAST(int, myState)]);
+		RenderScene::GetInstance().AddToScene(mySprites[CAST(int, myState)]);
 	}
 }
 

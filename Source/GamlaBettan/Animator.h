@@ -32,7 +32,7 @@ public:
 	private:
 		friend Animator;
 		
-		size_t myId = -1;
+		size_t myId = static_cast<size_t>(-1);
 	};
 
 	void Init(std::vector<BoneInfo>* aBoneinfo);

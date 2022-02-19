@@ -4,14 +4,24 @@
 const float globalMeterScaleFactor = 100.f;
 
 float operator""_m(long double aMeterValue);
+float operator""_dm(long double aDeciMeterValue);
 float operator""_cm(long double aCentiMeterValue);
 float operator""_m2(long double aMeterValue);
+float operator""_dm2(long double aDeciMeterValue);
 float operator""_cm2(long double aCentiMeterValue);
+float operator""_m3(long double aMeterValue);
+float operator""_dm3(long double aDeciMeterValue);
+float operator""_cm3(long double aCentiMeterValue);
 
 float operator""_m(size_t aMeterValue);
+float operator""_dm(size_t aDeciMeterValue);
 float operator""_cm(size_t aCentiMeterValue);
 float operator""_m2(size_t aMeterValue);
+float operator""_dm2(size_t aDeciMeterValue);
 float operator""_cm2(size_t aCentiMeterValue);
+float operator""_m3(size_t aMeterValue);
+float operator""_dm3(size_t aDeciMeterValue);
+float operator""_cm3(size_t aCentiMeterValue);
 
 size_t operator""_b(size_t aBytes);
 size_t operator""_kb(size_t aKiloBytes);

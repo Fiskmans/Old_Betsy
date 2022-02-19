@@ -12,7 +12,7 @@ class BaseState
 public:
 	BaseState(bool shouldDeleteOnPop = true);
 	virtual ~BaseState() = 0;
-	virtual void Update(const float aDeltaTime) = 0;
+	virtual void Update() = 0;
 	virtual void Render(CGraphicsEngine* aGraphicsEngine) = 0;
 
 	inline bool IsMain() const;

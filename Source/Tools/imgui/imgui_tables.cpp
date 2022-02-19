@@ -150,7 +150,7 @@ Index of this file:
 
 
 //-----------------------------------------------------------------------------
-// TABLES CLIPPING/CULLING
+// TABLES CLIPPING/CommonUtilitiesLLING
 //-----------------------------------------------------------------------------
 // About clipping/culling of Rows in Tables:
 // - For large numbers of rows, it is recommended you use ImGuiListClipper to only submit visible rows.
@@ -186,8 +186,8 @@ Index of this file:
 // [SECTION] Header mess
 //-----------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
-#define _CRT_SECURE_NO_WARNINGS
+#if defined(_MSC_VER) && !defined(_CRT_SECommonUtilitiesRE_NO_WARNINGS)
+#define _CRT_SECommonUtilitiesRE_NO_WARNINGS
 #endif
 
 #include "imgui.h"

@@ -4,9 +4,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <OutDir>$(SolutionDir)..\Game\</OutDir>
-    <IntDir>$(SolutionDir)Workbench\$(Projectname)\</IntDir>
     <TargetName>$(ProjectName)_$(configuration)</TargetName>
+    <IntDir>$(solutiondir)Workbed\$(Projectname)\</IntDir>
   </PropertyGroup>
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

@@ -7,7 +7,7 @@ class ForwardRenderer;
 class LightLoader;
 class WindowHandler;
 class SpriteRenderer;
-class Scene;
+class RenderScene;
 class Camera;
 class Skybox;
 class TextInstance;
@@ -36,7 +36,6 @@ public:
 	DirectX11Framework* GetFrameWork();
 	LightLoader* GetLightLoader();
 	SpriteRenderer* GetSpriteRenderer();
-	RenderManager* GetRendreManarger();
 
 #if USEIMGUI
 	void Imgui();
@@ -45,8 +44,6 @@ public:
 
 private:
 	bool InitInternal();
-
-	RenderManager* myRendreManarger;
 
 	DirectX11Framework* myFrameWork;
 	SpriteFactory mySpriteFactory;

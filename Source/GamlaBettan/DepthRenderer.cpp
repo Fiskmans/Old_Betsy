@@ -13,7 +13,7 @@
 #include "Environmentlight.h"
 #include "RenderManager.h"
 #include "AssetManager.h"
-#include "GamlaBettan\Scene.h"
+#include "GamlaBettan\RenderScene.h"
 #include "GamlaBettan\ModelInstance.h"
 
 DepthRenderer::~DepthRenderer()
@@ -29,14 +29,14 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 		myCameras[i] = CCameraFactory::CreateCamera(90, false, SHADOWNEARPLANE, SHADOWFARPLANE);
 		myCameras[i]->SetResolution(V2ui(SHADOWRESOLUTION, SHADOWRESOLUTION));
 	}
-	myCameras[0]->SetRotation(V3F(0, 0, 0));
-	myCameras[1]->SetRotation(V3F(PI, 0, 0));
-	myCameras[2]->SetRotation(V3F(-PI / 2, 0, 0));
-	myCameras[3]->SetRotation(V3F(PI / 2, 0, 0));
-	myCameras[4]->SetRotation(V3F(0, -PI / 2, 0));
-	myCameras[5]->SetRotation(V3F(0, PI / 2, 0));
+	myCameras[0]->SetRotation(V3F(0.f, 0.f, 0.f));
+	myCameras[1]->SetRotation(V3F(PI_F, 0.f, 0.f));
+	myCameras[2]->SetRotation(V3F(-PI_F / 2.2f, 0.f, 0.f));
+	myCameras[3]->SetRotation(V3F(PI_F / 2.2f, 0.f, 0.f));
+	myCameras[4]->SetRotation(V3F(0.f, -PI_F / 2.2f, 0.f));
+	myCameras[5]->SetRotation(V3F(0.f, PI_F / 2.2f, 0.f));
 
-	myEnvironmentCamera = CCameraFactory::CreateCamera(Camera::CameraType::Orthographic);
+	myEnvironmentCamera = CCameraFactory::CreateCamera();
 
 	//myEnvironmentCamera = CCameraFactory::CreateCamera(90, false, SHADOWNEARPLANE, SHADOWFARPLANE);
 	//myEnvironmentCamera->SetResolution(V2F(SHADOWRESOLUTION, SHADOWRESOLUTION));
@@ -53,7 +53,6 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	ID3D11ShaderResourceView* viewEnvironment;
 	ID3D11DepthStencilView* depth;
 	ID3D11DepthStencilView* depthEnvironment;
-	ID3D11DepthStencilView* depthDecals;
 
 	CD3D11_TEXTURE2D_DESC tdesc;
 	WIPE(tdesc);
@@ -150,7 +149,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	desc2.SampleDesc.Count = 1;
 	desc2.SampleDesc.Quality = 0;
 
-	DirectX11Framework::AddGraphicsMemoryUsage(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format], "pointlight rt", "Engine Texture");
+	DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format]), "pointlight rt", "Engine Texture");
 	result = device->CreateTexture2D(&desc2, nullptr, &tex2_1x6);
 	if (FAILED(result))
 	{
@@ -162,7 +161,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	desc2.Width = ENVIRONMENTSHADOWRESOLUTION;
 	desc2.Height = ENVIRONMENTSHADOWRESOLUTION;
 
-	DirectX11Framework::AddGraphicsMemoryUsage(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format], "environment rt", "Engine Texture");
+	DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format]), "environment rt", "Engine Texture");
 	result = device->CreateTexture2D(&desc2, nullptr, &tex2_1x1);
 	if (FAILED(result))
 	{
@@ -173,7 +172,7 @@ bool DepthRenderer::Init(DirectX11Framework* aFramework)
 	desc2.Height = DECALRESOLUTION;
 	desc2.Width = DECALRESOLUTION;
 
-	DirectX11Framework::AddGraphicsMemoryUsage(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format], "decal rt", "Engine Texture");
+	DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(desc2.Height * desc2.Width * DirectX11Framework::FormatToSizeLookup[desc2.Format]), "decal rt", "Engine Texture");
 	result = device->CreateTexture2D(&desc2, nullptr, &texDecal);
 	if (FAILED(result))
 	{
@@ -266,7 +265,7 @@ void DepthRenderer::Render(PointLight* aLight, BoneTextureCPUBuffer& aBoneBuffer
 	std::vector<ModelInstance*> preCull;
 	{
 		PERFORMANCETAG("Precull");
-		preCull = Scene::GetInstance().Cull(CommonUtilities::Sphere<float>(aLight->position, SHADOWFARPLANE * CUBEHALFSIZETOENCAPSULATINGSPHERERADIUS));
+		preCull = RenderScene::GetInstance().Cull(CommonUtilities::Sphere<float>(aLight->position, SHADOWFARPLANE * CUBEHALFSIZETOENCAPSULATINGSPHERERADIUS));
 	}
 
 
@@ -282,14 +281,14 @@ void DepthRenderer::Render(PointLight* aLight, BoneTextureCPUBuffer& aBoneBuffer
 		port.Width = SHADOWRESOLUTION;
 		port.MinDepth = 0.f;
 		port.MaxDepth = 1.f;
-		port.TopLeftX = SHADOWRESOLUTION * i;
+		port.TopLeftX = static_cast<float>(SHADOWRESOLUTION * i);
 		port.TopLeftY = 0;
 		myContext->RSSetViewports(1, &port);
 		myCameras[i]->SetPosition(aLight->position);
 		std::vector<class ModelInstance*> filtered;
 		{
 			PERFORMANCETAG("Culling");
-			filtered = Scene::GetInstance().Cull(myCameras[i], preCull, false);
+			filtered = RenderScene::GetInstance().Cull(myCameras[i], preCull, false);
 		}
 
 		Render(myCameras[i], filtered, aBoneBuffer, aBoneMapping);
@@ -315,7 +314,7 @@ void DepthRenderer::RenderSpotLightDepth(SpotLight* aSpotlight, BoneTextureCPUBu
 	std::vector<class ModelInstance*> filtered;
 	{
 		PERFORMANCETAG("Culling");
-		filtered = Scene::GetInstance().Cull(aSpotlight->myCamera);
+		filtered = RenderScene::GetInstance().Cull(aSpotlight->myCamera);
 	}
 
 	Render(aSpotlight->myCamera, filtered, aBoneBuffer, aBoneMapping);
@@ -326,7 +325,7 @@ void DepthRenderer::RenderEnvironmentDepth(EnvironmentLight* aLight, BoneTexture
 {
 	if (!aLight)
 	{
-		ONETIMEWARNING("Rendering without an envinronmentlight");
+		ONETIMEWARNING("Rendering without an envinronmentlight","");
 		return;
 	}
 	myContext->ClearDepthStencilView(myDepth1x1, D3D11_CLEAR_DEPTH, 1.f, 0);
@@ -350,7 +349,7 @@ void DepthRenderer::RenderEnvironmentDepth(EnvironmentLight* aLight, BoneTexture
 	std::vector<class ModelInstance*> filtered;
 	{
 		PERFORMANCETAG("Culling");
-		filtered = Scene::GetInstance().Cull(myEnvironmentCamera);
+		filtered = RenderScene::GetInstance().Cull(myEnvironmentCamera);
 	}
 
 
@@ -432,7 +431,7 @@ ID3D11ShaderResourceView* DepthRenderer::RenderDecalDepth(Decal* aDecal, BoneTex
 	myContext->RSSetViewports(1, &port);
 	myContext->OMSetRenderTargets(1, &myDecalRenderTarget, depth);
 
-	std::vector<class ModelInstance*> filtered = Scene::GetInstance().Cull(aDecal->myCamera);
+	std::vector<class ModelInstance*> filtered = RenderScene::GetInstance().Cull(aDecal->myCamera);
 	Render(aDecal->myCamera, filtered, aBoneBuffer, aBoneMapping);
 
 	tex->Release();
@@ -445,7 +444,6 @@ void DepthRenderer::Render(Camera* aCamera, const std::vector<ModelInstance*>& a
 {
 	PERFORMANCETAG("DepthRender");
 	Model* model = nullptr;
-	Model::ModelData* modelData = nullptr;
 
 
 	HRESULT result;
@@ -541,9 +539,17 @@ void DepthRenderer::Render(Camera* aCamera, const std::vector<ModelInstance*>& a
 				UINT vertexOffset = 0;
 
 				myContext->IASetVertexBuffers(0, 1, &modelData->myVertexBuffer, &modelData->myStride, &vertexOffset);
-				myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
 
-				myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
+				if (modelData->myIsIndexed)
+				{
+					myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
+					myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
+				}
+				else
+				{
+					myContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_R8_TYPELESS, 0);
+					myContext->Draw(modelData->myNumberOfVertexes, 0);
+				}
 			}
 		}
 	}

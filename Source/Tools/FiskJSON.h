@@ -4,7 +4,7 @@
 #include <optional>
 #include <variant>
 #include <vector>
-
+#include "DereferencingIteratorWrapper.h"
 
 namespace FiskJSON
 {
@@ -36,12 +36,15 @@ namespace FiskJSON
 	
 	class Object
 	{
-		friend class Array;
+		friend class ArrayWrapper;
+		friend class ConstArrayWrapper;
 	public:
 		void Parse(const std::string& aDocument);
 		void Parse(const char* aBegin, const char* aEnd);
 
 		~Object();
+		Object() = default;
+		Object(const Object& aOther) = delete;
 
 		Object& operator[](const std::string& aKey);
 		Object& operator[](const char* aKey);
@@ -50,7 +53,10 @@ namespace FiskJSON
 		Object& operator[](int aIndex);
 		Object& operator[](long aIndex);
 
-		bool Has(const std::string& aKey);
+		const Object& operator[](const std::string& aKey) const;
+		const Object& operator[](const char* aKey) const;
+
+		bool Has(const std::string& aKey) const;
 
 		template<typename T>
 		void AddValueChild(const std::string& aKey, T aValue);
@@ -61,6 +67,10 @@ namespace FiskJSON
 		template<typename T>
 		void PushValueChild(T aValue);
 		void MakeArray();
+
+		static Object& Null() { static Object null; return null; }
+		bool NotNull() const { return this != &Null(); }
+		bool IsNull() const { return this == &Null(); }
 
 		std::string Serialize(bool aPretty = false);
 
@@ -77,15 +87,21 @@ namespace FiskJSON
 		operator bool();
 
 		template<typename Type>
-		bool Is();
+		bool Is() const;
 
 		template<class Type>
-		Type Get();
+		Type Get()
+		{
+			return static_cast<const Object* const>(this)->Get<Type>();
+		};
+
+		template<class Type>
+		Type Get() const;
 
 		template<typename Type>
-		inline bool GetIf(Type& aValueToPlaceIn)
+		inline bool GetIf(Type& aValueToPlaceIn) const 
 		{
-			if (this && Is<Type>())
+			if (NotNull() && Is<Type>())
 			{
 				aValueToPlaceIn = Get<Type>();
 				return true;
@@ -122,90 +138,110 @@ namespace FiskJSON
 
 	};
 
-	class Array
+	class ArrayWrapper
 	{
 		friend Object;
 	public:
 
 		Object& operator[](size_t aIndex);
-		std::vector<Object*>::iterator begin();
-		std::vector<Object*>::iterator end();
+		DereferencingIteratorWrapper<std::vector<Object*>::iterator> begin();
+		DereferencingIteratorWrapper<std::vector<Object*>::iterator> end();
+
+		void PushChild(FiskJSON::Object* aObject);
+		
+		template<class T>
+		void PushValue(T&& aValue);
 
 	private:
-		Array(Object* aParent);
+		ArrayWrapper(Object* aParent);
 
 		std::vector<Object*>* myArrayRef = nullptr;
+	};
+
+	class ConstArrayWrapper
+	{
+		friend Object;
+	public:
+
+		const Object& operator[](size_t aIndex);
+		DereferencingIteratorWrapper<std::vector<Object*>::const_iterator> begin();
+		DereferencingIteratorWrapper<std::vector<Object*>::const_iterator> end();
+
+	private:
+		ConstArrayWrapper(const Object* aParent);
+
+		const std::vector<Object*>* myArrayRef = nullptr;
 	};
 
 #pragma region Is
 
 #pragma region number
 	template<>
-	inline bool Object::Is<long long>()
+	inline bool Object::Is<long long>() const
 	{
-		return  this && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
+		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
 	}
 	template<>
-	inline bool Object::Is<long>()
+	inline bool Object::Is<long>() const
 	{
-		return  this && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
+		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
 	}
 	template<>
-	inline bool Object::Is<int>()
+	inline bool Object::Is<int>() const
 	{
-		return  this && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
+		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
 	}
 #pragma endregion
 
 #pragma region floatingPoint
 	template<>
-	inline bool Object::Is<float>()
+	inline bool Object::Is<float>() const
 	{
-		return  this && myType == Type::Value && myValue.has_value() && myValue.value().index() == 1;
+		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 1;
 	}
 	template<>
-	inline bool Object::Is<double>()
+	inline bool Object::Is<double>() const
 	{
-		return  this && myType == Type::Value && myValue.has_value() && myValue.value().index() == 1;
+		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 1;
 	}
 #pragma endregion
 
 #pragma region text
 	template<>
-	inline bool Object::Is<std::string>()
+	inline bool Object::Is<std::string>() const
 	{
-		return  this && myType == Type::Value && myValue.has_value() && myValue.value().index() == 2;
+		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 2;
 	}
 	template<>
-	inline bool Object::Is<const char*>()
+	inline bool Object::Is<const char*>() const
 	{
-		return  this && myType == Type::Value && myValue.has_value() && myValue.value().index() == 2;
+		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 2;
 	}
 	template<>
-	inline bool Object::Is<char*>()
+	inline bool Object::Is<char*>() const
 	{
-		return  this && myType == Type::Value && myValue.has_value() && myValue.value().index() == 2;
+		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 2;
 	}
 #pragma endregion
 
 #pragma region Array
 	template<>
-	inline bool Object::Is<std::vector<Object*>>()
+	inline bool Object::Is<std::vector<Object*>>() const
 	{
-		return this && myType == Type::Array;
+		return NotNull() && myType == Type::Array;
 	}
 	template<>
-	inline bool Object::Is<Array>()
+	inline bool Object::Is<ArrayWrapper>() const
 	{
-		return  this && myType == Type::Array;
+		return NotNull() && myType == Type::Array;
 	}
 #pragma endregion
 
 #pragma region Bool
 	template<>
-	inline bool Object::Is<bool>()
+	inline bool Object::Is<bool>() const
 	{
-		return  this && myType == Type::Value && myValue.has_value() && myValue.value().index() == 3;
+		return NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 3;
 	}
 #pragma endregion
 
@@ -216,32 +252,32 @@ namespace FiskJSON
 
 #pragma region Number
 	template<>
-	inline long long Object::Get<long long>()
+	inline long long Object::Get<long long>() const
 	{
 		if (!Is<long long>())
 		{
-			throw Invalid_Get("[" + Serialize(true) + "] object is not a number");
+			throw Invalid_Get("object is not a number");
 		}
 		return std::get<long long>(myValue.value());
 	}
 
 	template<>
-	inline long Object::Get<long>()
+	inline long Object::Get<long>() const
 	{
 		if (!Is<long long>())
 		{
-			throw Invalid_Get("[" + Serialize(true) + "] object is not a number");
+			throw Invalid_Get("object is not a number");
 		}
 		return long(std::get<long long>(myValue.value()));
 	}
 
 
 	template<>
-	inline int Object::Get<int>()
+	inline int Object::Get<int>() const
 	{
 		if (!Is<long long>())
 		{
-			throw Invalid_Get("[" + Serialize(true) + "] object is not a number");
+			throw Invalid_Get("object is not a number");
 		}
 		return int(std::get<long long>(myValue.value()));
 	}
@@ -250,21 +286,21 @@ namespace FiskJSON
 
 #pragma region FloatingPoint
 	template<>
-	inline double Object::Get<double>()
+	inline double Object::Get<double>() const
 	{
 		if (!Is<double>())
 		{
-			throw Invalid_Get("[" + Serialize(true) + "] object is not a floating point");
+			throw Invalid_Get("object is not a floating point");
 		}
 		return std::get<double>(myValue.value());
 	}
 
 	template<>
-	inline float Object::Get<float>()
+	inline float Object::Get<float>() const
 	{
 		if (!Is<double>())
 		{
-			throw Invalid_Get("[" + Serialize(true) + "] object is not a floating point");
+			throw Invalid_Get("object is not a floating point");
 		}
 		return float(std::get<double>(myValue.value()));
 	}
@@ -272,33 +308,30 @@ namespace FiskJSON
 
 #pragma region Text
 	template<>
-	inline std::string Object::Get<std::string>()
+	inline std::string Object::Get<std::string>() const
 	{
 		if (!Is<std::string>())
 		{
-			throw Invalid_Get("[" + Serialize(true) + "] object is not text");
+			throw Invalid_Get("object is not text");
 		}
 		return std::get<std::string>(myValue.value());
 	}
 	template<>
 	///This pointer will only be valid until the object changes
-	inline const char* Object::Get<const char*>() 
+	inline const char* Object::Get<const char*>() const
 	{
 		if (!Is<std::string>())
 		{
-			throw Invalid_Get("[" + Serialize(true) + "] object is not text");
+			throw Invalid_Get("object is not text");
 		}
 		return std::get<std::string>(myValue.value()).c_str();
 	}
 	template<>
-	inline char* Object::Get<char*>()
+	inline char* Object::Get<char*>() const
 	{
-#if !defined(FISKJSON_DISABLE_CHARPOINTER_WARNING)
-		static_assert(true, "This could be really dangerous, define FISKJSON_DISABLE_CHARPOINTER_WARNING before including FiskJSON.h to disable warning");
-#endif
 		if (!Is<std::string>())
 		{
-			throw Invalid_Get("[" + Serialize(true) + "] object is not text");
+			throw Invalid_Get("object is not text");
 		}
 		return const_cast<char*>(std::get<std::string>(myValue.value()).c_str());
 	}
@@ -306,19 +339,25 @@ namespace FiskJSON
 
 #pragma region Array
 	template<>
-	inline Array Object::Get<Array>()
+	inline ArrayWrapper Object::Get<ArrayWrapper>()
 	{
-		return Array(this);
+		return ArrayWrapper(this);
+	}
+
+	template<>
+	inline ConstArrayWrapper Object::Get<ConstArrayWrapper>() const
+	{
+		return ConstArrayWrapper(this);
 	}
 #pragma endregion
 
 #pragma region Bool
 	template<>
-	inline bool Object::Get<bool>()
+	inline bool Object::Get<bool>() const
 	{
 		if (!Is<bool>())
 		{
-			throw Invalid_Get("[" + Serialize(true) + "] object is not boolean");
+			throw Invalid_Get("object is not boolean");
 		}
 		return std::get<bool>(myValue.value());
 	}
@@ -331,7 +370,7 @@ namespace FiskJSON
 #pragma region Number
 	inline Object& Object::operator=(const long long& aValue)
 	{
-		if (!this) { return *this; }
+		if (IsNull()) { return Null(); }
 		MakeValue();
 		myValue = aValue;
 		return *this;
@@ -354,7 +393,7 @@ namespace FiskJSON
 #pragma region floatingPoint
 	inline Object& Object::operator=(const double& aValue)
 	{
-		if (!this) { return *this; }
+		if ( IsNull() ) { return Null(); }
 		MakeValue();
 		myValue = double(aValue);
 		return *this;
@@ -368,7 +407,7 @@ namespace FiskJSON
 #pragma region Text
 	inline Object& Object::operator=(const std::string& aValue)
 	{
-		if (!this) { return *this; }
+		if (IsNull()) { return Null(); }
 		MakeValue();
 		myValue = aValue;
 		return *this;
@@ -383,14 +422,14 @@ namespace FiskJSON
 
 	inline Object& Object::operator=(const bool& aValue)
 	{
-		if (!this) { return *this; }
+		if (IsNull()) { return Null(); }
 		MakeValue();
 		myValue = aValue;
 		return *this;
 	}
 	inline Object::operator bool()
 	{
-		return !!this;
+		return NotNull();
 	}
 #pragma endregion
 
@@ -398,7 +437,7 @@ namespace FiskJSON
 
 	
 	template<>
-	inline bool Object::GetIf<float>(float& aValueToPlaceIn)
+	inline bool Object::GetIf<float>(float& aValueToPlaceIn) const
 	{
 		if (Is<float>())
 		{
@@ -412,27 +451,6 @@ namespace FiskJSON
 		}
 		return false;
 	}
-	template<>
-	inline bool Object::GetIf<V3F>(V3F& aValueToPlaceIn)
-	{
-		if (Is<FiskJSON::Array>())
-		{
-			float data[3];
-			char count = 0;
-			for (auto& arrChild : Get<FiskJSON::Array>())
-			{
-				if (arrChild->GetIf(data[count]))
-				{
-					if (++count == 3)
-					{
-						aValueToPlaceIn = V3F(data[0], data[1], data[2]);
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
 
 	template<typename T>
 	inline void Object::AddValueChild(const std::string& aKey, T aValue)
@@ -440,20 +458,7 @@ namespace FiskJSON
 		Object* child = new Object();
 		*child = aValue;
 		AddChild(aKey, child);
-	}
-
-	template<>
-	inline void Object::AddValueChild(const std::string& aKey, V3F aValue)
-	{
-		Object* child = new Object();
-		child->MakeArray();
-		for (auto& i : aValue)
-		{
-			child->PushValueChild(i);
-		}
-		AddChild(aKey, child);
-	}
-	
+	}	
 
 	template<typename T>
 	inline void Object::PushValueChild(T aValue)
@@ -461,6 +466,16 @@ namespace FiskJSON
 		Object* child = new Object();
 		*child = aValue;
 		PushChild(child);
+	}
+	
+	template<class T>
+	inline void ArrayWrapper::PushValue(T&& aValue)
+	{
+		if (!myArrayRef) { return; }
+
+		FiskJSON::Object* obj = new FiskJSON::Object();
+		*obj = std::forward<T>(aValue);
+		myArrayRef->push_back(obj);
 	}
 }
 

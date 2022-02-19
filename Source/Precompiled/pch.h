@@ -7,6 +7,7 @@
 
 //Windows
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <ws2tcpip.h>
 #include <windows.h>
 
@@ -43,10 +44,12 @@
 #include "CommonUtilities\Matrix.hpp"
 #include "CommonUtilities\Vector.hpp"
 #include "CommonUtilities\ObjectPool.h"
+#include "CommonUtilities\Ray.hpp"
 
 //TOOLS
 #include "Tools\Logger.h"
 #include "Tools\FiskJSON.h"
+#include "Tools\FiskJSONCustomTypes.h"
 #include "Tools\MetricValue.h"
 #include "Tools\TimeHelper.h"
 #include "Tools\FileHelpers.h"
@@ -55,6 +58,7 @@
 #include "Tools\Observer.hpp"
 #include "Tools\Random.h"
 #include "Tools\ExecuteOnDestruct.h"
+#include "Tools\TypeTraits.h"
 
 #if USEFILEWATHCER
 #include "Tools\FileWatcher.h"
@@ -68,6 +72,7 @@
 #include "GamlaBettan\DebugDrawer.h"
 #include "GamlaBettan\WindowControl.h"
 #include "GamlaBettan\ComponentManager.h"
+#include "GamlaBettan\Input.h"
 
 //Literals
 #include "Precompiled\Literals.h"

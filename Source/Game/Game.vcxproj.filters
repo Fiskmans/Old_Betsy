@@ -27,6 +27,8 @@
     <ClInclude Include="BounceComponent.h">
       <Filter>Game\Components</Filter>
     </ClInclude>
+    <ClInclude Include="MarchingSquares.h" />
+    <ClInclude Include="MarchingCubes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameState.cpp">
@@ -44,5 +46,7 @@
     <ClCompile Include="BounceComponent.cpp">
       <Filter>Game\Components</Filter>
     </ClCompile>
+    <ClCompile Include="MarchingSquares.cpp" />
+    <ClCompile Include="MarchingCubes.cpp" />
   </ItemGroup>
 </Project>

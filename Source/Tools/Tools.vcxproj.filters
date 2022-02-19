@@ -16,11 +16,11 @@
     <Filter Include="StateStack">
       <UniqueIdentifier>{a62f8d2a-b323-4022-b1a0-adb1e76c2680}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Måns">
-      <UniqueIdentifier>{9c2122cf-41f0-4169-ac7e-7a1aab7cb4a0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{23878b0a-2af1-4256-9f1d-e9e895aca5af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json">
+      <UniqueIdentifier>{9c2122cf-41f0-4169-ac7e-7a1aab7cb4a0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -37,12 +37,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PostMaster.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ThreadPool.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Work.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InputManager.h">
@@ -84,9 +78,6 @@
     <ClInclude Include="CurlHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SSLHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Base64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -100,7 +91,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FiskJSON.h">
-      <Filter>Måns</Filter>
+      <Filter>Json</Filter>
     </ClInclude>
     <ClInclude Include="..\CommonUtilities\CommonUtilities\FastSqrt.h">
       <Filter>Math</Filter>
@@ -168,6 +159,15 @@
     <ClInclude Include="Handover.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TypeTraits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FiskJSONCustomTypes.h">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="DereferencingIteratorWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileWatcher.cpp">
@@ -180,9 +180,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PostMaster.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ThreadPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CatmullRom.cpp">
@@ -224,9 +221,6 @@
     <ClCompile Include="CurlHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SSLHelpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Base64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -237,7 +231,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FiskJSON.cpp">
-      <Filter>Måns</Filter>
+      <Filter>Json</Filter>
     </ClCompile>
     <ClCompile Include="Bezier.cpp">
       <Filter>Math</Filter>

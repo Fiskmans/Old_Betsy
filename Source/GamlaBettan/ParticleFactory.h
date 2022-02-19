@@ -4,7 +4,7 @@
 class DirectX11Framework;
 class ParticleInstance;
 class Particle;
-class Scene;
+class RenderScene;
 
 class ParticleFactory
 {

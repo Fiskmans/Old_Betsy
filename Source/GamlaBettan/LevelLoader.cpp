@@ -284,6 +284,8 @@ bool ParseCollisionBoxes(std::istream& aStream, LevelParseResult& aResult)
 		SYSERROR("physX boxes broke level loader", aResult.myLevelFile);
 		return false;
 	}
+
+	return true;
 }
 
 bool ParseDestructables(std::istream& aStream, LevelParseResult& aResult)
@@ -309,6 +311,8 @@ bool ParseDestructables(std::istream& aStream, LevelParseResult& aResult)
 		SYSERROR("destructibles boxes broke level loader", aResult.myLevelFile);
 		return false;
 	}
+
+	return true;
 }
 
 bool ParseSpotlights(std::istream& aStream, LevelParseResult& aResult)
@@ -334,6 +338,8 @@ bool ParseSpotlights(std::istream& aStream, LevelParseResult& aResult)
 		SYSERROR("Spotlights broke level loader", aResult.myLevelFile);
 		return false;
 	}
+
+	return true;
 }
 
 bool ParseDynamicObjects(std::istream& aStream, LevelParseResult& aResult)
@@ -358,6 +364,8 @@ bool ParseDynamicObjects(std::istream& aStream, LevelParseResult& aResult)
 		SYSERROR("dynamicObjects broke level loader", aResult.myLevelFile);
 		return false;
 	}
+
+	return true;
 }
 
 LevelParseResult ParseLevelFile(const std::string& aFilePath)

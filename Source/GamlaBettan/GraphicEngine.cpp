@@ -2,7 +2,7 @@
 #include "pch.h"
 
 #include "GraphicEngine.h"
-#include "Scene.h"
+#include "RenderScene.h"
 #include "DirectX11Framework.h"
 #include "ForwardRenderer.h"
 #include "SpriteRenderer.h"
@@ -21,17 +21,14 @@
 CGraphicsEngine::CGraphicsEngine()
 {
 	myFrameWork = new DirectX11Framework();
-	myRendreManarger = new RenderManager();
 	myLightLoader = new LightLoader();
 }
 
 CGraphicsEngine::~CGraphicsEngine()
 {
-	myRendreManarger->Release();
 
 	delete myFrameWork;
 	myFrameWork = nullptr;
-	SAFE_DELETE(myRendreManarger);
 	SAFE_DELETE(myLightLoader);
 }
 
@@ -57,34 +54,34 @@ bool CGraphicsEngine::Init(V2ui aWindowSize)
 
 void CGraphicsEngine::BeginFrame(float aClearColor[4])
 {
-	myRendreManarger->BeginFrame(aClearColor);
+	RenderManager::GetInstance().BeginFrame(aClearColor);
 }
 
 void CGraphicsEngine::RenderFrame()
 {
-	myRendreManarger->Render();
+	RenderManager::GetInstance().Render();
 }
 
 void CGraphicsEngine::RenderText(const std::vector<TextInstance*>& aTextList)
 {
-	myRendreManarger->RenderText(aTextList);
+	RenderManager::GetInstance().RenderText(aTextList);
 }
 
 void CGraphicsEngine::EndFrame()
 {
-	myRendreManarger->EndFrame();
+	RenderManager::GetInstance().EndFrame();
 	myFrameWork->EndFrame();
 }
 
 void CGraphicsEngine::AddExtraSpriteToRender(SpriteInstance* aSprite)
 {
-	myRendreManarger->AddExtraSpriteToRender(aSprite);
+	RenderManager::GetInstance().AddExtraSpriteToRender(aSprite);
 }
 
 #if USEIMGUI
 void CGraphicsEngine::Imgui()
 {
-	myRendreManarger->Imgui();
+	RenderManager::GetInstance().Imgui();
 }
 
 bool CGraphicsEngine::InitInternal()
@@ -113,7 +110,7 @@ bool CGraphicsEngine::InitInternal()
 		SYSCRASH("Cound not init light loader :c")
 			return false;
 	}
-	if (!myRendreManarger->Init(myFrameWork))
+	if (!RenderManager::GetInstance().Init(myFrameWork))
 	{
 		SYSCRASH("Could not init rendremanargre :c");
 		return false;
@@ -134,12 +131,7 @@ LightLoader* CGraphicsEngine::GetLightLoader()
 
 SpriteRenderer* CGraphicsEngine::GetSpriteRenderer()
 {
-	return myRendreManarger->GetSpriteRenderer();
-}
-
-RenderManager* CGraphicsEngine::GetRendreManarger()
-{
-	return myRendreManarger;
+	return RenderManager::GetInstance().GetSpriteRenderer();
 }
 
 SpriteFactory& CGraphicsEngine::GetSpriteFactory()

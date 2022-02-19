@@ -20,8 +20,6 @@
 
 #include "TextInstance.h"
 
-#include <WindSystem.h>
-
 #include "GamlaBettan\PathFinder.h"
 #include "Tools\perlin_noise.h"
 
@@ -37,7 +35,7 @@
 #include "AssetManager.h"
 
 #include "GamlaBettan\ModelInstance.h"
-#include "GamlaBettan\Scene.h"
+#include "GamlaBettan\RenderScene.h"
 #include "GamlaBettan\EntityManager.h"
 
 #include "GamlaBettan\MeshComponent.h"
@@ -46,23 +44,12 @@
 
 #include "Game\BounceComponent.h"
 
-GameWorld::GameWorld() :
-	myParticleFactory(nullptr),
-	myGBPhysXPtr(nullptr),
-	myGBPhysXColliderFactory(nullptr),
-	mySpriteFactory(nullptr)
-{
-}
-
-GameWorld::~GameWorld()
-{
-	myGBPhysXPtr = nullptr;
-
-	SAFE_DELETE(myParticleFactory);
-	SAFE_DELETE(myGBPhysXColliderFactory);
-}
-
-bool GameWorld::Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader)
+GameWorld::GameWorld(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX)
+	: myParticleFactory(nullptr)
+	, myGBPhysXPtr(nullptr)
+	, mySpriteFactory(nullptr)
+	, myPlayer(0)
+	, myTerrain(aFramework, aGBPhysX, { 16, 16, 16 }, {8_m, 8_m, 8_m})
 {
 	myWindowSize.x = 1920;
 	myWindowSize.y = 1080;
@@ -74,18 +61,25 @@ bool GameWorld::Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramewo
 	myParticleFactory = new ParticleFactory;
 	if (!myParticleFactory->Init(aFramework))
 	{
-		return false;
+		throw std::exception("Failed to initialize GameWorld");
 	}
 	myGBPhysXPtr = aGBPhysX;
 
 	SetupWorld();
 }
 
+GameWorld::~GameWorld()
+{
+	myGBPhysXPtr = nullptr;
+
+	SAFE_DELETE(myParticleFactory);
+}
+
 void GameWorld::SetupWorld()
 {
-	myPlayer = EntityManager::GetInstance().Get();
-	EntityManager::GetInstance().Retrieve(myPlayer)->AddComponent<MeshComponent>("Quaternius/Medieval/Buildings/House_1.fbx");
-	EntityManager::GetInstance().Retrieve(myPlayer)->AddComponent<BounceComponent>();
+	myPlayer = EntityManager::GetInstance().MakeEntity();
+	//EntityManager::GetInstance().Retrieve(myPlayer)->AddComponent<MeshComponent>("Quaternius/Medieval/Buildings/House_1.fbx");
+	//EntityManager::GetInstance().Retrieve(myPlayer)->AddComponent<BounceComponent>();
 	EntityManager::GetInstance().Retrieve(myPlayer)->AddComponent<FreeCam>();
 }
 
@@ -93,14 +87,11 @@ void GameWorld::SetupWorld()
 void GameWorld::ImGuiNode()
 {
 }
-
 #endif // !_RETAIL
 
-void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDeltaTime)
+void GameWorld::Update()
 {
 	PerlinNoise noise;
-	float now = Tools::GetTotalTime();
-	WindSystem::GetInstance().SetBaseWind(V3F((noise.noise(now * 2, now * PI, 5) - 0.5) * 10000, 0, (noise.noise(now * 2, now * PI, 10) - 0.5) * 10000));
 
 #if USEIMGUI
 	static bool showBoundingBoxes = false;
@@ -118,11 +109,16 @@ void GameWorld::Update(CommonUtilities::InputHandler& aInputHandler, float aDelt
 			ImGui::Checkbox("Show Bounding Boxes", &showBoundingBoxes);
 		});
 
+	myTerrain.Imgui();
 #endif // !USEIMGUI
 
+	{
+		PERFORMANCETAG("Terrain");
+		myTerrain.Update();
+	}
 
 	{
-		EnvironmentLight* env = Scene::GetInstance().GetEnvironmentLight();
+		EnvironmentLight* env = RenderScene::GetInstance().GetEnvironmentLight();
 		if (env)
 		{
 			env->myShadowCorePosition = EntityManager::GetInstance().Retrieve(myPlayer)->GetPosition();

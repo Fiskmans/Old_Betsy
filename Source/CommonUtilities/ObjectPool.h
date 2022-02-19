@@ -11,7 +11,7 @@ namespace CommonUtilities
 		typedef std::vector<T*>::iterator iterator;
 
 		template<class... Args>
-		T* Get(Args... args);
+		T* Get(Args&&... args);
 
 		void Return(T* aObject);
 
@@ -25,9 +25,9 @@ namespace CommonUtilities
 
 	template<class T>
 	template<class... Args>
-	inline T* ObjectPool<T>::Get(Args... args)
+	inline T* ObjectPool<T>::Get(Args&&... args)
 	{
-		T* out = new T(args...);
+		T* out = new T(std::forward<Args>(args)...);
 		mySlots.push_back(out);
 		return out;
 	}

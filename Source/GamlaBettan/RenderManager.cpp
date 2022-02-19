@@ -7,6 +7,7 @@
 #include "ShaderFlags.h"
 #include "ModelInstance.h"
 #include "Model.h"
+#include "GamlaBettan\RenderScene.h"
 
 #include "AssetManager.h"
 
@@ -78,7 +79,7 @@ bool RenderManager::Init(DirectX11Framework* aFramework)
 	{
 		return false;
 	}
-	if (!myFullscreenFactory.Init(aFramework))
+	if (!TextureFactory::GetInstance().Init(aFramework))
 	{
 		return false;
 	}
@@ -117,7 +118,7 @@ bool RenderManager::Init(DirectX11Framework* aFramework)
 
 	myStartedAt = Tools::GetTotalTime();
 #if USEIMGUI
-	Tools::ImguiHelperGlobals::Setup(aFramework->GetDevice(), aFramework->GetContext(), &myFullscreenRenderer, &myFullscreenFactory);
+	Tools::ImguiHelperGlobals::Setup(aFramework->GetDevice(), aFramework->GetContext(), &myFullscreenRenderer);
 #endif // USEIMGUI
 
 	return true;
@@ -166,7 +167,7 @@ void RenderManager::Render()
 	static std::vector<std::array<PointLight*, NUMBEROFPOINTLIGHTS>> affectingLights;
 	{
 		PERFORMANCETAG("Culling");
-		modelsLeftToRender = Scene::GetInstance().Cull(Scene::GetInstance().GetMainCamera());
+		modelsLeftToRender = RenderScene::GetInstance().Cull(RenderScene::GetInstance().GetMainCamera());
 	}
 	std::vector<ModelInstance*> modelsToHighlight;
 	std::vector<ModelInstance*> shadowCasters = modelsLeftToRender;
@@ -177,7 +178,7 @@ void RenderManager::Render()
 			modelsToHighlight.push_back(mod);
 		}
 	}
-	sprites = Scene::GetInstance().GetSprites();
+	sprites = RenderScene::GetInstance().GetSprites();
 	for (auto& sprite : myExtraSpritesToRenderThisFrame)
 	{
 		sprites.push_back(sprite);
@@ -188,7 +189,7 @@ void RenderManager::Render()
 		PERFORMANCETAG("BoneTexture Generation");
 		static std::vector<ModelInstance*> buffer;
 		buffer.clear();
-		std::copy_if(Scene::GetInstance().begin(), Scene::GetInstance().end(), std::back_inserter(buffer), [](ModelInstance* aInstance) { return !!(aInstance->GetModelAsset().GetAsModel()->myAnimations.IsValid()); });
+		std::copy_if(RenderScene::GetInstance().begin(), RenderScene::GetInstance().end(), std::back_inserter(buffer), [](ModelInstance* aInstance) { return !!(aInstance->GetModelAsset().GetAsModel()->myAnimations.IsValid()); });
 		SetupBoneTexture(buffer);
 	}
 
@@ -207,7 +208,7 @@ void RenderManager::Render()
 		UnbindResources();
 		myStateManerger.SetDepthStencilState(RenderStateManager::DepthStencilState::Default);
 		myFrameworkPtr->GetContext()->VSSetShaderResources(5, 1, &myBoneTextureView);
-		modelsLeftToRender = myDeferredRenderer.GenerateGBuffer(Scene::GetInstance().GetMainCamera(), modelsLeftToRender, myBoneBuffer, myBoneOffsetMap, &myTextures[static_cast<int>(Textures::BackFaceBuffer)], &myStateManerger, Scene::GetInstance().GetDecals(), &myGBuffer, &myBufferGBuffer, myFullscreenRenderer, &myTextures[ENUM_CAST(Textures::IntermediateDepth)], myBoneBuffer);
+		modelsLeftToRender = myDeferredRenderer.GenerateGBuffer(RenderScene::GetInstance().GetMainCamera(), modelsLeftToRender, myBoneBuffer, myBoneOffsetMap, &myTextures[static_cast<int>(Textures::BackFaceBuffer)], &myStateManerger, RenderScene::GetInstance().GetDecals(), &myGBuffer, &myBufferGBuffer, myFullscreenRenderer, &myTextures[ENUM_CAST(Textures::IntermediateDepth)], myBoneBuffer);
 		myStateManerger.SetAllStates();
 	}
 
@@ -249,16 +250,16 @@ void RenderManager::Render()
 		myTextures[ENUM_CAST(Textures::IntermediateDepth)].SetAsResourceOnSlot(15);
 		myStateManerger.SetSamplerState(RenderStateManager::SamplerState::Point);
 		myStateManerger.SetRasterizerState(RenderStateManager::RasterizerState::Default);
-		myDeferredRenderer.Render(myFullscreenRenderer, Scene::GetInstance().GetPointLights(), Scene::GetInstance().GetSpotLights(), &myStateManerger, myBoneBuffer, myBoneOffsetMap);
+		myDeferredRenderer.Render(myFullscreenRenderer, RenderScene::GetInstance().GetPointLights(), RenderScene::GetInstance().GetSpotLights(), &myStateManerger, myBoneBuffer, myBoneOffsetMap);
 		myStateManerger.SetSamplerState(RenderStateManager::SamplerState::Trilinear);
 	}
 
 	for (auto& model : modelsLeftToRender)
 	{
-		affectingLights.push_back(Scene::GetInstance().CullPointLights(model));
+		affectingLights.push_back(RenderScene::GetInstance().CullPointLights(model));
 	}
 
-	ModelInstance* skybox = Scene::GetInstance().GetSkybox();
+	ModelInstance* skybox = RenderScene::GetInstance().GetSkybox();
 	if (skybox)
 	{
 		myForwardRenderer.SetSkybox(skybox);
@@ -279,7 +280,7 @@ void RenderManager::Render()
 		//myStateManerger.SetDepthStencilState(RenderStateManager::DepthStencilState::ReadOnly);
 		myGBuffer.SetAsResourceOnSlot(GBuffer::Textures::Postion, 8);
 		myTextures[static_cast<int>(Textures::IntermediateTexture)].SetAsActiveTarget(&myTextures[static_cast<int>(Textures::IntermediateDepth)]);
-		myForwardRenderer.Render(modelsLeftToRender, Scene::GetInstance().GetMainCamera(), affectingLights, myBoneOffsetMap, myStateManerger, myBoneBuffer);
+		myForwardRenderer.Render(modelsLeftToRender, RenderScene::GetInstance().GetMainCamera(), affectingLights, myBoneOffsetMap, myStateManerger, myBoneBuffer);
 		myStateManerger.SetBlendState(RenderStateManager::BlendState::Disable);
 	}
 
@@ -290,7 +291,7 @@ void RenderManager::Render()
 		ID3D11ShaderResourceView* arr[16] = { nullptr };
 		myFrameworkPtr->GetContext()->PSSetShaderResources(0, 16, arr);
 		myTextures[static_cast<int>(Textures::IntermediateTexture)].SetAsActiveTarget(&myTextures[static_cast<int>(Textures::IntermediateDepth)]);
-		myParticleRenderer.Render(Scene::GetInstance().GetMainCamera(), Scene::GetInstance().GetParticles());
+		myParticleRenderer.Render(RenderScene::GetInstance().GetMainCamera(), RenderScene::GetInstance().GetParticles());
 	}
 
 
@@ -301,7 +302,7 @@ void RenderManager::Render()
 		myStateManerger.SetAllStates();
 		myStateManerger.SetBlendState(RenderStateManager::BlendState::AlphaBlend);
 		myTextures[static_cast<int>(Textures::IntermediateTexture)].SetAsActiveTarget(&myTextures[static_cast<int>(Textures::IntermediateDepth)]);
-		DebugDrawer::GetInstance().Render(Scene::GetInstance().GetMainCamera());
+		DebugDrawer::GetInstance().Render(RenderScene::GetInstance().GetMainCamera());
 		myStateManerger.SetBlendState(RenderStateManager::BlendState::Disable);
 	}
 #endif
@@ -337,10 +338,10 @@ void RenderManager::Render()
 		FullscreenPass({ Textures::IntermediateTexture }, Textures::BackBuffer, FullscreenRenderer::Shader::COPY);
 	}
 
-	RenderSelection(modelsToHighlight, Scene::GetInstance().GetMainCamera());
+	RenderSelection(modelsToHighlight, RenderScene::GetInstance().GetMainCamera());
 
 	RenderSprites(sprites);
-	RenderText(Scene::GetInstance().GetText());
+	RenderText(RenderScene::GetInstance().GetText());
 }
 
 void RenderManager::RenderSprites(const std::vector<SpriteInstance*>& aSpriteList)
@@ -402,8 +403,6 @@ void RenderManager::SetupBoneTexture(const std::vector<ModelInstance*>& aModelLi
 
 	myBoneOffsetMap.clear();
 
-
-	std::array<CommonUtilities::Matrix4x4<float>, NUMBEROFANIMATIONBONES> matrixes;
 	unsigned char boneIndexOffset = 0;
 
 	ID3D11DeviceContext* context = myFrameworkPtr->GetContext();
@@ -490,40 +489,40 @@ bool RenderManager::CreateTextures(const V2ui& aSize)
 		return false;
 	}
 
-	myTextures[static_cast<int>(Textures::BackBuffer)] = myFullscreenFactory.CreateTexture(backBufferTexture);
-	myTextures[static_cast<int>(Textures::IntermediateDepth)] = myFullscreenFactory.CreateDepth({ aSize.x, aSize.y }, "Main Depth");
+	TextureFactory::GetInstance().CreateTexture(backBufferTexture, myTextures[static_cast<int>(Textures::BackBuffer)]);
+	myTextures[static_cast<int>(Textures::IntermediateDepth)] = TextureFactory::GetInstance().CreateDepth({ aSize.x, aSize.y }, "Main Depth");
 
-	myTextures[static_cast<int>(Textures::IntermediateTexture)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "Intermediate texture");
-	myTextures[static_cast<int>(Textures::HalfSize)] = myFullscreenFactory.CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/2 size");
-	myTextures[static_cast<int>(Textures::QuaterSize)] = myFullscreenFactory.CreateTexture({ aSize.x / 4U, aSize.y / 4U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/4 size");
-	myTextures[static_cast<int>(Textures::HalfQuaterSize)] = myFullscreenFactory.CreateTexture({ aSize.x / 8U, aSize.y / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/8 size");
+	myTextures[static_cast<int>(Textures::IntermediateTexture)] = TextureFactory::GetInstance().CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "Intermediate texture");
+	myTextures[static_cast<int>(Textures::HalfSize)] = TextureFactory::GetInstance().CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/2 size");
+	myTextures[static_cast<int>(Textures::QuaterSize)] = TextureFactory::GetInstance().CreateTexture({ aSize.x / 4U, aSize.y / 4U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/4 size");
+	myTextures[static_cast<int>(Textures::HalfQuaterSize)] = TextureFactory::GetInstance().CreateTexture({ aSize.x / 8U, aSize.y / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/8 size");
 
-	myTextures[static_cast<int>(Textures::SSAOBuffer)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8_UNORM, "SSAO buffer");
-	myTextures[static_cast<int>(Textures::BackFaceBuffer)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "Backface buffer");
+	myTextures[static_cast<int>(Textures::SSAOBuffer)] = TextureFactory::GetInstance().CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8_UNORM, "SSAO buffer");
+	myTextures[static_cast<int>(Textures::BackFaceBuffer)] = TextureFactory::GetInstance().CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "Backface buffer");
 
 #if ENABLEBLOOM
-	myTextures[static_cast<int>(Textures::Guassian1)] = myFullscreenFactory.CreateTexture({ aSize.x / 8U, aSize.y / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom guassian 1");
-	myTextures[static_cast<int>(Textures::Guassian2)] = myFullscreenFactory.CreateTexture({ aSize.x / 8U, aSize.y / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom guassian 2");
+	myTextures[static_cast<int>(Textures::Guassian1)] = TextureFactory::GetInstance().CreateTexture({ aSize.x / 8U, aSize.y / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom guassian 1");
+	myTextures[static_cast<int>(Textures::Guassian2)] = TextureFactory::GetInstance().CreateTexture({ aSize.x / 8U, aSize.y / 8U }, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom guassian 2");
 
-	myTextures[static_cast<int>(Textures::Luminance)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "luminance");
+	myTextures[static_cast<int>(Textures::Luminance)] = TextureFactory::GetInstance().CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "luminance");
 #endif
 
-	myTextures[static_cast<int>(Textures::SelectionScaleDown1)] = myFullscreenFactory.CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 1/2");
-	myTextures[static_cast<int>(Textures::SelectionScaleDown2)] = myFullscreenFactory.CreateTexture({ aSize.x / 4U, aSize.y / 4U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 1/4");
+	myTextures[static_cast<int>(Textures::SelectionScaleDown1)] = TextureFactory::GetInstance().CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 1/2");
+	myTextures[static_cast<int>(Textures::SelectionScaleDown2)] = TextureFactory::GetInstance().CreateTexture({ aSize.x / 4U, aSize.y / 4U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 1/4");
 
-	myTextures[static_cast<int>(Textures::Selection)] = myFullscreenFactory.CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection");
-	myTextures[static_cast<int>(Textures::SelEdgesHalf)] = myFullscreenFactory.CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection edges half");
-	myTextures[static_cast<int>(Textures::SelEdges)] = myFullscreenFactory.CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection edges all");
-	myTextures[static_cast<int>(Textures::Selection2)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 2");
+	myTextures[static_cast<int>(Textures::Selection)] = TextureFactory::GetInstance().CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection");
+	myTextures[static_cast<int>(Textures::SelEdgesHalf)] = TextureFactory::GetInstance().CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection edges half");
+	myTextures[static_cast<int>(Textures::SelEdges)] = TextureFactory::GetInstance().CreateTexture({ aSize.x / 2U, aSize.y / 2U }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection edges all");
+	myTextures[static_cast<int>(Textures::Selection2)] = TextureFactory::GetInstance().CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 2");
 
-	myTextures[static_cast<int>(Textures::Edges)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8_UNORM, "Edges");
-	myTextures[static_cast<int>(Textures::AAHorizontal)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "AA horisontal");
+	myTextures[static_cast<int>(Textures::Edges)] = TextureFactory::GetInstance().CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8_UNORM, "Edges");
+	myTextures[static_cast<int>(Textures::AAHorizontal)] = TextureFactory::GetInstance().CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "AA horisontal");
 
-	myTextures[static_cast<int>(Textures::LUT)] = myFullscreenFactory.CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "LUT buffer");
+	myTextures[static_cast<int>(Textures::LUT)] = TextureFactory::GetInstance().CreateTexture({ aSize.x, aSize.y }, DXGI_FORMAT_R8G8B8A8_UNORM, "LUT buffer");
 
 	myRandomNormal = AssetManager::GetInstance().GetTexture("engine/SSAONormal.dds");
-	myGBuffer = myFullscreenFactory.CreateGBuffer({ aSize.x,aSize.y }, "main gBuffer");
-	myBufferGBuffer = myFullscreenFactory.CreateGBuffer({ aSize.x,aSize.y }, "secondary GBuffer");
+	myGBuffer = TextureFactory::GetInstance().CreateGBuffer({ aSize.x,aSize.y }, "main gBuffer");
+	myBufferGBuffer = TextureFactory::GetInstance().CreateGBuffer({ aSize.x,aSize.y }, "secondary GBuffer");
 
 	for (auto& i : myTextures)
 	{
@@ -613,7 +612,7 @@ void RenderManager::FullscreenPass(std::vector<Textures> aSources, Textures aTar
 {
 	UnbindTargets();
 	UnbindResources();
-	for (size_t i = 0; i < aSources.size(); i++)
+	for (unsigned int i = 0; i < aSources.size(); i++)
 	{
 		myTextures[static_cast<int>(aSources[i])].SetAsResourceOnSlot(i);
 	}

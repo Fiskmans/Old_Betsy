@@ -5,7 +5,7 @@
 #pragma warning(pop)
 #include "GBPhysX.h"
 
-PxQueryHitType::Enum GBPhysXQueryFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags)
+PxQueryHitType::Enum GBPhysXQueryFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* /*actor*/, PxHitFlags& /*queryFlags*/)
 {
 	if ((shape->getQueryFilterData().word0 & filterData.word1) && (filterData.word0 & shape->getQueryFilterData().word1))
 	{
@@ -25,12 +25,13 @@ PxQueryHitType::Enum GBPhysXQueryFilterCallback::postFilter(const PxFilterData& 
 	return PxQueryHitType::eNONE;
 }
 
-PxQueryHitType::Enum GBPhysXBulletQueryFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags)
+PxQueryHitType::Enum GBPhysXBulletQueryFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* /*actor*/, PxHitFlags& /*queryFlags*/)
 {
 	if ((shape->getQueryFilterData().word0 & filterData.word0) == 0)
 	{
 		return PxQueryHitType::eNONE;
 	}
+	return PxQueryHitType::eBLOCK;
 }
 
 PxQueryHitType::Enum GBPhysXBulletQueryFilterCallback::postFilter(const PxFilterData& filterData, const PxQueryHit& hit)
@@ -43,12 +44,13 @@ PxQueryHitType::Enum GBPhysXBulletQueryFilterCallback::postFilter(const PxFilter
 	return PxQueryHitType::eNONE;
 }
 
-PxQueryHitType::Enum GBPhysXInteractQueryFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags)
+PxQueryHitType::Enum GBPhysXInteractQueryFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* /*actor*/, PxHitFlags& /*queryFlags*/)
 {
 	if ((shape->getQueryFilterData().word0 & filterData.word0) == 0)
 	{
 		return PxQueryHitType::eNONE;
 	}
+	return PxQueryHitType::eBLOCK;
 }
 
 PxQueryHitType::Enum GBPhysXInteractQueryFilterCallback::postFilter(const PxFilterData& filterData, const PxQueryHit& hit)

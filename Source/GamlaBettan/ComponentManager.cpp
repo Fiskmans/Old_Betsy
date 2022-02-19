@@ -6,9 +6,10 @@
 void ComponentManager::RegisterSystem(ComponentSystemBase* aSystem)
 {
 	mySystems.push_back(aSystem);
+	mySystemsByName[aSystem->myName] = aSystem;
 }
 
-void ComponentManager::Update(const Component::FrameData& aFrameData)
+void ComponentManager::Update(const ComponentBase::FrameData& aFrameData)
 {
 	for (ComponentSystemBase* system : mySystems)
 	{
@@ -24,6 +25,7 @@ void ComponentManager::RemoveAllComponents(EntityID aEntityID)
 	}
 }
 
+#if USEIMGUI
 void ComponentManager::RunImGuiFor(EntityID aEntityID)
 {
 	for (ComponentSystemBase* componentSystem : mySystems)
@@ -34,12 +36,12 @@ void ComponentManager::RunImGuiFor(EntityID aEntityID)
 
 void ComponentManager::ImGui()
 {
-	size_t colums = ImGui::GetWindowWidth() / 150;
-	colums = MIN(colums, mySystems.size());
+	int colums = static_cast<int>(ImGui::GetWindowWidth() / 150.f);
+	colums = std::min(colums, static_cast<int>(mySystems.size()));
 	if (colums > 0)
 	{
-		size_t height = ((mySystems.size()-1) / colums) + 1;
-		ImGui::BeginChild("ComponentManager",ImVec2(0,37 * height + 7), true);
+		int height = static_cast<int>(((mySystems.size()-1) / colums) + 1);
+		ImGui::BeginChild("ComponentManager",ImVec2(0.f, 37.f * height + 7.f), true);
 		ImGui::Columns(colums);
 		for (size_t i = 0; i < colums; i++)
 		{
@@ -52,3 +54,25 @@ void ComponentManager::ImGui()
 		ImGui::EndChild();
 	}
 }
+
+void ComponentManager::Serialize(EntityID aEntityID, FiskJSON::Object& aObject)
+{
+	for (auto& system : mySystems)
+	{
+		system->Serialize(aEntityID, aObject);
+	}
+}
+
+void ComponentManager::Deserialize(EntityID aEntityID, FiskJSON::Object& aObject)
+{
+	for (auto& keyValuePair : aObject)
+	{
+		if (mySystemsByName.count(keyValuePair.first) == 0) 
+		{
+			SYSERROR("No component system registered with that name", keyValuePair.first, std::to_string(aEntityID));
+			continue; 
+		}
+		mySystemsByName[keyValuePair.first]->Deserialize(aEntityID, *keyValuePair.second);
+	}
+}
+#endif

@@ -116,6 +116,12 @@ Model* AssetHandle::GetAsModel() const
 	return reinterpret_cast<ModelAsset*>(myAsset)->myModel;
 }
 
+std::string AssetHandle::GetModelPath() const
+{
+	if (myAsset->myType != Asset::AssetType::Model && myAsset->myType != Asset::AssetType::SkyBox) { throw std::exception("GetAsModel() on non model asset"); }
+	return reinterpret_cast<ModelAsset*>(myAsset)->myFilePath;
+}
+
 Model* AssetHandle::GetAsSkybox() const
 {
 	if (myAsset->myType != Asset::AssetType::SkyBox) { throw std::exception("GetAsSkybox() on non Skybox asset"); }
@@ -188,10 +194,12 @@ Animation* AssetHandle::GetAsAnimation() const
 	return reinterpret_cast<AnimationAsset*>(myAsset)->myAnimation;
 }
 
-ModelAsset::ModelAsset(Model* aModel)
+
+ModelAsset::ModelAsset(Model* aModel, const std::string& aFilePath)
 	: Asset(AssetType::Model)
 {
 	myModel = aModel;
+	myFilePath = aFilePath;
 }
 
 SkyboxAsset::SkyboxAsset(Model* aSkyBox)

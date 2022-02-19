@@ -12,7 +12,7 @@
       <AdditionalIncludeDirectories>$(solutiondir)precompiled/;$(solutionDir)Tools/;$(solutionDir)CommonUtilities/CommonUtilities/;$(solutionDir)GamlaBettan/;$(Solutiondir)IMGui\imgui_ne\ThirdParty\imgui\;$(solutionDir)Game/;$(solutionDir)GBPhysX/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(solutiondir)Workbed\Precompiled\pch.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>$(solutiondir)Workbed\shared\pch$(TargetExt).pch</PrecompiledHeaderOutputFile>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

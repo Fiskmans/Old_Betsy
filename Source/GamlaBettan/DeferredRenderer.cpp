@@ -13,14 +13,14 @@
 #include "CommonUtilities\Intersection.hpp"
 #include "ShaderBuffers.h"
 #include "TimeHelper.h"
-#include "FullscreenTexture.h"
+#include "Texture.h"
 #include "DirectX11Framework.h"
 #include "DepthRenderer.h"
 #include "Decal.h"
 #include "RenderManager.h"
 #include "FoldNumbers.h"
 #include "AssetManager.h"
-#include "GamlaBettan\Scene.h"
+#include "GamlaBettan\RenderScene.h"
 
 struct DefPixelEnvLightBuffer
 {
@@ -143,24 +143,24 @@ bool DeferredRenderer::Init(DirectX11Framework* aFramework, AssetHandle aPerlinH
 	return true;
 }
 
-std::vector<ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, std::vector<ModelInstance*>& aModelList, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping, FullscreenTexture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer, GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer, FullscreenTexture* aDepth, BoneTextureCPUBuffer& aBoneTextureBuffer)
+std::vector<ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, std::vector<ModelInstance*>& aModelList, BoneTextureCPUBuffer& aBoneBuffer, std::unordered_map<ModelInstance*, short>& aBoneMapping, Texture* aBacksideTexture, RenderStateManager* aRenderStateManager, std::vector<Decal*>& aDecals, GBuffer* aGBuffer, GBuffer* aBufferGBuffer, FullscreenRenderer& aFullscreenRenderer, Texture* aDepth, BoneTextureCPUBuffer& aBoneTextureBuffer)
 {
 
 	std::vector<ModelInstance*> filtered;
 	std::vector<ModelInstance*> drawn;
 
-	HRESULT result;
+	{
+		FrameBufferData fData;
+		WIPE(fData);
 
-	FrameBufferData fData;
-	WIPE(fData);
+		fData.myWorldToCamera = CommonUtilities::Matrix4x4<float>::Transpose(CommonUtilities::Matrix4x4<float>::GetFastInverse(aCamera->GetTransform()));
+		fData.myCameraPosition = aCamera->GetPosition();
+		fData.myCameraDirection = aCamera->GetForward();
+		fData.myTotalTime = RenderManager::GetTotalTime();
+		fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
 
-	fData.myWorldToCamera = CommonUtilities::Matrix4x4<float>::Transpose(CommonUtilities::Matrix4x4<float>::GetFastInverse(aCamera->GetTransform()));
-	fData.myCameraPosition = aCamera->GetPosition();
-	fData.myCameraDirection = aCamera->GetForward();
-	fData.myTotalTime = RenderManager::GetTotalTime();
-	fData.myCameraToProjection = CommonUtilities::Matrix4x4<float>::Transpose(aCamera->GetProjection());
-
-	if (!OverWriteBuffer(myFrameBuffer, &fData, sizeof(fData))) { return {}; }
+		if (!OverWriteBuffer(myFrameBuffer, &fData, sizeof(fData))) { return {}; }
+	}
 
 	ID3D11ShaderResourceView* resource[1] =
 	{
@@ -243,8 +243,17 @@ std::vector<ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, s
 				UINT vertexOffset = 0;
 
 				myContext->IASetVertexBuffers(0, 1, &modelData->myVertexBuffer, &modelData->myStride, &vertexOffset);
-				myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
-				myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
+
+				if (modelData->myIsIndexed)
+				{
+					myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
+					myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
+				}
+				else
+				{
+					myContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_R8_TYPELESS, 0);
+					myContext->Draw(modelData->myNumberOfVertexes, 0);
+				}
 			}
 			drawn.push_back(modelInstance);
 		}
@@ -297,8 +306,16 @@ std::vector<ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, s
 				UINT vertexOffset = 0;
 
 				myContext->IASetVertexBuffers(0, 1, &modelData->myVertexBuffer, &modelData->myStride, &vertexOffset);
-				myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
-				myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
+				if (modelData->myIsIndexed)
+				{
+					myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
+					myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
+				}
+				else
+				{
+					myContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_R8_TYPELESS, 0);
+					myContext->Draw(modelData->myNumberOfVertexes, 0);
+				}
 			}
 		}
 	}
@@ -341,38 +358,38 @@ std::vector<ModelInstance*> DeferredRenderer::GenerateGBuffer(Camera* aCamera, s
 
 		aBufferGBuffer->SetAsActiveTarget();
 		float now = Tools::GetTotalTime();
-		for (auto& i : aDecals)
+		for (Decal* decal : aDecals)
 		{
 			DefDecalBuffer fData;
 
-			fData.Position = i->myCamera->GetPosition();
-			if (!CommonUtilities::IntersectionSpherePlaneVolume(CommonUtilities::Sphere<float>(i->myCamera->GetPosition(), i->myRange * CUBEHALFSIZETOENCAPSULATINGSPHERERADIUS), aCamera->GenerateFrustum()))
+			fData.Position = decal->myCamera->GetPosition();
+			if (!CommonUtilities::IntersectionSpherePlaneVolume(CommonUtilities::Sphere<float>(decal->myCamera->GetPosition(), decal->myRange * CUBEHALFSIZETOENCAPSULATINGSPHERERADIUS), aCamera->GenerateFrustum()))
 			{
 				continue;
 			}
 
-			myContext->PSSetShaderResources(8, 1, &i->myDepth);
-			myContext->VSSetShaderResources(8, 1, &i->myDepth);
+			myContext->PSSetShaderResources(8, 1, &decal->myDepth);
+			myContext->VSSetShaderResources(8, 1, &decal->myDepth);
 
 			ID3D11ShaderResourceView* reources[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { nullptr };
 
-			for (size_t texIndex = 0; texIndex < i->myTextures.size(); texIndex++)
+			for (size_t texIndex = 0; texIndex < decal->myTextures.size(); texIndex++)
 			{
-				resource[texIndex] = i->myTextures[texIndex].GetAsTexture();
+				resource[texIndex] = decal->myTextures[texIndex].GetAsTexture();
 			}
-			myContext->PSSetShaderResources(9, i->myTextures.size(), resource);
+			myContext->PSSetShaderResources(9, static_cast<UINT>(decal->myTextures.size()), resource);
 
-			fData.myToCamera = M44f::GetFastInverse(i->myCamera->GetTransform());
-			fData.myToProj = i->myCamera->GetProjection();
-			fData.myLifeTime = now - i->myTimestamp;
-			fData.myCustomData = i->myCustomData;
+			fData.myToCamera = M44f::GetFastInverse(decal->myCamera->GetTransform());
+			fData.myToProj = decal->myCamera->GetProjection();
+			fData.myLifeTime = now - decal->myTimestamp;
+			fData.myCustomData = decal->myCustomData;
 
 			if (!OverWriteBuffer(myDecalBuffer, &fData, sizeof(fData))) { return {}; }
 
 			myContext->PSSetConstantBuffers(0, 1, &myDecalBuffer);
 			aRenderStateManager->SetBlendState(RenderStateManager::BlendState::AlphaBlend);
 			aRenderStateManager->SetRasterizerState(RenderStateManager::RasterizerState::Default);
-			aFullscreenRenderer.Render(i->myPixelShader);
+			aFullscreenRenderer.Render(decal->myPixelShader);
 		}
 		myContext->PSSetShaderResources(0, 16, clearResource);
 		myContext->OMSetRenderTargets(8, clearview, nullptr);
@@ -389,7 +406,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE bufferData;
 	WIPE(bufferData);
-	CommonUtilities::PlaneVolume<float> frustum = Scene::GetInstance().GetMainCamera()->GenerateFrustum();
+	CommonUtilities::PlaneVolume<float> frustum = RenderScene::GetInstance().GetMainCamera()->GenerateFrustum();
 
 	ID3D11ShaderResourceView* perlinResource[1] =
 	{
@@ -409,7 +426,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 		myContext->PSGetShaderResources(0, 16, oldShaderResources);
 		myContext->RSGetViewports(&oldPortCount, oldPort);
 		myContext->OMGetRenderTargets(1, &oldView, &oldDepth);
-		myShadowRenderer->RenderEnvironmentDepth(Scene::GetInstance().GetEnvironmentLight(), aBoneBuffer, aBoneMapping);
+		myShadowRenderer->RenderEnvironmentDepth(RenderScene::GetInstance().GetEnvironmentLight(), aBoneBuffer, aBoneMapping);
 		myContext->OMSetRenderTargets(1, &oldView, oldDepth);
 		myContext->RSSetViewports(oldPortCount, oldPort);
 		myContext->PSSetShaderResources(0, 16, oldShaderResources);
@@ -425,22 +442,22 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 		DefPixelPointLightBuffer fData;
 
 		WIPE(fData);
-		fData.CameraPosition = Scene::GetInstance().GetMainCamera()->GetPosition();
+		fData.CameraPosition = RenderScene::GetInstance().GetMainCamera()->GetPosition();
 		aRenderStateManager->SetBlendState(RenderStateManager::BlendState::AdditativeBlend);
 		myContext->PSSetShaderResources(7, 1, perlinResource);
 		const auto& shadowCameras = myShadowRenderer->GetCameras();
 
-		for (auto& i : aPointLightList)
+		for (auto& pintlight : aPointLightList)
 		{
-			if (!CommonUtilities::IntersectionSpherePlaneVolume(CommonUtilities::Sphere<float>(i->position, i->range), frustum))
+			if (!CommonUtilities::IntersectionSpherePlaneVolume(CommonUtilities::Sphere<float>(pintlight->position, pintlight->range), frustum))
 			{
 				continue;
 			}
 
-			fData.Intensity = i->intensity;
-			fData.LightColor = i->color;
-			fData.Position = i->position;
-			fData.Range = i->range;
+			fData.Intensity = pintlight->intensity;
+			fData.LightColor = pintlight->color;
+			fData.Position = pintlight->position;
+			fData.Range = pintlight->range;
 
 			{
 				PERFORMANCETAG("Shadowmapping");
@@ -454,7 +471,7 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 				myContext->PSGetShaderResources(0, 16, oldShaderResources);
 				myContext->RSGetViewports(&oldPortCount, oldPort);
 				myContext->OMGetRenderTargets(1, &oldView, &oldDepth);
-				myShadowRenderer->Render(i, aBoneBuffer, aBoneMapping);
+				myShadowRenderer->Render(pintlight, aBoneBuffer, aBoneMapping);
 				myContext->OMSetRenderTargets(1, &oldView, oldDepth);
 				myContext->RSSetViewports(oldPortCount, oldPort);
 				myContext->PSSetShaderResources(0, 16, oldShaderResources);
@@ -464,10 +481,10 @@ void DeferredRenderer::Render(FullscreenRenderer& aFullscreenRenderer, std::vect
 			myContext->PSSetShaderResources(7, 1, perlinResource);
 			//Render Shadows on/to resource 8-14
 
-			for (size_t i = 0; i < 6; i++)
+			for (size_t side = 0; side < 6; side++)
 			{
-				fData.myToCamera[i] = M44f::GetFastInverse(shadowCameras[i]->GetTransform());
-				fData.myToProj[i] = shadowCameras[i]->GetProjection();
+				fData.myToCamera[side] = M44f::GetFastInverse(shadowCameras[side]->GetTransform());
+				fData.myToProj[side] = shadowCameras[side]->GetProjection();
 			}
 
 
@@ -572,8 +589,8 @@ void DeferredRenderer::MapEnvLightBuffer()
 
 	WIPE(fData);
 
-	fData.myCameraPosition = Scene::GetInstance().GetMainCamera()->GetPosition();
-	EnvironmentLight* envlight = Scene::GetInstance().GetEnvironmentLight();
+	fData.myCameraPosition = RenderScene::GetInstance().GetMainCamera()->GetPosition();
+	EnvironmentLight* envlight = RenderScene::GetInstance().GetEnvironmentLight();
 	if (envlight)
 	{
 		ID3D11ShaderResourceView* texture[1] =

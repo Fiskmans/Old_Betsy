@@ -9,10 +9,11 @@
 #define BANKNAME_SFX "InGame.bnk"
 #define BANKNAME_MUSIC "Music.bnk"
 
-AudioManager::AudioManager():
-	myWwiseFramework(nullptr),
-	myListenerID(NULL),
-	Observer({
+AudioManager::AudioManager()
+	: myWwiseFramework(nullptr)
+	, myListenerID(NULL)
+	, my2DMasterObjectID(0)
+	, Observer({
 			MessageType::StartLoading,
 			MessageType::UnloadLevel,
 			MessageType::SetMasterVolume,
@@ -50,7 +51,7 @@ void AudioManager::RecieveMessage(const Message& aMessage)
 	break;
 	case MessageType::SetMasterVolume:
 	{
-		SetMasterVolume(*reinterpret_cast<const int*>(aMessage.myData));
+		SetMasterVolume(static_cast<float>(*reinterpret_cast<const int*>(aMessage.myData)));
 	}
 	break;
 	case MessageType::ChangedItem:
@@ -81,7 +82,7 @@ void AudioManager::ShutDown()
 	myWwiseFramework->Terminate();
 }
 
-void AudioManager::Update(float aDeltaTime)
+void AudioManager::Update()
 {
 	myWwiseFramework->ProcessAudio();
 }
@@ -89,8 +90,7 @@ void AudioManager::Update(float aDeltaTime)
 void AudioManager::SetMasterVolume(float aVolume)
 {
 	//TODO: implement better way to set master bus volume
-	myMasterVolume = aVolume;
-	myWwiseFramework->SetGameParameterValue(AK::GAME_PARAMETERS::MASTER_VOLUME, aVolume,  AK_INVALID_GAME_OBJECT, 0.5f);
+	myWwiseFramework->SetGameParameterValue(AK::GAME_PARAMETERS::MASTER_VOLUME, aVolume,  AK_INVALID_GAME_OBJECT, 500);
 }
 
 void AudioManager::PostEvent(const AudioEventID& aEvent, const AudioObjectID& aObjectID)
@@ -156,7 +156,7 @@ LMVector AudioManager::GetListenerPosition()
 
 int AudioManager::GetListenerID()
 {
-	return myListenerID;
+	return static_cast<int>(myListenerID);
 }
 
 void AudioManager::UpdateObjectTransform(const LMVector& aPosition, const LMVector& aForward, const LMVector& aTop, const int& aObjectID)

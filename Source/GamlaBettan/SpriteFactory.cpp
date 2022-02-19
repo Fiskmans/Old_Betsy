@@ -62,8 +62,6 @@ Sprite* SpriteFactory::GetSprite(const std::string& aDDSPath)
 
 Sprite* SpriteFactory::LoadSprite(const std::string& aDDSPath)
 {
-	HRESULT result;
-
 	std::wstring texturePath(aDDSPath.begin(), aDDSPath.end());
 	AssetHandle texture = AssetManager::GetInstance().GetTexture(aDDSPath);
 	UINT ddsWidth = 0;

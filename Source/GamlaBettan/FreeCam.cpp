@@ -1,21 +1,27 @@
 #include "pch.h"
 #include "FreeCam.h"
-#include "GamlaBettan\Scene.h"
+#include "GamlaBettan\RenderScene.h"
 #include "GamlaBettan\Camera.h"
 
 FreeCam::FreeCam()
 {
 }
 
+FreeCam::FreeCam(const FiskJSON::Object& aObject)
+{
+	aObject["rotSpeed"].GetIf(myRotationSpeed);
+	aObject["movSpeed"].GetIf(myMovementSpeed);
+}
+
 FreeCam::FreeCam(const UseDefaults&)
 {
 }
 
-void FreeCam::Update(const FrameData& aFrameData, EntityID aEntityID)
+void FreeCam::Update(const FrameData& aFrameData, EntityID /*aEntityID*/)
 {
 	if (aFrameData.myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key::Key_Alt))
 	{
-		Camera* mainCam = Scene::GetInstance().GetMainCamera();
+		Camera* mainCam = RenderScene::GetInstance().GetMainCamera();
 
 		static Point lastmp = aFrameData.myInputHandler.GetMousePosition();
 		Point mp = aFrameData.myInputHandler.GetMousePosition();
@@ -43,62 +49,16 @@ void FreeCam::Update(const FrameData& aFrameData, EntityID aEntityID)
 		}
 		lastmp = mp;
 	}
-	else
-	{
-		CommonUtilities::Vector3<float> movement = { 0.f, 0.f, 0.f };
-		CommonUtilities::Vector3<float> rotation = { 0.f, 0.f, 0.f };
-		if (aFrameData.myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key::Key_W))
-		{
-			movement.z += myMovementSpeed * aFrameData.myDeltaTime;
-		}
-		if (aFrameData.myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key::Key_S))
-		{
-			movement.z -= myMovementSpeed * aFrameData.myDeltaTime;
-		}
-
-		if (aFrameData.myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key::Key_D))
-		{
-			movement.x += myMovementSpeed * aFrameData.myDeltaTime;
-		}
-		if (aFrameData.myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key::Key_A))
-		{
-			movement.x -= myMovementSpeed * aFrameData.myDeltaTime;
-		}
-
-		if (aFrameData.myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key::Key_Space))
-		{
-			movement.y += myMovementSpeed * aFrameData.myDeltaTime;
-		}
-		if (aFrameData.myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key::Key_Shift))
-		{
-			movement.y -= myMovementSpeed * aFrameData.myDeltaTime;
-		}
-
-		if (aFrameData.myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key::Key_Q))
-		{
-			rotation.y -= myRotationSpeed * aFrameData.myDeltaTime;
-		}
-		if (aFrameData.myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key::Key_E))
-		{
-			rotation.y += myRotationSpeed * aFrameData.myDeltaTime;
-		}
-		if (aFrameData.myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key::Key_Z))
-		{
-			rotation.x -= myRotationSpeed * aFrameData.myDeltaTime;
-		}
-		if (aFrameData.myInputHandler.IsKeyDown(CommonUtilities::InputHandler::Key::Key_X))
-		{
-			rotation.x += myRotationSpeed * aFrameData.myDeltaTime;
-		}
-		Camera* mainCam = Scene::GetInstance().GetMainCamera();
-
-		mainCam->Move(movement);
-		mainCam->Rotate(rotation);
-	}
 }
 
 #if USEIMGUI
-void FreeCam::ImGui(EntityID aEntityID)
+void FreeCam::ImGui(EntityID /*aEntityID*/)
 {
+}
+
+void FreeCam::Serialize(FiskJSON::Object& aObject)
+{
+	aObject.AddValueChild("rotSpeed", myRotationSpeed);
+	aObject.AddValueChild("movSpeed", myMovementSpeed);
 }
 #endif

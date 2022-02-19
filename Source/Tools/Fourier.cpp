@@ -8,10 +8,10 @@ namespace Math
 		CompF val;
 		for (size_t i = 0; i < aValues.size(); i++)
 		{
-			val += aValues[i] * CompF::EPow(TAU * -aFrequencyToCheck * float(i) / float(aValues.size() - 1));
+			val += aValues[i] * CompF::EPow(static_cast<float>(TAU * -aFrequencyToCheck * i / (aValues.size() - 1)));
 		}
 
-		return { aFrequencyToCheck, val * (1.f / float(aValues.size())) };
+		return { aFrequencyToCheck, val * (1.f / static_cast<float>(aValues.size())) };
 	}
 
 	std::vector<FourierTransformValue> DiscreteFourierTransform(const std::vector<CompF>& aValues, size_t aFrequenciesToCheck)
@@ -36,7 +36,7 @@ namespace Math
 		out.push_back(at);
 		for (auto& i : aSeries)
 		{
-			at += i.myC * CompF::EPow(i.myFrequency * TAU * aValue);
+			at += i.myC * CompF::EPow(static_cast<float>(i.myFrequency * TAU * aValue));
 			out.push_back(at);
 		}
 		return out;
@@ -47,7 +47,7 @@ namespace Math
 		CompF at(0.f, ImagF(0.f));
 		for (auto& i : aSeries)
 		{
-			at += i.myC * CompF::EPow(i.myFrequency * TAU * aValue);
+			at += i.myC * CompF::EPow(static_cast<float>(i.myFrequency * TAU * aValue));
 		}
 		return at;
 	}

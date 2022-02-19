@@ -18,10 +18,12 @@ std::mutex tmemtx;
 
 using namespace physx;
 
-StaticMeshCooker::StaticMeshCooker() :
-	myCooker(nullptr),
-	myUniqueMeshID(0),
-	Observer({
+StaticMeshCooker::StaticMeshCooker()
+	: myCooker(nullptr)
+	, myUniqueMeshID(0)
+	, myTriangleMeshCollection(nullptr)
+	, myPhysicsPtr(nullptr)
+	, Observer({
 			MessageType::SerializePhysXObjects
 		})
 {
@@ -56,9 +58,8 @@ physx::PxTriangleMesh* StaticMeshCooker::GetTriangleMeshFromPath(const std::stri
 		if (TriangleMeshExists(aPath))
 		{
 			std::lock_guard lockGuard(tmemtx);
-			int index = myTriangleMeshIndexes[aPath];
 			PxBase* object = myTriangleMeshCollection->find(myTriangleMeshIndexes[aPath]);
-			
+
 			if (object)
 			{
 				return object->is<PxTriangleMesh>();
@@ -94,7 +95,7 @@ bool StaticMeshCooker::LoadCollisionMesh(physx::PxPhysics* aPhysics, std::string
 		current = stack.top();
 		stack.pop();
 
-		for (int childIndex = 0; childIndex < current->mNumChildren; childIndex++)
+		for (size_t childIndex = 0; childIndex < current->mNumChildren; childIndex++)
 		{
 			stack.push(current->mChildren[childIndex]);
 		}
@@ -139,7 +140,7 @@ void StaticMeshCooker::CleanUp()
 	myTriangleMeshIndexes.clear();
 }
 
-bool StaticMeshCooker::CookTriangleMesh(PxPhysics* aPhysics, float* aVertices, int aNumberOfVertices, unsigned int* aIndices, int aNumberOfFaces, unsigned long long newID, const std::string& aPath)
+bool StaticMeshCooker::CookTriangleMesh(PxPhysics* aPhysics, float* aVertices, int aNumberOfVertices, unsigned int* aIndices, int aNumberOfFaces, unsigned long long /*newID*/, const std::string& aPath)
 {
 
 	physx::PxTriangleMeshDesc meshDesc;
@@ -160,17 +161,17 @@ bool StaticMeshCooker::CookTriangleMesh(PxPhysics* aPhysics, float* aVertices, i
 	{
 	case PxTriangleMeshCookingResult::eSUCCESS:
 	{
-		SYSINFO("Cooking success for: " + aPath, aPath);
+		SYSERROR("Cooking success for: " + aPath, aPath);
 	}
 	break;
 	case PxTriangleMeshCookingResult::eLARGE_TRIANGLE:
 	{
-		SYSINFO("Triangles to large for cooking for: " + aPath, aPath);
+		SYSERROR("Triangles to large for cooking for: " + aPath, aPath);
 	}
 	break;
 	case PxTriangleMeshCookingResult::eFAILURE:
 	{
-		SYSINFO("Cooking failure for: " + aPath, aPath);
+		SYSERROR("Cooking failure for: " + aPath, aPath);
 	}
 	break;
 
@@ -180,7 +181,7 @@ bool StaticMeshCooker::CookTriangleMesh(PxPhysics* aPhysics, float* aVertices, i
 
 	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
 	PxTriangleMesh* triangleMesh = aPhysics->createTriangleMesh(readBuffer);
-	
+
 	std::lock_guard lockGuard(tmemtx);
 	myTriangleMeshIndexes[aPath] = ++myUniqueMeshID;
 	myTriangleMeshCollection->add(*triangleMesh, myUniqueMeshID);
@@ -207,7 +208,7 @@ void StaticMeshCooker::SerializeObjects(physx::PxPhysics* aPhysics, const std::s
 			bob << val.first << '\n';
 			bob << val.second << '\n';
 		}
-		
+
 	}
 	registry->release();
 }
@@ -226,9 +227,9 @@ bool StaticMeshCooker::DeSerializeObjects(physx::PxPhysics* aPhysics, const std:
 		{
 			myTriangleMeshCollection = PxSerialization::createCollectionFromXml(meshData, *myCooker, *registry);
 			int numberOfLoadedMeshes = myTriangleMeshCollection->getNbObjects();
-			
+
 			std::ifstream instream("Data/Metrics/SerializedObjectNames.names");
-			
+
 			std::string path;
 			std::string id;
 
@@ -240,7 +241,7 @@ bool StaticMeshCooker::DeSerializeObjects(physx::PxPhysics* aPhysics, const std:
 				myTriangleMeshIndexes[path] = index;
 			}
 			myUniqueMeshID = numberOfLoadedMeshes;
-			
+
 			registry->release();
 			return true;
 		}

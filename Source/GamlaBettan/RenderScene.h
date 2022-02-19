@@ -15,10 +15,10 @@ class ProgressBar;
 struct SpotLight;
 struct Decal;
 
-class Scene : public CommonUtilities::Singleton<Scene>
+class RenderScene : public CommonUtilities::Singleton<RenderScene>
 {
 public:
-	~Scene();
+	~RenderScene();
 
 	void Update(float aDeltaTime);
 
@@ -45,13 +45,17 @@ public:
 	void RefreshAll(float aAmount);
 	void SetSkybox(ModelInstance* aSkybox);
 
+#if USEIMGUI
+	void Imgui();
+#endif
+
 	ModelInstance*		GetSkybox();
 	Camera*				GetMainCamera();
 	EnvironmentLight*	GetEnvironmentLight();
 
 	std::vector<ModelInstance*> Cull(Camera* aCamera);
 	std::vector<ModelInstance*> Cull(Camera* aCamera, std::vector<ModelInstance*>& aSelection, float aRangeModifier = 1.f);
-	std::vector<ModelInstance*> Cull(const CommonUtilities::PlaneVolume<float>& aPlaneVolume, std::vector<ModelInstance*>& aSelection, const V3F& aCameraPos, float aRangeModifier = 1.f);
+	std::vector<ModelInstance*> Cull(const CommonUtilities::PlaneVolume<float>& aPlaneVolume, std::vector<ModelInstance*>& aSelection, float aRangeModifier = 1.f);
 	std::vector<ModelInstance*> Cull(const CommonUtilities::Sphere<float>& aBoundingSphere);
 
 	std::array<PointLight*, NUMBEROFPOINTLIGHTS> CullPointLights(ModelInstance* aModel);

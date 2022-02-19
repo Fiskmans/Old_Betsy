@@ -9,8 +9,8 @@ class ModelInstance;
 struct ID3D11DeviceContext;
 struct ID3D11Buffer;
 class Camera;
-struct Texture;
-class Scene;
+class Texture;
+class RenderScene;
 class PointLight;
 struct D3D11_MAPPED_SUBRESOURCE;
 class DepthRenderer;
@@ -33,7 +33,7 @@ private:
 
 	inline void RenderModel(
 		ModelInstance* aModelInstance, std::array<PointLight*, NUMBEROFPOINTLIGHTS>* aLightList, std::unordered_map<ModelInstance*, short>& aBoneMapping, 
-		D3D11_MAPPED_SUBRESOURCE& aBuffer, const Camera* aCamera, BoneTextureCPUBuffer& aBoneBuffer);
+		D3D11_MAPPED_SUBRESOURCE& aBuffer, BoneTextureCPUBuffer& aBoneBuffer);
 
 	ID3D11DeviceContext* myContext = nullptr;
 	ID3D11Device* myDevice = nullptr;

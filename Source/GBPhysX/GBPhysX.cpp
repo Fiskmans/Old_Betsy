@@ -1,5 +1,7 @@
 #include <pch.h>
 
+#pragma warning(disable : 26495)
+#pragma warning(disable : 33010)
 #include "GBPhysX.h"
 #include "SnippetUtils.h"
 #include "include\PxPhysicsAPI.h"
@@ -41,6 +43,13 @@ GBPhysXBulletQueryFilterCallback* bulletQueryFilterCallback = NULL;
 GBPhysXInteractQueryFilterCallback* interactQueryFilterCallback = NULL;
 GBPhysXCCTQueryFilterCallback* cctQueryFilterCallback = NULL;
 
+namespace PhysxHelpers
+{
+	physx::PxVec3 Vec3(V3F aVector)
+	{
+		return physx::PxVec3(aVector.x, aVector.y, aVector.z);
+	}
+}
 
 // Setup common cooking params
 void setupCommonCookingParams(PxCookingParams& params, bool skipMeshCleanup, bool skipEdgeData)
@@ -283,7 +292,7 @@ physx::PxFilterFlags CollisionFilterShader(
 	return PxFilterFlag::eSUPPRESS;
 }
 
-void initPhysics(bool interactive)
+void initPhysics(bool /*interactive*/)
 {
 	if (!gFoundation)
 	{
@@ -291,8 +300,9 @@ void initPhysics(bool interactive)
 	}
 
 	gPvd = PxCreatePvd(*gFoundation);
-	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 100);
 	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+
 
 	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
 	gCooking = PxCreateCooking(PX_PHYSICS_VERSION, *gFoundation, PxCookingParams(PxTolerancesScale()));
@@ -398,7 +408,6 @@ M44f TransformToMat(PxTransform& aTransform)
 							mat.column0.z, mat.column1.z, mat.column2.z, mat.column3.z,
 							mat.column0.w, mat.column1.w, mat.column2.w, mat.column3.w };
 	return returnValue;
-	return M44f::Transpose(returnValue);
 }
 
 PxCapsuleGeometry GetHitboxGeometry(HitBoxType aType)
@@ -484,7 +493,7 @@ GBPhysX::~GBPhysX()
 	SAFE_DELETE(myStaticMeshCooker);
 }
 
-GBPhysXActor* GBPhysX::GBCreateDynamicSphere(M44f aMatrixTransform, int aRadius, float aDensity)
+GBPhysXActor* GBPhysX::GBCreateDynamicSphere(M44f /*aMatrixTransform*/, int aRadius, float aDensity)
 {
 	physx::PxRigidDynamic* actor;
 	actor = createDynamic(PxTransform(PxVec3()), PxSphereGeometry(physx::PxReal(aRadius)), PxVec3(0.0f, 0.0f, 0.0f), aDensity);
@@ -587,6 +596,58 @@ GBPhysXActor* GBPhysX::GBCreateKinematicBox(V3F aPosition, V3F aSize, V3F aForce
 	return gbActor;
 }
 
+GBPhysXActor* GBPhysX::GBCreateTriangleMesh(const char* aVertexData, size_t aVertexStride, size_t aVertexCount)
+{
+	physx::PxTriangleMeshDesc desc;
+
+	desc.points.count = static_cast<physx::PxU32>(aVertexCount);
+	desc.points.stride = static_cast<physx::PxU32>(aVertexStride);
+	desc.points.data = aVertexData;
+
+	std::vector<PxU32> indexes;
+	indexes.resize(aVertexCount);
+	for (PxU32 i = 0; i < aVertexCount; i++)
+		indexes[i] = i;
+
+	desc.triangles.count = static_cast<PxU32>(aVertexCount / 3);
+	desc.triangles.stride = sizeof(PxU32) * 3;
+	desc.triangles.data = indexes.data();
+
+	if (!desc.isValid())
+	{
+		SYSERROR("Triangle will fail to cook");
+		return nullptr;
+	}
+
+	physx::PxTriangleMesh* mesh = myStaticMeshCooker->myCooker->createTriangleMesh(desc, gPhysics->getPhysicsInsertionCallback());
+
+	if (!mesh)
+	{
+		SYSERROR("failed to cook trianglemesh");
+		return nullptr;
+	}
+
+	GBPhysXActor* gbActor = new GBPhysXActor();
+	gbActor->myGBPhysX = this;
+	gbActor->myRigidActor = physx::PxCreateStatic(*gPhysics, physx::PxTransform(physx::PxIDENTITY::PxIdentity), physx::PxTriangleMeshGeometry(mesh), *gMaterial);
+	gbActor->myRigidActor->userData = gbActor;
+
+	PxFilterData filterData;
+	filterData.word0 = GBPhysXFilters::CollisionFilter::EnvironmentStatic;
+	filterData.word1 = GBPhysXFilters::CollisionFilter::Player;
+	filterData.word3 = 1;
+
+	PxShape* shape;
+	gbActor->myRigidActor->getShapes(&shape, 1);
+
+	shape->setSimulationFilterData(filterData);
+	shape->setQueryFilterData(filterData);
+
+	gScene->addActor(*gbActor->myRigidActor);
+	mesh->release();
+	return gbActor;
+}
+
 std::vector<GBPhysXActor*> GBPhysX::GBCreateChain(V3F aPosition, V3F aSize, int aLength, float aSeparation)
 {
 	std::vector<GBPhysXActor*> vector;
@@ -636,7 +697,7 @@ PxController* CreateCharacterController(V3F aPosition, PxFilterData* aFilterData
 	return controller;
 }
 
-GBPhysXCharacter* GBPhysX::GBCreateCapsuleController(V3F aPosition, V3F aRotation, float aHeight, float aRadius, bool aIsPlayer)
+GBPhysXCharacter* GBPhysX::GBCreateCapsuleController(V3F aPosition, V3F /*aRotation*/, float /*aHeight*/, float /*aRadius*/, bool aIsPlayer)
 {
 	physx::PxRigidDynamic* actor;
 	physx::PxController* controller;
@@ -665,48 +726,35 @@ GBPhysXCharacter* GBPhysX::GBCreateCapsuleController(V3F aPosition, V3F aRotatio
 	return gbChar;
 }
 
-BulletHitReport GBPhysX::RayPickActor(V3F aOrigin, V3F aDirection, bool aIsBullet)
+HitResult GBPhysX::RayCast(FRay aRay, float aRange)
 {
-	V3F slightlyForward = aOrigin + aDirection * 50.0f;
-	PxVec3 origin = PxVec3(slightlyForward.x, slightlyForward.y, slightlyForward.z);
-	PxVec3 dir = PxVec3(aDirection.x, aDirection.y, aDirection.z);
 	PxRaycastBuffer buffer;
 	PxFilterData filterData = PxFilterData();
 	PxQueryFilterData queryfilterData = PxQueryFilterData();
-	if (aIsBullet)
-	{
-		filterData.word0 = GBPhysXFilters::CollisionFilter::Enemy | GBPhysXFilters::CollisionFilter::EnvironmentDynamic | GBPhysXFilters::CollisionFilter::EnvironmentStatic;
-		queryfilterData.data = filterData;
-		queryfilterData.flags = physx::PxQueryFlag::ePREFILTER | physx::PxQueryFlag::ePOSTFILTER | physx::PxQueryFlag::eSTATIC | physx::PxQueryFlag::eDYNAMIC;
 
-		gScene->raycast(origin, dir, 6000, buffer, physx::PxHitFlag::eDEFAULT, queryfilterData, bulletQueryFilterCallback);
-	}
-	else
-	{
-		filterData.word0 = GBPhysXFilters::CollisionFilter::EnvironmentStatic;
-		queryfilterData.data = filterData;
-		queryfilterData.flags = physx::PxQueryFlag::ePREFILTER | physx::PxQueryFlag::ePOSTFILTER | physx::PxQueryFlag::eSTATIC | physx::PxQueryFlag::eDYNAMIC;
-		gScene->raycast(origin, dir, 150, buffer, physx::PxHitFlag::eDEFAULT, queryfilterData, interactQueryFilterCallback);
-	}
-
-	BulletHitReport report;
-	if (buffer.hasBlock)
+	filterData.word0 = GBPhysXFilters::CollisionFilter::EnvironmentStatic;
+	queryfilterData.data = filterData;
+	queryfilterData.flags = physx::PxQueryFlag::ePREFILTER | physx::PxQueryFlag::ePOSTFILTER | physx::PxQueryFlag::eSTATIC | physx::PxQueryFlag::eDYNAMIC;
+	
+	HitResult report;
+	if (gScene->raycast(PhysxHelpers::Vec3(aRay.Position()), PhysxHelpers::Vec3(aRay.Direction()), aRange, buffer, physx::PxHitFlag::eDEFAULT, queryfilterData))
 	{
 		GBPhysXActor* hitActor = (GBPhysXActor*)buffer.block.actor->userData;
 		PxVec3 worldSpaceHitPos = buffer.block.position;
 		PxVec3 worldSpaceHitNormal = buffer.block.normal;
 
+		report.faceIndex = buffer.block.faceIndex;
 		report.actor = hitActor;
 		report.position = V3F(worldSpaceHitPos.x, worldSpaceHitPos.y, worldSpaceHitPos.z);
 		report.normal = V3F(worldSpaceHitNormal.x, worldSpaceHitNormal.y, worldSpaceHitNormal.z);
 	}
 	else
 	{
+		report.faceIndex = 0;
 		report.actor = nullptr;
 		report.position = V3F();
 		report.normal = V3F();
 	}
-	report.incomingAngle = aDirection;
 
 	return report;
 }
@@ -811,7 +859,7 @@ void GBPhysX::RemoveActor(physx::PxRigidActor* aRigidActor)
 	gScene->removeActor(*aRigidActor);
 }
 
-void GBPhysX::ReleaseActor(physx::PxRigidActor* aRigidActor)
+void GBPhysX::ReleaseActor(physx::PxRigidActor* /*aRigidActor*/)
 {
 	//aRigidActor->release();
 }
@@ -1149,7 +1197,7 @@ void GBPhysXCharacter::ReleaseHitBoxes()
 {
 	if (!myActorHasBeenReleased)
 	{
-		for (int index = myHitBoxes.size() - 1; index >= 0; index--)
+		for (int index = static_cast<int>(myHitBoxes.size() - 1); index >= 0; index--)
 		{
 			myHitBoxes[index]->RemoveFromScene();
 			myHitBoxes[index]->Release();

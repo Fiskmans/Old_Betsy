@@ -10,7 +10,7 @@ public:
 	static bool Init(float aNear, float aFar);
 	static Camera* CreateCamera(float aFoV, const bool aShouldAdaptToWindowRes);
 	static Camera* CreateCamera(float aFoV, const bool aShouldAdaptToWindowRes, float aCustomNear, float aCustomFar);
-	static Camera* CreateCamera(Camera::CameraType aType);
+	static Camera* CreateCamera();
 
 private:
 	static std::vector<Camera*> ourCameras;

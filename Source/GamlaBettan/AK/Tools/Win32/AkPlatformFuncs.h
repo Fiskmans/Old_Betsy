@@ -28,6 +28,9 @@ the specific language governing permissions and limitations under the License.
 #ifndef _AK_PLATFORM_FUNCS_H_
 #define _AK_PLATFORM_FUNCS_H_
 
+#pragma warning(disable : 26495)
+#pragma warning(disable : 26812)
+
 #include "malloc.h"
 #include <AK/Tools/Common/AkAssert.h>
 #include <AK/SoundEngine/Common/AkAtomic.h>
@@ -161,7 +164,7 @@ namespace AKPLATFORM
 	}
 
 #endif
-	AkForceInline void FreeVM(void* address, size_t size, size_t extra, size_t release)
+	AkForceInline void FreeVM(void* address, size_t size, size_t /*extra*/, size_t release)
 	{
 		VirtualFree(address, release ? 0 : size, release ? MEM_RELEASE : MEM_DECOMMIT);
 	}

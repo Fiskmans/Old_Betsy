@@ -2,29 +2,20 @@
 #include "MetricValue.h"
 
 #include "GamlaBettan\Entity.h"
-
-
-namespace CommonUtilities
-{
-	class InputHandler;
-}
+#include "Terrain.h"
 
 class SpriteFactory;
 class ParticleFactory;
 class AudioManager;
 class GBPhysX;
-class GBPhysXColliderFactory;
 
 class GameWorld
 {
 public:
-	GameWorld();
+	GameWorld(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX);
 	~GameWorld();
-
-
-	bool Init(SpriteFactory* aSpriteFactory, DirectX11Framework* aFramework, AudioManager* aAudioManager, GBPhysX* aGBPhysX, LightLoader* aLightLoader);
 	
-	void Update(CommonUtilities::InputHandler& aInputHandler, float aDeltaTime);
+	void Update();
 
 #if USEIMGUI
 	void ImGuiNode();
@@ -36,6 +27,8 @@ private:
 
 	EntityID myPlayer;
 
+	Terrain myTerrain;
+
 	CommonUtilities::Vector2<float> myWindowSize;
 	GAMEMETRIC(float, myFreecamSpeed, FREECAMSPEED, 0.3f);
 	GAMEMETRIC(float, myFreecamRotationSpeed, FREECAMROTATIONSPEED, 0.3f);
@@ -46,7 +39,6 @@ private:
 	SpriteFactory* mySpriteFactory;
 
 	GBPhysX* myGBPhysXPtr;
-	GBPhysXColliderFactory* myGBPhysXColliderFactory;
 
 	bool myFirstFadeInComplete = false;
 };

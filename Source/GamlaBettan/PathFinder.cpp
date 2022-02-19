@@ -105,7 +105,6 @@ namespace Pathfinderhelpers
 
 	void AddIntersections(const std::vector<Portal>& aPortals, size_t aFrom, size_t aTo, V2f aStart, V2f aEnd, std::vector<V3F>& aOutPoints)
 	{
-		float discard;
 		V3F start = V3F(aStart.x, 0.f, aStart.y);
 		V3F end = V3F(aEnd.x, 0.f, aEnd.y);
 		V3F to = end - start;
@@ -116,9 +115,6 @@ namespace Pathfinderhelpers
 		V4F endColor = { 0.f, 0.f, 1.f, 0.2f };
 		for (size_t i = aFrom; i < aTo; i++)
 		{
-
-			float part = (float(i - aFrom) / float(aTo - aFrom));
-
 			V3F rayStart = V3F(aPortals[i].left.x, aPortals[i].ly, aPortals[i].left.y);
 			V3F rayEnd = V3F(aPortals[i].right.x, aPortals[i].ry, aPortals[i].right.y);
 
@@ -153,8 +149,6 @@ namespace Pathfinderhelpers
 		{
 			V2f left = aPortals[i].left;
 			V2f right = aPortals[i].right;
-			float ly = aPortals[i].ly;
-			float ry = aPortals[i].ry;
 
 			// Update right vertex.
 			if (triarea2(portalApex, portalRight, right) <= 0.0f)
@@ -383,6 +377,7 @@ void PathFinder::Imgui()
 					{
 						ImGui::Text("No navmesh");
 					}
+#if _DEBUG
 					else
 					{
 						NavMeshIndexType nodeindex = FindNode(*DebugTools::LastKnownMouseRay);
@@ -427,6 +422,7 @@ void PathFinder::Imgui()
 							}
 						}
 					}
+#endif
 				}
 				ImGui::End();
 			}
@@ -745,7 +741,7 @@ void PathFinder::OptimizePath(V3F aStart, V3F aEnd, const std::vector<NavMeshInd
 
 NavMeshIndexType PathFinder::FindNode(FRay aRay)
 {
-	NavMeshIndexType foundNode = -1;
+	NavMeshIndexType foundNode = static_cast<NavMeshIndexType>(-1);
 
 	NavMesh* mesh = myNavMesh.GetAsNavMesh();
 

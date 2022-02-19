@@ -1,10 +1,9 @@
 #pragma once
 #include <initializer_list>
-#include "../../Tools/Logger.h"
+#include "Tools/Logger.h"
 #include <math.h>
 #include <iostream>
 
-#define CU CommonUtilities
 #define V3F CommonUtilities::Vector3<float>
 
 namespace CommonUtilities
@@ -34,6 +33,8 @@ namespace CommonUtilities
 		bool operator==(const Vector3 &aVector) const;
 		bool operator!=(const Vector3 &aVector) const;
 
+		T Sum() const;
+		T Volume() const;
 		T Length() const;
 		T LengthSqr() const;
 		T Distance(const Vector3<T> aVector) const;
@@ -42,6 +43,10 @@ namespace CommonUtilities
 		void Normalize();
 		bool IsNormalized() const;
 		bool IsZero() const;
+
+		template<typename Other>
+		requires(std::is_convertible_v<T, Other>)
+			Vector3<Other> As() const { return { static_cast<Other>(x), static_cast<Other>(y), static_cast<Other>(z) }; }
 
 		const Vector3<T>& RotateX(const double aRad); //Should return reference?
 		Vector3<T> RotatedX(const double aRad) const; 
@@ -319,6 +324,18 @@ namespace CommonUtilities
 #pragma endregion
 
 	template<class T>
+	inline T Vector3<T>::Sum() const
+	{
+		return x + y + z;
+	}
+
+	template<class T>
+	inline T Vector3<T>::Volume() const
+	{
+		return x * y * z;
+	}
+
+	template<class T>
 	inline T Vector3<T>::Length() const
 	{
 		return static_cast<T>(sqrt((x * x) + (y * y) + (z * z)));
@@ -593,7 +610,7 @@ namespace CommonUtilities
 }
 
 template<class T>
-std::istream& operator>>(std::istream& aStream, CU::Vector3<T>& aVector)
+std::istream& operator>>(std::istream& aStream, CommonUtilities::Vector3<T>& aVector)
 {
 	return aStream >> aVector.x >> aVector.y >> aVector.z;
 }

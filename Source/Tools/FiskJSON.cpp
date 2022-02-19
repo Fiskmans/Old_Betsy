@@ -244,11 +244,6 @@ namespace FiskJSON
 				}
 				endOfValue = FiskJson_Help::FindFirstWhitespaceInSameScope(startOfValue, end);
 
-				if (endOfValue == end)
-				{
-					throw Invalid_JSON("Childvalue ends unexpectedly");
-				}
-
 				Object* obj = new Object();
 				obj->Parse(startOfValue,endOfValue);
 				AddChild(std::string(nextStart + 1, nameEnd), obj);
@@ -256,11 +251,6 @@ namespace FiskJSON
 			else
 			{
 				endOfValue = FiskJson_Help::FindFirstWhitespaceInSameScope(nextStart, end);
-
-				if (endOfValue == end)
-				{
-					throw Invalid_JSON("Childvalue ends unexpectedly");
-				}
 
 				Object* obj = new Object();
 				obj->Parse(nextStart, endOfValue);
@@ -289,9 +279,9 @@ namespace FiskJSON
 
 	Object& FiskJSON::Object::operator[](const std::string& aKey)
 	{
-		if (!this || !Has(aKey))
+		if (IsNull() || !Has(aKey))
 		{
-			return *static_cast<Object*>(nullptr);
+			return Null();
 		}
 		auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
 		return *children[aKey];
@@ -304,11 +294,11 @@ namespace FiskJSON
 
 	Object& Object::operator[](size_t aIndex)
 	{
-		if (this && Is<Array>())
+		if (NotNull() && Is<ArrayWrapper>())
 		{
-			return Get<Array>()[aIndex];
+			return Get<ArrayWrapper>()[aIndex];
 		}
-		return *static_cast<Object*>(nullptr);
+		return Null();
 	}
 
 	Object& Object::operator[](int aIndex)
@@ -321,7 +311,22 @@ namespace FiskJSON
 		return operator[](size_t(aIndex));
 	}
 
-	bool Object::Has(const std::string& aKey)
+	const Object& FiskJSON::Object::operator[](const std::string& aKey) const
+	{
+		if (IsNull() || !Has(aKey))
+		{
+			return Null();
+		}
+		const auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+		return *children.at(aKey);
+	}
+
+	const Object& Object::operator[](const char* aKey) const
+	{
+		return operator[](std::string(aKey));
+	}
+
+	bool Object::Has(const std::string& aKey) const
 	{
 		auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
 		return children.count(aKey) != 0;
@@ -534,9 +539,9 @@ namespace FiskJSON
 	{
 		if (myType == Type::Array && myValue.has_value() && myValue.value().index() == 2)
 		{
-			for (auto& child : Array(this))
+			for (auto& child : ArrayWrapper(this))
 			{
-				delete child;
+				delete &child;
 			}
 			myValue.reset();
 		}
@@ -621,33 +626,79 @@ namespace FiskJSON
 	}
 
 
-	Object& Array::operator[](size_t aIndex)
+	Object& ArrayWrapper::operator[](size_t aIndex)
 	{
 		if (!myArrayRef || aIndex >= myArrayRef->size())
 		{
-			return *static_cast<Object*>(nullptr);
+			return Object::Null();
 		}
 		return *(*myArrayRef)[aIndex];
 	}
-	std::vector<Object*>::iterator Array::begin()
+	DereferencingIteratorWrapper<std::vector<Object*>::iterator> ArrayWrapper::begin()
 	{
 		if (myArrayRef)
 		{
 			return myArrayRef->begin();
 		}
-		return std::vector<Object*>::iterator();
+		return {};
 	}
-	std::vector<Object*>::iterator Array::end()
+	DereferencingIteratorWrapper<std::vector<Object*>::iterator> ArrayWrapper::end()
 	{
 		if (myArrayRef)
 		{
 			return myArrayRef->end();
 		}
-		return std::vector<Object*>::iterator();
+		return {};
 	}
-	Array::Array(Object* aParent)
+
+	void ArrayWrapper::PushChild(FiskJSON::Object* aObject)
 	{
-		if (aParent && aParent->Is<Array>())
+		if (!myArrayRef)
+		{
+			delete aObject;
+			return;
+		}
+		myArrayRef->push_back(aObject);
+	}
+
+	ArrayWrapper::ArrayWrapper(Object* aParent)
+	{
+		if (aParent->NotNull() && aParent->Is<ArrayWrapper>())
+		{
+			myArrayRef = &std::get<std::vector<Object*>>(aParent->myValue.value());
+		}
+	}
+
+	const Object& ConstArrayWrapper::operator[](size_t aIndex)
+	{
+		if (!myArrayRef || aIndex >= myArrayRef->size())
+		{
+			return Object::Null();
+		}
+		return *(*myArrayRef)[aIndex];
+	}
+
+	DereferencingIteratorWrapper<std::vector<Object*>::const_iterator> ConstArrayWrapper::begin()
+	{
+		if (myArrayRef)
+		{
+			return myArrayRef->begin();
+		}
+		return {};
+	}
+
+	DereferencingIteratorWrapper<std::vector<Object*>::const_iterator> ConstArrayWrapper::end()
+	{
+		if (myArrayRef)
+		{
+			return myArrayRef->end();
+		}
+		return {};
+	}
+
+	ConstArrayWrapper::ConstArrayWrapper(const Object* aParent)
+	{
+		if (aParent->NotNull() && aParent->Is<ArrayWrapper>())
 		{
 			myArrayRef = &std::get<std::vector<Object*>>(aParent->myValue.value());
 		}

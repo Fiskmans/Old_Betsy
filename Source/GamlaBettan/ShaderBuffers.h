@@ -13,7 +13,7 @@ struct FrameBufferData
 	M44f myWorldToShadowCamera;
 	M44f myCameraToShadowProjection;
 	V3F myCameraDirection = { 0.f,0.f,0.f };
-	float trash_0;
+	float trash_0 = 0.f;
 };
 
 struct ObjectBufferData
@@ -31,8 +31,8 @@ struct ObjectBufferData
 	unsigned int myBoneOffsetIndex = 0;
 	unsigned int myNumOfUsedPointLights = 0;
 	float myObjectLifeTime = 0;
-	unsigned int myObjectId;
+	unsigned int myObjectId = 0;
 
 	V3F myDiffuseColor = { 0.5,0.5,0.5 };
-	float trash = 0.5f;
+	float trash = 0.f;
 };

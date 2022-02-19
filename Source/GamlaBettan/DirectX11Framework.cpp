@@ -131,10 +131,6 @@ const std::array<float, DXGI_FORMAT_V408 + 1> DirectX11Framework::FormatToSizeLo
 
 DirectX11Framework::DirectX11Framework()
 {
-	mySwapChain = nullptr;
-	myDevice = nullptr;
-	myDeviceContext = nullptr;
-	myDepthBuffer = nullptr;
 }
 
 DirectX11Framework::~DirectX11Framework()
@@ -182,12 +178,12 @@ bool DirectX11Framework::Init()
 
 	if (FAILED(result))
 	{
-		SYSCRASH("Could not create swapchain","oh noes")
+		SYSCRASH("Could not create swapchain")
 		return false;
 	}
 
 	V2ui size = WindowHandler::GetInstance().GetSize();
-	AddGraphicsMemoryUsage(DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R8G8B8A8_UNORM] * size.x * size.y, "Backbuffer", "Engine");
+	AddGraphicsMemoryUsage(static_cast<size_t>(DirectX11Framework::FormatToSizeLookup[DXGI_FORMAT_R8G8B8A8_UNORM] * size.x * size.y), "Backbuffer", "Engine");
 	return true;
 }
 

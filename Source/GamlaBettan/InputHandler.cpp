@@ -214,7 +214,7 @@ namespace CommonUtilities
 
 	void InputHandler::SetMousePosition(V2f	aPosition)
 	{
-		SetMousePosition(LERP(myWindowRect.left, myWindowRect.right, aPosition.x), LERP(myWindowRect.top, myWindowRect.bottom, aPosition.y));
+		SetMousePosition(static_cast<int>(LERP(myWindowRect.left, myWindowRect.right, aPosition.x)), static_cast<int>(LERP(myWindowRect.top, myWindowRect.bottom, aPosition.y)));
 	}
 
 	int InputHandler::GetMouseVx() const
@@ -282,7 +282,7 @@ namespace CommonUtilities
 			}
 		}
 #endif
-		return myWheelDelta;
+		return static_cast<short>(myWheelDelta);
 	}
 	short InputHandler::GetWheelVelNormalized() const
 	{
@@ -295,7 +295,7 @@ namespace CommonUtilities
 			}
 		}
 #endif
-		return myWheelDelta / WHEEL_DELTA;
+		return static_cast<short>(myWheelDelta / WHEEL_DELTA);
 	}
 
 	bool InputHandler::IsMouseDown(const Mouse aKey) const

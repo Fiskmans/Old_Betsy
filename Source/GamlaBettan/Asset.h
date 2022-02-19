@@ -9,7 +9,7 @@ struct ID3D11ShaderResourceView;
 class ModelInstance;
 class Model;
 class TextInstance;
-class NavMesh;
+struct NavMesh;
 class Animation;
 
 class Asset
@@ -37,13 +37,15 @@ public:
 
 	AssetType myType;
 
-	std::atomic<int32_t> myRefCount;
-	std::atomic<bool> myIsLoaded;
 
 	void IncRefCount();
 	void DecRefCount();
 private:
+	std::atomic<int32_t> myRefCount;
+	std::atomic<bool> myIsLoaded;
 	friend class AssetManager;
+	friend class AssetHandle;
+
 	std::string myFileName;
 	Tools::FileWatcherUniqueID myFileHandle;
 };
@@ -70,6 +72,7 @@ public:
 	TextInstance* InstansiateText() const;
 
 	Model* GetAsModel() const;
+	std::string GetModelPath() const;
 	Model* GetAsSkybox() const;
 	ID3D11ShaderResourceView* GetAsTexture() const;
 
@@ -98,9 +101,10 @@ class ModelAsset
 	: public Asset
 {
 public:
-	ModelAsset(Model* aModel);
+	ModelAsset(Model* aModel, const std::string& aFilePath);
 
 	Model* myModel;
+	std::string myFilePath;
 };
 
 class SkyboxAsset

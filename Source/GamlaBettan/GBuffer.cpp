@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "GBuffer.h"
 #include <d3d11.h>
-#include "FullscreenTexture.h"
+#include "Texture.h"
 
 GBuffer::~GBuffer()
 {
@@ -28,13 +28,13 @@ void GBuffer::ClearTextures(const V4F aClearColor)
 	}
 }
 
-void GBuffer::SetAsActiveTarget(FullscreenTexture* aDepth)
+void GBuffer::SetAsActiveTarget(Texture* aDepth)
 {
 	myContext->OMSetRenderTargets(ENUM_CAST(GBuffer::Textures::Count), myRenderTargets.data(), aDepth ? aDepth->myDepth : nullptr);
 	myContext->RSSetViewports(1, myViewport);
 }
 
-void GBuffer::SetAsActiveTarget(const Textures aResource, class FullscreenTexture* aDepth)
+void GBuffer::SetAsActiveTarget(const Textures aResource, class Texture* aDepth)
 {
 	myContext->OMSetRenderTargets(1, myRenderTargets.data()+static_cast<int>(aResource), aDepth ? aDepth->myDepth : nullptr);
 	myContext->RSSetViewports(1, myViewport);

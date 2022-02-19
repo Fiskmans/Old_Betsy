@@ -1,7 +1,5 @@
 #include "pch.h"
 #include "ParticleInstance.h"
-#include <Random.h>
-#include "WindSystem.h"
 
 void ParticleInstance::Init(Particle* aParticle)
 {
@@ -49,7 +47,6 @@ void ParticleInstance::Update(const float aDeltaTime, const V3F& aCameraPosition
 
 	V4F gravity = V4F(particleData.myCustomizable.myGravity * aDeltaTime, 0);
 
-	WindSystem& wind = WindSystem::GetInstance();
 	for (int index = static_cast<int>(myParticleVertices.size())-1; index >= 0; --index)
 	{
 		myParticleVertices[index].myLifetime += aDeltaTime;
@@ -57,7 +54,7 @@ void ParticleInstance::Update(const float aDeltaTime, const V3F& aCameraPosition
 		part = CLAMP(0.0f, 1.0f, part);
 
 		myParticleVertices[index].myMovement += gravity;
-		V3F referenceFrame = wind.GetWindAmount(myParticleVertices[index].myPosition);
+		V3F referenceFrame = V3F(0.f, 0.f, 0.f);
 		V4F referenceSpeed = myParticleVertices[index].myMovement - V4F(referenceFrame,0);
 		referenceSpeed *= (1.f - particleData.myCustomizable.myDrag * aDeltaTime);
 		myParticleVertices[index].myMovement = referenceSpeed + V4F(referenceFrame,0);
@@ -120,7 +117,7 @@ Particle* ParticleInstance::GetParticle()
 	return myParticle;
 }
 
-const CU::Matrix4x4<float>& ParticleInstance::GetTransform() const
+const CommonUtilities::Matrix4x4<float>& ParticleInstance::GetTransform() const
 {
 	return myTransform;
 }

@@ -7,6 +7,7 @@
 #include <assert.h>
 #include "MainMenuState.h"
 #include <DirectX11Framework.h>
+#include "AssetManager.h"
 
 Game::Game() :
 	myInputManager(nullptr)
@@ -24,6 +25,8 @@ bool Game::Init(CommonUtilities::InputHandler* aInputHandler, LightLoader* aLigh
 	myInputManager = new InputManager();
 	myInputManager->Init(aInputHandler);
 	myStateStack.Init();
+
+	Input::GetInstance();
 
 	MainMenuState* menu = new MainMenuState();
 	if (menu->Init(myInputManager, aSpriteFactory, aLightLoader, aFramework, aAudioManager, aSpriteRenderer) == false)

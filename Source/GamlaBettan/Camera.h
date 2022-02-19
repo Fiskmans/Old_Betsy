@@ -12,10 +12,6 @@ namespace CommonUtilities
 class Camera : public Observer
 {
 public:
-	enum class CameraType
-	{
-		Orthographic
-	};
 
 	Camera();
 	~Camera();
@@ -39,6 +35,7 @@ public:
 	void LookAt(T* aTarget);
 	void LookAt(CommonUtilities::Vector3<float> aTarget);
 
+	FRay GetRay(V2f aPosition);
 
 	CommonUtilities::Matrix4x4<float> GetTransform() const;
 	CommonUtilities::Matrix4x4<float> GetProjection() const;
@@ -55,7 +52,6 @@ public:
 private:
 	CommonUtilities::Matrix4x4<float> myTransform;
 	CommonUtilities::Matrix4x4<float> myProjection;
-	CommonUtilities::Matrix4x4<float> myProjection2;
 
 	CommonUtilities::Vector3<float> myOrthoBounds;
 	V2ui myResolution;

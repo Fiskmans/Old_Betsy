@@ -1,10 +1,10 @@
 #pragma once
 #include "GameWorld.h"
-#include <Spline.h>
 #include "BaseState.h"
 #include "TimerController.h"
 #include "SpotLightFactory.h"
 #include "DecalFactory.h"
+#include "MarchingSquares.h"
 
 class NodePollingStation;
 class Scene;
@@ -18,16 +18,18 @@ public:
 
 	GameState(bool aShouldDeleteOnPop = true);
 	~GameState();
-	virtual void Update(const float aDeltaTime) override;
-	bool Init(InputManager* aInputManager, SpriteFactory* aSpritefactory, LightLoader* aLightLoader, DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);
+	virtual void Update() override;
+	void ImguiContent(float now);
+	bool Init(InputManager* aInputManager, SpriteFactory* aSpritefactory, LightLoader* aLightLoader, DirectX11Framework* aFramework, AudioManager* aAudioManager);
 	virtual void Render(CGraphicsEngine* aGraphicsEngine) override;
 
 	void LoadLevel(const int& aLevel);
 
-	void PreSetup(const float aDeltaTime);
+	void PreSetup();
 private:
 
-	void RunImGui(float aDeltatime);
+	void RunImGui();
+	void ImguiContent(bool& drawFrustums);
 	void SetDefaultLevel(const std::string& aLevel);
 	void LoadDefaultLevel();
 	bool LoadLevel(const std::string& aFilePath);
@@ -37,7 +39,7 @@ private:
 
 	void UnloadCurrentLevel();
 	void UnloadLevel(std::string aFilepath);
-	void CreateWorld(DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);
+	void CreateWorld(DirectX11Framework* aFramework);
 
 	virtual void Activate() override;
 	virtual void Deactivate() override;
@@ -75,6 +77,7 @@ private:
 	std::unordered_set<std::string> myCurrentLoadedLevels;
 	std::vector<std::string> myLevelSequence;
 	unsigned int myCurrentLevelindex;
+	float myLastFrame;
 
 	// Inherited via Observer
 	virtual void RecieveMessage(const Message& aMessage) override;

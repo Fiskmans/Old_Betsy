@@ -271,11 +271,11 @@ void DebugDrawer::DrawSphere(const CommonUtilities::Sphere<float>& aSphere, cons
 	V3F last = aSphere.Position() - V3F(0, -1, 0) * aSphere.Radius();
 	for (size_t i = 0; i < aLaps * linesperlap; i++)
 	{
-		float l = i / static_cast<float>(aLaps * linesperlap)* PI;
+		float l = i / static_cast<float>(aLaps * linesperlap)* PI_F;
 		float y = cos(l);
 		float r = sin(l);
 
-		V3F next = V3F(sin(i * PI / linesperlap) * r, y, cos(i * PI / linesperlap) * r) * aSphere.Radius() + aSphere.Position();
+		V3F next = V3F(static_cast<float>(sin(i * PI_F / linesperlap) * r), y, static_cast<float>(cos(i * PI_F / linesperlap) * r)) * aSphere.Radius() + aSphere.Position();
 		DrawLine(last, next);
 		last = next;
 	}
@@ -496,6 +496,8 @@ void DebugDrawer::DrawSkeleton(ModelInstance* aInstance)
 
 		}
 	}
+#else
+	UNUSED(aInstance);
 #endif
 }
 

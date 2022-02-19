@@ -2,7 +2,7 @@
 #include "Observer.hpp"
 
 class Sprite;
-class Scene;
+class RenderScene;
 
 class SpriteInstance
 {

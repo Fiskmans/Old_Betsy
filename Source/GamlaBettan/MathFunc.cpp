@@ -27,9 +27,6 @@ uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
 		}
 	}
 	return pNodeAnim->mNumRotationKeys - 2;
-	SYSCRASH("Animation could not find rotation key");
-	assert(0);
-	return 0xFFFFFFFF;
 } 
 
 void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
@@ -62,8 +59,6 @@ uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
 		}
 	}
 	return pNodeAnim->mNumScalingKeys - 2;
-	assert(0);
-	return 0xFFFFFFFF;
 } 
 
 void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
@@ -95,8 +90,6 @@ uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
 		}
 	}
 	return pNodeAnim->mNumPositionKeys - 2;
-	assert(0);
-	return 0xFFFFFFFF;
 } 
 
 void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)

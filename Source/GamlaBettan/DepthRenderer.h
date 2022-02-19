@@ -2,9 +2,9 @@
 
 class DirectX11Framework;
 class PixelShader;
-class SpotLight;
+struct SpotLight;
 class PointLight;
-class EnvironmentLight;
+struct EnvironmentLight;
 struct Decal;
 
 class DepthRenderer

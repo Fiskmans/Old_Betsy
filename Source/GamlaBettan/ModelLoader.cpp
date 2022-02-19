@@ -8,7 +8,7 @@
 #include "ModelInstance.h"
 #include "DirectX11Framework.h"
 #include "ShaderCompiler.h"
-#include "Scene.h"
+#include "RenderScene.h"
 #include "Macros.h"
 #include "NameThread.h"
 #include "TextureLoader.h"
@@ -441,7 +441,7 @@ void ModelLoader::LoadMesh(const aiScene* aScene, const aiNode* aNode, aiMatrix4
 
 	CD3D11_BUFFER_DESC indexBufferDescription;
 	WIPE(indexBufferDescription);
-	indexBufferDescription.ByteWidth = indexCount * sizeof(UINT);
+	indexBufferDescription.ByteWidth = static_cast<UINT>(indexCount * sizeof(UINT));
 	indexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
 	indexBufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
@@ -488,7 +488,7 @@ void ModelLoader::LoadMesh(const aiScene* aScene, const aiNode* aNode, aiMatrix4
 	modelData->myTextures[1] = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Normal"], true);
 	modelData->myTextures[2] = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Reflection"], true);
 	modelData->myUseForwardRenderer = (aInOutAttributes["PixelShader"] != myDefaultPixelShader);
-	modelData->myNumberOfIndexes = indexCount;
+	modelData->myNumberOfIndexes = static_cast<UINT>(indexCount);
 	modelData->myDiffuseColor = colorMappings["Diffuse"];
 
 	modelData->myVertexBuffer = vertexBuffer;
@@ -531,7 +531,7 @@ Asset* ModelLoader::LoadModel(const std::string& aFilePath)
 	PERFORMANCETAG("Model loading");
 	Model* model = new Model();
 	PrepareModel(model, aFilePath);
-	return new ModelAsset(model);
+	return new ModelAsset(model, aFilePath);
 }
 
 

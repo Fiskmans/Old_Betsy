@@ -125,13 +125,13 @@ struct LevelParseResult
 
 	std::string myLevelFile;
 	std::string mySkyboxPath;
-	int myWorldAxisSize;
+	int myWorldAxisSize = 0;
 	DirLightInstanceBuffer myEnvironmentlight;
 	std::string myNavMeshPath;
 	V3F myPlayerStart;
 
-	size_t myCounter; //Metadata that should be moved
-	size_t myStep;
+	size_t myCounter = 0; //Metadata that should be moved
+	size_t myStep = 0;
 	bool myIsComplete = true;
 	bool myIsSuccessfull = false;
 };

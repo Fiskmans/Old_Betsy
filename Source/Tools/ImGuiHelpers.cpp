@@ -3,8 +3,8 @@
 #include <math.h>
 #include "TimeHelper.h"
 #include "FullscreenRenderer.h"
-#include "FullscreenTexture.h"
-#include "FullscreenTextureFactory.h"
+#include "Texture.h"
+#include "TextureFactory.h"
 #include "Sprite.h"
 #include "GamlaBettan\Camera.h"
 #include "GamlaBettan\PathFinder.h"
@@ -15,23 +15,21 @@ namespace Tools
 	{
 		ID3D11Device* globalDevice;
 		ID3D11DeviceContext* globalContext;
-		std::vector<FullscreenTexture> globalTextureStack;
+		std::vector<Texture> globalTextureStack;
 		size_t globalTextureUsage;
 		FullscreenRenderer* globalRenderer;
-		FullscreenTextureFactory* globalTextureFactory;
 		
 		void ResetCounter()
 		{
 			globalTextureUsage = 0;
 		}
 
-		void Setup(ID3D11Device* aDevice, ID3D11DeviceContext* aContext, FullscreenRenderer* aRenderer, FullscreenTextureFactory* aFactory)
+		void Setup(ID3D11Device* aDevice, ID3D11DeviceContext* aContext, FullscreenRenderer* aRenderer)
 		{
 			ResetCounter();
 			globalDevice = aDevice;
 			globalContext = aContext;
 			globalRenderer = aRenderer;
-			globalTextureFactory = aFactory;
 		}
 	}
 	thread_local bool dummy = false;
@@ -51,17 +49,17 @@ namespace Tools
 			float delta = ImGui::GetIO().MouseWheel;
 			if (ImGui::GetIO().KeyShift)
 			{
-				zoom *= pow(1.1, delta);
+				zoom *= pow(1.1f, delta);
 			}
 			else
 			{
-				region_sz *= pow(1.1, -delta);
-				zoom *= pow(1.1, delta);
+				region_sz *= pow(1.1f, -delta);
+				zoom *= pow(1.1f, delta);
 			}
 			if (region_sz > 200.f)
 			{
-				region_sz *= pow(1.1, delta);
-				zoom *= pow(1.1, -delta);
+				region_sz *= pow(1.1f, delta);
+				zoom *= pow(1.1f, -delta);
 			}
 
 			float region_x = iopos.x - drawPos.x - region_sz * 0.5f; if (region_x < 0.0f) region_x = 0.0f; else if (region_x > aSize.x - region_sz) region_x = aSize.x - region_sz;
@@ -74,12 +72,12 @@ namespace Tools
 
 	}
 
-	FullscreenTexture GetNextTexture()
+	Texture GetNextTexture()
 	{
 		if (ImguiHelperGlobals::globalTextureUsage == ImguiHelperGlobals::globalTextureStack.size())
 		{
 			ImguiHelperGlobals::globalTextureStack.push_back(
-				ImguiHelperGlobals::globalTextureFactory->CreateTexture(
+				TextureFactory::GetInstance().CreateTexture(
 					V2ui(960,540),
 					DXGI_FORMAT_R8G8B8A8_UNORM,
 					"Imgui debug texture"));
@@ -89,7 +87,7 @@ namespace Tools
 
 	ID3D11ShaderResourceView* CopyTexture(void* aTexture)
 	{
-		FullscreenTexture texture = GetNextTexture();
+		Texture texture = GetNextTexture();
 		ID3D11ShaderResourceView* source = (ID3D11ShaderResourceView*)aTexture;
 
 		struct BACKUP_DX11_STATE
@@ -179,8 +177,8 @@ namespace Tools
 	ImVec4 GetColor(int aDepth)
 	{
 		static std::vector<ImVec4> colors = {
-			ImVec4(0.0f,1.0f,0.0f,1.0f),
-			ImVec4(1.0f,0.0f,0.0f,1.0f),
+			ImVec4(0.3f,1.0f,0.4f,1.0f),
+			ImVec4(1.0f,0.6f,0.6f,1.0f),
 			ImVec4(0.5f,0.7f,0.5f,1.0f),
 			ImVec4(0.5f,0.5f,0.8f,1.0f),
 			ImVec4(0.9f,0.9f,0.5f,1.0f),
@@ -189,7 +187,7 @@ namespace Tools
 		};
 		return colors[aDepth % colors.size()];
 	}
-	ImVec4 DefaultColor(int aDepth)
+	ImVec4 DefaultColor(int /*aDepth*/)
 	{
 		return ImGui::GetStyleColorVec4(ImGuiCol_Text);
 	}
@@ -271,7 +269,7 @@ namespace Tools
 		ImGui::SameLine();
 		if (ImGui::BeginCombo("Value Mode", names[mode]))
 		{
-			for (size_t i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)
 			{
 				bool selected = mode == i;
 				if (ImGui::Selectable(names[i], &selected))

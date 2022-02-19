@@ -1,14 +1,14 @@
 #pragma once
 
 class FullscreenRenderer;
-class FullscreenTextureFactory;
+class TextureFactory;
 
 namespace Tools
 {
 	namespace ImguiHelperGlobals
 	{
 		void ResetCounter();
-		void Setup(ID3D11Device* aDevice, ID3D11DeviceContext* aContext, FullscreenRenderer* aRenderer, FullscreenTextureFactory* aFactory);
+		void Setup(ID3D11Device* aDevice, ID3D11DeviceContext* aContext, FullscreenRenderer* aRenderer);
 	}
 	extern thread_local bool dummy;
 

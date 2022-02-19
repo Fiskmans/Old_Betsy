@@ -122,7 +122,7 @@ std::wstring CreateMiniDump(EXCEPTION_POINTERS* aExceptionPointers)
 	exceptionInfo.ExceptionPointers = aExceptionPointers;
 	exceptionInfo.ClientPointers = FALSE;
 
-	BOOL dumped = pMiniDumpWriteDump(
+	pMiniDumpWriteDump(
 		GetCurrentProcess(),
 		GetCurrentProcessId(),
 		hFile,
@@ -151,7 +151,7 @@ LONG WINAPI ExceptionFilterFunction(_EXCEPTION_POINTERS* aExceptionP)
 	//std::count << result << std::endl;
 
 	MessageBoxA(NULL, std::to_string(aExceptionP->ExceptionRecord->ExceptionCode).c_str(), "Error code", MB_ICONEXCLAMATION | MB_OK);
-	if(result == IDYES);
+	if(result == IDYES)
 	{
 		MessageBoxW(NULL, CreateMiniDump(aExceptionP).c_str(), L"Chashdump Result", MB_ICONEXCLAMATION | MB_OK);
 	}

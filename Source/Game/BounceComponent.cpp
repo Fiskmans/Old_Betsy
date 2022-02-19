@@ -6,6 +6,11 @@ BounceComponent::BounceComponent()
 {
 }
 
+BounceComponent::BounceComponent(const FiskJSON::Object& aObject)
+{
+	aObject["speed"].GetIf(mySpeed);
+}
+
 BounceComponent::BounceComponent(Component::UseDefaults&)
 {
 }
@@ -18,8 +23,13 @@ void BounceComponent::Update(const FrameData& aFrameData, EntityID aEntityID)
 }
 
 #if USEIMGUI
-void BounceComponent::ImGui(EntityID aEntityID)
+void BounceComponent::ImGui(EntityID /*aEntityID*/)
 {
 	ImGui::InputFloat("speed", &mySpeed);
+}
+
+void BounceComponent::Serialize(FiskJSON::Object& aObject)
+{
+	aObject.AddValueChild("speed", mySpeed);
 }
 #endif

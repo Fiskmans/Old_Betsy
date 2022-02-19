@@ -13,7 +13,7 @@ class MainMenuState : public BaseState, public Observer
 public:
 	MainMenuState(bool aShouldDeleteOnPop = true);
 	~MainMenuState();
-	virtual void Update(const float aDeltaTime) override;
+	virtual void Update() override;
 	virtual void RecieveMessage(const Message& aMessage) override;
 	bool Init(InputManager* aInputManager, SpriteFactory* aSpritefactory, 
 		LightLoader* aLightLoader, DirectX11Framework* aFramework, AudioManager* aAudioManager, SpriteRenderer* aSpriteRenderer);

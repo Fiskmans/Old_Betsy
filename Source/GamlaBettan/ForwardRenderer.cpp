@@ -8,7 +8,7 @@
 #include <functional>
 
 #include "Camera.h"
-#include "Scene.h"
+#include "RenderScene.h"
 #include "Environmentlight.h"
 #include "PointLight.h"
 #include "PostMaster.hpp"
@@ -139,7 +139,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 	fData.myTotalTime = RenderManager::GetTotalTime();
 	fData.myCameraToProjection = M44f::Transpose(aCamera->GetProjection());
 
-	EnvironmentLight* envoLight = Scene::GetInstance().GetEnvironmentLight();
+	EnvironmentLight* envoLight = RenderScene::GetInstance().GetEnvironmentLight();
 
 	if (envoLight)
 	{
@@ -208,7 +208,7 @@ void ForwardRenderer::Render(std::vector<ModelInstance*>& aModelList, Camera* aC
 		memcpy(bufferData.pData, &fData, sizeof(fData));
 		myContext->Unmap(myFrameBuffer, 0);
 
-		RenderModel(modelAndLight.first, modelAndLight.second, aBoneMapping, bufferData, aCamera, aBoneBuffer);
+		RenderModel(modelAndLight.first, modelAndLight.second, aBoneMapping, bufferData, aBoneBuffer);
 	}
 
 	aStateManager.SetDepthStencilState(RenderStateManager::DepthStencilState::OnlyCovered);
@@ -227,10 +227,9 @@ void ForwardRenderer::SetSkybox(ModelInstance* aSkyBox)
 
 inline void ForwardRenderer::RenderModel(
 	ModelInstance* aModelInstance, std::array<PointLight*, NUMBEROFPOINTLIGHTS>* aLightList, std::unordered_map<ModelInstance*, short>& aBoneMapping, 
-	D3D11_MAPPED_SUBRESOURCE& aBuffer, const Camera* aCamera, BoneTextureCPUBuffer& aBoneBuffer)
+	D3D11_MAPPED_SUBRESOURCE& aBuffer, BoneTextureCPUBuffer& aBoneBuffer)
 {
 	static HRESULT result;
-	float now = Tools::GetTotalTime();
 
 	Model* model = aModelInstance->GetModelAsset().GetAsModel();
 
@@ -306,7 +305,15 @@ inline void ForwardRenderer::RenderModel(
 		UINT bufferOffset = 0;
 
 		myContext->IASetVertexBuffers(0, 1, &modelData->myVertexBuffer, &modelData->myStride, &bufferOffset);
-		myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
-		myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
+		if (modelData->myIsIndexed)
+		{
+			myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
+			myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
+		}
+		else
+		{
+			myContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_R8_TYPELESS, 0);
+			myContext->Draw(modelData->myNumberOfVertexes, 0);
+		}
 	}
 }

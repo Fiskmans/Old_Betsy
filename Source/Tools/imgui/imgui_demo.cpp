@@ -73,8 +73,8 @@ Index of this file:
 
 */
 
-#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
-#define _CRT_SECURE_NO_WARNINGS
+#if defined(_MSC_VER) && !defined(_CRT_SECommonUtilitiesRE_NO_WARNINGS)
+#define _CRT_SECommonUtilitiesRE_NO_WARNINGS
 #endif
 
 #include "imgui.h"
@@ -1698,7 +1698,7 @@ static void ShowDemoWindowWidgets()
         }
         if (ImGui::BeginPopup("mypicker"))
         {
-            ImGui::Text("MY CUSTOM COLOR PICKER WITH AN AMAZING PALETTE!");
+            ImGui::Text("MY CommonUtilitiesSTOM COLOR PICKER WITH AN AMAZING PALETTE!");
             ImGui::Separator();
             ImGui::ColorPicker4("##picker", (float*)&color, misc_flags | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview);
             ImGui::SameLine();

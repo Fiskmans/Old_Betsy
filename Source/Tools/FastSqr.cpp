@@ -36,8 +36,8 @@ double FastInverseSquareRoot(const double aNumber)
 	const double x2 = aNumber * 0.5;
 	double y = aNumber;
 
-	long i = *(long*)&y;					//evil floating point bit level hacking
-	i = 0x5FE6EB50C7B537A9 - (i >> 1);				//what the fuck? 
+	long long i = *(long long*)&y;					//evil floating point bit level hacking
+	i = 0x5FE6EB50C7B537A9 - (i >> 1ull);				//what the fuck? 
 
 	y = *(double*)&i;
 

@@ -21,8 +21,8 @@ public:
 	~GBuffer();
 
 	void ClearTextures(const V4F aClearColor = V4F(0.f, 0.f, 0.f, 0.f));
-	void SetAsActiveTarget(class FullscreenTexture* aDepth = nullptr);
-	void SetAsActiveTarget(const Textures aResource, class FullscreenTexture* aDepth = nullptr);
+	void SetAsActiveTarget(class Texture* aDepth = nullptr);
+	void SetAsActiveTarget(const Textures aResource, class Texture* aDepth = nullptr);
 	void SetAsResourceOnSlot(const Textures aResource, const unsigned int aSlot);
 	void SetAllAsResources();
 	void CopyTo(GBuffer* aOther, ID3D11DeviceContext* aContext);
@@ -30,7 +30,7 @@ public:
 	void Release();
 
 private:
-	friend class FullscreenTextureFactory;
+	friend class TextureFactory;
 
 	std::array<struct ID3D11Texture2D*, ENUM_CAST(Textures::Count)> myTextures;
 	std::array<struct ID3D11RenderTargetView*, ENUM_CAST(Textures::Count)> myRenderTargets;

@@ -27,8 +27,6 @@ bool FullscreenRenderer::Init(DirectX11Framework* aFramework)
 		return false;
 	}
 
-	ID3D11Device* device = aFramework->GetDevice();
-
 	myVertexShader = AssetManager::GetInstance().GetVertexShader("Fullscreen.hlsl");
 
 	std::array<std::string, static_cast<int>(Shader::COUNT)> filePaths;

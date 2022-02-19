@@ -233,7 +233,7 @@ void SpriteInstance::ImGui()
 
 	
 	ImGui::DragFloat("Depth", &myDepth, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("Rotation", &myRotation, 0.01f, 0.0f, TAU);
+	ImGui::DragFloat("Rotation", &myRotation, 0.01f, 0.0f, TAU_F);
 	ImGui::GetWindowDrawList()->AddRect(ImVec2(cursorpos.x + myUVMinMax.x * imageSize.x, cursorpos.y + myUVMinMax.y * imageSize.y), ImVec2(cursorpos.x + myUVMinMax.z * imageSize.x, cursorpos.y + myUVMinMax.w * imageSize.y), IM_COL32(255, 0, 0, 255));
 	ImVec2 pivotPos = ImVec2(cursorpos.x + myPivot.x * imageSize.x, cursorpos.y + myPivot.y * imageSize.y);
 	ImGui::GetWindowDrawList()->AddLine(ImVec2(pivotPos.x - 20.f, pivotPos.y - 20.f), ImVec2(pivotPos.x + 20.f, pivotPos.y + 20.f), IM_COL32(255, 0, 0, 255));

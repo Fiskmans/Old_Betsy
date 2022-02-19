@@ -24,6 +24,14 @@ namespace Logger_Local
 		ret++;
 		return ret;
 	}
+
+	template<class T>
+	class ExecuteFunctionOnConstruct
+	{
+	public:
+		ExecuteFunctionOnConstruct(T&& aFunctor) { aFunctor(); }
+	};
+
 }
 #define SYSCRASH(text)				Logger::Log(Logger::Type::SystemCrash,text);
 #define SYSERROR(error, ...)		Logger::Rapport(Logger::Type::SystemError,Logger_Local::DirtySubstring(__FILE__), error, {__VA_ARGS__});
@@ -37,7 +45,7 @@ namespace Logger_Local
 #define LOGERROR(text)				Logger::Log(Logger::Type::Error,text);
 #define LOGVERBOSE(text)			Logger::Log(Logger::Type::Verbose,text);
 
-#define ONETIMEWARNING(warning,text) { static bool shoudShow = true; if(shoudShow) {shoudShow = false; SYSWARNING(warning,text); } }
+#define ONETIMEWARNING(warning, ...) { static Logger_Local::ExecuteFunctionOnConstruct executeOnce([]() -> void { SYSWARNING(warning, __VA_ARGS__); }); }
 
 const size_t COUNTERSTART = __COUNTER__;
 #define INCREMENT (__COUNTER__ - COUNTERSTART - 1)
@@ -98,7 +106,8 @@ namespace Logger
 
 	void Shutdown();
 }
+
 #ifndef __INTELLISENSE__
-static_assert(INCREMENT < sizeof(LoggerType) * CHAR_BIT - 1, "Ran out of bits for logger types");
+static_assert(INCREMENT < sizeof(LoggerType)* CHAR_BIT - 1, "Ran out of bits for logger types");
 #endif // !__INTELLISENSE__
 #pragma warning(pop)

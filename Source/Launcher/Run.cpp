@@ -8,6 +8,7 @@
 #if USEIMGUI
 #include "Tools\imgui\backend\imgui_impl_dx11.h"
 #include "Tools\imgui\backend\imgui_impl_win32.h"
+#include "RenderScene.h"
 #endif // !_RETAIL
 
 #include "AudioManager.h"
@@ -38,7 +39,7 @@ void LoadOrDefaultImGuiStyle()
 		ImGui::StyleColorsDark();
 	}
 }
-#endif // !_RETAIL
+#endif // !USEIMGUI
 
 int Run()
 {
@@ -149,6 +150,21 @@ int Run()
 					ImGui::NewFrame();
 
 					WindowControl::DrawWindowControl();
+#if TRACKPERFORMANCE
+					WindowControl::Window("Diagnostic", []()
+					{
+						Tools::TimeTree* at = Tools::GetTimeTreeRoot();
+						static bool accumulative = true;
+						ImGui::Checkbox("Accumulative", &accumulative);
+						Tools::DrawTimeTree(at);
+						if (!accumulative)
+						{
+							Tools::FlushTimeTree();
+						}
+					});
+#endif
+
+					RenderScene::GetInstance().Imgui();
 #if USELOGGER
 					WindowControl::Window("Console log", []()
 						{
@@ -189,6 +205,11 @@ int Run()
 								if (ImGui::Button("Save Changes"))
 								{
 									SaveImGuiStyle();
+								}
+								ImGui::SameLine();
+								if (ImGui::Button("Reload"))
+								{
+									LoadOrDefaultImGuiStyle();
 								}
 								ImGui::ShowStyleEditor();
 								ImGui::EndPopup();
@@ -237,33 +258,20 @@ int Run()
 					}
 
 #if USEAUDIO
-					audioManager.Update(CAST(float, double(delta) / (1000.0 * 1000.0)));
+					//audioManager.Update();
 #endif
 				}
-#if USEIMGUI && TRACKPERFORMANCE
-				WindowControl::Window("Diagnostic", []()
-					{
-						Tools::TimeTree* at = Tools::GetTimeTreeRoot();
-						static bool accumulative = true;
-						ImGui::Checkbox("Accumulative", &accumulative);
-						Tools::DrawTimeTree(at);
-						if (!accumulative)
-						{
-							Tools::FlushTimeTree();
-						}
-					});
-#endif
 				{
 					PERFORMANCETAG("Main loop");
 #if USEIMGUI
 					{
-						PERFORMANCETAG("Imgui Drawing [old]");
+						PERFORMANCETAG("Imgui Drawing");
 						ImGui::Render();
 						ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 					}
 #endif // !USEIMGUI
 					{
-						PERFORMANCETAG("End frame [old]");
+						PERFORMANCETAG("End frame");
 						engine.EndFrame();
 					}
 				}

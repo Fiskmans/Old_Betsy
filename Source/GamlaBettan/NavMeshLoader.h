@@ -2,6 +2,7 @@
 #include "Asset.h"
 
 typedef unsigned int NavMeshIndexType;
+const NavMeshIndexType NavMeshErrorIndex = static_cast<NavMeshIndexType>(-1);
 
 struct NavmeshWall
 {
@@ -13,7 +14,7 @@ struct NavmeshWall
 
 struct NavMeshLink
 {
-	NavMeshIndexType toNode = -1;
+	NavMeshIndexType toNode = NavMeshErrorIndex;
 	float weight = 0.f;
 };
 

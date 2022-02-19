@@ -10,7 +10,7 @@
 SpriteRenderer* TextInstance::ourBackgroundRendererPtr;
 
 TextInstance::TextInstance() :
-	myTitle(L""),
+	myTitle(),
 	myColor({ 1.f, 1.f, 1.f, 1.f }),
 	myTitleColor({ 1.f, 1.f, 1.f, 1.f }),
 	myPosition({ 0.f, 0.f }),
@@ -28,8 +28,8 @@ TextInstance::TextInstance() :
 
 TextInstance::TextInstance(const AssetHandle& aFont) :
 	mySpriteFont(aFont),
-	myText(L""),
-	myTitle(L""),
+	myText(),
+	myTitle(),
 	myColor({ 1.f, 1.f, 1.f, 1.f }),
 	myTitleColor({ 1.f, 1.f, 1.f, 1.f }),
 	myPosition({ 0.f, 0.f }),
@@ -113,9 +113,9 @@ V2f TextInstance::GetSize() const
 	return GetSize(myText, myTitle);
 }
 
-V2f TextInstance::GetSize(const std::wstring& someText, const std::wstring& aTitle) const
+V2f TextInstance::GetSize(const std::wstring& aText, const std::wstring& aTitle) const
 {
-	V2f size = FromShitVector(mySpriteFont.GetAsFont()->MeasureString(someText.c_str())) * myScale;
+	V2f size = FromShitVector(mySpriteFont.GetAsFont()->MeasureString(aText.c_str())) * myScale;
 	V2f titleSize = (aTitle.empty() ? V2f() : FromShitVector(mySpriteFont.GetAsFont()->MeasureString(aTitle.c_str())) * myTitleScale);
 
 	size.y += titleSize.y;
@@ -151,7 +151,14 @@ const std::wstring& TextInstance::GetWideText() const
 
 std::string TextInstance::GetSlimText() const
 {
-	return std::string(myText.begin(), myText.end());
+	std::string out;
+	out.reserve(myText.size());
+	for (const wchar_t& c : myText)
+	{
+		out += static_cast<char>(c);
+	}
+
+	return out;
 }
 
 void TextInstance::SetTitle(const std::wstring& aTitle)
@@ -171,7 +178,14 @@ const std::wstring& TextInstance::GetWideTitle() const
 
 std::string TextInstance::GetSlimTitle() const
 {
-	return std::string(myTitle.begin(), myTitle.end());
+	std::string out;
+	out.reserve(myTitle.size());
+	for (const wchar_t& c : myTitle)
+	{
+		out += static_cast<char>(c);
+	}
+
+	return out;
 }
 
 const V2f& TextInstance::GetPixelPosition() const

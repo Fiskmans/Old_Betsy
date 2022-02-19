@@ -31,7 +31,7 @@ void StateStack::Update(const float aDeltaTime, int aStateToUpdateDeph)
 			{
 				Update(aDeltaTime, aStateToUpdateDeph);
 			}
-			state->Update(aDeltaTime);
+			state->Update();
 		}
 
 		if (myShouldPopMajorAtEndOfFrame)

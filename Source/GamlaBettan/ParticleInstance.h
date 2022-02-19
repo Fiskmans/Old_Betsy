@@ -13,7 +13,7 @@ public:
 
 	Particle* GetParticle();
 	const std::vector<Particle::Vertex>& GetParticleVertices() const;
-	const CU::Matrix4x4<float>& GetTransform() const;
+	const CommonUtilities::Matrix4x4<float>& GetTransform() const;
 
 	void RefreshTimeout(float aTimeout);
 
@@ -35,7 +35,7 @@ private:
 
 	V4F myDirection;
 
-	CU::Matrix4x4<float> myTransform;
+	CommonUtilities::Matrix4x4<float> myTransform;
 	std::vector<Particle::Vertex> myParticleVertices;
 };
 

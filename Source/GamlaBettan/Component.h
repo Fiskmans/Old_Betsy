@@ -1,26 +1,22 @@
 #pragma once
-#include "GamlaBettan\EntityID.h"
-#include "GamlaBettan\InputHandler.h"
+#include "ComponentBase.h"
+#include "ComponentSystem.h"
 
-class Component
+template<class ComponentType> 
+class AutoRegisterComponentSystem
 {
 public:
-	struct UseDefaults {};
+	AutoRegisterComponentSystem() { ComponentSystem<ComponentType>::GetInstance(); }
+};
 
-	struct FrameData
-	{
-		CommonUtilities::InputHandler& myInputHandler;
-		float myDeltaTime;
-		float myTotalTime;
-	};
+template<class ParentComponentType>
+class Component : public ComponentBase
+{
+public:
+	template<typename... Args>
+	Component(Args&&... args) : ComponentBase(std::forward<Args>(args)...) {}
 
-	virtual ~Component() = default;
-
-	virtual void Update(const FrameData& aFrameData, EntityID aEntityID) = 0;
-
-#if USEIMGUI
-	virtual void ImGui(EntityID aEntityID) = 0;
-#endif
-
+private:
+	inline static AutoRegisterComponentSystem<ParentComponentType> autoRegister = {};
 };
 

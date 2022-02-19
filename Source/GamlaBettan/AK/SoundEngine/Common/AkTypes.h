@@ -33,6 +33,9 @@ the specific language governing permissions and limitations under the License.
 #ifndef _AK_DATA_TYPES_H_
 #define _AK_DATA_TYPES_H_
 
+#pragma warning(disable : 26495)
+#pragma warning(disable : 26812)
+
 // Platform-specific section.
 //----------------------------------------------------------------------------------------------------
 #include <AK/AkPlatforms.h>

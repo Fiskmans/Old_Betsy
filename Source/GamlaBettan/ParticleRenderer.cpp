@@ -56,7 +56,7 @@ void ParticleRenderer::Render(Camera* aCamera,const std::vector<ParticleInstance
 
 	ID3D11DeviceContext* context = myFrameWork->GetContext();
 
-	frameBufferData.myWorldToCamera = CU::Matrix4x4<float>::GetFastInverse(aCamera->GetTransform());
+	frameBufferData.myWorldToCamera = CommonUtilities::Matrix4x4<float>::GetFastInverse(aCamera->GetTransform());
 	frameBufferData.myCameraToProjection = aCamera->GetProjection();
 
 

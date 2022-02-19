@@ -30,7 +30,7 @@ public:
 	void Init();
 	void ShutDown();
 
-	void Update(float aDeltaTime);
+	void Update();
 
 	void RecieveMessage(const Message& aMessage) override;
 
@@ -55,8 +55,6 @@ public:
 
 private:
 	WwiseFramework* myWwiseFramework;
-
-	int myMasterVolume;
 	
 	AudioObjectID myListenerID;
 	AudioObjectID my2DMasterObjectID;

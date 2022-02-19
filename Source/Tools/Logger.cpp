@@ -19,7 +19,7 @@ namespace Logger
 
 	struct LoggerNode
 	{
-		bool myIsOpen;
+		bool myIsOpen = true;
 		size_t myCount = 0;
 		std::unordered_map<std::string, LoggerNode*> mySubNodes;
 	};
@@ -88,15 +88,15 @@ namespace Logger
 				currentNode = currentNode->mySubNodes[aError];
 				currentNode->myCount++;
 
-				for (const std::string& i : aArguments)
+				for (const std::string& arg : aArguments)
 				{
-					toPrint += ", " + i;
+					toPrint += ", " + arg;
 
-					if (currentNode->mySubNodes.count(i) == 0)
+					if (currentNode->mySubNodes.count(arg) == 0)
 					{
-						currentNode->mySubNodes[i] = new LoggerNode();
+						currentNode->mySubNodes[arg] = new LoggerNode();
 					}
-					currentNode = currentNode->mySubNodes[i];
+					currentNode = currentNode->mySubNodes[arg];
 					currentNode->myCount++;
 				}
 			}
@@ -280,12 +280,13 @@ namespace Logger
 #endif
 	}
 
-	void Log(LoggerType aType, const std::wstring& aMessage)
+	void Log(LoggerType /*aType*/, const std::wstring& /*aMessage*/)
 	{
 #if USELOGGER
 		std::cout << "wstring are not supported" << std::endl;
 #endif
 	}
+
 	void SetFilter(LoggerType aFilter)
 	{
 #if USELOGGER
@@ -363,9 +364,9 @@ namespace Logger
 
 				std::string file = FileMapping[messageType];
 				FileMapping.erase(messageType);
-				for (auto& i : FileMapping)
+				for (auto& fileMap : FileMapping)
 				{
-					if (i.second == file)
+					if (fileMap.second == file)
 					{
 						return;
 					}
@@ -396,6 +397,12 @@ namespace Logger
 #if USELOGGER
 		window = reinterpret_cast<HWND>(aHWND);
 		HRESULT hr = CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, IID_ITaskbarList3, reinterpret_cast<void**>(&pTaskbar));
+		if (FAILED(hr))
+		{
+			std::cerr << "Failed to set up logger icons" << std::endl;
+			return;
+		}
+
 		errorIcon = static_cast<HICON>(::LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(129), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR));
 		warningIcon = static_cast<HICON>(::LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(130), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR));
 #endif
@@ -443,7 +450,7 @@ namespace Logger
 			char delta = 0;
 			if (ImGui::IsWindowHovered())
 			{
-				delta = ImGui::GetIO().MouseWheel * -2.f;
+				delta = static_cast<char>(ImGui::GetIO().MouseWheel * -2.f);
 			}
 			bool shouldSetScrollBar = delta != 0;
 			if (int(at) + delta < 0)
@@ -495,7 +502,7 @@ namespace Logger
 			}
 			else
 			{
-				at = ImGui::GetScrollY() / itemsize;
+				at = static_cast<size_t>(ImGui::GetScrollY() / itemsize);
 			}
 			ImGui::EndChild();
 			ImGui::NextColumn();

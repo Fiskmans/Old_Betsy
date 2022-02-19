@@ -61,7 +61,7 @@ ShaderFlags ShaderTypes::FlagsFromMesh(const aiMesh* aMesh)
 	if (aMesh->HasTextureCoords(0))
 	{
 		result |= ShaderFlags::HasUvSets;
-		size_t count = 0;
+		unsigned int count = 0;
 		while (aMesh->HasTextureCoords(++count)){ }
 		result |= (ShaderFlags::UvMask & ((count-1) << ShaderFlags::NumUvSetsOffset));
 	}
@@ -166,16 +166,16 @@ void ShaderTypes::DefinesFromFlags(_D3D_SHADER_MACRO* aBuffer, size_t aFlags)
 
 	aBuffer[at++] = _D3D_SHADER_MACRO{ STRING(NUMBEROFPOINTLIGHTS), STRINGVALUE(NUMBEROFPOINTLIGHTS) };
 	aBuffer[at++] = _D3D_SHADER_MACRO{ STRING(NUMBEROFANIMATIONBONES), STRINGVALUE(NUMBEROFANIMATIONBONES) };
-	aBuffer[at++] = _D3D_SHADER_MACRO{ STRING(MODELSAMOUNTOFCUSTOMDATA), STRINGVALUE(MODELSAMOUNTOFCUSTOMDATA) };
+	aBuffer[at++] = _D3D_SHADER_MACRO{ STRING(MODELSAMOUNTOFCommonUtilitiesSTOMDATA), STRINGVALUE(MODELSAMOUNTOFCommonUtilitiesSTOMDATA) };
 
 	if (aFlags & ShaderFlags::HasVertexColors)
 	{
 		aBuffer[at++] = _D3D_SHADER_MACRO{ "VERTEXCOLOR", "true" };
 	}
-	aBuffer[at++] = _D3D_SHADER_MACRO{ "HAS_UV_SETS", (aFlags & ShaderFlags::HasUvSets) ? "true" : "false" };
 	
 	if (aFlags & ShaderFlags::HasUvSets)
 	{
+		aBuffer[at++] = _D3D_SHADER_MACRO{ "HAS_UV_SETS", "true" };
 		aBuffer[at++] = _D3D_SHADER_MACRO{ "UV_SETS_COUNT", numberLookup[UvSetsCountFromFlags(aFlags)] };
 	}
 	if (aFlags & ShaderFlags::HasBones)

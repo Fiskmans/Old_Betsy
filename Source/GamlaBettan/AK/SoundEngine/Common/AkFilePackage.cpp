@@ -25,6 +25,9 @@ written agreement between you and Audiokinetic Inc.
 //
 //////////////////////////////////////////////////////////////////////
 #include "pch.h"
+#pragma warning(disable : 26495)
+#pragma warning(disable : 4100)
+#pragma warning(disable : 33010)
 #include "stdafx.h"
 #include "AkFilePackage.h"
 

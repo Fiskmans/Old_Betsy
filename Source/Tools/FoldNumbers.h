@@ -2,17 +2,12 @@
 
 namespace Math
 {
-	template<class T>
-	unsigned int BinaryFold(const T& aData)
+	inline unsigned int BinaryFold(const void* aData)
 	{
-		static_assert(sizeof(aData) >= sizeof(unsigned int));
+		static_assert(sizeof(void*) == sizeof(unsigned int) * 2);
 
-		unsigned int val = 0;
-
-		for (size_t i = 0; i < (sizeof(aData) / sizeof(unsigned int)); i++)
-		{
-			val ^= *(reinterpret_cast<const unsigned int*>(&aData) + i);
-		}
+		unsigned int val = *reinterpret_cast<const unsigned int*>(&aData);
+		val ^= *(reinterpret_cast<const unsigned int*>(&aData) + 1);
 
 		return val;
 	}

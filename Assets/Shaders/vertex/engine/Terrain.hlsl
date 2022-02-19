@@ -4,6 +4,7 @@ struct TerrainVertexInput
 {
 	float3 myWorldPos	: SV_POSITION;
 	float3 myNormal		: NORMAL;
+	uint   mySeed		: RANDOM_SEED;
 };
 
 struct TerrainVertexToPixel
@@ -11,6 +12,7 @@ struct TerrainVertexToPixel
 	float4 myScreenPos	: SV_POSITION;
 	float3 myWorldPos	: POSITION;
 	float3 myNormal		: NORMAL;
+	uint   mySeed		: RANDOM_SEED;
 };
 
 TerrainVertexToPixel vertexShader(TerrainVertexInput input)
@@ -32,6 +34,7 @@ TerrainVertexToPixel vertexShader(TerrainVertexInput input)
 	output.myWorldPos = worldPosition[0].xyz;
 	output.myScreenPos = screenPosition[0];
 	output.myNormal = normalize(worldPosition[1].xyz);
+	output.mySeed = input.mySeed;
 
 	return output;
 }

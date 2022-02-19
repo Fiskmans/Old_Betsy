@@ -44,7 +44,7 @@ VertexToPixel vertexShader(VertexInput input)
 	returnValue.myTangent = worldPosition[2];
 	returnValue.myBiTangent = worldPosition[3];
 
-#if HAS_UV_SETS
+#ifdef HAS_UV_SETS
 	[unroll] for (uint i = 0; i < UV_SETS_COUNT; i++)
 	{	
 		returnValue.myUV[0] = input.myUV[0];

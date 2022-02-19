@@ -31,11 +31,14 @@ void TextRenderer::Render(const std::vector<TextInstance*>& aTextList)
 {
 	mySpriteBatch->Begin();
 
-	for (int i = aTextList.size() - 1; i >= 0; i--)
+	if (!aTextList.empty())
 	{
-		if (aTextList[i]->GetShouldDraw())
+		for (int i = static_cast<int>(aTextList.size() - 1); i >= 0; i--)
 		{
-			aTextList[i]->Render(mySpriteBatch);
+			if (aTextList[i]->GetShouldDraw())
+			{
+				aTextList[i]->Render(mySpriteBatch);
+			}
 		}
 	}
 

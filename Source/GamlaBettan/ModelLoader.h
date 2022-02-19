@@ -15,7 +15,7 @@ class Model;
 class ModelInstance;
 struct ID3D11Device;
 class DirectX11Framework;
-class Scene;
+class RenderScene;
 class Skybox;
 struct ID3D11PixelShader;
 struct ID3D11VertexShader;

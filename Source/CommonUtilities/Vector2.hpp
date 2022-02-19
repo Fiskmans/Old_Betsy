@@ -1,8 +1,8 @@
 #pragma once
 #include <initializer_list>
-#include "../../Tools/Logger.h"
+#include "Tools/Logger.h"
 #include <math.h>
-#include "../../Tools/FastSqrt.h"
+#include "Tools/FastSqrt.h"
 
 namespace CommonUtilities
 {

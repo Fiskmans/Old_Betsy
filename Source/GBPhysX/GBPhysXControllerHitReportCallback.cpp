@@ -21,10 +21,10 @@ void GBPhysXControllerHitReportCallback::onShapeHit(const PxControllerShapeHit& 
 	}
 }
 
-void GBPhysXControllerHitReportCallback::onControllerHit(const PxControllersHit& hit)
+void GBPhysXControllerHitReportCallback::onControllerHit(const PxControllersHit& /*hit*/)
 {
 }
 
-void GBPhysXControllerHitReportCallback::onObstacleHit(const PxControllerObstacleHit& hit)
+void GBPhysXControllerHitReportCallback::onObstacleHit(const PxControllerObstacleHit& /*hit*/)
 {
 }

@@ -67,7 +67,7 @@ Asset* ShaderCompiler::GetGeometryShader(const std::string& aBaseFolder, const s
 
 void ShaderCompiler::ReloadShader(Asset* aAsset, const std::string& aBaseFolder, const std::string& aShader, ShaderFlags aFlags, const std::string& aFileChanged)
 {
-	SYSINFO("Reloading shader", aFileChanged);
+	SYSINFO("Reloading shader");
 
 	Asset* newShader;
 	

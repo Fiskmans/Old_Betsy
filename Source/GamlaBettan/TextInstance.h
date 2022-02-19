@@ -111,7 +111,7 @@ protected:
 
 	void CalculateBackgroundSize();
 	virtual V2f GetTitleSize() const;
-	V2f GetSize(const std::wstring& someText, const std::wstring& aTitle) const;
+	V2f GetSize(const std::wstring& aText, const std::wstring& aTitle) const;
 };
 
 

@@ -109,7 +109,7 @@ namespace NavMeshLoader_Private
 			aNavMesh->myNodes.reserve(scene->mMeshes[0]->mNumFaces);
 			aNavMesh->myVertexCollection.reserve(scene->mMeshes[0]->mNumVertices);
 		}
-		std::unordered_map<size_t, size_t> indexMapping;
+		std::unordered_map<size_t, NavMeshIndexType> indexMapping;
 
 		const auto ConvertToEngine = [](const aiVector3D& aVec) -> V3F
 		{
@@ -122,7 +122,7 @@ namespace NavMeshLoader_Private
 			{
 				V3F pos = ConvertToEngine(scene->mMeshes[0]->mVertices[indexIndex]);
 				auto it = std::find(aNavMesh->myVertexCollection.begin(), aNavMesh->myVertexCollection.end(), pos);
-				indexMapping[indexIndex] = it - aNavMesh->myVertexCollection.begin();
+				indexMapping[indexIndex] = static_cast<NavMeshIndexType>(it - aNavMesh->myVertexCollection.begin());
 				if (it == aNavMesh->myVertexCollection.end())
 				{
 					aNavMesh->myVertexCollection.push_back(pos);
@@ -217,7 +217,7 @@ namespace NavMeshLoader_Private
 				if (neighbors[i])
 				{
 					NavMeshLink l;
-					l.toNode = neighbors[i] - aNavMesh->myNodes.data();
+					l.toNode = static_cast<NavMeshIndexType>(neighbors[i] - aNavMesh->myNodes.data());
 					l.weight = (node.myCenter - neighbors[i]->myCenter).Length();
 					node.myLinks[i] = l;
 				}

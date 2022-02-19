@@ -1,6 +1,6 @@
 #pragma once
-#include "FullscreenTextureFactory.h"
-#include "FullscreenTexture.h"
+#include "TextureFactory.h"
+#include "Texture.h"
 
 #include "ForwardRenderer.h"
 #include "FullscreenRenderer.h"
@@ -17,12 +17,13 @@
 
 #include "GamlaBettan\DirectX11Framework.h"
 #include "GamlaBettan\WindowHandler.h"
-#include "GamlaBettan\Scene.h"
 
 class SpriteRenderer;
 struct ID3D11ShaderResourceView;
 
-class RenderManager : public Observer
+class RenderManager
+	: public Observer
+	, public CommonUtilities::Singleton<RenderManager>
 {
 public:
 	RenderManager();
@@ -77,8 +78,6 @@ private:
 
 	struct ID3D11Texture2D* myBoneBufferTexture = nullptr;
 
-	FullscreenTextureFactory myFullscreenFactory;
-
 	enum class Textures
 	{
 		BackBuffer,
@@ -105,7 +104,7 @@ private:
 		LUT,
 		Count
 	};
-	std::array<FullscreenTexture, static_cast<int>(Textures::Count)> myTextures;
+	std::array<Texture, static_cast<int>(Textures::Count)> myTextures;
 	GBuffer myGBuffer;
 	GBuffer myBufferGBuffer;
 	BoneTextureCPUBuffer myBoneBuffer;
@@ -123,7 +122,7 @@ private:
 	bool CreateTextures(const V2ui& aSize);
 	void Resize(const V2ui& aSize);
 
-	void FullscreenPass(std::vector<Textures> aSources,Textures aTarget, FullscreenRenderer::Shader aShader);
+	void FullscreenPass(std::vector<Textures> aSources, Textures aTarget, FullscreenRenderer::Shader aShader);
 	void UnbindResources();
 	void UnbindTargets();
 };

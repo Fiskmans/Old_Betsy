@@ -2,7 +2,10 @@
 #include "EntityManager.h"
 #include "GamlaBettan\MeshComponent.h"
 
-EntityID EntityManager::Get()
+#define SCENE_BASE_FOLDER "../baked/scenes/"
+#define SCENE_EXTENSION ".scene"
+
+EntityID EntityManager::MakeEntity()
 {
     if (myUnused.empty())
     {
@@ -10,8 +13,8 @@ EntityID EntityManager::Get()
         std::array<Entity, myBatchSize>* nextBuffer = new std::array<Entity, myBatchSize>();
         for (int i = myBatchSize-1; i >= 0; i--)
         {
-            myUnused.push_back(myPools.size() * myBatchSize + i + myIDStartOffset);
-            nextBuffer->at(i).myID = myPools.size() * myBatchSize + i + myIDStartOffset;
+            myUnused.push_back(static_cast<EntityID>(myPools.size() * myBatchSize + i + myIDStartOffset));
+            nextBuffer->at(i).myID = static_cast<EntityID>(myPools.size() * myBatchSize + i + myIDStartOffset);
         }
         myPools.push_back(nextBuffer);
     }
@@ -19,7 +22,7 @@ EntityID EntityManager::Get()
     EntityID out = myUnused.back();
     myUnused.pop_back();
 
-    Retrieve(out)->Construct();
+    Retrieve(out)->Activate();
     return out;
 }
 
@@ -30,7 +33,7 @@ Entity* EntityManager::Retrieve(EntityID aID)
 
 void EntityManager::Return(EntityID& aID)
 {
-    Retrieve(aID)->Destruct();
+    Retrieve(aID)->Deactivate();
     myUnused.push_back(aID);
 }
 
@@ -39,17 +42,30 @@ void EntityManager::ImGui()
 {
     WindowControl::Window("Entity Manager", [this]() {
 
+        static char FilePathBuffer[MAX_PATH + 1] = "defaultScene";
+        ImGui::InputText("File", FilePathBuffer, MAX_PATH + 1);
+        if (ImGui::Button("Save"))
+        {
+            Scene scene(GetAllActive());
+            SaveScene(scene, SCENE_BASE_FOLDER + std::string(FilePathBuffer) + SCENE_EXTENSION);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Load"))
+        {
+            auto _ = LoadScene(SCENE_BASE_FOLDER + std::string(FilePathBuffer) + SCENE_EXTENSION);
+        }
+
         ImGui::Text("Current Unused %d", myUnused.size());
 
         ComponentManager::GetInstance().ImGui();
 
-        for (size_t poolIndex = 0; poolIndex < myPools.size(); poolIndex++)
+        for (int poolIndex = 0; poolIndex < myPools.size(); poolIndex++)
         {
             ImGui::PushID(poolIndex);
             if (ImGui::TreeNode("node", "%d", poolIndex))
             {
                 int unusedCounter = 0;
-                for (size_t i = 0; i < myBatchSize; i++)
+                for (int i = 0; i < myBatchSize; i++)
                 {
                     Entity& entity = myPools[poolIndex]->at(i);
                     EntityID id = entity.myID;
@@ -144,5 +160,86 @@ void EntityManager::ImGui()
 
         });
 
+}
+
+std::vector<EntityID> EntityManager::GetAllActive()
+{
+	std::vector<EntityID> out;
+	for (EntityID poolIndex = 0; poolIndex < myPools.size(); poolIndex++)
+	{
+		for (EntityID i = 0; i < myBatchSize; i++)
+		{
+			if ((*myPools[poolIndex])[i].myIsActive)
+			{
+				out.push_back(myIDStartOffset + poolIndex * myBatchSize + i);
+			}
+		}
+	}
+    return out;
+}
+
+void EntityManager::SaveScene(Scene& aScene, const std::string& aFilePath)
+{
+	FiskJSON::Object root;
+	FiskJSON::Object* entities = new FiskJSON::Object();
+	entities->MakeArray();
+    SaveCollection(aScene.myEntities, entities->Get<FiskJSON::ArrayWrapper>());
+	root.AddValueChild("version", 1);
+	root.AddChild("entities", entities);
+
+	std::filesystem::create_directories(Tools::PathWithoutFile(aFilePath));
+	std::ofstream outFile(aFilePath);
+	outFile << root.Serialize();
+	if (!outFile)
+	{
+		SYSERROR("Failed to save scene to file", aFilePath);
+	}
+}
+
+void EntityManager::SaveCollection(const std::vector<EntityID>& aEntities, FiskJSON::ArrayWrapper aObject)
+{
+	for (auto& id : aEntities)
+	{
+		Entity& entity = *Retrieve(id);
+		FiskJSON::Object* entityObject = new FiskJSON::Object();
+		entity.Serialize(*entityObject);
+        aObject.PushChild(entityObject);
+	}
+}
+
+Scene EntityManager::LoadScene(const std::string& aFilePath)
+{
+	FiskJSON::Object root;
+	try
+	{
+		root.Parse(Tools::ReadWholeFile(aFilePath));
+	}
+	catch (const std::exception& e)
+	{
+		SYSERROR("Failed to load scene, json failed to parse", aFilePath, e.what());
+		return {};
+	}
+
+	int version;
+	if (!root["version"].GetIf(version))
+	{
+		SYSERROR("Failed to load scene, no version number", aFilePath);
+		return {};
+	}
+    return Scene(LoadCollection(root));
+}
+
+std::vector<EntityID> EntityManager::LoadCollection(const FiskJSON::Object& aObject)
+{
+	std::vector<EntityID> out;
+
+	for (FiskJSON::Object& entity : aObject["entities"].Get<FiskJSON::ConstArrayWrapper>())
+	{
+        EntityID id = MakeEntity();
+        ComponentManager::GetInstance().Deserialize(id, entity);
+        out.push_back(id);
+	}
+
+    return out;
 }
 #endif

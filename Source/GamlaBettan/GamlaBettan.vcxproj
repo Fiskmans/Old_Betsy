@@ -5,16 +5,8 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Development|x64">
-      <Configuration>Development</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Retail|x64">
-      <Configuration>Retail</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -32,20 +24,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
@@ -61,16 +40,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\LibraryBuild.props" />
     <Import Project="..\Cxx17.props" />
-    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
-    <Import Project="..\SharedPCH.props" />
-    <Import Project="..\ZmSwitch.props" />
-    <Import Project="..\Includes.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\LibraryBuild.props" />
-    <Import Project="..\Cxx17.props" />
-    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
     <Import Project="..\SharedPCH.props" />
     <Import Project="..\ZmSwitch.props" />
     <Import Project="..\Includes.props" />
@@ -79,16 +48,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\LibraryBuild.props" />
     <Import Project="..\Cxx17.props" />
-    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
-    <Import Project="..\SharedPCH.props" />
-    <Import Project="..\ZmSwitch.props" />
-    <Import Project="..\Includes.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\LibraryBuild.props" />
-    <Import Project="..\Cxx17.props" />
-    <Import Project="..\IgnoreCXX17Depricationwarning.props" />
     <Import Project="..\SharedPCH.props" />
     <Import Project="..\ZmSwitch.props" />
     <Import Project="..\Includes.props" />
@@ -96,29 +55,11 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <Lib>
-      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\;$(solutiondiir)libs\Wwise\lib\</AdditionalLibraryDirectories>
-    </Lib>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,35 +71,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_RELEASE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-    </Link>
-    <Lib>
-      <AdditionalDependencies>D3D11.lib;assimp-vc140-mt.lib;d3dcompiler.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swscale.lib;DirectXTK_$(Configuration).lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(solutiondir)ExternalLibs\;$(solutiondir)libs\;$(solutiondiir)libs\Wwise\lib\</AdditionalLibraryDirectories>
-    </Lib>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtk_desktop_2015.2019.10.17.1\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_RETAIL;NDEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -176,7 +95,6 @@
     <ClCompile Include="AK\SoundEngine\Common\AkMultipleFileLocation.cpp" />
     <ClCompile Include="AK\SoundEngine\Win32\AkDefaultIOHookBlocking.cpp" />
     <ClCompile Include="AK\SoundEngine\Win32\AkDefaultIOHookDeferred.cpp" />
-    <ClCompile Include="AK\SoundEngine\Win32\stdafx.cpp" />
     <ClCompile Include="AnimationData.cpp" />
     <ClCompile Include="AnimationLoader.cpp" />
     <ClCompile Include="Animator.cpp" />
@@ -189,6 +107,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="FreeCam.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="LevelLoader.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="NavMeshLoader.cpp" />
@@ -201,8 +120,9 @@
     <ClCompile Include="Environmentlight.cpp" />
     <ClCompile Include="ForwardRenderer.cpp" />
     <ClCompile Include="FullscreenRenderer.cpp" />
-    <ClCompile Include="FullscreenTexture.cpp" />
-    <ClCompile Include="FullscreenTextureFactory.cpp" />
+    <ClCompile Include="ParentComponent.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureFactory.cpp" />
     <ClCompile Include="GBuffer.cpp" />
     <ClCompile Include="HighlightRenderer.cpp" />
     <ClCompile Include="GraphicEngine.cpp" />
@@ -224,10 +144,9 @@
     <ClCompile Include="ParticleInstance.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="RenderStateManager.cpp" />
-    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="RenderScene.cpp" />
     <ClCompile Include="ShaderCompiler.cpp" />
     <ClCompile Include="ShaderTypes.cpp" />
-    <ClCompile Include="Spline.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteFactory.cpp" />
     <ClCompile Include="SpriteInstance.cpp" />
@@ -238,7 +157,6 @@
     <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="videoplayer.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
-    <ClCompile Include="WindSystem.cpp" />
     <ClCompile Include="WwiseFramework.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -250,6 +168,7 @@
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="ComponentBase.h" />
     <ClInclude Include="ComponentManager.h" />
     <ClInclude Include="ComponentSystem.h" />
     <ClInclude Include="Decal.h" />
@@ -258,6 +177,7 @@
     <ClInclude Include="EntityID.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="FreeCam.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="NavMeshLoader.h" />
@@ -270,14 +190,14 @@
     <ClInclude Include="Environmentlight.h" />
     <ClInclude Include="ForwardRenderer.h" />
     <ClInclude Include="FullscreenRenderer.h" />
-    <ClInclude Include="FullscreenTexture.h" />
-    <ClInclude Include="FullscreenTextureFactory.h" />
+    <ClInclude Include="ParentComponent.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureFactory.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="HighlightRenderer.h" />
     <ClInclude Include="GraphicEngine.h" />
     <ClCompile Include="ParticleRenderer.cpp" />
     <ClInclude Include="PathFinder.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="DepthRenderer.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="SpotLightFactory.h" />
@@ -298,12 +218,11 @@
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="RenderStateManager.h" />
-    <ClInclude Include="Scene.h" />
+    <ClInclude Include="RenderScene.h" />
     <ClInclude Include="ShaderBuffers.h" />
     <ClInclude Include="ShaderCompiler.h" />
     <ClInclude Include="ShaderFlags.h" />
     <ClInclude Include="ShaderTypes.h" />
-    <ClInclude Include="Spline.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteFactory.h" />
     <ClInclude Include="SpriteInstance.h" />
@@ -314,7 +233,6 @@
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="videoplayer.h" />
     <ClInclude Include="WindowHandler.h" />
-    <ClInclude Include="WindSystem.h" />
     <ClInclude Include="WwiseFramework.h" />
     <ClInclude Include="Wwise_IDs.h" />
   </ItemGroup>

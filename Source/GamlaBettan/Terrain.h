@@ -1,89 +1,93 @@
 #pragma once
 #include "GamlaBettan\Model.h"
 #include "Tools\Handover.h"
+#include "GBPhysX\GBPhysX.h"
 
 class Terrain : public CommonUtilities::Singleton<Terrain>
 {
 public:
-	Terrain();
+	Terrain(DirectX11Framework* aFramework, GBPhysX* aPhysx, const CommonUtilities::Vector3<size_t>& aResolution, const V3F aSize);
 
-	void Init(DirectX11Framework* aFramework);
 	void Update();
 
 #if USEIMGUI
 	void Imgui();
+	void ImguiContent();
 #endif
+
+	struct DigResult
+	{
+		size_t myDirt = 0;
+		size_t myRock = 0;
+		size_t myIron = 0;
+		size_t myGold = 0;
+
+		bool Empty() const { return myDirt == 0 && myRock == 0 && myIron == 0 && myGold == 0; }
+	};
+
+
+	DigResult Dig(V3F aPosition, size_t aPower);
 
 private:
 
-	static const size_t MaxTriCount = 1 << 20; // ~13mb of graphics memory
+	struct TerrainNode
+	{
+		uint8_t myDirt = 0;
+		uint8_t myRock = 0;
+		uint8_t myIron = 0;
+		uint8_t myGold = 0;
 
-	void FromFile(const std::string& aFilePath);
+		operator float();
+		void AttemptDig(DigResult& aInOutResult, size_t aPower);
+		bool Empty() const { return myDirt == 0 && myRock == 0 && myIron == 0 && myGold == 0; }
+	};
 
-	void FromFBX(const std::string aFilePath);
-	void FromTER(const std::string aFilePath);
+	std::vector<TerrainNode> myTerrainData;
+	CommonUtilities::Vector3<size_t> myResolution;
+	CommonUtilities::Vector3<size_t> myIndexing;
+	size_t MaxTriCount = 0; // ~13mb of graphics memory
+	V3F mySize = {1,1,1};
 
-	void ToFile(const std::string& aFilePath);
-
-	void GenerateVertexInfo();
-
-	void Setup();
-	void SetupGraphicsResources();
-	void SetupAllNormals();
-	void SetupNormals(UINT aVertexThatChanged);
-	void SetupNormals(std::vector<UINT> aVertexesAffected);
-	float Area(UINT aTri);
-	float Triangleness(UINT aTri);
-
-	void TestMesh();
-
-	void MoveVertex(UINT aIndex, V3F aTargetPosition);
-	void Tesselate(UINT aTri);
-	void SwapVertex(UINT aTri, UINT aOriginal, UINT aTarget);
-	UINT XorAllVerticies(UINT aTri);
-	UINT AddVertex(V3F aPosition);
-	UINT AddTri(UINT aA, UINT aB, UINT aC);
-
-	bool OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize);
-	
 	struct Vertex
 	{
 		V3F myPosition;
 		V3F myNormal;
+		uint32_t mySeed = 0;
 	};
-
-	struct VertexInfo
-	{
-		struct Edge
-		{
-			UINT myOtherVertex;
-			UINT myTri; //The tri that has this vertex followed by myOtherVertex going clockwise around it
-		};
-
-		std::vector<Edge> myEdges;
-	};
-
-	struct Tri
-	{
-		UINT myA;
-		UINT myB;
-		UINT myC;
-	};
-
-	DirectX11Framework* myFramework;
-
-	std::vector<Vertex> myVertexes;
-	std::vector<VertexInfo> myVertexInfo;
-
-	std::vector<Tri> myTris;
 	
-	float myTotalVolumeDiscrepancy;
+	void GenerateTerrain();
 
-	Model::ModelData* myModelData;
-	Asset* myModelAsset;
+	void FromFile(const std::string& aFilePath);
+
+	void FromTER(const std::string aFilePath);
+
+	void ToFile(const std::string& aFilePath); 
+
+	void Setup();
+	void SetupGraphicsResources();
+
+	bool OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize);
+	
+
+	DirectX11Framework* myFramework = nullptr;
+	GBPhysX* myPhysx = nullptr;
+
+	//DATA
+	std::vector<Vertex> myVertexes;
+
+	Model::ModelData* myModelData = nullptr;
+	Asset* myModelAsset = nullptr;
 	AssetHandle myModelHandle;
-	ModelInstance* myModelInstance;
+	ModelInstance* myModelInstance = nullptr;
 
+	GBPhysXActor* myActor = nullptr;
 
+	bool myIsDirty = true;
+
+	size_t myMaxStepsPerFrame = 5000;
+
+	float myLastRebake = 0;
+
+	const float myRebakeInterval = 0.16f;
 };
 

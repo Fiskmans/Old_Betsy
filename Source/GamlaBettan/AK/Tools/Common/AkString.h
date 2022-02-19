@@ -84,7 +84,7 @@ public:
 			AkUInt32 uLen = tImpl::Length();
 			if (uLen > 0)
 			{
-				tData::pStr = (T_CHAR*)TAlloc::Alloc((uLen + 1) * sizeof(T_CHAR));
+				tData::pStr = (T_CHAR*)TAlloc::Alloc((uLen + 1ull) * sizeof(T_CHAR));
 				if (tData::pStr == NULL)
 					return AK_InsufficientMemory;
 

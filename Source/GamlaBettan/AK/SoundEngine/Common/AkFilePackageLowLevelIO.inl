@@ -325,7 +325,7 @@ AKRESULT CAkFilePackageLowLevelIO<T_LLIOHOOK_FILELOC,T_PACKAGE>::_LoadFilePackag
 		AkUInt32 uHeaderSize;
 	};
 
-	AkUInt32 uReadBufferSize = AkMax( 2 * in_reader.GetBlockSize(), sizeof(AkFilePackageHeader) );
+	AkUInt32 uReadBufferSize = AkMax( 2ull * in_reader.GetBlockSize(), sizeof(AkFilePackageHeader) );
 	AkUInt8 * pBufferForHeader = (AkUInt8*)AkAlloca( uReadBufferSize );
 	AkUInt32 uSizeToRead;
 	bool bAligned = ( sizeof(AkFilePackageHeader) % in_reader.GetBlockSize() ) > 0;

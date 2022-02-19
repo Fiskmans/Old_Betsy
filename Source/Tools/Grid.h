@@ -40,7 +40,7 @@ public:
 	GridNode<T>& operator()(const int aX, const int aY);
 	const GridNode<T>& operator()(const int aX, const int aY) const;
 
-	CU::Vector2<int> GetGridIndex(const V2f& aPosition) const;
+	CommonUtilities::Vector2<int> GetGridIndex(const V2f& aPosition) const;
 
 	size_t GetWidth() const;
 	size_t GetHeight() const;
@@ -102,7 +102,7 @@ inline void Grid<T>::AddAtPos(const T& anElement, const V2f& aPosition, const bo
 template<class T>
 inline GridNode<T>& Grid<T>::GetNode(const V2f& aPosition)
 {
-	const CU::Vector2<int> pos = GetGridIndex(aPosition);
+	const CommonUtilities::Vector2<int> pos = GetGridIndex(aPosition);
 
 	return (*this)(pos.x, pos.y);
 }
@@ -110,7 +110,7 @@ inline GridNode<T>& Grid<T>::GetNode(const V2f& aPosition)
 template<class T>
 inline const GridNode<T>& Grid<T>::GetNode(const V2f& aPosition) const
 {
-	const CU::Vector2<int> pos = GetGridIndex(aPosition);
+	const CommonUtilities::Vector2<int> pos = GetGridIndex(aPosition);
 	return (*this)(pos.x, pos.y);
 }
 
@@ -181,9 +181,9 @@ inline const GridNode<T>& Grid<T>::operator()(const int aX, const int aY) const
 }
 
 template<class T>
-inline CU::Vector2<int> Grid<T>::GetGridIndex(const V2f& aPosition) const
+inline CommonUtilities::Vector2<int> Grid<T>::GetGridIndex(const V2f& aPosition) const
 {
-	return CU::Vector2<int>(CAST(int, floor(aPosition.x / myNodeSize.x)), CAST(int, floor(aPosition.y / myNodeSize.y))) - CU::Vector2<int>(CAST(int, floor(myMin.x / myNodeSize.x)), CAST(int, floor(myMin.y / myNodeSize.y)));
+	return CommonUtilities::Vector2<int>(CAST(int, floor(aPosition.x / myNodeSize.x)), CAST(int, floor(aPosition.y / myNodeSize.y))) - CommonUtilities::Vector2<int>(CAST(int, floor(myMin.x / myNodeSize.x)), CAST(int, floor(myMin.y / myNodeSize.y)));
 }
 
 template<class T>

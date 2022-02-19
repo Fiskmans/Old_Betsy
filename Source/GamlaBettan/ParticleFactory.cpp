@@ -6,19 +6,18 @@
 #include <d3d11.h>
 #include "ShaderCompiler.h"
 #include <fstream>
-#include "WindSystem.h"
 #include "AssetManager.h"
 
 #if USEIMGUI
-#include "Scene.h"
+#include "RenderScene.h"
 #include "Camera.h"
 #endif
 
 #pragma region ParticleSaveVersionHandling
 namespace SavingAndLoading
 {
-	void LoadInto(Particle::Data::Customizable& aParticle,const std::string& aFilepath);
-	void SaveFrom(Particle::Data::Customizable& aParticle,const std::string& aFilepath);
+	void LoadInto(Particle::Data::Customizable& aParticle, const std::string& aFilepath);
+	void SaveFrom(Particle::Data::Customizable& aParticle, const std::string& aFilepath);
 	void Default(Particle::Data::Customizable& aParticle);
 	void Reconstruct(ID3D11Device* aDevice, Particle& aParticle);
 }
@@ -64,13 +63,13 @@ bool ParticleFactory::Init(DirectX11Framework* aFramework)
 
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, 
-		{ "MOVEMENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, 
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "MOVEMENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "DISTANCE", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "LIFETIME", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "UVMIN", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, 
+		{ "UVMIN", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "UVMAX", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "FBTIMER", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
@@ -80,13 +79,6 @@ bool ParticleFactory::Init(DirectX11Framework* aFramework)
 	{
 		SYSERROR("could not create input layout for particle");
 		return false;
-	}
-
-	static bool once = true;
-	if (once)
-	{
-		WindSystem::GetInstance().Init(V3F(2.f, 0.f, 3.f).GetNormalized());
-		once = false;
 	}
 
 	return true;
@@ -118,7 +110,7 @@ ParticleInstance* ParticleFactory::InstantiateParticle(const std::string& aFileP
 #if USEIMGUI
 void EditOverTime(Particle::Data::Customizable::OverTime& aOverTime)
 {
-	ImGui::DragFloat("Size", &aOverTime.mySize,0.01f);
+	ImGui::DragFloat("Size", &aOverTime.mySize, 0.01f);
 	ImGui::ColorPicker4("Color", &aOverTime.myParticleColor.x);
 }
 
@@ -148,7 +140,7 @@ void ParticleFactory::EditParticles()
 
 	if (numberToEdit > myParticalsEditing.size())
 	{
-		for (int i = myParticalsEditing.size(); i < numberToEdit; ++i)
+		for (size_t i = myParticalsEditing.size(); i < numberToEdit; ++i)
 		{
 			if (i == myParticalsEditing.size())
 			{
@@ -161,7 +153,7 @@ void ParticleFactory::EditParticles()
 	}
 	else if (numberToEdit < myParticalsEditing.size())
 	{
-		for (int i = myParticalsEditing.size() - 1; i >= numberToEdit; --i)
+		for (size_t i = myParticalsEditing.size() - 1; i >= numberToEdit; --i)
 		{
 			if (myParticalsEditing[i].instance)
 			{
@@ -195,7 +187,7 @@ void ParticleFactory::EditParticles()
 	}
 	ImGui::Separator();
 	auto it = myParticles.begin();
-	while(it != myParticles.end())
+	while (it != myParticles.end())
 	{
 		if (ImGui::Selectable(it->first.c_str()))
 		{
@@ -207,7 +199,7 @@ void ParticleFactory::EditParticles()
 					particle.editing = it;
 					particle.instance = InstantiateParticle(it->first);
 					particle.instance->SetDirection(direction);
-					Scene::GetInstance().AddToScene(particle.instance);
+					RenderScene::GetInstance().AddToScene(particle.instance);
 
 					shouldClear = false;
 					break;
@@ -221,7 +213,7 @@ void ParticleFactory::EditParticles()
 					if (particle.instance)
 					{
 						particle.editing = myParticles.end();
-						Scene::GetInstance().RemoveFromScene(particle.instance);
+						RenderScene::GetInstance().RemoveFromScene(particle.instance);
 						SAFE_DELETE(particle.instance);
 					}
 				}
@@ -233,7 +225,7 @@ void ParticleFactory::EditParticles()
 						particle.editing = it;
 						particle.instance = InstantiateParticle(it->first);
 						particle.instance->SetDirection(direction);
-						Scene::GetInstance().AddToScene(particle.instance);
+						RenderScene::GetInstance().AddToScene(particle.instance);
 						break;
 					}
 				}
@@ -357,22 +349,22 @@ void ParticleFactory::EditParticles()
 			ImGui::InputFloat3("Max", myParticalsEditing[i].max);
 
 			emitterMinPos.x = myParticalsEditing[i].min[0];
-			emitterMinPos.y =  myParticalsEditing[i].min[1];
-			emitterMinPos.z =  myParticalsEditing[i].min[2];
+			emitterMinPos.y = myParticalsEditing[i].min[1];
+			emitterMinPos.z = myParticalsEditing[i].min[2];
 			emitterMinPos.w = 1;
 
-			emitterMaxPos.x =  myParticalsEditing[i].max[0];
-			emitterMaxPos.y =  myParticalsEditing[i].max[1];
-			emitterMaxPos.z =  myParticalsEditing[i].max[2];
+			emitterMaxPos.x = myParticalsEditing[i].max[0];
+			emitterMaxPos.y = myParticalsEditing[i].max[1];
+			emitterMaxPos.z = myParticalsEditing[i].max[2];
 			emitterMaxPos.w = 1;
 
 			if (emitterMinPos.LengthSqr() < emitterMaxPos.LengthSqr())
 			{
 				instance->SetBounds(emitterMinPos, emitterMaxPos);
 			}
-				
+
 			float before = customizable.mySpawnRate;
-			if (ImGui::DragFloat("Emission Rate",&customizable.mySpawnRate,0.1f,0.001f,10000.f))
+			if (ImGui::DragFloat("Emission Rate", &customizable.mySpawnRate, 0.1f, 0.001f, 10000.f))
 			{
 				if (before > customizable.myParticleLifetime)
 				{
@@ -380,7 +372,7 @@ void ParticleFactory::EditParticles()
 				}
 			}
 			before = customizable.myParticleLifetime;
-			if (ImGui::DragFloat("Lifetime", &customizable.myParticleLifetime,0.1f,0.01f,1000.f))
+			if (ImGui::DragFloat("Lifetime", &customizable.myParticleLifetime, 0.1f, 0.01f, 1000.f))
 			{
 				if (before < customizable.myParticleLifetime)
 				{
@@ -393,7 +385,7 @@ void ParticleFactory::EditParticles()
 			{
 				customizable.mySeperation = 1.f;
 			}
-			ImGui::DragFloat3("Gravity xyz", &customizable.myGravity.x,0.1f, -20.f, 20.f);
+			ImGui::DragFloat3("Gravity xyz", &customizable.myGravity.x, 0.1f, -20.f, 20.f);
 			ImGui::SameLine();
 			if (ImGui::Button("Zero"))
 			{
@@ -401,7 +393,7 @@ void ParticleFactory::EditParticles()
 			}
 
 			ImGui::DragFloat("Speed", &customizable.myParticleSpeed);
-			ImGui::DragFloat("Drag", &customizable.myDrag,0.01f,0.0f,100.0f);
+			ImGui::DragFloat("Drag", &customizable.myDrag, 0.01f, 0.0f, 100.0f);
 
 			ImGui::DragFloat("Time Per Frame", &customizable.myFlipBook.myTime);
 			ImGui::DragInt("Pages", &customizable.myFlipBook.myPages);
@@ -467,13 +459,13 @@ namespace SavingAndLoading
 
 	namespace Version0
 	{
-		void LoadInto(LegacyParticleTypes::Customizable_V1& aParticle, Header& aHeader,std::ifstream& aFileStream)
+		void LoadInto(LegacyParticleTypes::Customizable_V1& aParticle, Header& /*aHeader*/, std::ifstream& aFileStream)
 		{
 			LegacyParticleTypes::Customizable_V0 buffer;
 			aFileStream.read(reinterpret_cast<char*>(&buffer), sizeof(LegacyParticleTypes::Customizable_V0));
 			aParticle.myEnd.myParticleColor = buffer.myEnd.myParticleColor;
 			aParticle.myEnd.mySize = buffer.myEnd.mySize;
-			memcpy(aParticle.myFilePath,buffer.myFilePath, sizeof(buffer.myFilePath));
+			memcpy(aParticle.myFilePath, buffer.myFilePath, sizeof(buffer.myFilePath));
 			aParticle.myParticleLifetime = buffer.myParticleLifetime;
 			aParticle.myParticleSpeed = buffer.myParticleSpeed;
 
@@ -481,7 +473,7 @@ namespace SavingAndLoading
 			aParticle.mySpawnRate = buffer.mySpawnRate;
 			aParticle.myStart.myParticleColor = buffer.myStart.myParticleColor;
 			aParticle.myStart.mySize = buffer.myStart.mySize;
-			aParticle.myGravity = V3F(0,0,0);
+			aParticle.myGravity = V3F(0, 0, 0);
 			aParticle.myDrag = 0.0f;
 		}
 	}
@@ -519,7 +511,7 @@ namespace SavingAndLoading
 			aParticle.myFlipBook.mySizeY = 0;
 		}
 	}
-	void LoadInto(Particle::Data::Customizable& aParticle, Header& aHeader, std::ifstream& aFileStream)
+	void LoadInto(Particle::Data::Customizable& aParticle, Header& /*aHeader*/, std::ifstream& aFileStream)
 	{
 		aFileStream.read(reinterpret_cast<char*>(&aParticle), sizeof(Particle::Data::Customizable));
 	}
@@ -531,7 +523,7 @@ namespace SavingAndLoading
 		static_assert(sizeof(Header) == 32, "Header struct is invalid");
 		Header header;
 		std::ifstream infile;
-		infile.open(aFilepath,std::ios::binary | std::ios::in);			//Open file
+		infile.open(aFilepath, std::ios::binary | std::ios::in);			//Open file
 		infile.read(reinterpret_cast<char*>(&header), sizeof(Header));	//Read header
 		if (infile)														//Load using appropriate loader
 		{
@@ -548,7 +540,7 @@ namespace SavingAndLoading
 				}
 				else
 				{
-					LOGWARNING("Particle is outdated and will be loaded using a legacy loader. file version: " + std::to_string(header.myVersionNumber) + " code version: " + std::to_string(CurrentVersion), aFilepath);
+					LOGWARNING("Particle is outdated and will be loaded using a legacy loader. file version: " + std::to_string(header.myVersionNumber) + " code version: " + std::to_string(CurrentVersion));
 					switch (header.myVersionNumber)
 					{
 					case 0:
@@ -572,7 +564,7 @@ namespace SavingAndLoading
 	{
 		static_assert(CHAR_BIT == 8, "Assumtion wrong");
 		static_assert(sizeof(Header) == 32, "Header struct is invalid");
-		
+
 		Header header;
 		header.myVersionNumber = CurrentVersion;
 
@@ -580,12 +572,12 @@ namespace SavingAndLoading
 		outfile.open(aFilepath, std::ios::out | std::ios::binary);
 		outfile.write(reinterpret_cast<char*>(&header), sizeof(Header));
 		outfile.write(reinterpret_cast<char*>(&aParticle), sizeof(Particle::Data::Customizable));
-		
+
 
 	}
 	void Reconstruct(ID3D11Device* aDevice, Particle& aParticle)
 	{
-		ID3D11Buffer* buffer = Constructing::CreateBufferFor(aDevice,aParticle.GetData());
+		ID3D11Buffer* buffer = Constructing::CreateBufferFor(aDevice, aParticle.GetData());
 
 		if (buffer)
 		{
@@ -606,8 +598,8 @@ namespace SavingAndLoading
 		aParticle.myEnd.myParticleColor = { 1,0,0,0 };
 		aParticle.myEnd.mySize = 5;
 
-		
-		strcpy_s(aParticle.myFilePath,96, "Data/Textures/gamlaBettan_Alpha.dds");
+
+		strcpy_s(aParticle.myFilePath, 96, "Data/Textures/gamlaBettan_Alpha.dds");
 	}
 }
 

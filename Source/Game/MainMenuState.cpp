@@ -5,7 +5,7 @@
 #include "SpriteInstance.h"
 #include <Xinput.h>
 #include "AssetManager.h"
-#include "GamlaBettan\Scene.h"
+#include "GamlaBettan\RenderScene.h"
 
 MainMenuState::MainMenuState(bool aShouldDeleteOnPop) :
 	BaseState(aShouldDeleteOnPop),
@@ -35,11 +35,11 @@ MainMenuState::~MainMenuState()
 	WIPE(*this);
 }
 
-void MainMenuState::Update(const float aDeltaTime)
+void MainMenuState::Update()
 {
 	if (myGameStateToStart)
 	{
-		myGameStateToStart->PreSetup(aDeltaTime);
+		myGameStateToStart->PreSetup();
 	}
 
 #if DIRECTTOGAME
@@ -92,8 +92,8 @@ void MainMenuState::Activate()
 		button->Enable();
 	}
 
-	Scene::GetInstance().AddToScene(myMousePointer);
-	Scene::GetInstance().AddToScene(myBackground);
+	RenderScene::GetInstance().AddToScene(myMousePointer);
+	RenderScene::GetInstance().AddToScene(myBackground);
 }
 
 void MainMenuState::Deactivate()
@@ -103,8 +103,8 @@ void MainMenuState::Deactivate()
 		button->Disable();
 	}
 
-	Scene::GetInstance().RemoveFromScene(myMousePointer);
-	Scene::GetInstance().RemoveFromScene(myBackground);
+	RenderScene::GetInstance().RemoveFromScene(myMousePointer);
+	RenderScene::GetInstance().RemoveFromScene(myBackground);
 }
 
 void MainMenuState::Unload()
@@ -167,7 +167,7 @@ GameState* MainMenuState::CreateGameState(const int& aStartLevel)
 	GameState* state = new GameState();
 
 	if (state->Init(myStateInitData.myInputManager,
-		myStateInitData.mySpriteFactory, myStateInitData.myLightLoader, myStateInitData.myFrameWork, myStateInitData.myAudioManager, myStateInitData.mySpriteRenderer) == false)
+		myStateInitData.mySpriteFactory, myStateInitData.myLightLoader, myStateInitData.myFrameWork, myStateInitData.myAudioManager) == false)
 	{
 		delete state;
 		return nullptr;

@@ -77,7 +77,6 @@ void HighlightRenderer::Render(const std::vector<class ModelInstance*>& aModels,
 
 	std::vector<class ModelInstance*> filtered;
 	Model* model = nullptr;
-	Model::ModelData* modelData = nullptr;
 
 
 	HRESULT result;
@@ -170,8 +169,16 @@ void HighlightRenderer::Render(const std::vector<class ModelInstance*>& aModels,
 			UINT vertexOffset = 0;
 
 			myContext->IASetVertexBuffers(0, 1, &modelData->myVertexBuffer, &modelData->myStride, &vertexOffset);
-			myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
-			myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
+			if (modelData->myIsIndexed)
+			{
+				myContext->IASetIndexBuffer(modelData->myIndexBuffer, modelData->myIndexBufferFormat, 0);
+				myContext->DrawIndexed(modelData->myNumberOfIndexes, 0, 0);
+			}
+			else
+			{
+				myContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_R8_TYPELESS, 0);
+				myContext->Draw(modelData->myNumberOfVertexes, 0);
+			}
 		}
 	}
 }

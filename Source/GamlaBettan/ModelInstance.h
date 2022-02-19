@@ -74,7 +74,7 @@ private:
 
 	bool myIsAttachedToBone;
 	ModelInstance* myAttachedToModel;
-	int myBoneIndex;
+	size_t myBoneIndex;
 
 	GBPhysXCharacter* myGBPhysXCharacter = nullptr;
 

@@ -84,6 +84,9 @@ void WwiseFramework::UnlloadBank(const char* aBankName)
 {
 	AKRESULT eResult = AK::SoundEngine::UnloadBank(aBankName, NULL);
 	assert(eResult == AK_Success);
+#ifndef _DEBUG
+	UNUSED(eResult);
+#endif
 }
 
 

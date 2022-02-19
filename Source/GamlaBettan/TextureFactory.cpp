@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "FullscreenTextureFactory.h"
+#include "TextureFactory.h"
 #include <d3d11.h>
 #include "DirectX11Framework.h"
 
-bool FullscreenTextureFactory::Init(DirectX11Framework* aFramework)
+bool TextureFactory::Init(DirectX11Framework* aFramework)
 {
 	myFramework = aFramework;
 
@@ -14,7 +14,52 @@ bool FullscreenTextureFactory::Init(DirectX11Framework* aFramework)
 	return !!myFramework;
 }
 
-FullscreenTexture FullscreenTextureFactory::CreateTexture(CU::Vector2<unsigned int> aSize, DXGI_FORMAT aFormat, const std::string& aName)
+UpdatableTexture* TextureFactory::CreateUpdatableTexture(CommonUtilities::Vector2<unsigned int> aSize, const std::string& aName)
+{
+	HRESULT result;
+
+	D3D11_TEXTURE2D_DESC desc;
+	WIPE(desc);
+	desc.Width = aSize.x;
+	desc.Height = aSize.y;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R32_FLOAT;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+
+	DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(aSize.x * aSize.y * sizeof(float)), aName, "Engine Texture");
+
+	ID3D11Texture2D* texture;
+	result = myFramework->GetDevice()->CreateTexture2D(&desc, nullptr, &texture);
+	if (FAILED(result))
+	{
+		SYSERROR("Could not create texture in fullscreen texture factory :c");
+		return nullptr;
+	}
+
+	UpdatableTexture* returnVal = new UpdatableTexture(aSize);
+
+	ID3D11ShaderResourceView* shaderResource;
+	result = myFramework->GetDevice()->CreateShaderResourceView(texture, nullptr, &shaderResource);
+	if (FAILED(result))
+	{
+		SYSERROR("Could not create shader resource in fullscreen texture factory :c");
+		return nullptr;
+	}
+	returnVal->myShaderResource = shaderResource;
+	returnVal->myContext = myFramework->GetContext();
+	returnVal->myTexture = texture;
+	returnVal->myViewport = new D3D11_VIEWPORT({ 0.f, 0.f, static_cast<float>(aSize.x), static_cast<float>(aSize.y), 0.f, 1.f });
+
+	return returnVal;
+}
+
+Texture TextureFactory::CreateTexture(CommonUtilities::Vector2<unsigned int> aSize, DXGI_FORMAT aFormat, const std::string& aName)
 {
 	HRESULT result;
 
@@ -32,24 +77,24 @@ FullscreenTexture FullscreenTextureFactory::CreateTexture(CU::Vector2<unsigned i
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = 0;
 
-	DirectX11Framework::AddGraphicsMemoryUsage(aSize.x*aSize.y*DirectX11Framework::FormatToSizeLookup[aFormat],aName, "Engine Texture");
+	DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(aSize.x * aSize.y * DirectX11Framework::FormatToSizeLookup[aFormat]), aName, "Engine Texture");
 
 	ID3D11Texture2D* texture;
 	result = myFramework->GetDevice()->CreateTexture2D(&desc, nullptr, &texture);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not create texture in fullscreen texture factory :c");
+		SYSERROR("Could not create texture in texture factory :c");
 		return {};
 	}
 
-	FullscreenTexture returnVal;
-	returnVal = CreateTexture(texture);
+	Texture returnVal;
+	CreateTexture(texture, returnVal);
 
 	ID3D11ShaderResourceView* shaderResource;
 	result = myFramework->GetDevice()->CreateShaderResourceView(texture, nullptr, &shaderResource);
 	if (FAILED(result))
 	{
-		SYSERROR("Could not create shader resource in fullscreen texture factory :c");
+		SYSERROR("Could not create shader resource in texture factory :c");
 		return {};
 	}
 
@@ -57,7 +102,7 @@ FullscreenTexture FullscreenTextureFactory::CreateTexture(CU::Vector2<unsigned i
 	return returnVal;
 }
 
-FullscreenTexture FullscreenTextureFactory::CreateTexture(ID3D11Texture2D* aTexture)
+void TextureFactory::CreateTexture(ID3D11Texture2D* aTexture, Texture& aTextureObject)
 {
 	HRESULT result;
 
@@ -66,9 +111,9 @@ FullscreenTexture FullscreenTextureFactory::CreateTexture(ID3D11Texture2D* aText
 	if (FAILED(result))
 	{
 		SYSERROR("Could not create render target in fullscreen texture factory :c");
-		return {};
+		return;
 	}
-
+	aTextureObject.myRenderTarget = renderTarget;
 	D3D11_VIEWPORT* viewport = nullptr;
 	if (aTexture)
 	{
@@ -77,16 +122,12 @@ FullscreenTexture FullscreenTextureFactory::CreateTexture(ID3D11Texture2D* aText
 		viewport = new D3D11_VIEWPORT({ 0.f, 0.f, static_cast<float>(desc.Width), static_cast<float>(desc.Height), 0.f, 1.f });
 	}
 
-	FullscreenTexture returnVal;
-	returnVal.myContext = myFramework->GetContext();
-	returnVal.myTexture = aTexture;
-	returnVal.myRenderTarget = renderTarget;
-	returnVal.myViewport = viewport;
-
-	return returnVal;
+	aTextureObject.myContext = myFramework->GetContext();
+	aTextureObject.myTexture = aTexture;
+	aTextureObject.myViewport = viewport;
 }
 
-FullscreenTexture FullscreenTextureFactory::CreateDepth(CU::Vector2<unsigned int> aSize, const std::string& aName)
+Texture TextureFactory::CreateDepth(CommonUtilities::Vector2<unsigned int> aSize, const std::string& aName)
 {
 	HRESULT result;
 
@@ -103,7 +144,7 @@ FullscreenTexture FullscreenTextureFactory::CreateDepth(CU::Vector2<unsigned int
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = 0;
 
-	DirectX11Framework::AddGraphicsMemoryUsage(aSize.x * aSize.y * DirectX11Framework::FormatToSizeLookup[desc.Format], aName, "Engine Depth");
+	DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(aSize.x * aSize.y * DirectX11Framework::FormatToSizeLookup[desc.Format]), aName, "Engine Depth");
 	ID3D11Texture2D* texture;
 	result = myFramework->GetDevice()->CreateTexture2D(&desc, nullptr, &texture);
 	if (FAILED(result))
@@ -128,7 +169,7 @@ FullscreenTexture FullscreenTextureFactory::CreateDepth(CU::Vector2<unsigned int
 	sr_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
 	sr_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	sr_desc.Texture2D.MostDetailedMip = 0;
-	sr_desc.Texture2D.MipLevels = -1;
+	sr_desc.Texture2D.MipLevels = static_cast<UINT>(-1);
 
 	ID3D11ShaderResourceView* resourceView;
 	result = myFramework->GetDevice()->CreateShaderResourceView(texture, &sr_desc, &resourceView);
@@ -139,7 +180,7 @@ FullscreenTexture FullscreenTextureFactory::CreateDepth(CU::Vector2<unsigned int
 
 	D3D11_VIEWPORT* viewport = new D3D11_VIEWPORT({ 0.f, 0.f, static_cast<float>(aSize.x), static_cast<float>(aSize.y), 0.f, 1.f });
 
-	FullscreenTexture returnVal;
+	Texture returnVal;
 	returnVal.myContext = myFramework->GetContext();
 	returnVal.myTexture = texture;
 	returnVal.myDepth = depth;
@@ -149,7 +190,7 @@ FullscreenTexture FullscreenTextureFactory::CreateDepth(CU::Vector2<unsigned int
 	return returnVal;
 }
 
-GBuffer FullscreenTextureFactory::CreateGBuffer(const CU::Vector2<unsigned int>& aSize, const std::string& aName)
+GBuffer TextureFactory::CreateGBuffer(const CommonUtilities::Vector2<unsigned int>& aSize, const std::string& aName)
 {
 	HRESULT result;
 
@@ -182,13 +223,13 @@ GBuffer FullscreenTextureFactory::CreateGBuffer(const CU::Vector2<unsigned int>&
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = 0;
 	{
-		size_t bpp = 0;
-		for (auto& i : formats)
+		float bpp = 0;
+		for (DXGI_FORMAT& format : formats)
 		{
-			bpp += DirectX11Framework::FormatToSizeLookup[i];
+			bpp += DirectX11Framework::FormatToSizeLookup[format];
 		}
 
-		DirectX11Framework::AddGraphicsMemoryUsage(aSize.x * aSize.y * bpp, aName, "Engine GBuffer");
+		DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(aSize.x * aSize.y * bpp), aName, "Engine GBuffer");
 	}
 
 	GBuffer buffer;

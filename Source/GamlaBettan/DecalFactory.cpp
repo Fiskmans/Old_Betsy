@@ -38,9 +38,9 @@ Decal* DecalFactory::LoadDecal(const std::string& aDecalPath, V3F aRotation, V3F
 		{
 			decal->myTextures.push_back(AssetManager::GetInstance().GetTexture(textureFilePath));
 		};
-		for (auto& i : root["Texture"].Get<FiskJSON::Array>())
+		for (auto& i : root["Texture"].Get<FiskJSON::ArrayWrapper>())
 		{
-			if (i->GetIf(textureFilePath))
+			if (i.GetIf(textureFilePath))
 			{
 				decal->myTextures.push_back(AssetManager::GetInstance().GetTexture(textureFilePath));
 			};
@@ -64,7 +64,6 @@ Decal* DecalFactory::LoadDecal(const std::string& aDecalPath, Camera* aCameraToC
 	FiskJSON::Object root;
 	root.Parse(Tools::ReadWholeFile(aDecalPath));
 	std::string shaderFilePath;
-	std::string textureFilePath;
 	float fov;
 	float range;
 	if (root["ShaderPath"].GetIf(shaderFilePath) &&
@@ -82,9 +81,9 @@ Decal* DecalFactory::LoadDecal(const std::string& aDecalPath, Camera* aCameraToC
 		{
 			decal->myTextures.push_back(AssetManager::GetInstance().GetTexture(textureFilePath));
 		};
-		for (auto& i : root["Texture"].Get<FiskJSON::Array>())
+		for (auto& i : root["Texture"].Get<FiskJSON::ArrayWrapper>())
 		{
-			if (i->GetIf(textureFilePath))
+			if (i.GetIf(textureFilePath))
 			{
 				decal->myTextures.push_back(AssetManager::GetInstance().GetTexture(textureFilePath));
 			};
@@ -93,14 +92,14 @@ Decal* DecalFactory::LoadDecal(const std::string& aDecalPath, Camera* aCameraToC
 		decal->myPixelShader = AssetManager::GetInstance().GetPixelShader(shaderFilePath);
 
 		size_t count = 0;
-		for (auto& i : root["CustomData"].Get<FiskJSON::Array>())
+		for (auto& i : root["CustomData"].Get<FiskJSON::ArrayWrapper>())
 		{
 			if (count > 3)
 			{
 				SYSERROR("custom data has too many elements", aDecalPath);
 				break;
 			}
-			if (!i->GetIf(decal->myCustomData[count++]))
+			if (!i.GetIf(decal->myCustomData[count++]))
 			{
 				SYSERROR("Custom data can not be converted to float", aDecalPath);
 			}

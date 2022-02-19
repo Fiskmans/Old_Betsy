@@ -1,22 +1,21 @@
 #include "pch.h"
-#include "Scene.h"
+#include "RenderScene.h"
 #include "Camera.h"
 #include "ModelInstance.h"
 #include "PointLight.h"
 #include "ParticleInstance.h"
 #include "CommonUtilities\Ray.hpp"
 #include "CommonUtilities\Intersection.hpp"
-#include "WindSystem.h"
 #include "CommonUtilities\Sphere.hpp"
 #include "SpriteInstance.h"
 #include "TextInstance.h"
 
-Scene::~Scene()
+RenderScene::~RenderScene()
 {
 	RemoveAll();
 }
 
-void Scene::Update(float aDeltaTime)
+void RenderScene::Update(float aDeltaTime)
 {
 	{
 		PERFORMANCETAG("Particles");
@@ -33,13 +32,9 @@ void Scene::Update(float aDeltaTime)
 			delete myParticles[i];
 		}
 	}
-	{
-		PERFORMANCETAG("Wind System");
-		WindSystem::GetInstance().Update(aDeltaTime);
-	}
 }
 
-void Scene::RefreshAll(float aAmount)
+void RenderScene::RefreshAll(float aAmount)
 {
 	for (auto& i : myParticles)
 	{
@@ -47,24 +42,24 @@ void Scene::RefreshAll(float aAmount)
 	}
 }
 
-void Scene::AddToScene(ModelInstance* aModel)
+void RenderScene::AddToScene(ModelInstance* aModel)
 {
 	PERFORMANCETAG("Added model to scene");
 	myPreCull.push_back(aModel);
 	myModels.push_back(aModel);
 }
 
-void Scene::AddToScene(SpotLight* aSpotLight)
+void RenderScene::AddToScene(SpotLight* aSpotLight)
 {
 	mySpotlights.push_back(aSpotLight);
 }
 
-void Scene::AddToScene(Decal* aDecal)
+void RenderScene::AddToScene(Decal* aDecal)
 {
 	myDecals.push_back(aDecal);
 }
 
-void Scene::AddToScene(SpriteInstance* aSprite)
+void RenderScene::AddToScene(SpriteInstance* aSprite)
 {
 	if (aSprite)
 	{
@@ -80,7 +75,7 @@ void Scene::AddToScene(SpriteInstance* aSprite)
 	}
 }
 
-void Scene::AddToScene(TextInstance* aText)
+void RenderScene::AddToScene(TextInstance* aText)
 {
 	if (!aText->HadBeenAddedToScene())
 	{
@@ -89,7 +84,7 @@ void Scene::AddToScene(TextInstance* aText)
 	}
 }
 
-void Scene::RemoveFromScene(ModelInstance* aModel)
+void RenderScene::RemoveFromScene(ModelInstance* aModel)
 {
 	auto at = std::find(myPreCull.begin(), myPreCull.end(), aModel);
 	if (at != myPreCull.end())
@@ -107,22 +102,22 @@ void Scene::RemoveFromScene(ModelInstance* aModel)
 	}
 }
 
-void Scene::SetMainCamera(Camera* aCamera)
+void RenderScene::SetMainCamera(Camera* aCamera)
 {
 	myMainCamera = aCamera;
 }
 
-void Scene::SetEnvironmentLight(EnvironmentLight* aLight)
+void RenderScene::SetEnvironmentLight(EnvironmentLight* aLight)
 {
 	myEnvironmentLight = aLight;
 }
 
-void Scene::AddToScene(PointLight* aLight)
+void RenderScene::AddToScene(PointLight* aLight)
 {
 	myPointLights.push_back(aLight);
 }
 
-void Scene::RemoveFromScene(PointLight* aLight)
+void RenderScene::RemoveFromScene(PointLight* aLight)
 {
 	auto it = std::find(myPointLights.begin(), myPointLights.end(), aLight);
 
@@ -135,7 +130,7 @@ void Scene::RemoveFromScene(PointLight* aLight)
 	SYSWARNING("Tried to remove invalid point light :c");
 }
 
-void Scene::RemoveFromScene(ParticleInstance* aParticle)
+void RenderScene::RemoveFromScene(ParticleInstance* aParticle)
 {
 	for (size_t i = 0; i < myParticles.size(); i++)
 	{
@@ -147,7 +142,7 @@ void Scene::RemoveFromScene(ParticleInstance* aParticle)
 	}
 }
 
-void Scene::RemoveFromScene(Decal* aDecal)
+void RenderScene::RemoveFromScene(Decal* aDecal)
 {
 	for (size_t i = 0; i < myDecals.size(); i++)
 	{
@@ -159,7 +154,7 @@ void Scene::RemoveFromScene(Decal* aDecal)
 	}
 }
 
-void Scene::RemoveFromScene(SpotLight* aSpotLight)
+void RenderScene::RemoveFromScene(SpotLight* aSpotLight)
 {
 	for (size_t i = 0; i < mySpotlights.size(); i++)
 	{
@@ -171,7 +166,7 @@ void Scene::RemoveFromScene(SpotLight* aSpotLight)
 	}
 }
 
-void Scene::RemoveFromScene(SpriteInstance* aSprite)
+void RenderScene::RemoveFromScene(SpriteInstance* aSprite)
 {
 	for (size_t i = 0; i < mySprites.size(); i++)
 	{
@@ -185,7 +180,7 @@ void Scene::RemoveFromScene(SpriteInstance* aSprite)
 
 }
 
-void Scene::RemoveFromScene(TextInstance* aText)
+void RenderScene::RemoveFromScene(TextInstance* aText)
 {
 	for (size_t i = 0; i < myTexts.size(); i++)
 	{
@@ -200,7 +195,7 @@ void Scene::RemoveFromScene(TextInstance* aText)
 	SYSWARNING("Tried to remove invalid text :c");
 }
 
-void Scene::RemoveAll()
+void RenderScene::RemoveAll()
 {
 	myModels.clear();
 	for (auto& i : myParticles)
@@ -214,7 +209,7 @@ void Scene::RemoveAll()
 	myTexts.clear();
 }
 
-void Scene::SetSkybox(ModelInstance* aSkybox)
+void RenderScene::SetSkybox(ModelInstance* aSkybox)
 {
 	if (aSkybox->GetModelAsset().GetType() != ModelAsset::AssetType::SkyBox)
 	{
@@ -224,34 +219,62 @@ void Scene::SetSkybox(ModelInstance* aSkybox)
 	mySkybox = aSkybox;
 }
 
-std::vector<ParticleInstance*> Scene::GetParticles()
+#if USEIMGUI
+void RenderScene::Imgui()
+{
+	WindowControl::Window("Scene", [this]()
+	{
+		for (ModelInstance* model : myModels)
+		{
+			ImGui::PushID(model);
+			ImGui::Button("Model");
+			if (ImGui::IsItemHovered())
+			{
+				model->SetIsHighlighted(true);
+			}
+			else
+			{
+				if (ImGui::IsWindowHovered())
+				{
+					model->SetIsHighlighted(false);
+				}
+			}
+			ImGui::SameLine();
+			ImGui::Text("%p", model);
+			ImGui::PopID();
+		}
+	});
+}
+#endif
+
+std::vector<ParticleInstance*> RenderScene::GetParticles()
 {
 	return myParticles;
 }
 
-ModelInstance* Scene::GetSkybox()
+ModelInstance* RenderScene::GetSkybox()
 {
 	return mySkybox;
 }
 
-std::vector<ModelInstance*> Scene::Cull(const CommonUtilities::Sphere<float>& aBoundingSphere)
+std::vector<ModelInstance*> RenderScene::Cull(const CommonUtilities::Sphere<float>& aBoundingSphere)
 {
 	std::vector<ModelInstance*> filtered;
 	std::copy_if(myModels.begin(), myModels.end(), std::back_inserter(filtered), [&aBoundingSphere](ModelInstance* inst) {return CommonUtilities::IntersectionSphereSphere(inst->GetGraphicBoundingSphere(), aBoundingSphere); });
 	return filtered;
 }
 
-std::vector<ModelInstance*> Scene::Cull(Camera* aCamera)
+std::vector<ModelInstance*> RenderScene::Cull(Camera* aCamera)
 {
 	return Cull(aCamera, myModels, 2.f);
 }
 
-std::vector<ModelInstance*> Scene::Cull(Camera* aCamera, std::vector<ModelInstance*>& aSelection, float aRangeModifier)
+std::vector<ModelInstance*> RenderScene::Cull(Camera* aCamera, std::vector<ModelInstance*>& aSelection, float aRangeModifier)
 {
-	return Cull(aCamera->GenerateFrustum(), aSelection, aCamera->GetPosition(), aRangeModifier);
+	return Cull(aCamera->GenerateFrustum(), aSelection, aRangeModifier);
 }
 
-std::vector<ModelInstance*> Scene::Cull(const CommonUtilities::PlaneVolume<float>& aPlaneVolume, std::vector<ModelInstance*>& aSelection, const V3F& aCameraPos, float aRangeModifier)
+std::vector<ModelInstance*> RenderScene::Cull(const CommonUtilities::PlaneVolume<float>& aPlaneVolume, std::vector<ModelInstance*>& aSelection, float aRangeModifier)
 {
 	static std::vector<ModelInstance*> culledModels;
 	culledModels.clear();
@@ -268,22 +291,22 @@ std::vector<ModelInstance*> Scene::Cull(const CommonUtilities::PlaneVolume<float
 	return culledModels;
 }
 
-std::vector<PointLight*>& Scene::GetPointLights()
+std::vector<PointLight*>& RenderScene::GetPointLights()
 {
 	return myPointLights;
 }
 
-std::vector<SpotLight*>& Scene::GetSpotLights()
+std::vector<SpotLight*>& RenderScene::GetSpotLights()
 {
 	return mySpotlights;
 }
 
-std::vector<Decal*>& Scene::GetDecals()
+std::vector<Decal*>& RenderScene::GetDecals()
 {
 	return myDecals;
 }
 
-std::array<PointLight*, NUMBEROFPOINTLIGHTS> Scene::CullPointLights(ModelInstance* aModel)
+std::array<PointLight*, NUMBEROFPOINTLIGHTS> RenderScene::CullPointLights(ModelInstance* aModel)
 {
 	std::array<PointLight*, NUMBEROFPOINTLIGHTS> returnArr = { nullptr };
 
@@ -304,37 +327,37 @@ std::array<PointLight*, NUMBEROFPOINTLIGHTS> Scene::CullPointLights(ModelInstanc
 	return returnArr;
 }
 
-const std::vector<SpriteInstance*>& Scene::GetSprites()
+const std::vector<SpriteInstance*>& RenderScene::GetSprites()
 {
 	return mySprites;
 }
 
-const std::vector<TextInstance*>& Scene::GetText()
+const std::vector<TextInstance*>& RenderScene::GetText()
 {
 	return myTexts;
 }
 
-Camera* Scene::GetMainCamera()
+Camera* RenderScene::GetMainCamera()
 {
 	return myMainCamera;
 }
 
-EnvironmentLight* Scene::GetEnvironmentLight()
+EnvironmentLight* RenderScene::GetEnvironmentLight()
 {
 	return myEnvironmentLight;
 }
 
-std::vector<ModelInstance*>::iterator Scene::begin()
+std::vector<ModelInstance*>::iterator RenderScene::begin()
 {
 	return myModels.begin();
 }
 
-std::vector<ModelInstance*>::iterator Scene::end()
+std::vector<ModelInstance*>::iterator RenderScene::end()
 {
 	return myModels.end();
 }
 
-void Scene::AddToScene(ParticleInstance* aParticle)
+void RenderScene::AddToScene(ParticleInstance* aParticle)
 {
 	myParticles.push_back(aParticle);
 }

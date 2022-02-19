@@ -35,7 +35,7 @@
 
 Index of this file:
 
-DOCUMENTATION
+DOCommonUtilitiesMENTATION
 
 - MISSION STATEMENT
 - END-USER GUIDE
@@ -85,7 +85,7 @@ CODE
 */
 
 //-----------------------------------------------------------------------------
-// DOCUMENTATION
+// DOCommonUtilitiesMENTATION
 //-----------------------------------------------------------------------------
 
 /*
@@ -223,7 +223,7 @@ CODE
      ImGui_ImplWin32_Shutdown();
      ImGui::DestroyContext();
 
- EXHIBIT 2: IMPLEMENTING CUSTOM BACKEND / CUSTOM ENGINE
+ EXHIBIT 2: IMPLEMENTING CommonUtilitiesSTOM BACKEND / CommonUtilitiesSTOM ENGINE
 
      // Application init: create a dear imgui context, setup some options, load fonts
      ImGui::CreateContext();
@@ -766,8 +766,8 @@ CODE
 // [SECTION] INCLUDES
 //-------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
-#define _CRT_SECURE_NO_WARNINGS
+#if defined(_MSC_VER) && !defined(_CRT_SECommonUtilitiesRE_NO_WARNINGS)
+#define _CRT_SECommonUtilitiesRE_NO_WARNINGS
 #endif
 
 #include "imgui.h"
@@ -3374,8 +3374,8 @@ ImGuiContext* ImGui::GetCurrentContext()
 
 void ImGui::SetCurrentContext(ImGuiContext* ctx)
 {
-#ifdef IMGUI_SET_CURRENT_CONTEXT_FUNC
-    IMGUI_SET_CURRENT_CONTEXT_FUNC(ctx); // For custom thread-based hackery you may want to have control over this.
+#ifdef IMGUI_SET_CommonUtilitiesRRENT_CONTEXT_FUNC
+    IMGUI_SET_CommonUtilitiesRRENT_CONTEXT_FUNC(ctx); // For custom thread-based hackery you may want to have control over this.
 #else
     GImGui = ctx;
 #endif
@@ -5675,8 +5675,8 @@ void ImGui::RenderWindowTitleBarContents(ImGuiWindow* window, const ImRect& titl
 
     // Title bar text (with: horizontal alignment, avoiding collapse/close button, optional "unsaved document" marker)
     // FIXME: Refactor text alignment facilities along with RenderText helpers, this is WAY too much messy code..
-    const char* UNSAVED_DOCUMENT_MARKER = "*";
-    const float marker_size_x = (flags & ImGuiWindowFlags_UnsavedDocument) ? CalcTextSize(UNSAVED_DOCUMENT_MARKER, NULL, false).x : 0.0f;
+    const char* UNSAVED_DOCommonUtilitiesMENT_MARKER = "*";
+    const float marker_size_x = (flags & ImGuiWindowFlags_UnsavedDocument) ? CalcTextSize(UNSAVED_DOCommonUtilitiesMENT_MARKER, NULL, false).x : 0.0f;
     const ImVec2 text_size = CalcTextSize(name, NULL, true) + ImVec2(marker_size_x, 0.0f);
 
     // As a nice touch we try to ensure that centered title text doesn't get affected by visibility of Close/Collapse button,
@@ -5702,7 +5702,7 @@ void ImGui::RenderWindowTitleBarContents(ImGuiWindow* window, const ImRect& titl
     {
         ImVec2 marker_pos = ImVec2(ImMax(layout_r.Min.x, layout_r.Min.x + (layout_r.GetWidth() - text_size.x) * style.WindowTitleAlign.x) + text_size.x, layout_r.Min.y) + ImVec2(2 - marker_size_x, 0.0f);
         ImVec2 off = ImVec2(0.0f, IM_FLOOR(-g.FontSize * 0.25f));
-        RenderTextClipped(marker_pos + off, layout_r.Max + off, UNSAVED_DOCUMENT_MARKER, NULL, NULL, ImVec2(0, style.WindowTitleAlign.y), &clip_r);
+        RenderTextClipped(marker_pos + off, layout_r.Max + off, UNSAVED_DOCommonUtilitiesMENT_MARKER, NULL, NULL, ImVec2(0, style.WindowTitleAlign.y), &clip_r);
     }
 }
 
@@ -11212,7 +11212,7 @@ void ImGui::ShowMetricsWindow(bool* p_open)
         Text("DragDrop: %d, SourceId = 0x%08X, Payload \"%s\" (%d bytes)", g.DragDropActive, g.DragDropPayload.SourceId, g.DragDropPayload.DataType, g.DragDropPayload.DataSize);
         Unindent();
 
-        Text("NAV,FOCUS");
+        Text("NAV,FOCommonUtilitiesS");
         Indent();
         Text("NavWindow: '%s'", g.NavWindow ? g.NavWindow->Name : "NULL");
         Text("NavId: 0x%08X, NavLayer: %d", g.NavId, g.NavLayer);
@@ -11331,7 +11331,7 @@ void ImGui::DebugNodeDrawList(ImGuiWindow* window, const ImDrawList* draw_list, 
     if (draw_list == GetWindowDrawList())
     {
         SameLine();
-        TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "CURRENTLY APPENDING"); // Can't display stats for active draw list! (we don't have the data double-buffered)
+        TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "CommonUtilitiesRRENTLY APPENDING"); // Can't display stats for active draw list! (we don't have the data double-buffered)
         if (node_open)
             TreePop();
         return;

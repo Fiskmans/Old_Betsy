@@ -194,7 +194,7 @@ void ModelInstance::SetupanimationMatrixes(std::array<CommonUtilities::Matrix4x4
 }
 
 #if USEIMGUI
-bool ModelInstance::ImGuiNode(std::map<std::string, std::vector<std::string>>& aFiles, Camera* aCamera)
+bool ModelInstance::ImGuiNode(std::map<std::string, std::vector<std::string>>& /*aFiles*/, Camera* aCamera)
 {
 	CommonUtilities::Vector3<float> pos = GetPosition();
 	if (ImGui::DragFloat3("Position", &pos.x, 0.1f))
@@ -261,7 +261,6 @@ bool ModelInstance::ImGuiNode(std::map<std::string, std::vector<std::string>>& a
 
 	if (ImGui::Button("Find"))
 	{
-		CommonUtilities::Vector3<float> pos = GetPosition();
 		aCamera->SetPosition(pos + CommonUtilities::Vector3<float>(0, 0, -3));
 		aCamera->SetRotation(CommonUtilities::Matrix3x3<float>());
 	}
@@ -296,6 +295,15 @@ void ModelInstance::SetIsHighlighted(bool aState)
 
 bool ModelInstance::GetIsHighlighted()
 {
+	for (Model::ModelData* data : myModel.GetAsModel()->GetModelData())
+	{
+		if (!data->myTextures[0].IsValid()) { return false; }
+		if (!data->myTextures[1].IsValid()) { return false; }
+		if (!data->myTextures[2].IsValid()) { return false; }
+		if (data->myTextures[0].GetType() != Asset::AssetType::Texture) { return false; }
+		if (data->myTextures[1].GetType() != Asset::AssetType::Texture) { return false; }
+		if (data->myTextures[2].GetType() != Asset::AssetType::Texture) { return false; }
+	} 
 	return myIsHighlighted;
 }
 

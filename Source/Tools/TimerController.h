@@ -20,7 +20,7 @@ public:
 	void CheckTimers();
 	bool RemoveTimer(size_t aId) noexcept;
 private:
-	size_t myIdCounter;
+	size_t myIdCounter = 0;
 	std::vector<Callback> myTimers;
 };
 

@@ -27,8 +27,8 @@ namespace Tools
 	inline float GetTotalTime()
 	{
 		long long now = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
-		static float CreationTime = float(now / double(1000.0 * 1000.0));
-		return float(now / double(1000.0 * 1000.0) - CreationTime);
+		static long long CreationTime = now;
+		return float((now - CreationTime) / double(1000.0 * 1000.0));
 	}
 
 	inline std::unordered_map<std::string, float>& GetOpenDiagnostics()

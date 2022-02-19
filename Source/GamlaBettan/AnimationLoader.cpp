@@ -49,15 +49,13 @@ namespace Loader
 {
     struct BoneIfo
     {
-        size_t myIndex = -1;
+        size_t myIndex = static_cast<size_t>(-1);
         aiMatrix4x4 myOffset;
     };
 
     std::map<std::string, BoneIfo> MapBones(const aiMesh* pMesh)
     {
         std::map<std::string, BoneIfo> out;
-        size_t numBones = 0;
-
         for (size_t i = 0; i < pMesh->mNumBones; i++) 
         {
             if (out.count(pMesh->mBones[i]->mName.data) != 0)
@@ -114,7 +112,7 @@ namespace Loader
         aiMatrix4x4 GlobalTransformation = ParentTransform * NodeTransformation;
 
         if (aBoneMapping.find(NodeName) != aBoneMapping.end()) {
-            uint BoneIndex = aBoneMapping[NodeName].myIndex;
+            uint BoneIndex = static_cast<uint>(aBoneMapping[NodeName].myIndex);
             aOutBuffer[BoneIndex] = AiHelpers::ConvertToEngineMatrix44(aRootTransform * GlobalTransformation *
                 aBoneMapping[NodeName].myOffset);
         }
@@ -166,7 +164,10 @@ namespace Loader
             ReadNodeHeirarchy(aScene->mRootNode->mTransformation, anim, static_cast<float>(i), aScene->mRootNode, Identity, 2, boneMapping, buffer);
             aKeyFrames.push_back(buffer);
         }
+    
+        return true;
     }
+
 }
 
 
