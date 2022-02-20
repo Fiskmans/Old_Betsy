@@ -1,4 +1,3 @@
-#include <pch.h>
 #include "FiskJSON.h"
 
 #include <stack>
@@ -6,9 +5,7 @@
 #include <iostream>
 #include <charconv>
 
-
-
-namespace FiskJSON
+namespace Tools::FiskJSON
 {
 	namespace FiskJson_Help
 	{
@@ -607,7 +604,7 @@ namespace FiskJSON
 
 	std::unordered_map<std::string, Object*>::iterator Object::begin()
 	{
-		if (this && myType == Type::Object)
+		if (NotNull() && myType == Type::Object)
 		{
 			auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
 			return children.begin();
@@ -617,7 +614,7 @@ namespace FiskJSON
 
 	std::unordered_map<std::string, Object*>::iterator Object::end()
 	{
-		if (this && myType == Type::Object)
+		if (NotNull() && myType == Type::Object)
 		{
 			auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
 			return children.end();

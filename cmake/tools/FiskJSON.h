@@ -1,12 +1,16 @@
-#pragma once
+
+#ifndef TOOLS_FISK_JSON_H
+#define TOOLS_FISK_JSON_H
+
 #include <string>
 #include <unordered_map>
 #include <optional>
 #include <variant>
 #include <vector>
+
 #include "DereferencingIteratorWrapper.h"
 
-namespace FiskJSON
+namespace Tools::FiskJSON
 {
 	class Key_Unavailable : public std::exception
 	{
@@ -23,7 +27,7 @@ namespace FiskJSON
 	class Invalid_Object : public std::exception
 	{
 	public:
-		Invalid_Object(const std::string& aMessage) : std::exception(("This object has been severly invalidated: " + aMessage).c_str()) {}
+		Invalid_Object(const std::string& aMessage) : std::exception(("This object has been severely invalidated: " + aMessage).c_str()) {}
 	};
 
 	class Invalid_Get: public std::exception
@@ -377,16 +381,16 @@ namespace FiskJSON
 	}
 	inline Object& Object::operator=(const long& aValue)
 	{
-		return operator= (long long(aValue));
+		return operator= (static_cast<long long>(aValue));
 	}
 	inline Object& Object::operator=(const size_t& aValue)
 	{
-		return operator= (long long(aValue));
+		return operator= (static_cast<long long>(aValue));
 	}
 
 	inline Object& Object::operator=(const int& aValue)
 	{
-		return operator= (long long(aValue));
+		return operator= (static_cast<long long>(aValue));
 	}
 #pragma endregion
 
@@ -479,3 +483,4 @@ namespace FiskJSON
 	}
 }
 
+#endif
