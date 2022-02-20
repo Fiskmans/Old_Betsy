@@ -16,11 +16,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(OLD_CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=fuzzer")
 
-option(BUILD_LAUNCHER "build the launcher" ON)
-
-if(BUILD_LAUNCHER)
-	add_subdirectory(launcher)
-endif()
+add_subdirectory(launcher)
+add_subdirectory(tools)
 
 configure_file(versionConfig.h.in versionConfig.h)
 

@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "versionConfig.h"
+#include "tools/ExecuteOnDestruct.h"
 
 void HandlePacket(const std::vector<uint8_t>& aData)
 {
@@ -37,13 +38,14 @@ void HandlePacket(const std::vector<uint8_t>& aData)
 	std::abort();
 }
 
-int DoThething(uint8_t*& aData, size_t& aSize)
+int DoThething(uint8_t* aData, size_t& aSize)
 {
 	uint8_t* data = static_cast<uint8_t*>(malloc(aSize));
 	assert(data);
 
 	memcpy(data, aData, aSize);
 
+	Tools::ExecuteOnDestruct cleanup([data] { free(data); });
 
 	int packets = 0;
 	while (true)
@@ -79,7 +81,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * Data, size_t Size) {
 int main(int argc, char** argv)
 {
 	std::cout << "Hello world from cmake" << std::endl;
-	std::cout << "Version: " << LAUNCHER_VERSION_STRING << std::endl;
+	std::cout << "Launcher version: " << LAUNCHER_VERSION_STRING << std::endl;
+	std::cout << "\t using tools library version: " << TOOLS_VERSION_STRING << std::endl;
  	
 	if (argc > 1)
 	{
