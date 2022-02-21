@@ -9,3 +9,6 @@ add_executable(Launcher "${SOURCE_FILES}")
 
 target_include_directories(Launcher PUBLIC ${CMAKE_SOURCE_DIR})
 target_include_directories(Launcher PUBLIC ${CMAKE_BINARY_DIR})
+
+target_link_libraries(Launcher PUBLIC Tools)
+target_link_libraries(Launcher PUBLIC Logger)

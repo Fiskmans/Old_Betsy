@@ -1,6 +1,8 @@
 
 list(APPEND SOURCE_FILES "ExecuteOnDestruct.cpp")
 list(APPEND SOURCE_FILES "ExecuteOnDestruct.h")
+list(APPEND SOURCE_FILES "TimeHelper.cpp")
+list(APPEND SOURCE_FILES "TimeHelper.h")
 list(APPEND SOURCE_FILES "fiskJSON.h")
 list(APPEND SOURCE_FILES "fiskJSON.cpp")
 list(APPEND SOURCE_FILES "fiskJSONCustomTypes.h")

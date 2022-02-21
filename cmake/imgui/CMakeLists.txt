@@ -1,4 +1,3 @@
-
 list(APPEND SOURCE_FILES "imgui.cpp")
 list(APPEND SOURCE_FILES "imgui.h")
 list(APPEND SOURCE_FILES "imgui_demo.cpp")
@@ -14,6 +13,9 @@ list(APPEND SOURCE_FILES "backend/imgui_impl_dx11.cpp")
 list(APPEND SOURCE_FILES "backend/imgui_impl_dx11.h")
 list(APPEND SOURCE_FILES "backend/imgui_impl_win32.cpp")
 list(APPEND SOURCE_FILES "backend/imgui_impl_win32.h")
+
+list(APPEND SOURCE_FILES "WindowControl.cpp")
+list(APPEND SOURCE_FILES "WindowControl.h")
 
 add_library(Imgui STATIC "${SOURCE_FILES}")
 

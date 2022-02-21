@@ -1,8 +1,12 @@
-#pragma once
+#ifndef TOOLS_TIME_HELPER_H
+#define TOOLS_TIME_HELPER_H
+
 #include <chrono>
 #include <string>
 #include <unordered_map>
 #include <thread>
+
+//#include "common/Macros.h"
 
 namespace Tools
 {
@@ -53,6 +57,6 @@ namespace Tools
 	void PushTimeStamp(const char* aName);
 	float PopTimeStamp();
 	void FlushTimeTree();
-	
 }
 
+#endif

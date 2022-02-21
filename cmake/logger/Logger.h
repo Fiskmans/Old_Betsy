@@ -1,13 +1,11 @@
-#pragma once
+#ifndef LOGGER_LOGGER_H
+#define LOGGER_LOGGER_H
+
 #include <string>
 #include <vector>
 
-#ifndef STRING
-#define STRING(arg) #arg
-#endif
-#ifndef STRINGVALUE
-#define STRINGVALUE(arg) STRING(arg)
-#endif
+#include "common/Macros.h"
+
 namespace Logger_Local
 {
 	constexpr const char* DirtySubstring(const char* string)
@@ -47,12 +45,7 @@ namespace Logger_Local
 
 #define ONETIMEWARNING(warning, ...) { static Logger_Local::ExecuteFunctionOnConstruct executeOnce([]() -> void { SYSWARNING(warning, __VA_ARGS__); }); }
 
-const size_t COUNTERSTART = __COUNTER__;
-#define INCREMENT (__COUNTER__ - COUNTERSTART - 1)
 typedef unsigned short LoggerType;
-
-#pragma warning(push)
-#pragma warning(disable: 4369 4309)
 
 namespace Logger
 {
@@ -60,23 +53,23 @@ namespace Logger
 	{
 		///types
 		//system
-		SystemInfo		= 1LL << INCREMENT,
-		SystemError		= 1LL << INCREMENT,
-		SystemCrash		= 1LL << INCREMENT,
-		SystemWarning	= 1LL << INCREMENT,
-		SystemVerbose	= 1LL << INCREMENT,
-		SystemNetwork	= 1LL << INCREMENT,
+		SystemInfo		= 1LL << 0,
+		SystemError		= 1LL << 1,
+		SystemCrash		= 1LL << 2,
+		SystemWarning	= 1LL << 3,
+		SystemVerbose	= 1LL << 4,
+		SystemNetwork	= 1LL << 5,
 
 		//game
-		Info			= 1LL << INCREMENT,
-		Warning			= 1LL << INCREMENT,
-		Error			= 1LL << INCREMENT,
-		Verbose			= 1LL << INCREMENT,
+		Info			= 1LL << 6,
+		Warning			= 1LL << 7,
+		Error			= 1LL << 8,
+		Verbose			= 1LL << 9,
 
 		///filters
 		//global
-		None			= LoggerType(0),
-		All				= ~LoggerType(0),
+		None			= 0x0000,
+		All				= 0xFFFF,
 
 		//severity
 		AnyInfo			= SystemInfo | Info,
@@ -91,6 +84,7 @@ namespace Logger
 		AllGame			= AnyGame | Verbose,
 		AllSystem		= AnySystem | SystemVerbose
 	};
+
 	void Rapport(LoggerType aType, const std::string& aFile, const std::string& aError, const std::vector<std::string>& aArguments);
 	void Log(LoggerType aType, const std::string& aMessage);
 	void Log(LoggerType aType, const std::wstring& aMessage);
@@ -107,7 +101,4 @@ namespace Logger
 	void Shutdown();
 }
 
-#ifndef __INTELLISENSE__
-static_assert(INCREMENT < sizeof(LoggerType)* CHAR_BIT - 1, "Ran out of bits for logger types");
-#endif // !__INTELLISENSE__
-#pragma warning(pop)
+#endif

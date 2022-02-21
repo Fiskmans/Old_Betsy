@@ -1,19 +1,28 @@
-#include <pch.h>
-#include "Logger.h"
+#include <mutex>
+#include <iostream>
+#include <fstream>
+#include <unordered_map>
+#include <filesystem>
+
+#include "common/WindowsIncludeWrapper.h"
+
 #include <WinUser.h>
 #include <ShObjIdl.h>
-#ifdef _DEBUG
-#include "../GamlaBettan/DebugTools.h"
-#endif // _DEBUG
+
+#include "tools/TimeHelper.h"
+
+#include "logger/Logger.h"
+
+#include "imgui/WindowControl.h"
 
 namespace Logger
 {
 	LoggerType Filter = Type::All;
 	LoggerType Halting = Type::None;
 
-	std::map<LoggerType, std::string> FileMapping;
-	std::map<LoggerType, char> ColorMapping;
-	std::map<std::string, std::ofstream> OpenFiles;
+	std::unordered_map<LoggerType, std::string> FileMapping;
+	std::unordered_map<LoggerType, char> ColorMapping;
+	std::unordered_map<std::string, std::ofstream> OpenFiles;
 
 	float RapportTimeStamp = Tools::GetTotalTime();
 
@@ -48,7 +57,7 @@ namespace Logger
 			return "Warning";
 		case Type::SystemVerbose:
 		case Type::Verbose:
-			return "Vebose";
+			return "Verbose";
 		case Type::SystemCrash:
 			return "Crash";
 		default:
@@ -104,7 +113,7 @@ namespace Logger
 
 		Log(aType, toPrint);
 #if USEIMGUI
-		WindowControl::SetOpenState("Errors & Warnings", true);
+		old_betsy_imgui::WindowControl::SetOpenState("Errors & Warnings", true);
 		RapportTimeStamp = Tools::GetTotalTime();
 #endif // USEIMGUI
 
@@ -114,10 +123,10 @@ namespace Logger
 	void RapportWindow()
 	{
 #if USELOGGER && USEIMGUI
-		WindowControl::Window("Errors & Warnings", [&]()
+		old_betsy_imgui::WindowControl::Window("Errors & Warnings", [&]()
 			{
 				std::lock_guard lock(outMutex);
-				static auto ConsoleToImVec4 = [](char input)-> ImVec4
+				static auto ConsoleToImVec4 = [](char input)->  ImVec4
 				{
 					float intens = input & FOREGROUND_INTENSITY ? 1 : 0.5f;
 					return ImVec4
@@ -137,16 +146,16 @@ namespace Logger
 						{
 							if (i.second->myCount > 1)
 							{
-								ImGui::Text("%s (%d)", i.first.c_str(), i.second->myCount);
+								ImGui::Text(PFSTRING " (" PFSIZET ")", i.first.c_str(), i.second->myCount);
 							}
 							else
 							{
-								ImGui::Text("%s", i.first.c_str());
+								ImGui::Text(PFSTRING, i.first.c_str());
 							}
 						}
 						else
 						{
-							const char* fmt = i.second->myIsOpen ? "%s" : "%s (%d)";
+							const char* fmt = i.second->myIsOpen ? PFSTRING : PFSTRING " (" PFSIZET ")";
 
 							if (ImGui::TreeNode(i.first.c_str(), fmt, i.first.c_str(), i.second->myCount))
 							{
@@ -275,7 +284,7 @@ namespace Logger
 		if ((aType & Halting) != 0)
 		{
 			SetActiveWindow(GetConsoleWindow());
-			MessageBoxA(NULL, aMessage.c_str(), "A halting error occured", MB_OK);
+			MessageBoxA(NULL, aMessage.c_str(), "A halting error occurred", MB_OK);
 		}
 #endif
 	}

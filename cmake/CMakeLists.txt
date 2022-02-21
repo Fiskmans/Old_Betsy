@@ -28,6 +28,7 @@ set(TEST_VARIABLE testus_testus)
 add_subdirectory(tools)
 add_subdirectory(imgui)
 add_subdirectory(launcher)
+add_subdirectory(logger)
 
 if(DEFINED CLANG_COMPILER_RT)
 	add_subdirectory(fuzzers)

@@ -1,6 +1,8 @@
-#include <pch.h>
-#include "TimeHelper.h"
 
+#include <stack>
+#include <cassert>
+
+#include "TimeHelper.h"
 
 namespace Tools
 {
@@ -18,6 +20,7 @@ namespace Tools
 
 	TimeTree* GetTimeTreeRoot()
 	{
+		//TODO #1 this doesnt seem safe...
 		auto& roots = GetAllRoots();
 		auto it = roots.find(std::this_thread::get_id());
 		if (it == roots.end())
@@ -30,11 +33,11 @@ namespace Tools
 	void PushTimeStamp(const char* aName)
 	{
 		TimeTree* current = nullptr;
-		TimeTree* tree = nullptr;
+		TimeTree* parent = nullptr;
 		if (GetTimeStack().empty())
 		{
 			GetTimeTreeRoot()->myName = aName;
-			tree = GetTimeTreeRoot();
+			parent = GetTimeTreeRoot();
 		}
 		else
 		{
@@ -46,20 +49,20 @@ namespace Tools
 			{
 				if (i->myName == aName)
 				{
-					tree = i;
+					parent = i;
 				}
 			}
 		}
-		if (!tree)
+		if (!parent)
 		{
-			tree = new TimeTree();
-			tree->myParent = current;
-			current->myChildren.push_back(tree);
-			tree->myName = aName;
+			parent = new TimeTree();
+			parent->myParent = current;
+			current->myChildren.push_back(parent);
+			parent->myName = aName;
 		}
-		++tree->myCallCount;
-		tree->myTimeStamp = GetTotalTime();
-		GetTimeStack().push(tree);
+		++parent->myCallCount;
+		parent->myTimeStamp = GetTotalTime();
+		GetTimeStack().push(parent);
 	}
 	float PopTimeStamp()
 	{

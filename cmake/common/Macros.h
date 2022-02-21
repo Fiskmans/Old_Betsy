@@ -1,4 +1,6 @@
-#pragma once
+
+#ifndef COMMON_MACROS_H
+#define COMMON_MACROS_H
 
 //Constants
 #define PI 3.14159265359
@@ -117,8 +119,6 @@
 
 #define STRING(arg) #arg
 #define STRINGVALUE(arg) STRING(arg)
-#define EVALUATE_MACRO(arg) arg
-#define CONCAT(a, b) EVALUATE_MACRO(a) ## EVALUATE_MACRO(b)
 
 #ifdef _DEBUG
 #define NAMETHREAD(name) SetThreadDescription(GetCurrentThread(), name);
@@ -126,11 +126,13 @@
 #define NAMETHREAD(name) ((void*)0);
 #endif // _DEBUG
 
+#define CONCAT_(a,b) a##b
+#define CONCAT(a,b) CONCAT_(a,b)
 
 #if TRACKPERFORMANCE
-#define PERFORMANCETAG(name) auto CONCAT(PerformanceTag, __LINE__) = Tools::ScopeDiagnostic(name);
+#define PERFORMANCETAG(name) Tools::ScopeDiagnostic CONCAT(PerformanceTag, __LINE__)(name)
 #else
-#define PERFORMANCETAG(name) ((void*)0);
+#define PERFORMANCETAG(name) ((void*)0)
 #endif
 
 
@@ -142,4 +144,6 @@
 #define GAMEMETRIC(type,name,lookup,defaultValue) type name = type(lookup);
 #else
 #define GAMEMETRIC(type,name,lookup,defaultValue) MetricValue<type> name = MetricValue<type>(#lookup,defaultValue)
+#endif
+
 #endif
