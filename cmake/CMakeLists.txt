@@ -31,8 +31,22 @@ add_subdirectory(launcher)
 add_subdirectory(logger)
 
 if(DEFINED CLANG_COMPILER_RT)
+	message("Clang runtime directory speciafied, enabling fuzzers")
 	add_subdirectory(fuzzers)
+else()
+	message("define CLANG_COMPILER_RT to enable fuzzers")
 endif()
+
+Include(FetchContent)
+
+FetchContent_Declare(
+	  Catch2
+	  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+	  GIT_TAG        v3.0.0-preview3)
+
+FetchContent_MakeAvailable(Catch2)
+
+add_subdirectory(unit_tests)
 
 configure_file(versionConfig.h.in versionConfig.h)
 

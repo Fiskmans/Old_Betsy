@@ -20,6 +20,11 @@ target_link_options(fuzz-fiskJson PRIVATE /wholearchive:clang_rt.fuzzer-x86_64.l
 target_link_libraries(fuzz-fiskJson PRIVATE clang_rt.asan_dynamic-x86_64 clang_rt.asan_dynamic_runtime_thunk-x86_64)
 target_link_options(fuzz-fiskJson PRIVATE /wholearchive:clang_rt.asan_dynamic_runtime_thunk-x86_64.lib)
 
+add_custom_command(TARGET fuzz-fiskJson POST_BUILD 
+					COMMAND ${CMAKE_COMMAND} -E copy_if_different
+					${CLANG_COMPILER_RT}/clang_rt.asan_dynamic-x86_64.dll 
+					${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/fuzzers)
+					
 set_target_properties(fuzz-fiskJson
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/fuzzers"
@@ -30,11 +35,6 @@ file(WRITE ${PROJECT_BINARY_DIR}/runFiskJsonFuzzer.bat "fuzz-fiskJson.exe fiskJs
 add_custom_command(TARGET fuzz-fiskJson POST_BUILD 
 					COMMAND ${CMAKE_COMMAND} -E copy_if_different
 					${PROJECT_BINARY_DIR}/runFiskJsonFuzzer.bat
-					${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/fuzzers)
-					
-add_custom_command(TARGET fuzz-fiskJson POST_BUILD 
-					COMMAND ${CMAKE_COMMAND} -E copy_if_different
-					${CLANG_COMPILER_RT}/clang_rt.asan_dynamic-x86_64.dll 
 					${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/fuzzers)
 					
 add_custom_command(TARGET fuzz-fiskJson POST_BUILD 
