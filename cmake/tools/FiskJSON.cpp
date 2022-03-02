@@ -159,12 +159,13 @@ namespace Tools::FiskJSON
 		}
 	}
 
-	void Object::Parse(const std::string& aDocument)
+	Object& Object::Parse(const std::string& aDocument)
 	{
 		Parse(aDocument.c_str(), aDocument.c_str() + aDocument.length());
+		return *this;
 	}
 
-	void Object::Parse(const char* aBegin, const char* aEnd)
+	Object& Object::Parse(const char* aBegin, const char* aEnd)
 	{
 		const char* begin = FiskJson_Help::FindStart(aBegin, aEnd);
 		const char* end = FiskJson_Help::FindEnd(aBegin, aEnd);
@@ -186,7 +187,7 @@ namespace Tools::FiskJSON
 		default:
 			MakeValue();
 			ParseAsValue(begin, end);
-			return;
+			return *this;
 		}
 
 		if (end - begin < 2)
@@ -267,6 +268,8 @@ namespace Tools::FiskJSON
 
 			begin = commaOrEnd + 1;
 		}
+
+		return *this;
 	}
 
 	Object::~Object()

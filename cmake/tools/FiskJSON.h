@@ -43,8 +43,8 @@ namespace Tools::FiskJSON
 		friend class ArrayWrapper;
 		friend class ConstArrayWrapper;
 	public:
-		void Parse(const std::string& aDocument);
-		void Parse(const char* aBegin, const char* aEnd);
+		Object& Parse(const std::string& aDocument);
+		Object& Parse(const char* aBegin, const char* aEnd);
 
 		~Object();
 		Object() = default;
@@ -73,8 +73,8 @@ namespace Tools::FiskJSON
 		void MakeArray();
 
 		static Object& Null() { static Object null; return null; }
-		bool NotNull() const { return this != &Null(); }
-		bool IsNull() const { return this == &Null(); }
+		bool NotNull() const { return !IsNull(); }
+		bool IsNull() const { return this == &Null() || !myValue.has_value(); }
 
 		std::string Serialize(bool aPretty = false);
 
@@ -88,7 +88,8 @@ namespace Tools::FiskJSON
 		Object& operator=(const char*& aValue);
 		Object& operator=(const bool& aValue);
 
-		operator bool();
+		bool operator !() const;
+		operator bool() const;
 
 		template<typename Type>
 		bool Is() const;
@@ -181,6 +182,11 @@ namespace Tools::FiskJSON
 
 #pragma region number
 	template<>
+	inline bool Object::Is<size_t>() const
+	{
+		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
+	}
+	template<>
 	inline bool Object::Is<long long>() const
 	{
 		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
@@ -255,6 +261,16 @@ namespace Tools::FiskJSON
 #pragma region Get
 
 #pragma region Number
+	template<>
+	inline size_t Object::Get<size_t>() const
+	{
+		if (!Is<size_t>())
+		{
+			throw Invalid_Get("object is not a number");
+		}
+		return std::get<long long>(myValue.value());
+	}
+
 	template<>
 	inline long long Object::Get<long long>() const
 	{
@@ -431,7 +447,13 @@ namespace Tools::FiskJSON
 		myValue = aValue;
 		return *this;
 	}
-	inline Object::operator bool()
+
+	inline bool Object::operator!() const
+	{
+		return !operator bool();
+	}
+
+	inline Object::operator bool() const
 	{
 		return NotNull();
 	}

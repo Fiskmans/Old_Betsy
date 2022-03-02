@@ -15,6 +15,7 @@
 
 #include "imgui/WindowControl.h"
 
+
 namespace Logger
 {
 	LoggerType Filter = Type::All;
