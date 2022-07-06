@@ -3,9 +3,14 @@
 
 #include "engine/GameEngine.h"
 
+#include "engine/graphics/Camera.h"
+
+
 class Demo_game1 final : public engine::Game
 {
 public:
+	Demo_game1();
+
 
 	std::string AsciiName() final
 	{
@@ -22,7 +27,7 @@ public:
 	void PrepareRender() final;
 
 private:
-
+	engine::PerspectiveCamera myCamera;
 };
 
 #endif

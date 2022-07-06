@@ -62,8 +62,8 @@ namespace engine
 
 		RenderStateManager myStateManager;
 
-		//ForwardRenderer myForwardRenderer;
 		FullscreenRenderer myFullscreenRenderer;
+		//ForwardRenderer myForwardRenderer;
 		//SpriteRenderer mySpriteRenderer;
 		//ParticleRenderer myParticleRenderer;
 		//DeferredRenderer myDeferredRenderer;

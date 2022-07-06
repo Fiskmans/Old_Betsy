@@ -25,12 +25,13 @@ namespace engine
 		tools::Stopwatch stopWatch;
 		{
 			tools::TimedScope scopeTimer(stopWatch);
-			GraphicsEngine::GetInstance().Init(SettingsManager::GetInstance().myWindowSize.Get());
-
 			AssetManager::GetInstance().Init("data/assets", "data/baked");
 #ifdef _DEBUG
 			AssetManager::GetInstance().Preload();
 #endif // _DEBUG
+
+			GraphicsEngine::GetInstance().Init(SettingsManager::GetInstance().myWindowSize.Get());
+
 
 
 			IMGUI_CHECKVERSION();

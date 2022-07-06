@@ -4,6 +4,8 @@
 #include "tools/Singleton.h"
 #include "tools/MathVector.h"
 
+#include "common/Macros.h"
+
 namespace engine
 {
 	template<typename Type>
@@ -31,7 +33,8 @@ namespace engine
 	class SettingsManager : public tools::Singleton<SettingsManager>
 	{
 	public:
-		Setting<tools::V2ui> myWindowSize = tools::V2ui(tools::V2ui(1920, 1080));
+		Setting<tools::V2ui> myWindowSize = tools::V2ui(1920, 1080);
+		Setting<float> myFOV = TORAD(90);
 
 		void LoadOrDefaultImGuiStyle();
 		void SaveImGuiStyle();

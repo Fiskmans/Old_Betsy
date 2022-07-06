@@ -27,17 +27,15 @@ namespace engine
 
 	bool RenderManager::Init()
 	{
-		//if (!myStateManager.Init(aFramework))
-		//{
-		//	return false;
-		//}
+		if (!myStateManager.Init())
+			return false;
+		
+		if (!myFullscreenRenderer.Init())
+			return false;
+		
 		//myPerlinView = AssetManager::GetInstance().GetPerlinTexture({ 1024,1024 }, { 2,2 }, 2);
 		//
 		//if (!myForwardRenderer.Init(aFramework, myPerlinView, &myShadowRenderer))
-		//{
-		//	return false;
-		//}
-		//if (!myFullscreenRenderer.Init(aFramework))
 		//{
 		//	return false;
 		//}

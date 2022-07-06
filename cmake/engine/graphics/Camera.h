@@ -66,7 +66,7 @@ namespace engine
 	class PerspectiveCamera final : public Camera
 	{
 	public:
-		PerspectiveCamera(float aNearPlane, float aFarPlane, float aFOV, tools::V2ui aResolution);
+		PerspectiveCamera(float aNearPlane, float aFarPlane, float aFOV, tools::V2ui aResolution = AdaptToScreen);
 
 		void SetFOVRad(float aFOV);
 
