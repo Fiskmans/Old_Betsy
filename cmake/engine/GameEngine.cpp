@@ -11,8 +11,11 @@
 #include "imgui/backend/imgui_impl_win32.h"
 #include "imgui/backend/imgui_impl_dx11.h"
 
-
+#include "tools/ImGuiHelpers.h"
 #include "tools/Stopwatch.h"
+#include "tools/NameThread.h"
+
+#include <algorithm>
 
 namespace engine
 {
@@ -60,24 +63,80 @@ namespace engine
 
 	void GameEngine::Imgui()
 	{
+		PERFORMANCETAG("Engine");
+
 		old_betsy_imgui::WindowControl::DrawWindowControl();
-		if (ImGui::Begin("Hello"))
+
+		old_betsy_imgui::WindowControl::Window("Engine", [&]() { EngineWindow(); });
+		old_betsy_imgui::WindowControl::Window("Performance", PerformanceWindow);
+	}
+
+	void GameEngine::EngineWindow()
+	{
+
+	}
+
+	void GameEngine::PerformanceWindow()
+	{
+		static bool accumulate = true;
+		ImGui::Checkbox("Accumulate", &accumulate);
+
+		struct namedThread
 		{
-			static size_t frameCount = 0;
-			ImGui::Text("hello " PFSIZET, frameCount++);
+			std::thread::id myId;
+			tools::TimeTree* myRoot;
+			std::string myName;
+			auto operator <=>(const namedThread& aOther) const { return myId <=> aOther.myId; }
+		};
+		
+		std::vector<namedThread> sortedThreads;
 
-			ImVec2 pos = ImGui::GetCursorPos();
+		{
+			tools::LockedResource<tools::RootCollection> handle = tools::AllRoots();
+			for (std::pair<std::thread::id, tools::TimeTree*> threadTimeRoot : handle.Get())
+			{
+				namedThread thread;
+				thread.myId = threadTimeRoot.first;
+				thread.myRoot = threadTimeRoot.second;
+				thread.myName = tools::GetNameOfThread(threadTimeRoot.first);
 
-			ImGui::Text("window pos x:" PFFLOAT " y:" PFFLOAT, pos.x, pos.y);
+				sortedThreads.insert(std::upper_bound(sortedThreads.begin(), sortedThreads.end(), thread), thread);
+			}
+
+			if (sortedThreads.empty())
+			{
+				ImGui::Text("No performance data available");
+				return;
+			}
+
+			static int selected = 0;
+			if (selected >= sortedThreads.size())
+			{
+				selected = sortedThreads.size();
+			}
+
+			if (ImGui::BeginCombo("Thread", sortedThreads[selected].myName.c_str()))
+			{
+				for (size_t i = 0; i < sortedThreads.size(); i++)
+					if (ImGui::Selectable(sortedThreads[selected].myName.c_str()))
+						selected = i;
+
+				ImGui::EndCombo();
+			}
+
+
+			tools::DrawTimeTree(sortedThreads[selected].myRoot);
 		}
-		ImGui::End();
+
+		if (!accumulate)
+			tools::FlushTimeTree();
 	}
 
 	void GameEngine::Run()
 	{
 		while (!myGame->WantsExit())
 		{
-			PERFORMANCETAG("main_update_loop");
+			PERFORMANCETAG("Main Update Loop");
 
 			Update();
 			{
@@ -123,7 +182,7 @@ namespace engine
 
 	void GameEngine::Update()
 	{
-		PERFORMANCETAG("engine_update");
+		PERFORMANCETAG("Engine Update");
 		WindowManager::GetInstance().Update();
 	}
 }

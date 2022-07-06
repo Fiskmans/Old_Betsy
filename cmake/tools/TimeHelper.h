@@ -1,13 +1,18 @@
 #ifndef TOOLS_TIME_HELPER_H
 #define TOOLS_TIME_HELPER_H
 
+#include "tools/LockedResource.h"
+
 #include <chrono>
 #include <string>
 #include <unordered_map>
 #include <thread>
+#include <mutex>
+
 
 namespace tools
 {
+
 	class ScopeDiagnostic
 	{
 	public:
@@ -25,6 +30,8 @@ namespace tools
 		TimeTree* myParent = nullptr;
 		std::vector<TimeTree*> myChildren;
 	};
+
+	using RootCollection = std::unordered_map<std::thread::id, TimeTree*>;
 
 	inline float GetTotalTime()
 	{
@@ -49,7 +56,7 @@ namespace tools
 		return  GetTotalTime() - GetOpenDiagnostics()[aKey];
 	}
 
-	std::unordered_map<std::thread::id, TimeTree*>& GetAllRoots();
+	LockedResource<RootCollection> AllRoots();
 
 	TimeTree* GetTimeTreeRoot();
 	void PushTimeStamp(const char* aName);

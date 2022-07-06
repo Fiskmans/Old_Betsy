@@ -226,23 +226,47 @@ namespace tools
 	void DrawTimeTree_internal(tools::TimeTree* aTree, int aDepth, std::function<ImVec4(int)> aColorGetter, const char* aFormat, std::function<float(TimeTree*)> aArgumentGetter)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, aColorGetter(aDepth));
-		if (ImGui::TreeNode(aTree->myName, aFormat, PadOrTrimTo(aTree->myName, 20).c_str(),(int)aTree->myCallCount,  aArgumentGetter(aTree), GetCovarage(aTree->myCovarage)))
+		bool hovered = false;
+		if (aTree->myChildren.empty())
 		{
-			if (ImGui::IsItemHovered())
+			char buffer[512];
+
+			if (sprintf_s(buffer, sizeof(buffer), aFormat, PadOrTrimTo(aTree->myName, 20).c_str(), (int)aTree->myCallCount, aArgumentGetter(aTree), GetCovarage(aTree->myCovarage)) > 511)
 			{
-				HoveredTimeTree() = aTree;
+				strcpy_s<sizeof(buffer)>(buffer, "text to long to print");
 			}
-			for (auto& i : aTree->myChildren)
-			{
-				DrawTimeTree_internal(i, aDepth + 1, aColorGetter, aFormat, aArgumentGetter);
-			}
-			if (aTree->myChildren.empty())
-			{
-				ImGui::BulletText("No further breakdown available");
-			}
-			ImGui::TreePop();
+
+			ImGui::Bullet();
+			hovered |= ImGui::IsItemHovered();
+			ImGui::SameLine();
+
+			ImGui::Selectable(buffer);
+			hovered |= ImGui::IsItemHovered();
 		}
+		else
+		{
+			bool open = ImGui::TreeNode(aTree->myName, aFormat, PadOrTrimTo(aTree->myName, 20).c_str(), (int)aTree->myCallCount, aArgumentGetter(aTree), GetCovarage(aTree->myCovarage));
+			hovered |= ImGui::IsItemHovered();
+			if (open)
+			{
+				for (auto& i : aTree->myChildren)
+				{
+					DrawTimeTree_internal(i, aDepth + 1, aColorGetter, aFormat, aArgumentGetter);
+				}
+				if (aTree->myChildren.empty())
+				{
+					ImGui::BulletText("No further breakdown available");
+				}
+				ImGui::TreePop();
+			}
+		}
+
 		ImGui::PopStyleColor(1);
+
+		if (hovered)
+		{
+			HoveredTimeTree() = aTree;
+		}
 	}
 
 	void DrawTimeTree(tools::TimeTree* aTree)
@@ -250,11 +274,9 @@ namespace tools
 
 		ImGui::PushID(aTree->myName);
 		static bool colorize = true;
-		ImGui::Checkbox("Colorize", &colorize);
 		static int mode = 0;
 
 		const char* names[4] = { "time","Percent of parent","percent of performance","percent of hovered" };
-		ImGui::SameLine();
 		if (ImGui::BeginCombo("Value Mode", names[mode]))
 		{
 			for (int i = 0; i < 4; i++)
@@ -267,6 +289,8 @@ namespace tools
 			}
 			ImGui::EndCombo();
 		}
+		ImGui::SameLine();
+		ImGui::Checkbox("Colorize", &colorize);
 
 
 		const char* format = nullptr;

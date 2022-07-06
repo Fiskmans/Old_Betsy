@@ -85,7 +85,7 @@ namespace engine
 		tools::V4f transparent = tools::V4f(0.f, 0.f, 0.f, 0.f);
 
 		myTextures[static_cast<int>(Textures::BackBuffer)].ClearTexture(transparent);
-		myTextures[static_cast<int>(Textures::IntermediateTexture)].ClearTexture(transparent);
+		myTextures[static_cast<int>(Textures::IntermediateTexture)].ClearTexture(aClearColor);
 		myTextures[static_cast<int>(Textures::IntermediateDepth)].ClearDepth();
 		myTextures[static_cast<int>(Textures::Selection)].ClearTexture(transparent);
 		myTextures[static_cast<int>(Textures::Selection2)].ClearTexture(transparent);

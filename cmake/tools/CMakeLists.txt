@@ -30,6 +30,9 @@ list(APPEND SOURCE_FILES "Event.h")
 list(APPEND SOURCE_FILES "Ray.h")
 list(APPEND SOURCE_FILES "Intersection.h")
 list(APPEND SOURCE_FILES "AABB3D.h")
+list(APPEND SOURCE_FILES "NameThread.cpp")
+list(APPEND SOURCE_FILES "NameThread.h")
+list(APPEND SOURCE_FILES "LockedResource.h")
 
 add_library(Tools STATIC "${SOURCE_FILES}")
 

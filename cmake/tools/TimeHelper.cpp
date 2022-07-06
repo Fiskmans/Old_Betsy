@@ -12,57 +12,77 @@ namespace tools
 		return out;
 	}
 
-	std::unordered_map<std::thread::id, TimeTree*>& GetAllRoots()
+
+	LockedResource<RootCollection> AllRoots()
 	{
 		static std::unordered_map<std::thread::id, TimeTree*> roots;
-		return roots;
+		static std::mutex mutex;
+		return LockedResource<RootCollection>(mutex, roots);
 	}
+
+	class TimeTreeRoot
+	{
+	public:
+		TimeTreeRoot()
+		{
+			AllRoots().Get().emplace(std::this_thread::get_id(), &myTimeTree);
+		}
+		~TimeTreeRoot()
+		{
+			LockedResource<RootCollection> handle = AllRoots();
+			handle.Get().erase(handle.Get().find(std::this_thread::get_id()));
+		}
+
+		TimeTree* Get()
+		{
+			return &myTimeTree;
+		}
+
+
+	private:
+		TimeTree myTimeTree;
+	};
+
 
 	TimeTree* GetTimeTreeRoot()
 	{
-		//TODO #1 this doesnt seem safe...
-		auto& roots = GetAllRoots();
-		auto it = roots.find(std::this_thread::get_id());
-		if (it == roots.end())
-		{
-			roots[std::this_thread::get_id()] = new TimeTree();
-		}
-		return roots[std::this_thread::get_id()];
+		thread_local TimeTreeRoot threadLocalTimeTree;
+		return threadLocalTimeTree.Get();
 	}
 
 	void PushTimeStamp(const char* aName)
 	{
-		TimeTree* current = nullptr;
 		TimeTree* parent = nullptr;
+		TimeTree* child = nullptr;
 		if (GetTimeStack().empty())
 		{
 			GetTimeTreeRoot()->myName = aName;
-			parent = GetTimeTreeRoot();
+			child = GetTimeTreeRoot();
 		}
 		else
 		{
-			current = GetTimeStack().top();
+			parent = GetTimeStack().top();
 		}
-		if (current)
+		if (parent)
 		{
-			for (auto& i : current->myChildren)
+			for (auto& i : parent->myChildren)
 			{
 				if (i->myName == aName)
 				{
-					parent = i;
+					child = i;
 				}
 			}
 		}
-		if (!parent)
+		if (!child)
 		{
-			parent = new TimeTree();
-			parent->myParent = current;
-			current->myChildren.push_back(parent);
-			parent->myName = aName;
+			child = new TimeTree();
+			child->myParent = parent;
+			parent->myChildren.push_back(child);
+			child->myName = aName;
 		}
-		++parent->myCallCount;
-		parent->myTimeStamp = GetTotalTime();
-		GetTimeStack().push(parent);
+		++child->myCallCount;
+		child->myTimeStamp = GetTotalTime();
+		GetTimeStack().push(child);
 	}
 	float PopTimeStamp()
 	{
@@ -102,9 +122,9 @@ namespace tools
 
 	void FlushTimeTree()
 	{
-		for (auto& i : GetAllRoots())
+		for (std::pair<std::thread::id, TimeTree*> root : AllRoots().Get())
 		{
-			FlushTimeTreeNode(i.second);
+			FlushTimeTreeNode(root.second);
 		}
 	}
 

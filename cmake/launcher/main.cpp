@@ -11,6 +11,7 @@
 
 #include "tools/TimeHelper.h"
 #include "tools/SubsystemManager.h"
+#include "tools/NameThread.h"
 
 #include "engine/GameEngine.h"
 
@@ -18,6 +19,8 @@
 
 int main(int argc, char** argv)
 {
+	tools::NameThread("main_thread");
+
 	logger::SetFilter(logger::Type::All & ~logger::Type::AnyVerbose);
 	logger::SetHalting(logger::Type::AnyError | logger::Type::SystemCrash);
 

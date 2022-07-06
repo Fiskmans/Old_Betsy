@@ -49,6 +49,9 @@ namespace engine
 	private:
 
 		void Imgui();
+		void EngineWindow();
+		static void PerformanceWindow();
+
 		void Run();
 		void Update();
 		Game* myGame = nullptr;
