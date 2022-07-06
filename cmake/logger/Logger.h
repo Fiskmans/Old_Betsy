@@ -22,32 +22,25 @@ namespace Logger_Local
 		ret++;
 		return ret;
 	}
-
-	template<class T>
-	class ExecuteFunctionOnConstruct
-	{
-	public:
-		ExecuteFunctionOnConstruct(T&& aFunctor) { aFunctor(); }
-	};
-
 }
-#define SYSCRASH(text)				Logger::Log(Logger::Type::SystemCrash,text);
-#define SYSERROR(error, ...)		Logger::Rapport(Logger::Type::SystemError,Logger_Local::DirtySubstring(__FILE__), error, {__VA_ARGS__});
-#define SYSINFO(text)				Logger::Log(Logger::Type::SystemInfo,text);
-#define SYSWARNING(warning, ...)	Logger::Rapport(Logger::Type::SystemWarning,Logger_Local::DirtySubstring(__FILE__), warning, {__VA_ARGS__});
-#define SYSVERBOSE(text)			Logger::Log(Logger::Type::SystemVerbose,text);
-#define SYSNETWORK(text)			Logger::Log(Logger::Type::SystemNetwork,text);
 
-#define LOGINFO(text)				Logger::Log(Logger::Type::Info,text);
-#define LOGWARNING(text)			Logger::Log(Logger::Type::Warning,text);
-#define LOGERROR(text)				Logger::Log(Logger::Type::Error,text);
-#define LOGVERBOSE(text)			Logger::Log(Logger::Type::Verbose,text);
+#define LOG(type, message, ...)			logger::Rapport(type, Logger_Local::DirtySubstring(__FILE__), __LINE__, message, {__VA_ARGS__})
 
-#define ONETIMEWARNING(warning, ...) { static Logger_Local::ExecuteFunctionOnConstruct executeOnce([]() -> void { SYSWARNING(warning, __VA_ARGS__); }); }
+#define LOG_SYS_CRASH(message, ...)		LOG(logger::Type::SystemCrash, message, __VA_ARGS__)
+#define LOG_SYS_ERROR(message, ...)		LOG(logger::Type::SystemError, message, __VA_ARGS__)
+#define LOG_SYS_INFO(message, ...)		LOG(logger::Type::SystemInfo, message, __VA_ARGS__)
+#define LOG_SYS_WARNING(message, ...)	LOG(logger::Type::SystemWarning, message, __VA_ARGS__)
+#define LOG_SYS_VERBOSE(message, ...)	LOG(logger::Type::SystemVerbose, message, __VA_ARGS__)
+#define LOG_SYS_NETWORK(message, ...)	LOG(logger::Type::SystemNetwork, message, __VA_ARGS__)
+
+#define LOG_INFO(message, ...)			LOG(logger::Type::Info, message, __VA_ARGS__)
+#define LOG_WARNING(message, ...)		LOG(logger::Type::Warning, message, __VA_ARGS__)
+#define LOG_ERROR(message, ...)			LOG(logger::Type::Error, message, __VA_ARGS__)
+#define LOG_VERBOSE(message, ...)		LOG(logger::Type::Verbose, message, __VA_ARGS__)
 
 typedef unsigned short LoggerType;
 
-namespace Logger
+namespace logger
 {
 	enum Type : LoggerType
 	{
@@ -85,9 +78,8 @@ namespace Logger
 		AllSystem		= AnySystem | SystemVerbose
 	};
 
-	void Rapport(LoggerType aType, const std::string& aFile, const std::string& aError, const std::vector<std::string>& aArguments);
+	void Rapport(LoggerType aType, const std::string& aFile, const size_t aLine, const std::string& aError, const std::vector<std::string>& aArguments);
 	void Log(LoggerType aType, const std::string& aMessage);
-	void Log(LoggerType aType, const std::wstring& aMessage);
 	void SetFilter(LoggerType aFilter);
 	void SetHalting(LoggerType aFilter);
 	void Map(LoggerType aMessageType, std::string aOutputFile);

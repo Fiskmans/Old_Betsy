@@ -17,14 +17,26 @@ namespace Tools::FiskJSON
 		const char* FindStart(const char* aBegin, const char* aEnd)
 		{
 			const char* start = aBegin;
-			while (IsWhiteSpace(*start) && ++start < aEnd);
+			while (start != aEnd)
+			{
+				if (!IsWhiteSpace(*start))
+					break;
+
+				start++;
+			}
 			return start;
 		}
 
 		const char* FindEnd(const char* aBegin, const char* aEnd)
 		{
 			const char* end = aEnd;
-			while (IsWhiteSpace(*(end - 1)) && --end > aBegin);
+			while (end != aBegin)
+			{
+				if(!IsWhiteSpace(*(end - 1)))
+					break;
+
+				--end;
+			}
 			return end;
 		}
 
@@ -164,7 +176,7 @@ namespace Tools::FiskJSON
 		Parse(aDocument.c_str(), aDocument.c_str() + aDocument.length());
 		return *this;
 	}
-
+										 
 	Object& Object::Parse(const char* aBegin, const char* aEnd)
 	{
 		const char* begin = FiskJson_Help::FindStart(aBegin, aEnd);

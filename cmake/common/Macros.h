@@ -18,12 +18,12 @@
 #define PFUINT "%u"
 
 //Values
-#define SHADOWRESOLUTION 246
+#define SHADOWRESOLUTION 256
 #define ENVIRONMENTSHADOWRESOLUTION 8192
 #define ENVIRONMENCAMEREASIZE 10_m
 #define DECALRESOLUTION 256
 #define NUMBEROFLODLEVELS 3
-#define NUMBEROFPOINTLIGHTS 1
+#define NUMBEROFPOINTLIGHTS 2
 #define NUMBEROFANIMATIONBONES 64
 #define MAXNUMBEROFANIMATIONSONSCREEN 256
 #define MAX_NUM_BONES_PER_VEREX 15
@@ -33,9 +33,9 @@
 #define SHADOWNEARPLANE 10.f
 #define SHADOWFARPLANE 3000.f
 #define CULLINGFRUSTOMREFRESHRATE 0.75f
-#define LATENTCommonUtilitiesLLINGFRUSTUMMULTIPLIER 5.f
+#define LATENTCULLINGFRUSTUMMULTIPLIER 5.f
 #define PLAYERPOSITIONVALIDATIONINTERVAL 0.2f
-#define MAXDEBUGLINES 1500000
+#define MAXDEBUGLINES (1 << 20)
 #define STANDARDMARG (1e-10)
 #define METRICFILE "Metrics.h"
 #define MAXUSERNAMELENGTH 128
@@ -85,6 +85,8 @@
 
 
 //Funtions
+#define VERSIONSTRING(project) (STRINGVALUE(project##_VERSION_MAJOR) "." STRINGVALUE(project##_VERSION_MINOR) "." STRINGVALUE(project##_VERSION_PATCH))
+
 #define CAST(type, value) (static_cast<type>(value))
 #define ENUM_CAST(value) (static_cast<int>(value))
 
@@ -130,7 +132,7 @@
 #define CONCAT(a,b) CONCAT_(a,b)
 
 #if TRACKPERFORMANCE
-#define PERFORMANCETAG(name) Tools::ScopeDiagnostic CONCAT(PerformanceTag, __LINE__)(name)
+#define PERFORMANCETAG(name) tools::ScopeDiagnostic CONCAT(PerformanceTag, __LINE__)(name)
 #else
 #define PERFORMANCETAG(name) ((void*)0)
 #endif
@@ -141,9 +143,9 @@
 
 #if BAKEVALUES
 #include "../../Game/Metrics.h"
-#define GAMEMETRIC(type,name,lookup,defaultValue) type name = type(lookup);
+#define GAMEMETRIC(type, name, lookup, defaultValue) type name = type(lookup);
 #else
-#define GAMEMETRIC(type,name,lookup,defaultValue) MetricValue<type> name = MetricValue<type>(#lookup,defaultValue)
+#define GAMEMETRIC(type, name, lookup, defaultValue) MetricValue<type> name = MetricValue<type>(#lookup,defaultValue)
 #endif
 
 #endif

@@ -6,9 +6,7 @@
 #include <unordered_map>
 #include <thread>
 
-//#include "common/Macros.h"
-
-namespace Tools
+namespace tools
 {
 	class ScopeDiagnostic
 	{

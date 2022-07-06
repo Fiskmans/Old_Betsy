@@ -1,1 +1,1 @@
-add_subdirectory(test-fiskjson)
+add_subdirectory(test-tools)

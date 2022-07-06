@@ -4,7 +4,7 @@ list(APPEND SOURCE_FILES "Logger.h")
 
 add_library(Logger STATIC "${SOURCE_FILES}")
 
-project(Logger VERSION 1.0.0)
+project(Logger VERSION 1.0.1)
 
 configure_file(config.h.in config.h)
 target_include_directories(Logger PUBLIC ${CMAKE_SOURCE_DIR})

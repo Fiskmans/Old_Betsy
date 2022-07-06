@@ -4,7 +4,7 @@
 
 #include "TimeHelper.h"
 
-namespace Tools
+namespace tools
 {
 	std::stack<TimeTree*>& GetTimeStack()
 	{

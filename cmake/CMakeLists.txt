@@ -22,16 +22,15 @@ project(oldBetsy VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
-
-set(TEST_VARIABLE testus_testus)
-
 add_subdirectory(tools)
 add_subdirectory(imgui)
 add_subdirectory(launcher)
 add_subdirectory(logger)
+add_subdirectory(engine)
+add_subdirectory(demo_game1)
 
 if(DEFINED CLANG_COMPILER_RT)
-	message("Clang runtime directory speciafied, enabling fuzzers")
+	message("Clang runtime directory specified, enabling fuzzers")
 	add_subdirectory(fuzzers)
 else()
 	message("define CLANG_COMPILER_RT to enable fuzzers")

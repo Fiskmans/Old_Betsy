@@ -16,7 +16,7 @@
 #include "imgui/WindowControl.h"
 
 
-namespace Logger
+namespace logger
 {
 	LoggerType Filter = Type::All;
 	LoggerType Halting = Type::None;
@@ -25,7 +25,7 @@ namespace Logger
 	std::unordered_map<LoggerType, char> ColorMapping;
 	std::unordered_map<std::string, std::ofstream> OpenFiles;
 
-	float RapportTimeStamp = Tools::GetTotalTime();
+	float RapportTimeStamp = tools::GetTotalTime();
 
 	struct LoggerNode
 	{
@@ -68,13 +68,13 @@ namespace Logger
 		return "";
 #endif
 	}
-	std::recursive_mutex outMutex;
+	std::recursive_mutex ourMutex;
 	static std::vector<std::pair<LoggerType, std::pair< std::string, char>>> ImguiLog;
 
-	void Rapport(LoggerType aType, const std::string& aFile, const std::string& aError, const std::vector<std::string>& aArguments)
+	void Rapport(LoggerType aType, const std::string& aFile, const size_t aLine, const std::string& aError, const std::vector<std::string>& aArguments)
 	{
 #if USELOGGER
-		std::string toPrint = aFile + ": " + aError;
+		std::string toPrint =  "[" + aFile + ":" + std::to_string(aLine) + "]: " + aError;
 
 		for (size_t i = 0; i < sizeof(LoggerType) * CHAR_BIT; i++)
 		{
@@ -115,7 +115,7 @@ namespace Logger
 		Log(aType, toPrint);
 #if USEIMGUI
 		old_betsy_imgui::WindowControl::SetOpenState("Errors & Warnings", true);
-		RapportTimeStamp = Tools::GetTotalTime();
+		RapportTimeStamp = tools::GetTotalTime();
 #endif // USEIMGUI
 
 #endif
@@ -126,7 +126,7 @@ namespace Logger
 #if USELOGGER && USEIMGUI
 		old_betsy_imgui::WindowControl::Window("Errors & Warnings", [&]()
 			{
-				std::lock_guard lock(outMutex);
+				std::lock_guard lock(ourMutex);
 				static auto ConsoleToImVec4 = [](char input)->  ImVec4
 				{
 					float intens = input & FOREGROUND_INTENSITY ? 1 : 0.5f;
@@ -189,7 +189,7 @@ namespace Logger
 				};
 
 
-				float now = Tools::GetTotalTime();
+				float now = tools::GetTotalTime();
 				if (ImGui::IsWindowHovered())
 				{
 					RapportTimeStamp = now;
@@ -221,7 +221,7 @@ namespace Logger
 	void Log(LoggerType aType, const std::string& aMessage)
 	{
 #if USELOGGER
-		std::lock_guard lock(outMutex);
+		std::lock_guard lock(ourMutex);
 		static HANDLE consoleHandle;
 		static bool first = true;
 		if (first)
@@ -270,7 +270,7 @@ namespace Logger
 		}
 		else
 		{
-			SYSERROR("Logging using multiple filters is not supported");
+			LOG_SYS_ERROR("Logging using multiple filters is not supported");
 		}
 		if ((aType & Filter) != 0)
 		{
@@ -290,19 +290,12 @@ namespace Logger
 #endif
 	}
 
-	void Log(LoggerType /*aType*/, const std::wstring& /*aMessage*/)
-	{
-#if USELOGGER
-		std::cout << "wstring are not supported" << std::endl;
-#endif
-	}
-
 	void SetFilter(LoggerType aFilter)
 	{
 #if USELOGGER
 		if ((aFilter & Halting) != Halting)
 		{
-			SYSERROR("Trying to set logger filter which does not encompass all halting types");
+			LOG_SYS_ERROR("Trying to set logger filter which does not encompass all halting types");
 			return;
 		}
 		Filter = aFilter;
@@ -314,7 +307,7 @@ namespace Logger
 #if USELOGGER
 		if ((aFilter & Filter) != aFilter)
 		{
-			SYSERROR("Trying to set logger halting which is not encompassed completely by filter");
+			LOG_SYS_ERROR("Trying to set logger halting which is not encompassed completely by filter");
 			return;
 		}
 		Halting = aFilter;
@@ -333,7 +326,7 @@ namespace Logger
 
 				if (FileMapping.count(messageType) != 0)
 				{
-					SYSERROR("Type is already mapped: ", std::to_string(messageType));
+					LOG_SYS_ERROR("Type is already mapped: ", std::to_string(messageType));
 					return;
 				}
 
@@ -348,7 +341,7 @@ namespace Logger
 					OpenFiles[aOutputFile].open(aOutputFile); // default construct and open
 					if (!OpenFiles[aOutputFile].good())
 					{
-						SYSERROR("Could not open file for logging", aOutputFile);
+						LOG_SYS_ERROR("Could not open file for logging", aOutputFile);
 					}
 				}
 			}
@@ -367,10 +360,10 @@ namespace Logger
 
 				if (FileMapping.count(messageType) == 0)
 				{
-					SYSERROR("Trying to unmap type which is not mapped: ", std::to_string(messageType));
+					LOG_SYS_ERROR("Trying to unmap type which is not mapped: ", std::to_string(messageType));
 					continue;
 				}
-				SYSINFO("Unmapping: " + std::to_string(messageType) + " from: " + FileMapping[messageType]);
+				LOG_SYS_INFO("Unmapping: " + std::to_string(messageType) + " from: " + FileMapping[messageType]);
 
 				std::string file = FileMapping[messageType];
 				FileMapping.erase(messageType);
@@ -427,7 +420,7 @@ namespace Logger
 	void ImGuiLog()
 	{
 #if USEIMGUI
-		std::unique_lock lock(outMutex);
+		std::unique_lock lock(ourMutex);
 		auto& buffer = ImguiLog;
 		if (ImGui::BeginChild("ConsoleLog", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar))
 		{

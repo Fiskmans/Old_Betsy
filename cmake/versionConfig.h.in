@@ -7,3 +7,5 @@
 #include "tools/config.h"
 #include "imgui/config.h"
 #include "logger/config.h"
+#include "engine/config.h"
+#include "demo_game1/config.h"

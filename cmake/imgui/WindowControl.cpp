@@ -38,7 +38,7 @@ namespace old_betsy_imgui
 	{
 		if (myOpenWindows[aLabel])
 		{
-			PERFORMANCETAG("Imgui");
+			PERFORMANCETAG("Imgui_window");
 			if (aWindowSettings)
 			{
 				PERFORMANCETAG("Imgui_setup");
