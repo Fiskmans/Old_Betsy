@@ -1,6 +1,10 @@
 # Old Betsy
 An open-souce game engine for anyone who wants to develop a game 'closer to the metal'
 
+It's been developed with the focus of making it feel nice and cozy to use, avoiding jagged edges, weird quirks and funky gotchas.
+
+Making a game in old betsy should feel like drinking a cup of hot cocoa infront of a fireplace on the day after christmas, everything is nice, just works and you can relax knowing all is cared for.
+
 ## UNDER MAINTENANCE
 the engine is currently being migrated from Pre_cmake to cmake, with some fairly significant rewrites taking place at the same time.
 
