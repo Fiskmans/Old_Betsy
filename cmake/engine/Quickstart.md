@@ -12,6 +12,8 @@ class YourGame : public engine::Game
 ```
 ```cpp
 //main.cpp
+#include "YourGame.h"
+
 int main()
 {
   YourGame yourGame;
