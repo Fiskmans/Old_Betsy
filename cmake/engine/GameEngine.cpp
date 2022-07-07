@@ -6,6 +6,10 @@
 
 #include "engine/assets/AssetManager.h"
 
+#include "engine/graph/NodeManager.h"
+#include "engine/graph/nodes/RenderCopyNode.h"
+
+
 #include "imgui/imgui.h"
 #include "imgui/WindowControl.h"
 #include "imgui/backend/imgui_impl_win32.h"
@@ -28,14 +32,14 @@ namespace engine
 		tools::Stopwatch stopWatch;
 		{
 			tools::TimedScope scopeTimer(stopWatch);
-			AssetManager::GetInstance().Init("data/assets", "data/baked");
+			AssetManager::GetInstance().Init("data/assets", "baked");
 #ifdef _DEBUG
 			AssetManager::GetInstance().Preload();
 #endif // _DEBUG
 
 			GraphicsEngine::GetInstance().Init(SettingsManager::GetInstance().myWindowSize.Get());
 
-
+			RegisterNodes();
 
 			IMGUI_CHECKVERSION();
 			ImGui::CreateContext();
@@ -69,6 +73,8 @@ namespace engine
 
 		old_betsy_imgui::WindowControl::Window("Engine", [&]() { EngineWindow(); });
 		old_betsy_imgui::WindowControl::Window("Performance", PerformanceWindow);
+
+		graph::NodeManager::GetInstance().Imgui();
 	}
 
 	void GameEngine::EngineWindow()
@@ -132,6 +138,31 @@ namespace engine
 			tools::FlushTimeTree();
 	}
 
+	void GameEngine::RegisterNodes()
+	{
+		LOG_SYS_INFO("Registering nodes");
+		tools::Stopwatch stopWatch;
+		{
+			tools::TimedScope scopeTimer(stopWatch);
+			RegisterEngineNodes();
+			myGame->RegisterNodes();
+			graph::NodeManager::GetInstance().EndNode();
+		}
+		LOG_SYS_INFO("Nodes registerd in " + std::to_string(stopWatch.Read()) + " seconds");
+	}
+
+	void GameEngine::RegisterEngineNodes()
+	{
+		LOG_SYS_INFO("Registering Engine nodes");
+		tools::Stopwatch stopWatch;
+		{
+			tools::TimedScope scopeTimer(stopWatch);
+		
+			graph::node::RenderCopyNode::Register();
+		}
+		LOG_SYS_INFO("Engine nodes registerd in " + std::to_string(stopWatch.Read()) + " seconds");
+	}
+
 	void GameEngine::Run()
 	{
 		while (!myGame->WantsExit())
@@ -150,7 +181,7 @@ namespace engine
 			
 			{
 				PERFORMANCETAG("Render frame");
-				GraphicsEngine::GetInstance().BeginFrame(tools::V4f(0.6f + 0.1f * cos(tools::GetTotalTime()), 0.5f  + 0.2f * cos(tools::GetTotalTime() / 1.8f), 0.5f + 0.3f * cos(tools::GetTotalTime() / 3.2f), 1.f));
+				GraphicsEngine::GetInstance().BeginFrame(tools::V4f(0.14f, 0.14f, 0.14f, 1.f));// tools::V4f(0.6f + 0.1f * cos(tools::GetTotalTime()), 0.5f  + 0.2f * cos(tools::GetTotalTime() / 1.8f), 0.5f + 0.3f * cos(tools::GetTotalTime() / 3.2f), 1.f));
 				GraphicsEngine::GetInstance().RenderFrame();
 			}
 

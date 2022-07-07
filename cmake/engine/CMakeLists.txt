@@ -42,6 +42,18 @@ list(APPEND SOURCE_FILES "assets/AnimationData.h")
 list(APPEND SOURCE_FILES "assets/AnimationData.cpp")
 list(APPEND SOURCE_FILES "assets/PointLight.h")
 
+list(APPEND SOURCE_FILES "graph/PinValue.cpp")
+list(APPEND SOURCE_FILES "graph/PinValue.h")
+list(APPEND SOURCE_FILES "graph/Node.h")
+list(APPEND SOURCE_FILES "graph/NodePin.cpp")
+list(APPEND SOURCE_FILES "graph/NodePin.h")
+list(APPEND SOURCE_FILES "graph/NodeInstanceId.h")
+list(APPEND SOURCE_FILES "graph/NodeManager.h")
+list(APPEND SOURCE_FILES "graph/NodeManager.cpp")
+
+list(APPEND SOURCE_FILES "graph/Nodes/RenderCopyNode.h")
+list(APPEND SOURCE_FILES "graph/Nodes/RenderCopyNode.cpp")
+
 list(APPEND SOURCE_FILES "GameEngine.h")
 list(APPEND SOURCE_FILES "GameEngine.cpp")
 list(APPEND SOURCE_FILES "SettingsManager.h")

@@ -21,6 +21,7 @@ namespace engine
 		virtual void Setup() = 0;
 		virtual void Update() = 0;
 		virtual void PrepareRender() = 0;
+		virtual void RegisterNodes(){}
 
 		inline void Exit()
 		{
@@ -51,6 +52,9 @@ namespace engine
 		void Imgui();
 		void EngineWindow();
 		static void PerformanceWindow();
+
+		void RegisterNodes();
+		void RegisterEngineNodes();
 
 		void Run();
 		void Update();
