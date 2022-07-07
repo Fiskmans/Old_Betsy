@@ -16,6 +16,9 @@ namespace engine::graph::node
 	private:
 		InPin<Texture> myInTexture = "In Texture";
 		OutPin<Texture> myOutTexture = "Out Texture";
+		OutPin<int> myIntPin = "strickty pal";
+		OutPin<float> myFloatPin = "floaty boy";
+		OutPin<RenderCopyNode*> myRandom = "a node";
 	};
 }
 

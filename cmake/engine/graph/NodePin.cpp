@@ -6,7 +6,6 @@
 
 namespace engine::graph
 {
-
 	ImColor ColorFromHashCode(size_t aHashcode)
 	{
 		float value = aHashcode % 20000;

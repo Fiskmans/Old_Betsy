@@ -2,6 +2,7 @@
 #define ENGINE_GRAPH_NODE_MANAGER_H
 
 #include "engine/graph/NodePin.h"
+#include "engine/graph/BuiltNode.h"
 
 #include "tools/Singleton.h"
 
@@ -9,27 +10,6 @@
 
 namespace engine::graph
 {
-	class BuiltNode
-	{
-	public:
-		BuiltNode(const std::string& aName);
-
-		const std::string& Name() { return myName; }
-
-		void AddInPin(PinBase* aInPin);
-		void AddOutPin(PinBase* aOutPin);
-
-		void Imgui();
-
-	private:
-
-		std::string myName;
-
-		std::vector<PinBase*> myInPins;
-		std::vector<PinBase*> myOutPins;
-	};
-
-
 	class NodeManager : public tools::Singleton<NodeManager>
 	{
 	public:
@@ -45,7 +25,6 @@ namespace engine::graph
 
 	private:
 		BuiltNode* myCurrent = nullptr;
-
 		std::vector<BuiltNode*> myNodes;
 	};
 }

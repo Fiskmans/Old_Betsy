@@ -9,7 +9,8 @@ namespace engine
 	const tools::V2ui Camera::AdaptToScreen = tools::V2ui(0, 0);
 
 	Camera::Camera(float aNearPlane, float aFarPlane, tools::V2ui aResolution)
-		: myTransform(tools::M44f::Identity())
+		: myRenderGraph("Render graph")
+		, myTransform(tools::M44f::Identity())
 		, myNearPlane(aNearPlane)
 		, myFarPlane(aFarPlane)
 	{

@@ -8,7 +8,7 @@
 
 #include "engine/graph/NodeManager.h"
 #include "engine/graph/NodeRegistration.h"
-
+#include "engine/graph/Graph.h"
 
 #include "imgui/imgui.h"
 #include "imgui/WindowControl.h"
@@ -75,6 +75,7 @@ namespace engine
 		old_betsy_imgui::WindowControl::Window("Performance", PerformanceWindow);
 
 		graph::NodeManager::GetInstance().Imgui();
+		graph::GraphManager::GetInstance().Imgui();
 	}
 
 	void GameEngine::EngineWindow()

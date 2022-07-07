@@ -1,6 +1,8 @@
 #ifndef ENGINE_GRAPHICS_CAMERA_H
 #define ENGINE_GRAPHICS_CAMERA_H
 
+#include "engine/graph/Graph.h"
+
 #include "tools/MathVector.h"
 #include "tools/Matrix4x4.h"
 #include "tools/Matrix3x3.h"
@@ -53,6 +55,7 @@ namespace engine
 
 	protected:
 	
+		engine::graph::Graph myRenderGraph;
 		tools::M44f myTransform;
 		tools::M44f myProjection;
 
