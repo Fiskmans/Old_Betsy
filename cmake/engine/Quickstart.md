@@ -4,11 +4,14 @@
 * Initialize the game engine with it
 * Run the game
 ```cpp
+//YourGame.h
 class YourGame : public engine::Game
 {
   ...
 }
-
+```
+```cpp
+//main.cpp
 int main()
 {
   YourGame yourGame;
