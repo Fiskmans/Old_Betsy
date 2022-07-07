@@ -19,7 +19,7 @@ namespace engine::graph
 
 		static void Register()
 		{
-			static_cast<void>(tools::Singleton<NodeBase<Derived>>::GetInstance());
+			static_cast<void>(Derived::GetInstance());
 		}
 		
 	};

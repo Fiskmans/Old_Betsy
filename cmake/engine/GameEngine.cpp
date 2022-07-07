@@ -7,7 +7,7 @@
 #include "engine/assets/AssetManager.h"
 
 #include "engine/graph/NodeManager.h"
-#include "engine/graph/nodes/RenderCopyNode.h"
+#include "engine/graph/NodeRegistration.h"
 
 
 #include "imgui/imgui.h"
@@ -157,8 +157,7 @@ namespace engine
 		tools::Stopwatch stopWatch;
 		{
 			tools::TimedScope scopeTimer(stopWatch);
-		
-			graph::node::RenderCopyNode::Register();
+			graph::NodeRegistration::Register();
 		}
 		LOG_SYS_INFO("Engine nodes registerd in " + std::to_string(stopWatch.Read()) + " seconds");
 	}
@@ -181,7 +180,7 @@ namespace engine
 			
 			{
 				PERFORMANCETAG("Render frame");
-				GraphicsEngine::GetInstance().BeginFrame(tools::V4f(0.14f, 0.14f, 0.14f, 1.f));// tools::V4f(0.6f + 0.1f * cos(tools::GetTotalTime()), 0.5f  + 0.2f * cos(tools::GetTotalTime() / 1.8f), 0.5f + 0.3f * cos(tools::GetTotalTime() / 3.2f), 1.f));
+				GraphicsEngine::GetInstance().BeginFrame(tools::V4f(0.14f, 0.14f, 0.14f, 1.f));
 				GraphicsEngine::GetInstance().RenderFrame();
 			}
 

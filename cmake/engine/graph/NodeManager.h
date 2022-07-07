@@ -19,6 +19,8 @@ namespace engine::graph
 		void AddInPin(PinBase* aInPin);
 		void AddOutPin(PinBase* aOutPin);
 
+		void Imgui();
+
 	private:
 
 		std::string myName;

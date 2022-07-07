@@ -20,4 +20,5 @@ namespace engine::graph
 		if (it != myDependents.end())
 			myDependents.erase(it);
 	}
+
 }

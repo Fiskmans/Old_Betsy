@@ -247,33 +247,6 @@ int Run()
 #endif // !USEIMGUI
 
 
-					static long long lastTime = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
-					long long currentTime = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
-					long long delta = currentTime - lastTime;
-					lastTime = currentTime;
-					{
-						PERFORMANCETAG("Engine run");
-						engine.BeginFrame(clearColor);
-						shouldRun &= game->Run(&engine, CAST(float, double(delta) / (1000.0 * 1000.0)));
-					}
-
-#if USEAUDIO
-					//audioManager.Update();
-#endif
-				}
-				{
-					PERFORMANCETAG("Main loop");
-#if USEIMGUI
-					{
-						PERFORMANCETAG("Imgui Drawing");
-						ImGui::Render();
-						ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-					}
-#endif // !USEIMGUI
-					{
-						PERFORMANCETAG("End frame");
-						engine.EndFrame();
-					}
 				}
 			}
 

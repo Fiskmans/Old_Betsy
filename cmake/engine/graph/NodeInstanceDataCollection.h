@@ -21,13 +21,13 @@ namespace engine::graph
 	template<class T>
 	class NodeInstandeDataCollection
 	{
-	private:
+	private: 
 		T& Get(NodeInstanceId aId);
 		void AddInstance(NodeInstanceId aId);
 		void RemoveInstance(NodeInstanceId aId);
 	private:
 
-		std::vector<std::unique_ptr<NodeInstanceData<T>>>::iterator IndexOf(NodeInstanceId aId);
+		typename std::vector<std::unique_ptr<NodeInstanceData<T>>>::iterator IndexOf(NodeInstanceId aId);
 		std::vector<std::unique_ptr<NodeInstanceData<T>>> myInstances;
 	};
 
@@ -52,7 +52,7 @@ namespace engine::graph
 	}
 
 	template<class T>
-	inline std::vector<std::unique_ptr<NodeInstanceData<T>>>::iterator NodeInstandeDataCollection<T>::IndexOf(NodeInstanceId aId)
+	inline typename std::vector<std::unique_ptr<NodeInstanceData<T>>>::iterator NodeInstandeDataCollection<T>::IndexOf(NodeInstanceId aId)
 	{
 		return std::lower_bound(myInstances.begin(), myInstances.end(), aId);
 	}

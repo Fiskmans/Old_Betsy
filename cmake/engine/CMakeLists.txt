@@ -50,6 +50,7 @@ list(APPEND SOURCE_FILES "graph/NodePin.h")
 list(APPEND SOURCE_FILES "graph/NodeInstanceId.h")
 list(APPEND SOURCE_FILES "graph/NodeManager.h")
 list(APPEND SOURCE_FILES "graph/NodeManager.cpp")
+list(APPEND SOURCE_FILES "graph/NodeRegistration.h")
 
 list(APPEND SOURCE_FILES "graph/Nodes/RenderCopyNode.h")
 list(APPEND SOURCE_FILES "graph/Nodes/RenderCopyNode.cpp")

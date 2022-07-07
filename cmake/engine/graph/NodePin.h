@@ -5,6 +5,8 @@
 #include "engine/graph/NodeInstanceDataCollection.h"
 #include "engine/graph/PinValue.h"
 
+#include "imgui/imgui.h"
+
 #include <typeinfo>
 #include <functional>
 
@@ -16,6 +18,9 @@ namespace engine::graph
 		virtual ~PinBase() = default;
 		virtual const char*		Name() = 0;
 		virtual const std::type_info& Type() = 0;
+
+		void Draw(ImVec2 aLocation, bool aHovered);
+		//static void Setup();
 	};
 
 	class OutPinInstanceBase
@@ -59,7 +64,10 @@ namespace engine::graph
 	class InPin : public PinBase
 	{
 	public:
-		InPin(const char* aPinName) : myPinName(aPinName) { node_pin_helpers::RegisterInPin(this); }
+		InPin(const char* aPinName) : myPinName(aPinName) 
+		{ 
+			node_pin_helpers::RegisterInPin(this); 
+		}
 		
 		const char* Name() override { return myPinName.c_str(); }
 		const std::type_info& Type() override { return typeid(PinType); }
@@ -78,7 +86,10 @@ namespace engine::graph
 	class OutPin : public PinBase
 	{
 	public:
-		OutPin(const char* aPinName) : myPinName(aPinName) { node_pin_helpers::RegisterOutPin(this); }
+		OutPin(const char* aPinName) : myPinName(aPinName) 
+		{ 
+			node_pin_helpers::RegisterOutPin(this); 
+		}
 		
 		const char* Name() override { return myPinName.c_str(); }
 		const std::type_info& Type() override { return typeid(PinType); }
