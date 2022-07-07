@@ -50,11 +50,11 @@ namespace engine
 		template<class Func>
 		void GenerateAllPixels(Func&& aFunctor)
 		{
-			for (unsigned int y = 0; y < mySize.y; y++)
+			for (unsigned int y = 0; y < mySize[1]; y++)
 			{
-				for (unsigned int x = 0; x < mySize.x; x++)
+				for (unsigned int x = 0; x < mySize[0]; x++)
 				{
-					myData[y * mySize.x + x] = aFunctor(x, y);
+					myData[y * mySize[0] + x] = aFunctor(x, y);
 				}
 			}
 		}

@@ -284,7 +284,7 @@ namespace tools
 		return Matrix4x4(	trot.Row(0).Extend(myRows[0][3]),
 							trot.Row(1).Extend(myRows[1][3]),
 							trot.Row(2).Extend(myRows[2][3]),	
-							(rot *  myRows[3]).Extend(myRows[3][3]);
+							(rot *  myRows[3]).Extend(myRows[3][3]));
 	}
 
 	template<class T>

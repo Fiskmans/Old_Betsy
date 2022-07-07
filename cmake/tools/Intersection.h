@@ -113,8 +113,8 @@ namespace tools
 		T t5 = (minCorner.z - origin.z) * dirInverse.z;
 		T t6 = (maxCorner.z - origin.z) * dirInverse.z;
 
-		T tmin = std::max(std::max(std::min(t1, t2), std::min(t3, t4)), std::min(t5, t6));
-		T tmax = std::min(std::min(std::max(t1, t2), std::max(t3, t4)), std::max(t5, t6));
+		T tmin = (std::max)((std::min)(t1, t2), (std::min)(t3, t4), (std::min)(t5, t6));
+		T tmax = (std::min)((std::max)(t1, t2), (std::max)(t3, t4), (std::max)(t5, t6));
 
 		aOutDistance = tmin;
 		return !(tmax < 0) && !(tmin > tmax);

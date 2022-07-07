@@ -58,12 +58,6 @@ namespace tools
 		Matrix3x3<T> operator/(const T aScalar) const;
 		Matrix3x3<T>& operator/=(const T aScalar);
 
-		T& operator()(const unsigned int aRow, const unsigned int aColumn);
-		const T& operator()(const unsigned int aRow, const unsigned int aColumn) const;
-
-		T& operator[](const unsigned int anIndex);
-		const T& operator[](const unsigned int anIndex) const;
-
 		MathVector<T, 3>& Row(size_t aIndex);
 		const MathVector<T, 3>& Row(size_t aIndex) const;
 
@@ -83,7 +77,7 @@ namespace tools
 	{
 		for (size_t y = 0; y < 3; y++)
 		{
-			myRows[y] = aMatrix[y]
+			myRows[y] = aMatrix[y];
 		}
 	}
 
@@ -223,7 +217,7 @@ namespace tools
 		{
 			for (size_t column = 0; column < 3; ++column)
 			{
-				transpose.myData[column][row] = myData[row][column];
+				transpose.myRows[column][row] = myRows[row][column];
 			}
 		}
 
@@ -350,50 +344,6 @@ namespace tools
 	inline Matrix3x3<T>& Matrix3x3<T>::operator/=(const T aScalar)
 	{
 		return operator *=(1 / aScalar);
-	}
-
-	template<class T>
-	inline T& Matrix3x3<T>::operator()(const unsigned int aRow, const unsigned int aColumn)
-	{
-		if (aRow > 0 && aRow <= 3 && aColumn > 0 && aColumn <= 3)
-		{
-			return myData[aRow - 1][aColumn - 1];
-		}
-
-		SYSERROR("Matrix3x3 index out of range.");
-		return myData[0][0];
-	}
-
-	template<class T>
-	inline const T& Matrix3x3<T>::operator()(const unsigned int aRow, const unsigned int aColumn) const
-	{
-		if (aRow > 0 && aRow <= 3 && aColumn > 0 && aColumn <= 3)
-		{
-			return myData[aRow - 1][aColumn - 1];
-		}
-
-		SYSERROR("Matrix3x3 index out of range.");
-		return myData[0][0];
-	}
-
-	template<class T>
-	inline T& Matrix3x3<T>::operator[](const unsigned int anIndex)
-	{
-		if (anIndex < 0 || anIndex >= 9)
-		{
-			SYSERROR("Matrix3x3 index out of range.");
-		}
-		return myRows[anIndex];
-	}
-
-	template<class T>
-	inline const T& Matrix3x3<T>::operator[](const unsigned int anIndex) const
-	{
-		if (anIndex < 0 || anIndex >= 9)
-		{
-			SYSERROR("Matrix3x3 index out of range.");
-		}
-		return myRows[anIndex];
 	}
 
 	template<class T>
