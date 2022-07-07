@@ -1,7 +1,7 @@
 # Old Betsy
 An open-souce game engine for anyone who wants to develop a game 'closer to the metal'
 
-##UNDER MAITENANCE
+## UNDER MAITENANCE
 the engine is currently being migrated from Pre_cmake to cmake, come back later och check out an old version if you want a working engine
 
 ## Supports
