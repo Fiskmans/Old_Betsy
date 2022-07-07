@@ -2,7 +2,8 @@
 An open-souce game engine for anyone who wants to develop a game 'closer to the metal'
 
 ## UNDER MAINTENANCE
-the engine is currently being migrated from Pre_cmake to cmake, come back later or check out an old version if you want a working engine
+the engine is currently being migrated from Pre_cmake to cmake, with some fairly significant rewrites taking place at the same time.
+Come back later or check out an old commit if you want a working engine
 
 ## Supports
 - Models
