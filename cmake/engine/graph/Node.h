@@ -16,14 +16,16 @@ namespace engine::graph
 		{
 			NodeManager::GetInstance().BeginNode(typeid(*this).name());
 		}
+		~NodeBase() = default;
+
 
 		static void Register()
 		{
 			static_cast<void>(Derived::GetInstance());
 		}
 		
+		virtual void Imgui(NodeInstanceId aId) {};
 	};
-
 }
 
 #endif

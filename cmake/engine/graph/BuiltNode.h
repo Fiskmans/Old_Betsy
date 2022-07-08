@@ -19,6 +19,9 @@ namespace engine::graph
 
 		void Imgui();
 
+		std::vector<PinBase*>& InPins() { return myInPins; }
+		std::vector<PinBase*>& OutPins() { return myOutPins; }
+
 	private:
 
 		std::string myName;

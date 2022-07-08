@@ -4,6 +4,9 @@
 #include "tools/Singleton.h"
 
 #include "engine/graph/nodes/RenderCopyNode.h"
+#include "engine/graph/nodes/RenderMergeNode.h"
+
+#include "common/Macros.h"
 
 namespace engine::graph
 {
@@ -16,7 +19,8 @@ namespace engine::graph
 		}
 
 	private:
-		node::RenderCopyNode renderCopyNode;
+		node::RenderCopyNode UNIQUENAME;
+		node::RenderMergeNode UNIQUENAME;
 	};
 }
 

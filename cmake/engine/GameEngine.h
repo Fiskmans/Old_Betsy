@@ -14,6 +14,9 @@ namespace engine
 	class Game
 	{
 	public:
+		Game();
+		virtual ~Game() = default;
+
 
 		virtual std::string AsciiName() = 0;
 		virtual std::wstring Name() = 0;
@@ -48,12 +51,12 @@ namespace engine
 		inline RenderScene& GetMainScene() { return myMainScene; }
 
 	private:
+		friend Game;
 
 		void Imgui();
 		void EngineWindow();
 		static void PerformanceWindow();
 
-		void RegisterNodes();
 		void RegisterEngineNodes();
 
 		void Run();

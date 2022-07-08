@@ -19,11 +19,13 @@ namespace engine::graph
 		virtual const char*		Name() = 0;
 		virtual const std::type_info& Type() = 0;
 
-		void Draw();
+		void Draw(float aScale, ImVec2 aLocation);
 		//static void Setup();
 
 	private:
 		bool myIsHovered = false;
+		static const std::type_info* ourHoveredType;
+		static float ourHoverIntensity;
 	};
 
 	class OutPinInstanceBase

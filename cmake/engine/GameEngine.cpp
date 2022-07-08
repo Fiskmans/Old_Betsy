@@ -23,6 +23,18 @@
 
 namespace engine
 {
+	Game::Game()
+	{
+		LOG_SYS_INFO("Registering nodes");
+		tools::Stopwatch stopWatch;
+		{
+			GameEngine::GetInstance().RegisterEngineNodes();
+			RegisterNodes();
+			graph::NodeManager::GetInstance().EndNode();
+		}
+		LOG_SYS_INFO("Nodes registerd in " + std::to_string(stopWatch.Read()) + " seconds");
+	}
+
 	void GameEngine::Init(Game& aGame)
 	{
 		LOG_SYS_INFO("Initializing Game Engine to run [" + aGame.AsciiName() + "]");
@@ -32,6 +44,7 @@ namespace engine
 		tools::Stopwatch stopWatch;
 		{
 			tools::TimedScope scopeTimer(stopWatch);
+
 			AssetManager::GetInstance().Init("data/assets", "baked");
 #ifdef _DEBUG
 			AssetManager::GetInstance().Preload();
@@ -39,7 +52,6 @@ namespace engine
 
 			GraphicsEngine::GetInstance().Init(SettingsManager::GetInstance().myWindowSize.Get());
 
-			RegisterNodes();
 
 			IMGUI_CHECKVERSION();
 			ImGui::CreateContext();
@@ -139,19 +151,6 @@ namespace engine
 			tools::FlushTimeTree();
 	}
 
-	void GameEngine::RegisterNodes()
-	{
-		LOG_SYS_INFO("Registering nodes");
-		tools::Stopwatch stopWatch;
-		{
-			tools::TimedScope scopeTimer(stopWatch);
-			RegisterEngineNodes();
-			myGame->RegisterNodes();
-			graph::NodeManager::GetInstance().EndNode();
-		}
-		LOG_SYS_INFO("Nodes registerd in " + std::to_string(stopWatch.Read()) + " seconds");
-	}
-
 	void GameEngine::RegisterEngineNodes()
 	{
 		LOG_SYS_INFO("Registering Engine nodes");
@@ -216,5 +215,6 @@ namespace engine
 		PERFORMANCETAG("Engine Update");
 		WindowManager::GetInstance().Update();
 	}
+	
 }
 

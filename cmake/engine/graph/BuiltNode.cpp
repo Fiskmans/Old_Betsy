@@ -7,24 +7,6 @@ namespace engine::graph
 	BuiltNode::BuiltNode(const std::string& aName)
 		: myName(aName)
 	{
-		if (myName.starts_with("class "))
-			myName = myName.substr(6);
-		else if (myName.starts_with("struct "))
-			myName = myName.substr(7);
-
-		if (myName.starts_with("engine::graph::NodeBase<class "))
-			myName = myName.substr(30);
-
-		if (myName.ends_with(">"))
-			myName = myName.substr(0, myName.size() - 1);
-
-		if (myName.ends_with("node") || myName.ends_with("Node"))
-			myName = myName.substr(0, myName.size() - 4);
-
-		size_t last = myName.find_last_of(':');
-		if (last != std::string::npos)
-			myName = myName.substr(last + 1);
-
 		if (myName.empty())
 			throw std::exception("Node created with no name");
 	}
@@ -43,15 +25,15 @@ namespace engine::graph
 	{
 		if (ImGui::TreeNode(myName.c_str()))
 		{
-			ImGui::Columns(2);
-			for (PinBase* inPin : myInPins)
-				inPin->Draw();
+			//ImGui::Columns(2);
+			//for (PinBase* inPin : myInPins)
+			//	inPin->Draw();
+			//
+			//ImGui::NextColumn();
+			//for (PinBase* outPin : myOutPins)
+			//	outPin->Draw();
 
-			ImGui::NextColumn();
-			for (PinBase* outPin : myOutPins)
-				outPin->Draw();
-
-			ImGui::NextColumn();
+			//ImGui::NextColumn();
 
 			ImGui::TreePop();
 		}

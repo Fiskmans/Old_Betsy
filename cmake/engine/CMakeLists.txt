@@ -58,6 +58,8 @@ list(APPEND SOURCE_FILES "graph/BuiltNode.h")
 
 list(APPEND SOURCE_FILES "graph/Nodes/RenderCopyNode.h")
 list(APPEND SOURCE_FILES "graph/Nodes/RenderCopyNode.cpp")
+list(APPEND SOURCE_FILES "graph/Nodes/RenderMergeNode.h")
+list(APPEND SOURCE_FILES "graph/Nodes/RenderMergeNode.cpp")
 
 list(APPEND SOURCE_FILES "GameEngine.h")
 list(APPEND SOURCE_FILES "GameEngine.cpp")

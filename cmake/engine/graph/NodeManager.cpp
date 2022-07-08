@@ -1,6 +1,8 @@
 #include "engine/graph/NodeManager.h"
 #include "imgui/WindowControl.h"
 
+#include "logger/Logger.h"
+
 #include "imgui/imgui.h"
 
 namespace engine::graph
@@ -10,7 +12,7 @@ namespace engine::graph
 		if (myCurrent)
 			EndNode();
 
-		myCurrent = new BuiltNode(aName);
+		myCurrent = new BuiltNode(PrettyfyName(aName));
 	}
 
 	void NodeManager::AddInPin(PinBase* aInPin)
@@ -25,7 +27,7 @@ namespace engine::graph
 	
 	void NodeManager::EndNode()
 	{
-		myNodes.push_back(myCurrent);
+		myNodes.emplace(myCurrent->Name(), myCurrent);
 		myCurrent = nullptr;
 	}
 
@@ -34,11 +36,46 @@ namespace engine::graph
 		old_betsy_imgui::WindowControl::Window("Nodes",
 			[&]()
 		{
-			for (BuiltNode* node : myNodes)
+			for (const std::pair<std::string,BuiltNode*>& node : myNodes)
 			{
-				node->Imgui();
+				node.second->Imgui();
 			}
 		});
+	}
+
+	BuiltNode* NodeManager::Get(const std::string& aName)
+	{
+		std::string key = PrettyfyName(aName);
+		typename decltype(myNodes)::iterator it = myNodes.find(key);
+		if (it != myNodes.end())
+			return it->second;
+
+		LOG_ERROR("No node with that name exists", aName, key);
+		return nullptr;
+	}
+
+	std::string NodeManager::PrettyfyName(const std::string& aName)
+	{
+		std::string name = aName;
+		if (name.starts_with("class "))
+			name	= name.substr(6);
+		else if (name.starts_with("struct "))
+			name	= name.substr(7);
+
+		if (name.starts_with("engine::graph::NodeBase<class "))
+			name = name.substr(30);
+
+		if (name.ends_with(">"))
+			name = name.substr(0, name.size() - 1);
+
+		if (name.ends_with("node") || name.ends_with("Node"))
+			name = name.substr(0, name.size() - 4);
+
+		size_t last = name.find_last_of(':');
+		if (last != std::string::npos)
+			name = name.substr(last + 1);
+
+		return name;
 	}
 
 }

@@ -3,6 +3,7 @@
 #include "engine/graph/NodeManager.h"
 
 #include "tools/TimeHelper.h"
+#include "tools/Utility.h"
 
 #include "common/Macros.h"
 
@@ -11,15 +12,22 @@ namespace engine::graph
 	ImColor ColorFromHashCode(size_t aHashcode)
 	{
 		float value = aHashcode % 20000;
-		return ImColor(0.6f + 0.1f * cos(value), 0.5f + 0.2f * cos(value / 1.8f), 0.5f + 0.3f * cos(value / 3.2f), 1.f);
+		return ImColor(
+			0.6f + 0.1f * cos(value), 
+			0.5f + 0.2f * cos(value / 1.8f), 
+			0.5f + 0.3f * cos(value / 3.2f), 
+			1.f);
 	}
 
-	void PinBase::Draw()
+	const std::type_info* PinBase::ourHoveredType = nullptr;
+	float PinBase::ourHoverIntensity = 0.f;
+
+	void PinBase::Draw(float aScale, ImVec2 aLocation)
 	{
 		const std::type_info& type = Type();
-		ImVec2 location	= ImGui::GetCursorScreenPos();
 
-		ImGui::Dummy(ImVec2(22, 16));
+		ImGui::SetCursorScreenPos(aLocation);
+		ImGui::Dummy(ImVec2(22 * aScale, 16 * aScale));
 		
 		static float startHover = 0;
 		{
@@ -41,27 +49,52 @@ namespace engine::graph
 		ImColor color = ColorFromHashCode(type.hash_code());
 
 		bool popupOpen = false;
+		bool highlight = false;
 
-		if (myIsHovered && tools::GetTotalTime() - startHover > 0.4f)
-			popupOpen = true;
-
+		const float timeToPopUp = 0.4f;
+		const float timeToHighlight = 1.1f;
+		
 		if (myIsHovered)
-			color = ImColor(LERP(color.Value.x, 1.f, 0.5f), LERP(color.Value.y, 1.f, 0.5f), LERP(color.Value.z, 1.f, 0.5f), 1.f);
+		{
+			const float hoverIntensity = 0.5f;
 
-		const float yOffset = 7.4f;
-		const float xOffset = 6.f;
+			if (tools::GetTotalTime() - startHover > timeToPopUp)
+				popupOpen = true;
 
-		const float bigCircleSize = 4.1f;
-		const float bigCircleThickness = 3.2f;
-		const float lineLength = 3.9f;
-		const float lineThickness = 1.4f;
-		const float smallCirclesize = 2.8f;
-		const float smallCircleThickness = 1.9f;
+
+			if (tools::GetTotalTime() - startHover > timeToHighlight)
+				highlight = true;
+
+			color = ImColor(LERP(color.Value.x, 1.f, hoverIntensity), LERP(color.Value.y, 1.f, hoverIntensity), LERP(color.Value.z, 1.f, hoverIntensity), 1.f);
+		}
+
+		if(highlight)
+		{
+			float x				= tools::GetTotalTime() - startHover - timeToHighlight;
+			ourHoverIntensity	= x / sqrt(1 + tools::Square(x));
+			ourHoveredType		= &type;
+		}
+
+		if (ourHoveredType && *ourHoveredType == type)
+		{
+			float intensity = (0.3f + 0.3f * cos(tools::GetTotalTime() * TAU)) * ourHoverIntensity;
+			color = ImColor(LERP(color.Value.x, 1.f, intensity), LERP(color.Value.y, 1.f, intensity), LERP(color.Value.z, 1.f, intensity), 1.f);
+		}
+
+		const float yOffset = 7.4f * aScale;
+		const float xOffset = 6.f * aScale;
+
+		const float bigCircleSize = 4.1f * aScale;
+		const float bigCircleThickness = 3.2f * aScale;
+		const float lineLength = 3.9f * aScale;
+		const float lineThickness = 1.4f * aScale;
+		const float smallCirclesize = 2.8f * aScale;
+		const float smallCircleThickness = 1.9f * aScale;
 
 		//drawList->AddRectFilled(aLocation, ImVec2(aLocation.x + 22, aLocation.y + 16), ImColor(0.5, 0.5, 0.5, 1.f));
-		drawList->AddCircle(ImVec2(location.x + xOffset, location.y + yOffset), bigCircleSize, color, 0, bigCircleThickness);
-		drawList->AddLine(ImVec2(location.x + xOffset + bigCircleSize, location.y + yOffset), ImVec2(location.x + xOffset + bigCircleSize + lineLength, location.y + yOffset), color, lineThickness);
-		drawList->AddCircle(ImVec2(location.x + xOffset + bigCircleSize + lineLength + smallCirclesize, location.y + yOffset), smallCirclesize, color, 0, smallCircleThickness);
+		drawList->AddCircle(ImVec2(aLocation.x + xOffset, aLocation.y + yOffset), bigCircleSize, color, 0, bigCircleThickness);
+		drawList->AddLine(ImVec2(aLocation.x + xOffset + bigCircleSize, aLocation.y + yOffset), ImVec2(aLocation.x + xOffset + bigCircleSize + lineLength, aLocation.y + yOffset), color, lineThickness);
+		drawList->AddCircle(ImVec2(aLocation.x + xOffset + bigCircleSize + lineLength + smallCirclesize, aLocation.y + yOffset), smallCirclesize, color, 0, smallCircleThickness);
 
 
 

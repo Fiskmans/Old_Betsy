@@ -15,17 +15,22 @@ namespace engine::graph
 	public:
 
 		void BeginNode(const std::string& aName);
-
 		void AddInPin(PinBase* aInPin);
 		void AddOutPin(PinBase* aOutPin);
-
 		void EndNode();
 
 		void Imgui();
 
+		template<class NodeType>
+		BuiltNode* Get() { return Get(typeid(NodeType).name()); }
+
+		BuiltNode* Get(const std::string& aName);
+
 	private:
+		static std::string PrettyfyName(const std::string& aName);
+
 		BuiltNode* myCurrent = nullptr;
-		std::vector<BuiltNode*> myNodes;
+		std::unordered_map<std::string, BuiltNode*> myNodes;
 	};
 }
 

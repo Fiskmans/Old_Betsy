@@ -131,6 +131,8 @@
 #define CONCAT_(a,b) a##b
 #define CONCAT(a,b) CONCAT_(a,b)
 
+#define UNIQUENAME CONCAT(UniqueName,__LINE__);
+
 #if TRACKPERFORMANCE
 #define PERFORMANCETAG(name) tools::ScopeDiagnostic CONCAT(PerformanceTag, __LINE__)(name)
 #else
