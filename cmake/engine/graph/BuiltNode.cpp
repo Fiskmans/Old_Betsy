@@ -45,23 +45,11 @@ namespace engine::graph
 		{
 			ImGui::Columns(2);
 			for (PinBase* inPin : myInPins)
-			{
-				ImVec2 location = ImGui::GetCursorScreenPos();
-				ImGui::Dummy(ImVec2(22, 16));
-				inPin->Draw(location, ImGui::IsItemHovered());
-				ImGui::SameLine();
-				ImGui::Text("%s", inPin->Name());
-			}
+				inPin->Draw();
 
 			ImGui::NextColumn();
 			for (PinBase* outPin : myOutPins)
-			{
-				ImVec2 location = ImGui::GetCursorScreenPos();
-				ImGui::Dummy(ImVec2(22, 16));
-				outPin->Draw(location, ImGui::IsItemHovered());
-				ImGui::SameLine();
-				ImGui::Text("%s", outPin->Name());
-			}
+				outPin->Draw();
 
 			ImGui::NextColumn();
 
