@@ -2,6 +2,8 @@
 
 #include "imgui/WindowControl.h"
 
+#include "tools/ImGuiHelpers.h"
+
 #define NOMINMAX
 #include <windows.h>
 
@@ -50,6 +52,8 @@ namespace engine::graph
 
 	void GraphManager::Imgui()
 	{
+		PinBase::Imgui();
+
 		static ImVec2 windowPosition = ImVec2(0,0);
 		static ImVec2 newWindowPosition = ImVec2(0,0);
 		old_betsy_imgui::WindowControl::Window("Graph manager",
@@ -72,12 +76,6 @@ namespace engine::graph
 		{
 			ImGui::SetNextWindowPos(newWindowPosition, ImGuiCond_Always);
 		});
-	}
-
-	ImColor
-	GetColor(ImGuiCol_ aColor)
-	{
-		return ImColor(ImGui::GetStyle().Colors[aColor]);
 	}
 
 	bool GraphManager::ManageGraphs()
@@ -150,7 +148,7 @@ namespace engine::graph
 		
 
 		ImGui::PopClipRect();
-		drawList->AddRect(topLeft, bottomRight, GetColor(ImGuiCol_Border), ImGui::GetStyle().FrameRounding, 0, ImGui::GetStyle().ChildBorderSize);
+		drawList->AddRect(topLeft, bottomRight, tools::GetImColor(ImGuiCol_Border), ImGui::GetStyle().FrameRounding, 0, ImGui::GetStyle().ChildBorderSize);
 		ImVec2 mousepos = ImGui::GetMousePos();
 
 		return mousepos.x > topLeft.x && mousepos.x < bottomRight.x
@@ -178,26 +176,37 @@ namespace engine::graph
 		const float		headerSize	= 20 * aScale;
 		const float		pinSpacing	= 4 * aScale;
 
-		ImVec2 size = ImVec2(120 * aScale,  headerSize + pinSize.y * pinCount + pinSpacing * (pinCount + 1));
+		ImVec2 size = ImVec2(160 * aScale,  headerSize + pinSize.y * pinCount + pinSpacing * (pinCount + 1));
 		ImVec2 topLeft = ImVec2(aPosition.x * aScale + offset.x, aPosition.y * aScale + offset.y);
 		ImVec2 bottomRight = ImVec2(topLeft.x + size.x, topLeft.y + size.y);
 
-		drawlist->AddRectFilled(ImVec2(topLeft.x + shadowOffset.x, topLeft.y + shadowOffset.y), ImVec2(bottomRight.x + shadowOffset.x, bottomRight.y + shadowOffset.y), GetColor(ImGuiCol_BorderShadow), 3.f);
-		drawlist->AddRectFilled(topLeft, bottomRight, GetColor(ImGuiCol_WindowBg), 3.f);
-		drawlist->AddRectFilled(topLeft, ImVec2(bottomRight.x, topLeft.y + headerSize), GetColor(ImGuiCol_Header), 3.f);
-		drawlist->AddRect(topLeft, bottomRight, GetColor(ImGuiCol_Border), 3.f);
+		drawlist->AddRectFilled(ImVec2(topLeft.x + shadowOffset.x, topLeft.y + shadowOffset.y), ImVec2(bottomRight.x + shadowOffset.x, bottomRight.y + shadowOffset.y), tools::GetImColor(ImGuiCol_BorderShadow), 3.f);
+		drawlist->AddRectFilled(topLeft, bottomRight, tools::GetImColor(ImGuiCol_WindowBg), 3.f);
+		drawlist->AddRectFilled(topLeft, ImVec2(bottomRight.x, topLeft.y + headerSize), tools::GetImColor(ImGuiCol_Header), 3.f);
+		drawlist->AddRect(topLeft, bottomRight, tools::GetImColor(ImGuiCol_Border), 3.f);
 
 		ImVec2 textPos = ImVec2(topLeft.x + 4 * aScale, topLeft.y + 4 * aScale);
 
-		drawlist->AddText(ImGui::GetFont(), ImGui::GetFontSize() * aScale, textPos, GetColor(ImGuiCol_Text), myType->Name().c_str());
+		drawlist->AddText(ImGui::GetFont(), ImGui::GetFontSize() * aScale, textPos, tools::GetImColor(ImGuiCol_Text), myType->Name().c_str());
 
-
-		ImVec2 pinPosition = ImVec2(topLeft.x + 2 * aScale, topLeft.y + headerSize + pinSpacing);
-
-		for (PinBase* pin : myType->InPins())
 		{
-			pin->Draw(aScale, pinPosition);
-			pinPosition = ImVec2(pinPosition.x, pinPosition.y + pinSpacing + pinSize.y);
+			ImVec2 pinPosition = ImVec2(topLeft.x + 2 * aScale, topLeft.y + headerSize + pinSpacing);
+
+			for (PinBase* pin : myType->InPins())
+			{
+				pin->Draw(aScale, pinPosition, true);
+				pinPosition = ImVec2(pinPosition.x, pinPosition.y + pinSpacing + pinSize.y);
+			}
+		}
+
+		{
+			ImVec2 pinPosition = ImVec2(bottomRight.x - 2 * aScale - pinSize.x, topLeft.y + headerSize + pinSpacing);
+
+			for (PinBase* pin : myType->OutPins())
+			{
+				pin->Draw(aScale, pinPosition, false);
+				pinPosition = ImVec2(pinPosition.x, pinPosition.y + pinSpacing + pinSize.y);
+			}
 		}
 
 

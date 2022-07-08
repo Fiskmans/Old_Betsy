@@ -20,6 +20,8 @@ namespace tools
 
 	void ZoomableImGuiSnapshot(void* aTexture, ImVec2 aSize);
 
+	ImColor GetImColor(ImGuiCol_ aColor);
+
 
 	bool EditPosition(const char* aName, float* aData, bool& hovered = dummy);
 

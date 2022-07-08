@@ -36,7 +36,7 @@ namespace engine::graph
 		old_betsy_imgui::WindowControl::Window("Nodes",
 			[&]()
 		{
-			for (const std::pair<std::string,BuiltNode*>& node : myNodes)
+			for (std::pair<std::string,BuiltNode*> node : myNodes)
 			{
 				node.second->Imgui();
 			}

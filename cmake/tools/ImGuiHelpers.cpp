@@ -153,6 +153,11 @@ namespace tools
 	//	ZoomableImGuiImage(CopyTexture(aTexture), aSize);
 	//}
 
+	ImColor GetImColor(ImGuiCol_ aColor)
+	{
+		return ImGui::GetStyle().Colors[aColor];
+	}
+
 	bool EditPosition(const char* aName, float* aData, bool& hovered)
 	{
 		bool changed = false;
