@@ -2,7 +2,7 @@
 ### 1.1 Cpp file extensions
 Use only `.h` for header files and `.cpp` for code files
 ### 1.2 File names
-Files should be named human readable and in PascalCase 
+Files should be named human readable and in PascalCase i.e `LockedResource.h`
 ### 1.3 Folder names
 Folders should always be single word and all lowercase
 # 2 Header guards
