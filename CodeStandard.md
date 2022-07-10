@@ -58,6 +58,8 @@ Should be arranged into blocks like this:
 #include "tools/Literals.h"
 #include "tools/MathVector.h"
 ```
+
+ImGui files count as part of the project
 #### 3.2.4 External files
 Always include external files with `<>`
 
