@@ -4,7 +4,7 @@ Use only `.h` for header files and `.cpp` for code files
 ### 1.2 File names
 Files should be named human readable and in PascalCase i.e `LockedResource.h`
 ### 1.3 Folder names
-Folders should always be single word and all lowercase
+Folders should always be single word and all lowercase i.e `engine/graphics/`
 # 2 Header guards
 Use `#ifndef ... #endif` blocks as header guards
 ```cpp
