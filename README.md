@@ -17,6 +17,8 @@ Come back later or check out an old commit if you want a working engine
   - Dds
 
 # Contributing
+Check out the [Code Standard](CodeStandard.md)
+
 If there is something you want to see added feel free to open a pull request.
 Only submit code or resources to this project that you have the permission to so with.
 
