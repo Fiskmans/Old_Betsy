@@ -69,8 +69,8 @@ The two final include blocks are `std` files and `platform` files
 #include <d3d11.h>
 ```
 ##### 3.2.4.1 Windows
-Always define `NOMINMAX` right before including `windows.h`
+Always define `NOMINMAX` right before including `Windows.h`
 ```cpp
 #define NOMINMAX
-#include <windows.h>
+#include <Windows.h>
 ```
