@@ -8,23 +8,19 @@
 
 namespace engine::graph
 {
-	template<class Derived>
-	class NodeBase : public tools::Singleton<NodeBase<Derived>>
+	class NodeBase
 	{
 	public:
 		NodeBase()
 		{
-			NodeManager::GetInstance().BeginNode(typeid(*this).name());
+			NodeManager::GetInstance().BeginNode(this);
 		}
-		~NodeBase() = default;
-
-
-		static void Register()
-		{
-			static_cast<void>(Derived::GetInstance());
-		}
+		virtual ~NodeBase() = default;
 		
-		virtual void Imgui(NodeInstanceId aId) {};
+		virtual void Activate(NodeInstanceId aId) = 0;
+
+		virtual ImVec2 ImguiSize(NodeInstanceId aId) { return ImVec2(0, 0); }
+		virtual void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) {};
 	};
 }
 

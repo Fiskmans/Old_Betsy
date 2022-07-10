@@ -12,7 +12,7 @@ namespace engine
 	const tools::V2ui Camera::AdaptToScreen = tools::V2ui(0, 0);
 
 	Camera::Camera(float aNearPlane, float aFarPlane, tools::V2ui aResolution)
-		: myRenderGraph("Render graph")
+		: myRenderGraph("Render graph", { &myRenderTexture }, { &myResolutionExport })
 		, myTransform(tools::M44f::Identity())
 		, myNearPlane(aNearPlane)
 		, myFarPlane(aFarPlane)
@@ -21,13 +21,15 @@ namespace engine
 
 		if (aResolution == AdaptToScreen)
 		{
-			myResolution = WindowManager::GetInstance().GetSize();
+			myResolutionExport.Write(WindowManager::GetInstance().GetSize());
 			myResolutionEvent = WindowManager::GetInstance().ResolutionChanged.Register(std::bind(&Camera::OnResolutionChanged, this, std::placeholders::_1));
 		}
 		else
 		{
-			myResolution = aResolution;
+			myResolutionExport.Write(aResolution);
 		}
+
+
 	}
 
 	Camera::~Camera()
@@ -200,6 +202,11 @@ namespace engine
 		return myTransform.Row(3);
 	}
 
+	void Camera::SetResolution(tools::V2ui aResolution)
+	{
+		myResolutionExport.Write(aResolution);
+	}
+
 	PerspectiveCamera::PerspectiveCamera(float aNearPlane, float aFarPlane, float aFOV, tools::V2ui aResolution)
 		: Camera(aNearPlane, aFarPlane, aResolution)
 	{
@@ -214,9 +221,10 @@ namespace engine
 
 	void PerspectiveCamera::SetFOVRad(float aFOV)
 	{
+		tools::V2ui resolution = myResolutionExport.Get();
 		const float maxFOV = (PI_F / 2.f) * (179.f / 180.f);
 		myXFOV = aFOV / 2.f;
-		myYFOV = aFOV / 2.f * (static_cast<float>(myResolution[0]) / static_cast<float>(myResolution[1]));
+		myYFOV = aFOV / 2.f * (static_cast<float>(resolution[0]) / static_cast<float>(resolution[1]));
 		if (myXFOV > maxFOV)
 		{
 			myXFOV = maxFOV;

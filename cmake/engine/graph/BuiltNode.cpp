@@ -1,14 +1,18 @@
 #include "engine/graph/BuiltNode.h"
+#include "engine/graph/Node.h"
 
 namespace engine::graph
 {
 
 
-	BuiltNode::BuiltNode(const std::string& aName)
-		: myName(aName)
+	BuiltNode::BuiltNode(NodeBase* aBaseNode)
+		: myBaseNode(aBaseNode)
 	{
-		if (myName.empty())
-			throw std::exception("Node created with no name");
+	}
+
+	const char* BuiltNode::Name() 
+	{ 
+		return typeid(*myBaseNode).name(); 
 	}
 
 	void BuiltNode::AddInPin(PinBase* aInPin)
@@ -23,7 +27,7 @@ namespace engine::graph
 
 	void BuiltNode::Imgui()
 	{
-		if (ImGui::TreeNode(myName.c_str()))
+		if (ImGui::TreeNode(Name()))
 		{
 			//ImGui::Columns(2);
 			//for (PinBase* inPin : myInPins)
@@ -37,5 +41,34 @@ namespace engine::graph
 
 			ImGui::TreePop();
 		}
+	}
+
+	void BuiltNode::AddInstance(NodeInstanceId aId)
+	{
+		for (PinBase* out : myOutPins)
+		{
+			out->AddInstance(aId);
+			out->GetOutPinInstance(aId)->GetStorage().SetRefreshCallback(std::bind(&NodeBase::Activate, myBaseNode, aId));
+		}
+
+		for (PinBase* in : myInPins)
+		{
+			in->AddInstance(aId);
+
+			InPinInstance* inInstance = in->GetInPinInstance(aId);
+			for (PinBase* out : myOutPins)
+				inInstance->AddDependent(out->GetOutStorage(aId));
+		}
+
+	}
+
+	void BuiltNode::RemoveInstance(NodeInstanceId aId)
+	{
+		for (PinBase* in : myInPins)
+			in->RemoveInstance(aId);
+
+		for (PinBase* out : myOutPins)
+			out->RemoveInstance(aId);
+
 	}
 }

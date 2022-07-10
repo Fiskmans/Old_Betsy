@@ -3,6 +3,8 @@
 
 #include "engine/graph/Graph.h"
 
+#include "engine/graphics/Texture.h"
+
 #include "tools/MathVector.h"
 #include "tools/Matrix4x4.h"
 #include "tools/Matrix3x3.h"
@@ -21,7 +23,6 @@ namespace engine
 	
 		Camera(float aNearPlane, float aFarPlane, tools::V2ui aResolution);
 		virtual ~Camera();
-
 
 		virtual void OnResolutionChanged(tools::V2ui aResolution);
 
@@ -53,14 +54,20 @@ namespace engine
 
 		virtual tools::PlaneVolume<float> GenerateFrustum() const = 0;
 
-	protected:
-	
+	private:
+		void SetResolution(tools::V2ui aResolution);
+
 		engine::graph::Graph myRenderGraph;
+
+		engine::graph::CustomInPin<Texture> myRenderTexture = "Texture to Render";
+	protected:
+
+		engine::graph::CustomOutPin<tools::V2ui> myResolutionExport = "Resolution";
+		
 		tools::M44f myTransform;
 		tools::M44f myProjection;
 
 		tools::EventID myResolutionEvent = tools::NullEventId;
-		tools::V2ui myResolution;
 
 		float myNearPlane;
 		float myFarPlane;

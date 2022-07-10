@@ -33,6 +33,8 @@ list(APPEND SOURCE_FILES "AABB3D.h")
 list(APPEND SOURCE_FILES "NameThread.cpp")
 list(APPEND SOURCE_FILES "NameThread.h")
 list(APPEND SOURCE_FILES "LockedResource.h")
+list(APPEND SOURCE_FILES "Solver.h")
+list(APPEND SOURCE_FILES "Solver.cpp")
 
 add_library(Tools STATIC "${SOURCE_FILES}")
 

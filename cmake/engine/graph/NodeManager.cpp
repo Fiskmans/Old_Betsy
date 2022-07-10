@@ -7,12 +7,12 @@
 
 namespace engine::graph
 {
-	void NodeManager::BeginNode(const std::string& aName)
+	void NodeManager::BeginNode(NodeBase* aBaseNode)
 	{
 		if (myCurrent)
 			EndNode();
 
-		myCurrent = new BuiltNode(PrettyfyName(aName));
+		myCurrent = new BuiltNode(aBaseNode);
 	}
 
 	void NodeManager::AddInPin(PinBase* aInPin)
@@ -27,7 +27,7 @@ namespace engine::graph
 	
 	void NodeManager::EndNode()
 	{
-		myNodes.emplace(myCurrent->Name(), myCurrent);
+		myNodes.emplace(PrettyfyName(myCurrent->Name()), myCurrent);
 		myCurrent = nullptr;
 	}
 

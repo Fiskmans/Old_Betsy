@@ -10,11 +10,12 @@
 
 namespace engine::graph
 {
+	class Nodebase;
 	class NodeManager : public tools::Singleton<NodeManager>
 	{
 	public:
 
-		void BeginNode(const std::string& aName);
+		void BeginNode(NodeBase* aBaseNode);
 		void AddInPin(PinBase* aInPin);
 		void AddOutPin(PinBase* aOutPin);
 		void EndNode();
@@ -26,8 +27,8 @@ namespace engine::graph
 
 		BuiltNode* Get(const std::string& aName);
 
-	private:
 		static std::string PrettyfyName(const std::string& aName);
+	private:
 
 		BuiltNode* myCurrent = nullptr;
 		std::unordered_map<std::string, BuiltNode*> myNodes;

@@ -5,6 +5,7 @@
 
 #include "engine/graph/nodes/RenderCopyNode.h"
 #include "engine/graph/nodes/RenderMergeNode.h"
+#include "engine/graph/nodes/TestNodes.h"
 
 #include "common/Macros.h"
 
@@ -21,6 +22,7 @@ namespace engine::graph
 	private:
 		node::RenderCopyNode UNIQUENAME;
 		node::RenderMergeNode UNIQUENAME;
+		node::PrintNode UNIQUENAME;
 	};
 }
 

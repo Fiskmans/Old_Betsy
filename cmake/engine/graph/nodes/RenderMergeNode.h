@@ -10,11 +10,10 @@
 
 namespace engine::graph::node
 {
-	class RenderMergeNode : engine::graph::NodeBase<RenderMergeNode>
+	class RenderMergeNode : engine::graph::NodeBase
 	{
 	public:
-
-
+		void Activate(NodeInstanceId aId) override;
 
 	private:
 		InPin<Texture> myInTexture1 = "Tex 1";

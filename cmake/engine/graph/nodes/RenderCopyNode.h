@@ -8,13 +8,14 @@
 
 namespace engine::graph::node
 {
-	class RenderCopyNode : public NodeBase<RenderCopyNode>
+	class RenderCopyNode : public NodeBase
 	{
 	public:
-
+		void Activate(NodeInstanceId aId) override;
 
 	private:
 		InPin<Texture> myInTexture = "In Texture";
+
 		OutPin<Texture> myOutTexture = "Out Texture";
 		OutPin<int> myIntPin = "strickty pal";
 		OutPin<float> myFloatPin = "floaty boy";

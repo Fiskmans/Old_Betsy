@@ -11,17 +11,30 @@ namespace engine::graph
 	template<class T>
 	struct NodeInstanceData
 	{
+		NodeInstanceData(NodeInstanceId aId)
+			: myId(aId)
+		{
+		}
+
 		NodeInstanceId myId;
 		T myData;
-
-		auto operator <=>(NodeInstanceData& aOther) { return myId <=> aOther.myId; }
-		auto operator <=>(NodeInstanceId aId) { return myId <=> aId; }
 	};
+
+	template<class T>
+	auto operator <=>(const std::unique_ptr<NodeInstanceData<T>>& aData, NodeInstanceId aId) { return aData->myId <=> aId; }
+
+	template<class T>
+	auto operator <=>(NodeInstanceId aId, const std::unique_ptr<NodeInstanceData<T>>& aData) { return aId <=> aData->myId; }
+
+	template<class T>
+	auto operator <=>(std::unique_ptr<NodeInstanceData<T>>& aLHS, std::unique_ptr<NodeInstanceData<T>>& aRHS) { return aLHS->myId <=> aRHS->myId; }
+
+
 
 	template<class T>
 	class NodeInstandeDataCollection
 	{
-	private: 
+	public: 
 		T& Get(NodeInstanceId aId);
 		void AddInstance(NodeInstanceId aId);
 		void RemoveInstance(NodeInstanceId aId);
@@ -36,13 +49,13 @@ namespace engine::graph
 	template<class T>
 	inline T& NodeInstandeDataCollection<T>::Get(NodeInstanceId aId)
 	{
-		return IndexOf(aId)->myData;
+		return (*IndexOf(aId))->myData;
 	}
 
 	template<class T>
 	inline void NodeInstandeDataCollection<T>::AddInstance(NodeInstanceId aId)
 	{
-		myInstances.emplace(IndexOf(aId), std::make_unique<NodeInstanceData<T>>());
+		myInstances.emplace(IndexOf(aId), std::make_unique<NodeInstanceData<T>>(aId));
 	}
 
 	template<class T>

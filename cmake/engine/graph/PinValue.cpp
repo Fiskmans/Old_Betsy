@@ -3,17 +3,17 @@
 namespace engine::graph
 {
 	void
-	PinValueBase::MarkDirty()
+	Dependable::MarkDirty()
 	{
 		if (!myIsDirty)
-			for (PinValueBase* dependent : myDependents)
+			for (Dependable* dependent : myDependents)
 				dependent->MarkDirty();
 
 		myIsDirty = true;
 	}
 
 	void
-	PinValueBase::RemoveDependent(PinValueBase* aDependent)
+	Dependable::RemoveDependent(Dependable* aDependent)
 	{
 		decltype(myDependents)::iterator it = std::find(myDependents.begin(), myDependents.end(), aDependent);
 
@@ -21,4 +21,12 @@ namespace engine::graph
 			myDependents.erase(it);
 	}
 
+	void Dependable::MarkRefreshed()
+	{
+		myIsDirty = false;
+		for (Dependable* dep : myDependents)
+		{
+			dep->MarkDirty();
+		}
+	}
 }

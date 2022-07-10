@@ -5,37 +5,95 @@
 
 #include "engine/graph/NodeManager.h"
 #include "engine/graph/BuiltNode.h"
+#include "engine/graph/NodeInstanceId.h"
 
 #include "imgui/imgui.h"
 
 #include <vector>
 #include <memory>
 #include <string>
+#include <concepts>
+#include <ranges>
+#include <optional>
 
 namespace engine::graph
 {
-	class NodeInstance
+
+	class Graph;
+
+	class DrawablePinBlock
+	{
+	public:
+		DrawablePinBlock(ImVec2 aPosition)
+			: myPosition(aPosition)
+		{
+
+		}
+
+		bool Imgui(const char* aName, Graph* aGraph, NodeInstanceId aId, float aScale, ImVec2 aPosition, const std::vector<PinBase*>& aInPins, const std::vector<PinBase*>& aOutPins);
+
+		ImVec2 myPosition;
+		bool myIsMoving = false;
+	};
+
+	class NodeInstance : private DrawablePinBlock
 	{
 	public:
 		NodeInstance(BuiltNode& aType, ImVec2 aPosition);
 
-		bool Imgui(float aScale, ImVec2 aPosition);
+		bool Imgui(Graph* aGraph, float aScale, ImVec2 aPosition);
 	private:
 		BuiltNode* myType;
-		ImVec2 myPosition;
+		NodeInstanceId myId;
 	};
 
-	struct GraphExportPin
+	class GraphExportPinBlock : private DrawablePinBlock
 	{
-		PinBase* myPin = nullptr;
-		ImVec2 myPosition;
+	public:
+		GraphExportPinBlock(const std::vector<PinBase*>& aPins)
+			: DrawablePinBlock(ImVec2(500,0))
+			, myPins(aPins)
+		{
+		}
+
+		bool Imgui(Graph* aGraph, float aScale, ImVec2 aPosition);
+		
+	private:
+		std::vector<PinBase*> myPins;
 	};
 
+	class GraphImportPinBlock : private DrawablePinBlock
+	{
+	public:
+		GraphImportPinBlock(const std::vector<PinBase*>& aPins)
+			: DrawablePinBlock(ImVec2(-500, 0))
+			, myPins(aPins)
+		{
+		}
+
+		bool Imgui(Graph* aGraph, float aScale, ImVec2 aPosition);
+
+	private:
+		std::vector<PinBase*> myPins;
+	};
+
+	class PinLink
+	{
+	public:
+		PinLink(OutPinInstanceBase* aFrom, InPinInstance* aTo);
+		~PinLink();
+
+		void Imgui(Graph* aGraph,const std::unordered_map<PinInstanceBase*, ImVec2>& aLocations, float aScale, ImVec2 aPosition);
+
+	private:
+		OutPinInstanceBase* myFrom;
+		InPinInstance*		myTo;
+	};
 
 	class Graph
 	{
 	public:
-		Graph(const std::string& aName);
+		Graph(const std::string& aName, const std::vector<PinBase*>& aExportPins = {}, const std::vector<PinBase*>& aImportPins = {});
 		~Graph();
 
 		template<class NodeType>
@@ -51,11 +109,24 @@ namespace engine::graph
 		void AddNode(BuiltNode& aType, ImVec2 aPosition);
 
 		bool Imgui(float aScale, ImVec2 aPosition);
+
+		void AddLink(OutPinInstanceBase* aFrom, InPinInstance* aTo);
+		void RemoveLink(PinLink* aLink);
+
+		void AddPinLocation(PinInstanceBase* aPin, ImVec2 aScreenPosition);
+
 		const std::string& Name();
 	private:
 
+		PinLink* myLinkToRemove = nullptr;
+
 		std::string myName;
 		std::vector<std::unique_ptr<NodeInstance>> myNodes;
+		std::vector<std::unique_ptr<PinLink>> myLinks;
+		std::optional<GraphExportPinBlock> myExportBlock;
+		std::optional<GraphImportPinBlock> myImportBlock;
+
+		std::unordered_map<PinInstanceBase*, ImVec2> myPinPositions;
 	};
 
 

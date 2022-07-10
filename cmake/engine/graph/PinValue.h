@@ -1,11 +1,13 @@
 #ifndef ENGINE_GRAPH_PIN_VALUE_H
 #define ENGINE_GRAPH_PIN_VALUE_H
 
-#include <vector>
+#include "engine/graph/Dependable.h"
+
+#include <functional>
 
 namespace engine::graph
 {
-	class PinValueBase
+	class PinValueBase : public Dependable
 	{
 	public:
 		virtual ~PinValueBase() = default;
@@ -13,12 +15,13 @@ namespace engine::graph
 		template <class T>
 		T& As() { return *reinterpret_cast<T*>(myValue); }
 
-		bool IsDirty() { return myIsDirty; }
-		void MarkDirty();
-		void MarkRefreshed() { myIsDirty = false; }
-		void AddDependent(PinValueBase* aDependent) { myDependents.push_back(aDependent); }
-		void RemoveDependent(PinValueBase* aDependent);
+		void Load()
+		{
+			if (IsDirty())
+				myCallback();
+		}
 
+		void SetRefreshCallback(std::function<void()> aCallback) { myCallback = aCallback; }
 	protected:
 		template <class T>
 		PinValueBase(T & aValue)
@@ -28,8 +31,7 @@ namespace engine::graph
 
 	private:
 		void* myValue = nullptr;
-		std::vector<PinValueBase*> myDependents;
-		bool myIsDirty = true;
+		std::function<void()> myCallback;
 	};
 
 	template <class Type>

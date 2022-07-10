@@ -1,6 +1,7 @@
 #include "engine/graph/NodePin.h"
 #include "engine/graph/Node.h"
 #include "engine/graph/NodeManager.h"
+#include "engine/graph/Graph.h"
 
 #include "tools/ImGuiHelpers.h"
 #include "tools/TimeHelper.h"
@@ -25,30 +26,54 @@ namespace engine::graph
 	float PinBase::ourHoverIntensity = 0.f;
 	bool PinBase::ourHoverIn = false;
 
-	void PinBase::Draw(float aScale, ImVec2 aLocation, bool aIn)
+	ImVec2 PinBase::ourHoverTarget;
+	bool PinBase::ourIsHoveringTarget = false;
+	bool PinBase::ourNextIsHoveringTarget = false;
+
+	bool PinBase::CanConnectTo(const PinBase& aOther) const
 	{
+		if (Type() != aOther.Type())
+			return false; // check if convertible
+
+		if (IsInPin() == aOther.IsInPin())
+			return false;
+
+		// check if would create loop
+
+		return true;
+	}
+
+	void PinBase::ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, NodeInstanceId aId)
+	{
+		const bool isIn = IsInPin();
+
+		const float yOffset = 1.4f * aScale;
+		const float xOffset = (8.f - (isIn ? 0.f : 26.f)) * aScale;
+
+		const float bigCircleSize = 4.1f * aScale;
+		const float bigCircleThickness = 3.2f * aScale;
+		const float lineLength = 3.9f * aScale;
+		const float lineThickness = 1.4f * aScale;
+		const float smallCirclesize = 2.8f * aScale;
+		const float smallCircleThickness = 1.9f * aScale;
+
+		static float startHover = 0;
+
 		ImGui::PushID(this);
 
 		const std::type_info& type = Type();
 
-		ImGui::SetCursorScreenPos(aLocation);
-		ImGui::InvisibleButton("drag_source", ImVec2(22 * aScale, 16 * aScale));
-		if (ImGui::BeginDragDropSource())
-		{
-			PinBase* payload = this;
-			ImGui::Text("%s", Name());
-			ImGui::Text("%s", type.name());
-			ImGui::SetDragDropPayload("NodePin", &payload, sizeof(payload), ImGuiCond_Once);
-			ImGui::EndDragDropSource();
+		ImDrawList * drawList = ImGui::GetWindowDrawList();
+		ImColor color = ColorFromHashCode(type.hash_code());
 
-			ourNextHoveredType = &type;
-			ourHoverIn = aIn;
-		}
-		
-		static float startHover = 0;
+		ImVec2 interactableRegionTopLeft = ImVec2(aLocation.x + xOffset - ImGui::GetStyle().FramePadding.x * aScale - 2.f * aScale, aLocation.y - 8.f * aScale);
+		ImVec2 interactableRegionSize = ImVec2(22 * aScale, 16 * aScale);
+
+		ImGui::SetCursorScreenPos(interactableRegionTopLeft);
+		ImGui::InvisibleButton("drag_source", interactableRegionSize);
 		{
 			bool hovered = ImGui::IsItemHovered();
-		
+
 			if (hovered && !myIsHovered)
 			{
 				startHover = tools::GetTotalTime();
@@ -57,8 +82,70 @@ namespace engine::graph
 			myIsHovered = hovered;
 		}
 
-		ImDrawList * drawList = ImGui::GetWindowDrawList();
-		ImColor color = ColorFromHashCode(type.hash_code());
+		if (ImGui::BeginDragDropSource())
+		{
+			PinBase* payload = this;
+			ImGui::Text("%s", Name());
+			ImGui::Text("%s", type.name());
+
+			ImGui::SetDragDropPayload("NodePin", &payload, sizeof(payload), ImGuiCond_Once);
+			ImGui::EndDragDropSource();
+
+			ourNextHoveredType = &type;
+			ourHoverIn = isIn;
+
+			const float bendyness = 50.f * aScale * (isIn ? -1.f : 1.f);
+			ImVec2 target = ImGui::GetMousePos();
+			if (ourIsHoveringTarget)
+			{
+				target = ourHoverTarget;
+			}
+
+
+			drawList->AddBezierCubic(aLocation, ImVec2(aLocation.x + bendyness, aLocation.y), ImVec2(target.x - bendyness, target.y), target, ImColor(0.8f, 0.8f, 0.8f, 0.8f), 2.f * aScale);
+		}
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("NodePin", ImGuiDragDropFlags_AcceptPeekOnly | ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
+			if (payload)
+			{
+				PinBase& source = **reinterpret_cast<PinBase**>(payload->Data);
+				
+				if (CanConnectTo(source))
+				{
+					if (payload->IsPreview())
+					{
+						drawList->AddRect(interactableRegionTopLeft, ImVec2(interactableRegionTopLeft.x + interactableRegionSize.x, interactableRegionTopLeft.y + interactableRegionSize.y), tools::GetImColor(ImGuiCol_Border), 3.f, 0, 2.f * aScale);
+
+						ourNextIsHoveringTarget = true;
+						ourHoverTarget = aLocation;
+					}
+
+					if(payload->IsDelivery())
+					{
+						InPinInstance* in = nullptr;
+						OutPinInstanceBase* out = nullptr;
+
+						if (isIn)
+						{
+							in = this->GetInPinInstance(aId);
+							out = source.GetOutPinInstance(aId);
+						}
+						else
+						{
+							in = source.GetInPinInstance(aId);
+							out = this->GetOutPinInstance(aId);
+						}
+
+						aGraph->AddLink(out, in);
+					}
+				}
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
 
 		bool popupOpen = false;
 
@@ -73,39 +160,29 @@ namespace engine::graph
 
 			color = ImColor(LERP(color.Value.x, 1.f, hoverIntensity), LERP(color.Value.y, 1.f, hoverIntensity), LERP(color.Value.z, 1.f, hoverIntensity), 1.f);
 			ourNextHoveredType = &type;
-			ourHoverIn = aIn;
+			ourHoverIn = isIn;
 		}
 
-		if (ourHoveredType && *ourHoveredType == type && ourHoverIn != aIn)
+		if (ourHoveredType && *ourHoveredType == type && ourHoverIn != isIn)
 		{
 			float intensity = (0.3f + 0.3f * cos(tools::GetTotalTime() * TAU)) * ourHoverIntensity;
 			color = ImColor(LERP(color.Value.x, 1.f, intensity), LERP(color.Value.y, 1.f, intensity), LERP(color.Value.z, 1.f, intensity), 1.f);
 		}
-
-		const float yOffset = 7.4f * aScale;
-		const float xOffset = 6.f * aScale;
-
-		const float bigCircleSize = 4.1f * aScale;
-		const float bigCircleThickness = 3.2f * aScale;
-		const float lineLength = 3.9f * aScale;
-		const float lineThickness = 1.4f * aScale;
-		const float smallCirclesize = 2.8f * aScale;
-		const float smallCircleThickness = 1.9f * aScale;
 
 		//drawList->AddRectFilled(aLocation, ImVec2(aLocation.x + 22, aLocation.y + 16), ImColor(0.5, 0.5, 0.5, 1.f));
 		drawList->AddCircle(ImVec2(aLocation.x + xOffset, aLocation.y + yOffset), bigCircleSize, color, 0, bigCircleThickness);
 		drawList->AddLine(ImVec2(aLocation.x + xOffset + bigCircleSize, aLocation.y + yOffset), ImVec2(aLocation.x + xOffset + bigCircleSize + lineLength, aLocation.y + yOffset), color, lineThickness);
 		drawList->AddCircle(ImVec2(aLocation.x + xOffset + bigCircleSize + lineLength + smallCirclesize, aLocation.y + yOffset), smallCirclesize, color, 0, smallCircleThickness);
 
-		float offset = 24;
+		float textOffset = 24;
 
-		if (!aIn)
+		if (!isIn)
 		{
 			ImVec2 textSize = ImGui::CalcTextSize(Name());
-			offset = -textSize.x - 2.f;
+			textOffset = -textSize.x - 26.f;
 		}
 
-		drawList->AddText(ImGui::GetFont(), ImGui::GetFontSize() * aScale, ImVec2(aLocation.x + offset * aScale, aLocation.y + 1 * aScale), ImColor(1.f, 1.f, 1.f, 1.f), Name());
+		drawList->AddText(ImGui::GetFont(), ImGui::GetFontSize() * aScale, ImVec2(aLocation.x + textOffset * aScale, aLocation.y - 5.f * aScale), ImColor(1.f, 1.f, 1.f, 1.f), Name());
 
 		if(popupOpen)
 		{
@@ -136,6 +213,9 @@ namespace engine::graph
 
 		ourHoveredType = ourNextHoveredType;
 		ourNextHoveredType = nullptr;
+
+		ourIsHoveringTarget = ourNextIsHoveringTarget;
+		ourNextIsHoveringTarget = false;
 
 		if (ourHoveredType)
 			sum += now - lastTick;
@@ -171,9 +251,7 @@ namespace engine::graph
 
 	PinValueBase& InPinInstance::Fetch()
 	{
-		if (myTarget->IsDirty())
-			myRefreshCallback();
-
+		myTarget->Load();
 		return *myTarget;
 	}
 

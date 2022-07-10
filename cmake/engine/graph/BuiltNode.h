@@ -4,15 +4,19 @@
 #include "engine/graph/NodePin.h"
 
 #include <string>
+#include <typeinfo>
+
 
 namespace engine::graph
 {
+	class NodeBase;
+
 	class BuiltNode
 	{
 	public:
-		BuiltNode(const std::string& aName);
+		BuiltNode(NodeBase* aBaseNode);
 
-		const std::string& Name() { return myName; }
+		const char* Name();
 
 		void AddInPin(PinBase* aInPin);
 		void AddOutPin(PinBase* aOutPin);
@@ -22,9 +26,12 @@ namespace engine::graph
 		std::vector<PinBase*>& InPins() { return myInPins; }
 		std::vector<PinBase*>& OutPins() { return myOutPins; }
 
+		void AddInstance(NodeInstanceId aId);
+		void RemoveInstance(NodeInstanceId aId);
+
 	private:
 
-		std::string myName;
+		NodeBase* myBaseNode;
 
 		std::vector<PinBase*> myInPins;
 		std::vector<PinBase*> myOutPins;
