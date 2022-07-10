@@ -16,6 +16,8 @@ Use `#ifndef ... #endif` blocks as header guards
 The include guard key should be of the form `Folder/Project, Folders, Filename split into words, the letter H` joined by underscores and fully capitalized
 
 So the file `engine/graphics/RenderStateManager.h` would have the key `ENGINE_GRAPHICS_RENDER_STATE_MANAGER_H`
+
+The header guard always encompasses the whole file
 # 3 Include
 ### 3.1 Never include relative
 For headers that are a part of the project always include with the full path from the source folder
