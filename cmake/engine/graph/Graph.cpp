@@ -1,5 +1,7 @@
 #include "engine/graph/Graph.h"
 
+#include "engine/graph/Node.h"
+
 #include "imgui/WindowControl.h"
 
 #include "tools/ImGuiHelpers.h"
@@ -7,6 +9,8 @@
 #include "tools/Utility.h"
 
 #include "common/Macros.h"
+
+#include <algorithm>
 
 #define NOMINMAX
 #include <windows.h>
@@ -239,7 +243,13 @@ namespace engine::graph
 		const float		headerSize = 20 * aScale;
 		const float		pinSpacing = 4 * aScale;
 
-		ImVec2 size = ImVec2(160 * aScale, headerSize + pinSize.y * pinCount + pinSpacing * (pinCount + 1));
+		const float pinBlockHeight = pinSize.y * pinCount + pinSpacing * (pinCount + 1);
+		
+		ImVec2 rawCustomSize = CustomImguiSize();
+		ImVec2 customSize = ImVec2(rawCustomSize.x * aScale, rawCustomSize.y * aScale);
+
+
+		ImVec2 size = ImVec2(160 * aScale + customSize.x, headerSize + (std::max)(customSize.y, pinBlockHeight));
 		ImVec2 topLeft = ImVec2((myPosition.x + aPosition.x) * aScale + offset.x, (myPosition.y + aPosition.y) * aScale + offset.y);
 		ImVec2 bottomRight = ImVec2(topLeft.x + size.x, topLeft.y + size.y);
 

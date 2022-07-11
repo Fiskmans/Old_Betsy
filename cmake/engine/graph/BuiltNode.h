@@ -23,6 +23,9 @@ namespace engine::graph
 
 		void Imgui();
 
+		ImVec2 ImguiSize(NodeInstanceId aId);
+		void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft);
+		
 		std::vector<PinBase*>& InPins() { return myInPins; }
 		std::vector<PinBase*>& OutPins() { return myOutPins; }
 

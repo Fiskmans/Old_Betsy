@@ -43,6 +43,16 @@ namespace engine::graph
 		}
 	}
 
+	ImVec2 BuiltNode::ImguiSize(NodeInstanceId aId)
+	{
+		return myBaseNode->ImguiSize(aId);
+	}
+
+	void BuiltNode::Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft)
+	{
+		myBaseNode->Imgui(aId, aScale, aTopLeft);
+	}
+
 	void BuiltNode::AddInstance(NodeInstanceId aId)
 	{
 		for (PinBase* out : myOutPins)

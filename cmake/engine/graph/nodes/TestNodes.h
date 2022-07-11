@@ -11,8 +11,8 @@ namespace engine::graph::node
 	public:
 		void Activate(NodeInstanceId aId) override;
 
-		//ImVec2 ImguiSize(NodeInstanceId aId) override;
-		//void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) override;
+		ImVec2 ImguiSize(NodeInstanceId aId) override;
+		void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) override;
 	private:
 		InPin<int> myIn = "Val";
 	};

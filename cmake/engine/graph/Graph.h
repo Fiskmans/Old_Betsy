@@ -27,10 +27,12 @@ namespace engine::graph
 		DrawablePinBlock(ImVec2 aPosition)
 			: myPosition(aPosition)
 		{
-
 		}
+		virtual ~DrawablePinBlock() = default;
 
 		bool Imgui(const char* aName, Graph* aGraph, NodeInstanceId aId, float aScale, ImVec2 aPosition, const std::vector<PinBase*>& aInPins, const std::vector<PinBase*>& aOutPins);
+
+		virtual ImVec2 CustomImguiSize() { return ImVec2(0, 0); }
 
 		ImVec2 myPosition;
 		bool myIsMoving = false;
@@ -40,8 +42,13 @@ namespace engine::graph
 	{
 	public:
 		NodeInstance(BuiltNode& aType, ImVec2 aPosition);
+		virtual ~NodeInstance() = default;
 
 		bool Imgui(Graph* aGraph, float aScale, ImVec2 aPosition);
+		
+		ImVec2 CustomImguiSize() override { return myType->ImguiSize(myId); }
+		void CustomImgui(float aScale, ImVec2 aTopLeft) { myType->Imgui(myId, aScale, aTopLeft); }
+
 	private:
 		BuiltNode* myType;
 		NodeInstanceId myId;
@@ -55,6 +62,7 @@ namespace engine::graph
 			, myPins(aPins)
 		{
 		}
+		virtual ~GraphExportPinBlock() = default;
 
 		bool Imgui(Graph* aGraph, float aScale, ImVec2 aPosition);
 		
@@ -70,6 +78,7 @@ namespace engine::graph
 			, myPins(aPins)
 		{
 		}
+		virtual ~GraphImportPinBlock() = default;
 
 		bool Imgui(Graph* aGraph, float aScale, ImVec2 aPosition);
 
