@@ -35,6 +35,7 @@ namespace engine::graph
 
 		bool CanConnectTo(const PinBase& aOther) const;
 
+		float GetImGuiWidth();
 		void ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, NodeInstanceId aId);
 		//static void Setup();
 

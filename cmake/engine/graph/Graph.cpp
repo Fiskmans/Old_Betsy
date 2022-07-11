@@ -245,11 +245,24 @@ namespace engine::graph
 
 		const float pinBlockHeight = pinSize.y * pinCount + pinSpacing * (pinCount + 1);
 		
+
+		float leftPinBlockWidth = 0;
+		for (PinBase* pin : aInPins)
+			leftPinBlockWidth = (std::max)(pin->GetImGuiWidth(), leftPinBlockWidth);
+		leftPinBlockWidth *= aScale;
+
+		float rightPinBlockWidth = 0;
+		for (PinBase* pin : aOutPins)
+			rightPinBlockWidth = (std::max)(pin->GetImGuiWidth(), rightPinBlockWidth);
+		rightPinBlockWidth *= aScale;
+
+
+
 		ImVec2 rawCustomSize = CustomImguiSize();
 		ImVec2 customSize = ImVec2(rawCustomSize.x * aScale, rawCustomSize.y * aScale);
 
 
-		ImVec2 size = ImVec2(160 * aScale + customSize.x, headerSize + (std::max)(customSize.y, pinBlockHeight));
+		ImVec2 size = ImVec2(leftPinBlockWidth + rightPinBlockWidth + customSize.x, headerSize + (std::max)(customSize.y, pinBlockHeight));
 		ImVec2 topLeft = ImVec2((myPosition.x + aPosition.x) * aScale + offset.x, (myPosition.y + aPosition.y) * aScale + offset.y);
 		ImVec2 bottomRight = ImVec2(topLeft.x + size.x, topLeft.y + size.y);
 

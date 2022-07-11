@@ -43,6 +43,11 @@ namespace engine::graph
 		return true;
 	}
 
+	float PinBase::GetImGuiWidth()
+	{
+		return ImGui::CalcTextSize(Name()).x + 28.f;
+	}
+
 	void PinBase::ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, NodeInstanceId aId)
 	{
 		const bool isIn = IsInPin();
@@ -174,7 +179,7 @@ namespace engine::graph
 		drawList->AddLine(ImVec2(aLocation.x + xOffset + bigCircleSize, aLocation.y + yOffset), ImVec2(aLocation.x + xOffset + bigCircleSize + lineLength, aLocation.y + yOffset), color, lineThickness);
 		drawList->AddCircle(ImVec2(aLocation.x + xOffset + bigCircleSize + lineLength + smallCirclesize, aLocation.y + yOffset), smallCirclesize, color, 0, smallCircleThickness);
 
-		float textOffset = 24;
+		float textOffset = 26.f;
 
 		if (!isIn)
 		{
