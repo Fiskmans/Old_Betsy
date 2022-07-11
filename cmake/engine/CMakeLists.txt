@@ -70,7 +70,18 @@ list(APPEND SOURCE_FILES "GameEngine.cpp")
 list(APPEND SOURCE_FILES "SettingsManager.h")
 list(APPEND SOURCE_FILES "SettingsManager.cpp")
 
-project(Engine VERSION 1.0.1)
+file(READ Version.txt VERSION_FILE)
+string(REGEX MATCH "VERSION_MAJOR ([0-9]+).*VERSION_MINOR ([0-9]+).*VERSION_PATCH ([0-9]+)" _ ${VERSION_FILE})
+
+set(VERSION_MAJOR ${CMAKE_MATCH_1}) 
+set(VERSION_MINOR ${CMAKE_MATCH_2}) 
+set(VERSION_PATCH ${CMAKE_MATCH_3})
+
+set(VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+
+message("Engine is on version ${VERSION_STRING}")
+
+project(Engine VERSION ${VERSION_STRING})
 list(APPEND SOURCE_FILES "${PROJECT_BINARY_DIR}/config.h")
 
 add_library(Engine "${SOURCE_FILES}")
