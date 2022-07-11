@@ -86,6 +86,14 @@ list(APPEND SOURCE_FILES "${PROJECT_BINARY_DIR}/config.h")
 
 add_library(Engine "${SOURCE_FILES}")
 
+if(WIN32)
+	add_custom_command(TARGET Engine 
+	POST_BUILD 
+	COMMAND 
+		${CMAKE_SOURCE_DIR}/engine/IncrementPatch.bat
+		${CMAKE_SOURCE_DIR}/engine/Version.txt)
+endif()
+
 configure_file(config.h.in config.h)
 target_include_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR})
 target_include_directories(Engine PUBLIC ${CMAKE_BINARY_DIR})
