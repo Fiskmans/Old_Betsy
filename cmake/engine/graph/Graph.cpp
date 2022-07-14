@@ -72,6 +72,19 @@ namespace engine::graph
 		}
 
 
+		if (!capture && ImGui::GetIO().MouseClicked[0] && !ImGui::GetIO().KeysDown[VK_SPACE])
+			mySelection.StartSelecting(ImGui::GetMousePos());
+
+		if (ImGui::GetIO().MouseReleased[0])
+			mySelection.FinalizeSelection();
+
+		if(mySelection.IsSelecting())
+		{
+			mySelection.SetEnd(ImGui::GetMousePos());
+			mySelection.UpdateSelection();
+		}
+
+		mySelection.DrawSelection();
 
 		return capture;
 	}
@@ -91,6 +104,11 @@ namespace engine::graph
 	void Graph::AddPinLocation(PinInstanceBase* aPin, ImVec2 aScreenPosition)
 	{
 		myPinPositions.emplace(aPin, aScreenPosition);
+	}
+
+	Selection& Graph::GetSelection()
+	{
+		return mySelection;
 	}
 
 	const std::string& Graph::Name()
@@ -266,11 +284,21 @@ namespace engine::graph
 		ImVec2 topLeft = ImVec2((myPosition.x + aPosition.x) * aScale + offset.x, (myPosition.y + aPosition.y) * aScale + offset.y);
 		ImVec2 bottomRight = ImVec2(topLeft.x + size.x, topLeft.y + size.y);
 
+		Selection& selection = aGraph->GetSelection();
+
+		if (selection.IsSelecting())
+		{
+			if(selection.Intersects(topLeft, bottomRight))
+			{
+				selection.AddToSelection(this);
+			}
+		}
+
 		ImGui::SetCursorScreenPos(topLeft);
 		ImGui::InvisibleButton("heading", ImVec2(size.x, headerSize));
 
 		bool headerHovered = ImGui::IsItemHovered();
-		bool headerActive = ImGui::IsItemActivated();
+		bool headerActive = selection.IsSelected(this);
 
 		ImGuiIO& io = ImGui::GetIO();
 		if (headerHovered && io.MouseClicked[0] && !io.KeysDown[VK_SPACE])
@@ -280,7 +308,18 @@ namespace engine::graph
 			myIsMoving = false;
 
 		if (myIsMoving)
-			myPosition = ImVec2(myPosition.x + io.MouseDelta.x / aScale, myPosition.y + io.MouseDelta.y / aScale);
+		{
+			ImVec2 delta = ImVec2(io.MouseDelta.x / aScale, io.MouseDelta.y / aScale);
+			if (selection.IsSelected(this))
+			{
+				selection.MoveAll(delta);
+			}
+			else
+			{
+				Move(delta);
+				selection.InvalidateSelection();
+			}
+		}
 
 
 		drawlist->AddRectFilled(ImVec2(topLeft.x + shadowOffset.x, topLeft.y + shadowOffset.y), ImVec2(bottomRight.x + shadowOffset.x, bottomRight.y + shadowOffset.y), tools::GetImColor(ImGuiCol_BorderShadow), 3.f);
@@ -293,12 +332,13 @@ namespace engine::graph
 
 		drawlist->AddText(ImGui::GetFont(), ImGui::GetFontSize() * aScale, textPos, tools::GetImColor(ImGuiCol_Text), aName);
 
+		bool interacting = false;
 		{
 			ImVec2 pinPosition = ImVec2(topLeft.x, topLeft.y + headerSize + pinSpacing + pinSize.y / 2.f);
 
 			for (PinBase* pin : aInPins)
 			{
-				pin->ImGui(aGraph, aScale, pinPosition, aId);
+				interacting |= pin->ImGui(aGraph, aScale, pinPosition, aId);
 				aGraph->AddPinLocation(pin->GetInPinInstance(aId), pinPosition);
 				pinPosition = ImVec2(pinPosition.x, pinPosition.y + pinSpacing + pinSize.y);
 			}
@@ -309,14 +349,20 @@ namespace engine::graph
 
 			for (PinBase* pin : aOutPins)
 			{
-				pin->ImGui(aGraph, aScale, pinPosition, aId);
+				interacting |= pin->ImGui(aGraph, aScale, pinPosition, aId);
 				aGraph->AddPinLocation(pin->GetOutPinInstance(aId), pinPosition);
 				pinPosition = ImVec2(pinPosition.x, pinPosition.y + pinSpacing + pinSize.y);
 			}
 		}
 
 		ImGui::PopID();
-		return false;// TODO capture
+		return myIsMoving || interacting;
+	}
+
+	void DrawablePinBlock::Move(ImVec2 aDelta)
+	{
+		myPosition.x += aDelta.x;
+		myPosition.y += aDelta.y;
 	}
 
 	bool GraphExportPinBlock::Imgui(Graph* aGraph, float aScale, ImVec2 aPosition)
@@ -394,4 +440,96 @@ namespace engine::graph
 			aGraph->RemoveLink(this);
 	}
 
+	Selection::Selection()
+		: myIsSelecting(false)
+	{
+	}
+
+	bool Selection::IsSelecting()
+	{
+		return myIsSelecting;
+	}
+
+	bool Selection::Intersects(ImVec2 aTopLeft, ImVec2 aBottomRight)
+	{
+		ImVec2 topLeft = TopLeft();
+		ImVec2 bottomRight = BottomRight();
+
+		if (topLeft.x < aBottomRight.x &&
+			bottomRight.x > aTopLeft.x &&
+			topLeft.y < aBottomRight.y &&
+			bottomRight.y > aTopLeft.y)	
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	ImVec2 Selection::TopLeft()
+	{
+		return ImVec2((std::min)(mySelectionStart.x, mySelectionEnd.x),(std::min)(mySelectionStart.y, mySelectionEnd.y));
+	}
+
+	ImVec2 Selection::BottomRight()
+	{
+		return ImVec2((std::max)(mySelectionStart.x, mySelectionEnd.x), (std::max)(mySelectionStart.y, mySelectionEnd.y));
+	}
+
+	void Selection::DrawSelection()
+	{
+		if (!myIsSelecting)
+			return;
+
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+		drawList->AddRect(TopLeft(), BottomRight(), ImColor(0.8f, 0.8f, 0.9f, 0.8f), 4);
+	}
+
+	void Selection::AddToSelection(DrawablePinBlock* aPinBlock)
+	{
+		myNextSelected.insert(aPinBlock);
+	}
+
+	bool Selection::IsSelected(DrawablePinBlock* aPinBlock)
+	{
+		return mySelected.contains(aPinBlock);
+	}
+
+	void Selection::StartSelecting(ImVec2 aSceenPos)
+	{
+		myIsSelecting = true;
+
+		mySelectionStart = aSceenPos;
+		mySelectionEnd = aSceenPos;
+	}
+
+	void Selection::SetEnd(ImVec2 aScreenPos)
+	{
+		mySelectionEnd = aScreenPos;
+	}
+
+	void Selection::FinalizeSelection()
+	{
+		if (myIsSelecting)
+			UpdateSelection();
+			
+		myIsSelecting = false;
+	}
+
+	void Selection::InvalidateSelection()
+	{
+		mySelected = {};
+	}
+
+	void Selection::UpdateSelection()
+	{
+		mySelected = myNextSelected;
+		myNextSelected = {};
+	}
+
+	void Selection::MoveAll(ImVec2 aDelta)
+	{
+		for (DrawablePinBlock* pinBlock : mySelected)
+			pinBlock->Move(aDelta);
+	}
 }
