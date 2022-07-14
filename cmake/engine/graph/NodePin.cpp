@@ -48,7 +48,7 @@ namespace engine::graph
 		return ImGui::CalcTextSize(Name()).x + 28.f;
 	}
 
-	void PinBase::ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, NodeInstanceId aId)
+	bool PinBase::ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, NodeInstanceId aId)
 	{
 		const bool isIn = IsInPin();
 
@@ -64,7 +64,9 @@ namespace engine::graph
 
 		static float startHover = 0;
 
+		bool isInteracting = false;
 		ImGui::PushID(this);
+
 
 		const std::type_info& type = Type();
 
@@ -78,6 +80,8 @@ namespace engine::graph
 		ImGui::InvisibleButton("drag_source", interactableRegionSize);
 		{
 			bool hovered = ImGui::IsItemHovered();
+
+			isInteracting |= hovered;
 
 			if (hovered && !myIsHovered)
 			{
@@ -106,7 +110,7 @@ namespace engine::graph
 				target = ourHoverTarget;
 			}
 
-
+			isInteracting |= true;
 			drawList->AddBezierCubic(aLocation, ImVec2(aLocation.x + bendyness, aLocation.y), ImVec2(target.x - bendyness, target.y), target, ImColor(0.8f, 0.8f, 0.8f, 0.8f), 2.f * aScale);
 		}
 
@@ -207,6 +211,8 @@ namespace engine::graph
 		}
 
 		ImGui::PopID();
+
+		return isInteracting;
 	}
 
 	void PinBase::Imgui()

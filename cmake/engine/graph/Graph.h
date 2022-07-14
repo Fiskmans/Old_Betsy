@@ -15,12 +15,13 @@
 #include <concepts>
 #include <ranges>
 #include <optional>
+#include <unordered_set>
 
 namespace engine::graph
 {
 
 	class Graph;
-
+	
 	class DrawablePinBlock
 	{
 	public:
@@ -33,6 +34,8 @@ namespace engine::graph
 		bool Imgui(const char* aName, Graph* aGraph, NodeInstanceId aId, float aScale, ImVec2 aPosition, const std::vector<PinBase*>& aInPins, const std::vector<PinBase*>& aOutPins);
 
 		virtual ImVec2 CustomImguiSize() { return ImVec2(0, 0); }
+
+		void Move(ImVec2 aDelta);
 
 		ImVec2 myPosition;
 		bool myIsMoving = false;
@@ -99,6 +102,46 @@ namespace engine::graph
 		InPinInstance*		myTo;
 	};
 
+	class Selection
+	{
+	public:
+		Selection();
+
+		bool IsSelecting();
+
+		bool Intersects(ImVec2 aTopLeft, ImVec2 aBottomRight);
+
+		void DrawSelection();
+		
+		void AddToSelection(DrawablePinBlock* aPinBlock);
+
+		bool IsSelected(DrawablePinBlock* aPinBlock);
+
+		void StartSelecting(ImVec2 aSceenPos);
+		void SetEnd(ImVec2 aScreenPos);
+
+		void FinalizeSelection();
+
+		void InvalidateSelection();
+
+		void UpdateSelection();
+
+		void MoveAll(ImVec2 aDelta);
+	private:
+		bool IsInside(ImVec2 aTopLeftA, ImVec2 aBottomRightA, ImVec2 aTopLeftB, ImVec2 aBottomRightB);
+
+		ImVec2	TopLeft();
+		ImVec2	BottomRight();
+
+		bool myIsSelecting;
+
+		ImVec2 mySelectionStart;
+		ImVec2 mySelectionEnd;
+
+		std::unordered_set<DrawablePinBlock*> mySelected;
+		std::unordered_set<DrawablePinBlock*> myNextSelected;
+	};
+
 	class Graph
 	{
 	public:
@@ -124,6 +167,8 @@ namespace engine::graph
 
 		void AddPinLocation(PinInstanceBase* aPin, ImVec2 aScreenPosition);
 
+		Selection& GetSelection();
+
 		const std::string& Name();
 	private:
 
@@ -136,6 +181,7 @@ namespace engine::graph
 		std::optional<GraphImportPinBlock> myImportBlock;
 
 		std::unordered_map<PinInstanceBase*, ImVec2> myPinPositions;
+		Selection mySelection;
 	};
 
 
