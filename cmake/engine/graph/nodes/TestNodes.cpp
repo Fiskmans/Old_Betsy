@@ -1,4 +1,4 @@
-#include "engine/graph/Nodes/TestNodes.h"
+#include "engine/graph/nodes/TestNodes.h"
 
 namespace engine::graph::node
 {

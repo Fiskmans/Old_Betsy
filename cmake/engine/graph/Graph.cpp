@@ -71,6 +71,7 @@ namespace engine::graph
 			myLinkToRemove = nullptr;
 		}
 
+		NodeManager::GetInstance().ImguiAddNodes(this, aScale, aPosition);
 
 
 		return capture;
