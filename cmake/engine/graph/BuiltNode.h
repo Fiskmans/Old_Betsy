@@ -10,6 +10,7 @@
 namespace engine::graph
 {
 	class NodeBase;
+	class NodeDataBase;
 
 	class BuiltNode
 	{
@@ -20,6 +21,7 @@ namespace engine::graph
 
 		void AddInPin(PinBase* aInPin);
 		void AddOutPin(PinBase* aOutPin);
+		void AddData(NodeDataBase* aData);
 
 		void Imgui();
 
@@ -38,6 +40,7 @@ namespace engine::graph
 
 		std::vector<PinBase*> myInPins;
 		std::vector<PinBase*> myOutPins;
+		std::vector<NodeDataBase*> myData;
 	};
 }
 

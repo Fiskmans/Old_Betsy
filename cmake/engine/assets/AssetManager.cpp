@@ -33,9 +33,9 @@ namespace engine
     void AssetManager::Init(const std::string& aBaseFolder, const std::string& aBakeFolder)
     {
         myBaseFolder = aBaseFolder;
-        //myTextureLoader = new TextureLoader(aDevice);
         //myModelLoader = new ModelLoader(aDevice, DEFAULT_PIXEL_SHADER);
-        myShaderCompiler = std::make_unique<ShaderCompiler>(aBakeFolder + BAKED_SHADER_FOLDER);
+        myTextureLoader = std::make_unique<assets::TextureLoader>();
+        myShaderCompiler = std::make_unique<assets::ShaderCompiler>(aBakeFolder + BAKED_SHADER_FOLDER);
 
         //myErrorTexture = myTextureLoader->LoadTexture(aBaseFolder + TEXTURE_FOLDER + "engine/error.dds");
     }
@@ -72,11 +72,11 @@ namespace engine
         //myFileWatcher.FlushChanges();
     }
 
-    //AssetHandle AssetManager::GetTexture(const std::string& aPath)
-    //{
-    //    return GetTextureInternal(myBaseFolder + TEXTURE_FOLDER + aPath, false);
-    //}
-    //
+	AssetHandle AssetManager::GetTexture(const std::string& aPath)
+	{
+		return GetTextureInternal(myBaseFolder + TEXTURE_FOLDER + aPath, false);
+	}
+
     //AssetHandle AssetManager::GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty)
     //{
     //    return GetTextureInternal(tools::PathWithoutFile(aBase) + aPath, aFailSilenty);
@@ -368,26 +368,26 @@ namespace engine
     //            }
     //        });
     //}
-    //
-    //AssetHandle AssetManager::GetTextureInternal(const std::string& aPath, bool aFailSilenty)
-    //{
-    //    if (myCachedTextures.count(aPath) == 0)
-    //    {
-    //        Asset* texture = myTextureLoader->LoadTexture(aPath, aFailSilenty);
-    //        if (!texture)
-    //        {
-    //            if (!aFailSilenty)
-    //            {
-    //                SYSERROR("Failed to load Texture", aPath);
-    //            }
-    //            return AssetHandle(myErrorTexture);
-    //        }
-    //        myCachedTextures[aPath] = texture;
-    //        return AssetHandle(texture);
-    //    }
-    //    return AssetHandle(myCachedTextures[aPath]);
-    //}
-    //
+    
+	AssetHandle AssetManager::GetTextureInternal(const std::string& aPath, bool aFailSilenty)
+	{
+		if (myCachedTextures.count(aPath) == 0)
+		{
+			Asset* texture = myTextureLoader->LoadTexture(aPath, aFailSilenty);
+			if (!texture)
+			{
+				if (!aFailSilenty)
+				{
+					LOG_ERROR("Failed to load Texture", aPath);
+				}
+				return AssetHandle(myErrorTexture);
+			}
+			myCachedTextures[aPath] = texture;
+			return AssetHandle(texture);
+		}
+		return AssetHandle(myCachedTextures[aPath]);
+	}
+
     //AssetHandle AssetManager::GetJSONInternal(const std::string& aPath)
     //{
     //    if (myCachedJSON.count(aPath) == 0)

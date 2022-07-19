@@ -21,6 +21,7 @@ namespace engine::graph
 {
 
 	class Graph;
+	class PinLink;
 	
 	class DrawablePinBlock
 	{
@@ -34,6 +35,7 @@ namespace engine::graph
 		bool Imgui(const char* aName, Graph* aGraph, NodeInstanceId aId, float aScale, ImVec2 aPosition, const std::vector<PinBase*>& aInPins, const std::vector<PinBase*>& aOutPins);
 
 		virtual ImVec2 CustomImguiSize() { return ImVec2(0, 0); }
+		virtual void CustomImgui(float aScale, ImVec2 aTopLeft) { }
 
 		void Move(ImVec2 aDelta);
 
@@ -41,7 +43,7 @@ namespace engine::graph
 		bool myIsMoving = false;
 	};
 
-	class NodeInstance : private DrawablePinBlock
+	class NodeInstance : public DrawablePinBlock
 	{
 	public:
 		NodeInstance(BuiltNode& aType, ImVec2 aPosition);
@@ -50,7 +52,9 @@ namespace engine::graph
 		bool Imgui(Graph* aGraph, float aScale, ImVec2 aPosition);
 		
 		ImVec2 CustomImguiSize() override { return myType->ImguiSize(myId); }
-		void CustomImgui(float aScale, ImVec2 aTopLeft) { myType->Imgui(myId, aScale, aTopLeft); }
+		void CustomImgui(float aScale, ImVec2 aTopLeft) override { myType->Imgui(myId, aScale, aTopLeft); }
+
+		void RemoveAllRelatedLinks(std::vector<std::unique_ptr<PinLink>>& aLinks);
 
 	private:
 		BuiltNode* myType;
@@ -92,14 +96,16 @@ namespace engine::graph
 	class PinLink
 	{
 	public:
-		PinLink(OutPinInstanceBase* aFrom, InPinInstance* aTo);
+		PinLink(OutPinInstanceBase* aFrom, InPinInstanceBase* aTo);
 		~PinLink();
 
 		void Imgui(Graph* aGraph,const std::unordered_map<PinInstanceBase*, ImVec2>& aLocations, float aScale, ImVec2 aPosition);
 
 	private:
+		friend NodeInstance;
+
 		OutPinInstanceBase* myFrom;
-		InPinInstance*		myTo;
+		InPinInstanceBase*	myTo;
 	};
 
 	class Selection
@@ -126,9 +132,12 @@ namespace engine::graph
 
 		void UpdateSelection();
 
+		void InvalidateIfOnly(DrawablePinBlock* aPinBlock);
+
 		void MoveAll(ImVec2 aDelta);
+
+		inline std::unordered_set<DrawablePinBlock*>& All() { return mySelected; }
 	private:
-		bool IsInside(ImVec2 aTopLeftA, ImVec2 aBottomRightA, ImVec2 aTopLeftB, ImVec2 aBottomRightB);
 
 		ImVec2	TopLeft();
 		ImVec2	BottomRight();
@@ -162,7 +171,7 @@ namespace engine::graph
 
 		bool Imgui(float aScale, ImVec2 aPosition);
 
-		void AddLink(OutPinInstanceBase* aFrom, InPinInstance* aTo);
+		void AddLink(OutPinInstanceBase* aFrom, InPinInstanceBase* aTo);
 		void RemoveLink(PinLink* aLink);
 
 		void AddPinLocation(PinInstanceBase* aPin, ImVec2 aScreenPosition);
@@ -171,6 +180,8 @@ namespace engine::graph
 
 		const std::string& Name();
 	private:
+
+		void RemoveNodes(std::unordered_set<DrawablePinBlock*>& aSelection);
 
 		PinLink* myLinkToRemove = nullptr;
 

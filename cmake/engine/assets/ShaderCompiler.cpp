@@ -17,7 +17,7 @@
 
 
 #define SHADER_VERSION (2)
-namespace engine
+namespace engine::assets
 {
 	ShaderCompiler::ShaderCompiler(const std::string& aBakedFolderPath)
 	{

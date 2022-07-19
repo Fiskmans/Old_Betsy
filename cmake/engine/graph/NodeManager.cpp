@@ -2,10 +2,12 @@
 #include "engine/graph/Graph.h"
 
 #include "imgui/WindowControl.h"
+#include "imgui/imgui.h"
+
+#include "tools/ImGuiHelpers.h"
 
 #include "logger/Logger.h"
 
-#include "imgui/imgui.h"
 
 namespace engine::graph
 {
@@ -25,6 +27,11 @@ namespace engine::graph
 	void NodeManager::AddOutPin(PinBase* aOutPin)
 	{
 		myCurrent->AddOutPin(aOutPin);
+	}
+
+	void NodeManager::AddData(NodeDataBase* aData)
+	{
+		myCurrent->AddData(aData);
 	}
 	
 	void NodeManager::EndNode()
@@ -96,6 +103,13 @@ namespace engine::graph
 
 		if (open)
 		{
+			ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+			ImVec2 size = ImVec2(150.f, 16.f * myNodes.size());
+			drawList->AddRectFilled(root, ImVec2(root.x + size.x, root.y + size.y), tools::GetImColor(ImGuiCol_WindowBg), 2.f);
+			drawList->AddRect(root, ImVec2(root.x + size.x, root.y + size.y), tools::GetImColor(ImGuiCol_Border), 2.f);
+
+
 			ImVec2 pos = root;
 			for (std::pair<std::string, BuiltNode*> node : myNodes)
 			{
@@ -109,9 +123,8 @@ namespace engine::graph
 					//(mousepos - offset) / aScale = mypos + apos
 					//(mousepos - offset) / aScale - apos = mypos
 
-					ImVec2 mousePos = ImGui::GetMousePos();
 					ImVec2 offset = ImGui::GetWindowPos();
-					ImVec2 translated = ImVec2((mousePos.x	- offset.x) / aScale - aPosition.x, (mousePos.y - offset.y) / aScale - aPosition.y);
+					ImVec2 translated = ImVec2((root.x	- offset.x) / aScale - aPosition.x, (root.y - offset.y) / aScale - aPosition.y);
 					aGraph->AddNode(*node.second, translated);
 				}
 				pos.y += 16 + ImGui::GetStyle().FramePadding.y;

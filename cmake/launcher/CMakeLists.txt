@@ -15,6 +15,7 @@ target_link_libraries(Launcher PUBLIC Logger)
 target_link_libraries(Launcher PUBLIC Engine)
 target_link_libraries(Launcher PUBLIC Imgui)
 target_link_libraries(Launcher PUBLIC Demo_game1)
+target_link_libraries(Launcher PUBLIC DirectXTK)
 
 target_link_libraries(Launcher PUBLIC d3d11.lib) 
 

@@ -21,6 +21,8 @@ namespace engine::graph
 				myCallback();
 		}
 
+		virtual void Unlink() {}
+
 		void SetRefreshCallback(std::function<void()> aCallback) { myCallback = aCallback; }
 	protected:
 		template <class T>

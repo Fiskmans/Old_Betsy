@@ -8,9 +8,8 @@
 #include "engine/assets/ShaderFlags.h"
 
 #include "engine/assets/ShaderCompiler.h"
+#include "engine/assets/TextureLoader.h"
 
-//#include "TextureLoader.h"
-//#include "ShaderCompiler.h"
 //#include "ModelLoader.h"
 
 #include <string>
@@ -30,7 +29,7 @@ namespace engine
 
 		void FlushChanges();
 
-		//AssetHandle GetTexture(const std::string& aPath);
+		AssetHandle GetTexture(const std::string& aPath);
 		//AssetHandle GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty = false);
 	
 		//AssetHandle GetCubeTexture(const std::string& aPath);
@@ -59,7 +58,7 @@ namespace engine
 
 	private:
 
-		//AssetHandle GetTextureInternal(const std::string& aPath, bool aFailSilenty);
+		AssetHandle GetTextureInternal(const std::string& aPath, bool aFailSilenty);
 		//AssetHandle GetJSONInternal(const std::string& aPath);
 		//AssetHandle GetAnimationInternal(const std::string& aPath);
 
@@ -68,8 +67,8 @@ namespace engine
 		std::string myBaseFolder;
 
 	//	std::unique_ptr<ModelLoader> myModelLoader;
-	//	std::unique_ptr<TextureLoader> myTextureLoader;
-		std::unique_ptr<ShaderCompiler> myShaderCompiler;
+		std::unique_ptr<assets::TextureLoader> myTextureLoader;
+		std::unique_ptr<assets::ShaderCompiler> myShaderCompiler;
 
 		Asset* myErrorTexture = nullptr;
 

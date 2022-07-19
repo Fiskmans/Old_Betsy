@@ -3,6 +3,7 @@
 
 #include "engine/graph/NodePin.h"
 #include "engine/graph/BuiltNode.h"
+#include "engine/graph/NodeData.h"
 
 #include "tools/Singleton.h"
 
@@ -17,8 +18,11 @@ namespace engine::graph
 	public:
 
 		void BeginNode(NodeBase* aBaseNode);
+		
 		void AddInPin(PinBase* aInPin);
 		void AddOutPin(PinBase* aOutPin);
+		void AddData(NodeDataBase* aData);
+
 		void EndNode();
 
 		void Imgui();

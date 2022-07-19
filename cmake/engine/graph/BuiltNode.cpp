@@ -1,10 +1,9 @@
 #include "engine/graph/BuiltNode.h"
 #include "engine/graph/Node.h"
+#include "engine/graph/NodeData.h"
 
 namespace engine::graph
 {
-
-
 	BuiltNode::BuiltNode(NodeBase* aBaseNode)
 		: myBaseNode(aBaseNode)
 	{
@@ -23,6 +22,11 @@ namespace engine::graph
 	void BuiltNode::AddOutPin(PinBase* aOutPin)
 	{
 		myOutPins.push_back(aOutPin);
+	}
+
+	void BuiltNode::AddData(NodeDataBase* aData)
+	{
+		myData.push_back(aData);
 	}
 
 	void BuiltNode::Imgui()
@@ -65,11 +69,13 @@ namespace engine::graph
 		{
 			in->AddInstance(aId);
 
-			InPinInstance* inInstance = in->GetInPinInstance(aId);
+			InPinInstanceBase* inInstance = in->GetInPinInstance(aId);
 			for (PinBase* out : myOutPins)
 				inInstance->AddDependent(out->GetOutStorage(aId));
 		}
 
+		for (NodeDataBase* data : myData)
+			data->AddInsitance(aId);
 	}
 
 	void BuiltNode::RemoveInstance(NodeInstanceId aId)
@@ -80,5 +86,7 @@ namespace engine::graph
 		for (PinBase* out : myOutPins)
 			out->RemoveInstance(aId);
 
+		for (NodeDataBase* data : myData)
+			data->RemoveInstance(aId);
 	}
 }

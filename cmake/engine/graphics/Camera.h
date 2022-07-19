@@ -3,7 +3,7 @@
 
 #include "engine/graph/Graph.h"
 
-#include "engine/graphics/Texture.h"
+#include "engine/assets/Asset.h"
 
 #include "tools/MathVector.h"
 #include "tools/Matrix4x4.h"
@@ -59,7 +59,7 @@ namespace engine
 
 		engine::graph::Graph myRenderGraph;
 
-		engine::graph::CustomInPin<Texture> myRenderTexture = "Texture to Render";
+		engine::graph::CustomInPin<AssetHandle> myRenderTexture = "Texture to Render";
 	protected:
 
 		engine::graph::CustomOutPin<tools::V2ui> myResolutionExport = "Resolution";

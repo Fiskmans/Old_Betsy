@@ -73,8 +73,8 @@ namespace engine::graph
 		ImDrawList * drawList = ImGui::GetWindowDrawList();
 		ImColor color = ColorFromHashCode(type.hash_code());
 
-		ImVec2 interactableRegionTopLeft = ImVec2(aLocation.x + xOffset - ImGui::GetStyle().FramePadding.x * aScale - 2.f * aScale, aLocation.y - 8.f * aScale);
-		ImVec2 interactableRegionSize = ImVec2(22 * aScale, 16 * aScale);
+		ImVec2 interactableRegionTopLeft = ImVec2(aLocation.x + xOffset - ImGui::GetStyle().FramePadding.x * aScale - 4.f * aScale, aLocation.y - 8.f * aScale);
+		ImVec2 interactableRegionSize = ImVec2(26 * aScale, 20 * aScale);
 
 		ImGui::SetCursorScreenPos(interactableRegionTopLeft);
 		ImGui::InvisibleButton("drag_source", interactableRegionSize);
@@ -91,9 +91,20 @@ namespace engine::graph
 			myIsHovered = hovered;
 		}
 
+		struct PinPayload
+		{
+			PinBase* myPin;
+			NodeInstanceId myId;
+		};
+
+		static_assert(std::is_trivial_v<PinPayload>);
+
 		if (ImGui::BeginDragDropSource())
 		{
-			PinBase* payload = this;
+			PinPayload payload;
+			payload.myPin = this;
+			payload.myId = aId;
+
 			ImGui::Text("%s", Name());
 			ImGui::Text("%s", type.name());
 
@@ -119,9 +130,11 @@ namespace engine::graph
 			const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("NodePin", ImGuiDragDropFlags_AcceptPeekOnly | ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
 			if (payload)
 			{
-				PinBase& source = **reinterpret_cast<PinBase**>(payload->Data);
+				PinPayload& translatedPayload = *reinterpret_cast<PinPayload*>(payload->Data);
+				PinBase* sourcePin = translatedPayload.myPin;
+				NodeInstanceId sourceId = translatedPayload.myId;
 				
-				if (CanConnectTo(source))
+				if (CanConnectTo(*sourcePin))
 				{
 					if (payload->IsPreview())
 					{
@@ -133,17 +146,17 @@ namespace engine::graph
 
 					if(payload->IsDelivery())
 					{
-						InPinInstance* in = nullptr;
+						InPinInstanceBase* in = nullptr;
 						OutPinInstanceBase* out = nullptr;
 
 						if (isIn)
 						{
 							in = this->GetInPinInstance(aId);
-							out = source.GetOutPinInstance(aId);
+							out = sourcePin->GetOutPinInstance(sourceId);
 						}
 						else
 						{
-							in = source.GetInPinInstance(aId);
+							in = sourcePin->GetInPinInstance(sourceId);
 							out = this->GetOutPinInstance(aId);
 						}
 
@@ -177,6 +190,16 @@ namespace engine::graph
 			float intensity = (0.3f + 0.3f * cos(tools::GetTotalTime() * TAU)) * ourHoverIntensity;
 			color = ImColor(LERP(color.Value.x, 1.f, intensity), LERP(color.Value.y, 1.f, intensity), LERP(color.Value.z, 1.f, intensity), 1.f);
 		}
+
+		bool dirty = false;
+		if (isIn)
+			dirty = GetInPinInstance(aId)->IsDirty();
+		else
+			dirty = GetOutPinInstance(aId)->GetStorage().IsDirty();
+
+		if (dirty)
+			drawList->AddRect(interactableRegionTopLeft, ImVec2(interactableRegionTopLeft.x + interactableRegionSize.x, interactableRegionTopLeft.y + interactableRegionSize.y), ImColor(1.f,0.8f,0.8f,0.3f), 3.f, 0, 2.f * aScale);
+
 
 		//drawList->AddRectFilled(aLocation, ImVec2(aLocation.x + 22, aLocation.y + 16), ImColor(0.5, 0.5, 0.5, 1.f));
 		drawList->AddCircle(ImVec2(aLocation.x + xOffset, aLocation.y + yOffset), bigCircleSize, color, 0, bigCircleThickness);
@@ -260,10 +283,23 @@ namespace engine::graph
 	//	ImGui::DragFloat("smallCircleThickness", &smallCircleThickness, 0.1f);
 	//}
 
-	PinValueBase& InPinInstance::Fetch()
+	PinValueBase& InPinInstanceBase::Fetch()
 	{
 		myTarget->Load();
+		MarkRefreshed();
 		return *myTarget;
+	}
+
+	void InPinInstanceBase::LinkTo(OutPinInstanceBase* aPin)
+	{
+		myTarget->Unlink();
+		aPin->GetStorage().AddDependent(this);
+	}
+
+	void InPinInstanceBase::UnlinkFrom(OutPinInstanceBase* aPin)
+	{
+		aPin->GetStorage().RemoveDependent(this);
+		AttachConstant();
 	}
 
 	namespace node_pin_helpers

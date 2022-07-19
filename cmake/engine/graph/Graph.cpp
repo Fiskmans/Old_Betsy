@@ -87,10 +87,16 @@ namespace engine::graph
 
 		mySelection.DrawSelection();
 
+		if (ImGui::GetIO().KeysDown[VK_DELETE] || ImGui::GetIO().KeysDown[VK_BACK])
+		{
+			RemoveNodes(mySelection.All());
+			mySelection.InvalidateSelection();
+		}
+
 		return capture;
 	}
 
-	void Graph::AddLink(OutPinInstanceBase* aFrom, InPinInstance* aTo)
+	void Graph::AddLink(OutPinInstanceBase* aFrom, InPinInstanceBase* aTo)
 	{
 		aTo->myTarget = &aFrom->GetStorage();
 
@@ -115,6 +121,21 @@ namespace engine::graph
 	const std::string& Graph::Name()
 	{
 		return myName;
+	}
+
+	void Graph::RemoveNodes(std::unordered_set<DrawablePinBlock*>& aSelection)
+	{
+
+		for (DrawablePinBlock* item : aSelection)
+		{
+			decltype(myNodes)::iterator it = std::find_if(std::begin(myNodes), std::end(myNodes), [item](const std::unique_ptr<NodeInstance>& aLHs) { return aLHs.get() == item; });
+
+			if (it != std::end(myNodes))
+			{
+				(*it)->RemoveAllRelatedLinks(myLinks);
+				myNodes.erase(it);
+			}
+		}
 	}
 
 	void GraphManager::AddGraph(Graph* aGraph)
@@ -197,7 +218,7 @@ namespace engine::graph
 		if (wheelDelta != 0)
 			scale *= pow(0.9f, -wheelDelta);
 
-		if (ImGui::GetIO().KeysDown[VK_SPACE])
+		if (ImGui::GetIO().KeysDown[VK_SPACE] && !selection->GetSelection().IsSelecting())
 		{
 			ImVec2 delta	= ImGui::GetMouseDragDelta();
 			newPosition		= ImVec2(position.x + delta.x / scale, position.y + delta.y / scale);
@@ -246,6 +267,27 @@ namespace engine::graph
 		return DrawablePinBlock::Imgui(NodeManager::PrettyfyName(myType->Name()).c_str(), aGraph, myId, aScale, aPosition, myType->InPins(), myType->OutPins());
 	}
 
+	void NodeInstance::RemoveAllRelatedLinks(std::vector<std::unique_ptr<PinLink>>& aLinks)
+	{
+		for (PinBase* pin : myType->InPins())
+		{
+			InPinInstanceBase* item = pin->GetInPinInstance(myId);
+			std::vector<std::unique_ptr<PinLink>>::iterator it = std::find_if(std::begin(aLinks), std::end(aLinks), [item](const std::unique_ptr<PinLink>& aLink) { return aLink->myTo == item; });
+
+			if (it != std::end(aLinks))
+				aLinks.erase(it);
+		}
+
+		for (PinBase* pin : myType->OutPins())
+		{
+			OutPinInstanceBase* item = pin->GetOutPinInstance(myId);
+			std::vector<std::unique_ptr<PinLink>>::iterator it = std::find_if(std::begin(aLinks), std::end(aLinks), [item](const std::unique_ptr<PinLink>& aLink) { return aLink->myFrom == item; });
+
+			if (it != std::end(aLinks))
+				aLinks.erase(it);
+		}
+	}
+
 	bool DrawablePinBlock::Imgui(const char* aName, Graph* aGraph, NodeInstanceId aId, float aScale, ImVec2 aPosition, const std::vector<PinBase*>& aInPins, const std::vector<PinBase*>& aOutPins)
 	{
 
@@ -259,6 +301,7 @@ namespace engine::graph
 		size_t pinCount = (std::max)(aInPins.size(), aOutPins.size());
 
 		const ImVec2 pinSize = ImVec2(22 * aScale, 16 * aScale);
+		const ImVec2 HeaderTextSize = ImGui::CalcTextSize(aName);
 		const float		headerSize = 20 * aScale;
 		const float		pinSpacing = 4 * aScale;
 
@@ -276,12 +319,11 @@ namespace engine::graph
 		rightPinBlockWidth *= aScale;
 
 
-
 		ImVec2 rawCustomSize = CustomImguiSize();
-		ImVec2 customSize = ImVec2(rawCustomSize.x * aScale, rawCustomSize.y * aScale);
+		ImVec2 customSize = ImVec2(rawCustomSize.x, rawCustomSize.y);
 
 
-		ImVec2 size = ImVec2(leftPinBlockWidth + rightPinBlockWidth + customSize.x, headerSize + (std::max)(customSize.y, pinBlockHeight));
+		ImVec2 size = ImVec2((std::max)(leftPinBlockWidth + rightPinBlockWidth + customSize.x, (HeaderTextSize.x + 8.f) * aScale), headerSize + (std::max)(customSize.y, pinBlockHeight));
 		ImVec2 topLeft = ImVec2((myPosition.x + aPosition.x) * aScale + offset.x, (myPosition.y + aPosition.y) * aScale + offset.y);
 		ImVec2 bottomRight = ImVec2(topLeft.x + size.x, topLeft.y + size.y);
 
@@ -306,20 +348,24 @@ namespace engine::graph
 			myIsMoving = true;
 
 		if (io.MouseReleased[0])
+		{
+			if (myIsMoving)
+				selection.InvalidateIfOnly(this);
+
 			myIsMoving = false;
+		}
 
 		if (myIsMoving)
 		{
 			ImVec2 delta = ImVec2(io.MouseDelta.x / aScale, io.MouseDelta.y / aScale);
-			if (selection.IsSelected(this))
+			if (!selection.IsSelected(this))
 			{
-				selection.MoveAll(delta);
-			}
-			else
-			{
-				Move(delta);
 				selection.InvalidateSelection();
+				selection.AddToSelection(this);
+				selection.UpdateSelection();
 			}
+	
+			selection.MoveAll(delta);
 		}
 
 
@@ -356,6 +402,11 @@ namespace engine::graph
 			}
 		}
 
+		ImVec2 customLocation = ImVec2(topLeft.x + leftPinBlockWidth, topLeft.y + headerSize);
+
+		CustomImgui(aScale, customLocation);
+
+
 		ImGui::PopID();
 		return myIsMoving || interacting;
 	}
@@ -376,26 +427,27 @@ namespace engine::graph
 		return DrawablePinBlock::Imgui("Import", aGraph, InvalidNodeInstanceId, aScale, aPosition, {}, myPins);
 	}
 
-	PinLink::PinLink(OutPinInstanceBase* aFrom, InPinInstance* aTo)
+	PinLink::PinLink(OutPinInstanceBase* aFrom, InPinInstanceBase* aTo)
 		: myFrom(aFrom)
 		, myTo(aTo)
 	{
-		aFrom->GetStorage().AddDependent(aTo);
+		aTo->LinkTo(aFrom);
 	}
 
 	PinLink::~PinLink()
 	{
+		myTo->UnlinkFrom(myFrom);
 		myFrom->GetStorage().RemoveDependent(myTo);
 	}
 
 	void PinLink::Imgui(Graph* aGraph, const std::unordered_map<PinInstanceBase*, ImVec2>& aLocations, float aScale, ImVec2 aPosition)
 	{
-		const float bendyness = 50.f * aScale;
-
 		ImVec2 start = aLocations.find(myFrom)->second;
-		ImVec2 q1 = ImVec2(start.x + bendyness, start.y);
-
 		ImVec2 end = aLocations.find(myTo)->second;
+
+		const float bendyness = (std::min)(50.f * aScale, std::abs(start.x - end.x));
+
+		ImVec2 q1 = ImVec2(start.x + bendyness, start.y);
 		ImVec2 q2 = ImVec2(end.x - bendyness, end.y);
 
 		ImDrawList* drawlist = ImGui::GetWindowDrawList();
@@ -526,6 +578,17 @@ namespace engine::graph
 	{
 		mySelected = myNextSelected;
 		myNextSelected = {};
+	}
+
+	void Selection::InvalidateIfOnly(DrawablePinBlock* aPinBlock)
+	{
+		if (mySelected.size() != 1)
+			return;
+
+		if (!IsSelected(aPinBlock))
+			return;
+
+		InvalidateSelection();
 	}
 
 	void Selection::MoveAll(ImVec2 aDelta)

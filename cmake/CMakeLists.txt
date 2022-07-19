@@ -29,6 +29,8 @@ add_subdirectory(logger)
 add_subdirectory(engine)
 add_subdirectory(demo_game1)
 
+add_subdirectory(DirectXTK)
+
 if(DEFINED CLANG_COMPILER_RT)
 	message("Clang runtime directory specified, enabling fuzzers")
 	add_subdirectory(fuzzers)

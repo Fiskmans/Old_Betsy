@@ -13,6 +13,7 @@ namespace engine::graph
 	{
 		NodeInstanceData(NodeInstanceId aId)
 			: myId(aId)
+			, myData{}
 		{
 		}
 

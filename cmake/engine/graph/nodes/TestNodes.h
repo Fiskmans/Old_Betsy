@@ -15,6 +15,31 @@ namespace engine::graph::node
 		void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) override;
 	private:
 		InPin<int> myIn = "Val";
+
+		NodeData<int> myStored;
+	};
+
+	class IntConstant : public NodeBase
+	{
+	public:
+		void Activate(NodeInstanceId aId) override;
+
+		ImVec2 ImguiSize(NodeInstanceId aId) override;
+		void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) override;
+	private:
+		OutPin<int> myOut = "Val";
+
+		NodeData<int> myValue;
+	};
+
+	class IntPassThrough : public NodeBase
+	{
+	public:
+		void Activate(NodeInstanceId aId) override { myOut.Write(aId, myIn.Get(aId)); }
+
+	private:
+		InPin<int> myIn = "In";
+		OutPin<int> myOut = "Out";
 	};
 }
 

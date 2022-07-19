@@ -5,6 +5,7 @@
 #include "engine/graph/NodeInstanceDataCollection.h"
 #include "engine/graph/PinValue.h"
 #include "engine/graph/Dependable.h"
+#include "engine/graph/PinConstant.h"
 
 #include "imgui/imgui.h"
 
@@ -15,7 +16,7 @@ namespace engine::graph
 {
 	class Graph;
 	class OutPinInstanceBase;
-	class InPinInstance;
+	class InPinInstanceBase;
 
 	class PinBase
 	{
@@ -29,7 +30,7 @@ namespace engine::graph
 		virtual void RemoveInstance(NodeInstanceId aId) {}
 
 		virtual OutPinInstanceBase* GetOutPinInstance(NodeInstanceId aId) { return nullptr; }
-		virtual InPinInstance* GetInPinInstance(NodeInstanceId aId) { return nullptr; }
+		virtual InPinInstanceBase* GetInPinInstance(NodeInstanceId aId) { return nullptr; }
 
 		virtual PinValueBase* GetOutStorage(NodeInstanceId aId) { return nullptr; }
 
@@ -78,17 +79,42 @@ namespace engine::graph
 		PinValue<T> myStorage;
 	};
 
-	class InPinInstance : 
+	class InPinInstanceBase : 
 		public PinInstanceBase,
 		public Dependable
 	{
 	public:
 		PinValueBase& Fetch();
 
-	private:
+		void LinkTo(OutPinInstanceBase* aPin);
+		void UnlinkFrom(OutPinInstanceBase* aPin);
+
+	protected:
+		virtual void AttachConstant() = 0;
+
 		friend Graph;
 
+		template<class Type>
+		friend class InPin;
+
 		PinValueBase* myTarget;
+	};
+
+	template<class Type>
+	class InPinInstance : public InPinInstanceBase
+	{
+	public:
+		InPinInstance() 
+		{
+			AttachConstant();
+		}
+
+	private:
+		void AttachConstant() override
+		{
+			myTarget = new PinConstant<Type>(this);
+			myTarget->AddDependent(this);
+		}
 	};
 
 	namespace node_pin_helpers
@@ -109,12 +135,12 @@ namespace engine::graph
 		const std::type_info& Type() const override { return typeid(PinType); }
 		bool IsInPin() const override { return true; }
 
-		InPinInstance* GetInPinInstance(NodeInstanceId aId) override { return &myValue; }
+		InPinInstanceBase* GetInPinInstance(NodeInstanceId aId) override { return &myValue; }
 
 		PinType& Get() { return myValue.Fetch().As<PinType>(); }
 	private:
 		std::string myPinName;
-		InPinInstance myValue;
+		InPinInstance<PinType> myValue;
 	};
 
 	template<class PinType>
@@ -156,16 +182,20 @@ namespace engine::graph
 		const std::type_info& Type() const override { return typeid(PinType); }
 		bool IsInPin() const override { return true; }
 
-		void AddInstance(NodeInstanceId aId) override { myInstances.AddInstance(aId); }
+		void AddInstance(NodeInstanceId aId) override 
+		{ 
+			myInstances.AddInstance(aId); 
+		}
+
 		void RemoveInstance(NodeInstanceId aId) override { myInstances.RemoveInstance(aId); };
 
-		InPinInstance* GetInPinInstance(NodeInstanceId aId) override { return &myInstances.Get(aId); }
+		InPinInstanceBase* GetInPinInstance(NodeInstanceId aId) override { return &myInstances.Get(aId); }
 
-		PinType& Get(NodeInstanceId aId) { return myInstances.Get(aId).Fetch().As<PinType>(); }
+		PinType& Get(NodeInstanceId aId) { return myInstances.Get(aId).Fetch().template As<PinType>(); }
 
 	private:
 		std::string myPinName;
-		NodeInstandeDataCollection<InPinInstance> myInstances;
+		NodeInstandeDataCollection<InPinInstance<PinType>> myInstances;
 	};
 
 	template<class PinType>
