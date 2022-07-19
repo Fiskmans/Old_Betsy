@@ -36,11 +36,11 @@ namespace engine::graph
 
 		bool CanConnectTo(const PinBase& aOther) const;
 
-		float GetImGuiWidth();
-		bool ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, NodeInstanceId aId);
+		ImVec2 ImGuiSize(NodeInstanceId aId);
+		bool ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, NodeInstanceId aId, ImVec2& aOutAttachPoint);
 		//static void Setup();
 
-		static void Imgui();
+		static void UpdateImGui();
 	private:
 		bool myIsHovered = false;
 
@@ -88,6 +88,9 @@ namespace engine::graph
 
 		void LinkTo(OutPinInstanceBase* aPin);
 		void UnlinkFrom(OutPinInstanceBase* aPin);
+
+		ImVec2 CustomImguiSize();
+		void CustomImgui(float aScale, ImVec2 aLocation);
 
 	protected:
 		virtual void AttachConstant() = 0;

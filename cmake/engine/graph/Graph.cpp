@@ -150,7 +150,7 @@ namespace engine::graph
 
 	void GraphManager::Imgui()
 	{
-		PinBase::Imgui();
+		PinBase::UpdateImGui();
 
 		static ImVec2 windowPosition = ImVec2(0,0);
 		static ImVec2 newWindowPosition = ImVec2(0,0);
@@ -298,32 +298,33 @@ namespace engine::graph
 
 		const ImVec2 shadowOffset = ImVec2(6 * aScale, 6 * aScale);
 
-		size_t pinCount = (std::max)(aInPins.size(), aOutPins.size());
 
-		const ImVec2 pinSize = ImVec2(22 * aScale, 16 * aScale);
 		const ImVec2 HeaderTextSize = ImGui::CalcTextSize(aName);
 		const float		headerSize = 20 * aScale;
 		const float		pinSpacing = 4 * aScale;
 
-		const float pinBlockHeight = pinSize.y * pinCount + pinSpacing * (pinCount + 1);
-		
-
-		float leftPinBlockWidth = 0;
+		ImVec2 leftPinBlockSize = ImVec2(pinSpacing, 0);
 		for (PinBase* pin : aInPins)
-			leftPinBlockWidth = (std::max)(pin->GetImGuiWidth(), leftPinBlockWidth);
-		leftPinBlockWidth *= aScale;
+		{
+			ImVec2 size = pin->ImGuiSize(aId);
+			leftPinBlockSize.y += size.y * aScale + pinSpacing;
+			leftPinBlockSize.x = (std::max)(size.x * aScale, leftPinBlockSize.x);
+		}
 
-		float rightPinBlockWidth = 0;
-		for (PinBase* pin : aOutPins)
-			rightPinBlockWidth = (std::max)(pin->GetImGuiWidth(), rightPinBlockWidth);
-		rightPinBlockWidth *= aScale;
+		ImVec2 rightPinBlockSize = ImVec2(pinSpacing, 0);
+		for (PinBase* pin : aInPins)
+		{
+			ImVec2 size = pin->ImGuiSize(aId);
+			rightPinBlockSize.y += size.y * aScale + pinSpacing;
+			rightPinBlockSize.x = (std::max)(size.x * aScale, rightPinBlockSize.x);
+		}
 
 
 		ImVec2 rawCustomSize = CustomImguiSize();
 		ImVec2 customSize = ImVec2(rawCustomSize.x, rawCustomSize.y);
 
 
-		ImVec2 size = ImVec2((std::max)(leftPinBlockWidth + rightPinBlockWidth + customSize.x, (HeaderTextSize.x + 8.f) * aScale), headerSize + (std::max)(customSize.y, pinBlockHeight));
+		ImVec2 size = ImVec2((std::max)(leftPinBlockSize.x + rightPinBlockSize.x + customSize.x, (HeaderTextSize.x + 8.f) * aScale), headerSize + (std::max)({ customSize.y, leftPinBlockSize.y, rightPinBlockSize.y }) + 2.f * aScale);
 		ImVec2 topLeft = ImVec2((myPosition.x + aPosition.x) * aScale + offset.x, (myPosition.y + aPosition.y) * aScale + offset.y);
 		ImVec2 bottomRight = ImVec2(topLeft.x + size.x, topLeft.y + size.y);
 
@@ -381,28 +382,32 @@ namespace engine::graph
 
 		bool interacting = false;
 		{
-			ImVec2 pinPosition = ImVec2(topLeft.x, topLeft.y + headerSize + pinSpacing + pinSize.y / 2.f);
+			ImVec2 pinPosition = ImVec2(topLeft.x, topLeft.y + headerSize + pinSpacing);
 
 			for (PinBase* pin : aInPins)
 			{
-				interacting |= pin->ImGui(aGraph, aScale, pinPosition, aId);
-				aGraph->AddPinLocation(pin->GetInPinInstance(aId), pinPosition);
-				pinPosition = ImVec2(pinPosition.x, pinPosition.y + pinSpacing + pinSize.y);
+				ImVec2 attachPoint;
+				interacting |= pin->ImGui(aGraph, aScale, pinPosition, aId, attachPoint);
+				aGraph->AddPinLocation(pin->GetInPinInstance(aId), attachPoint);
+				
+				pinPosition.y += pinSpacing + pin->ImGuiSize(aId).y * aScale;
 			}
 		}
 
 		{
-			ImVec2 pinPosition = ImVec2(bottomRight.x, topLeft.y + headerSize + pinSpacing + pinSize.y / 2.f);
+			ImVec2 pinPosition = ImVec2(bottomRight.x, topLeft.y + headerSize + pinSpacing);
 
 			for (PinBase* pin : aOutPins)
 			{
-				interacting |= pin->ImGui(aGraph, aScale, pinPosition, aId);
-				aGraph->AddPinLocation(pin->GetOutPinInstance(aId), pinPosition);
-				pinPosition = ImVec2(pinPosition.x, pinPosition.y + pinSpacing + pinSize.y);
+				ImVec2 attachPoint;
+				interacting |= pin->ImGui(aGraph, aScale, pinPosition, aId, attachPoint);
+				aGraph->AddPinLocation(pin->GetOutPinInstance(aId), attachPoint);
+				
+				pinPosition.y += pinSpacing + pin->ImGuiSize(aId).y * aScale;
 			}
 		}
 
-		ImVec2 customLocation = ImVec2(topLeft.x + leftPinBlockWidth, topLeft.y + headerSize);
+		ImVec2 customLocation = ImVec2(topLeft.x + leftPinBlockSize.x, topLeft.y + headerSize);
 
 		CustomImgui(aScale, customLocation);
 

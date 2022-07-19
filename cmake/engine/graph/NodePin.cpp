@@ -43,17 +43,25 @@ namespace engine::graph
 		return true;
 	}
 
-	float PinBase::GetImGuiWidth()
+	ImVec2 PinBase::ImGuiSize(NodeInstanceId aId)
 	{
-		return ImGui::CalcTextSize(Name()).x + 28.f;
+		ImVec2 namesize = ImGui::CalcTextSize(Name());
+		if (!IsInPin())
+			return ImVec2(28.f + namesize.x, (std::max)(namesize.y, 22.f));
+
+		InPinInstanceBase* instance = GetInPinInstance(aId);
+
+		ImVec2 customSize = instance->CustomImguiSize();
+
+		return ImVec2((std::max)(28.f + namesize.x, customSize.x), (std::max)(namesize.y, 22.f) + customSize.y);
 	}
 
-	bool PinBase::ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, NodeInstanceId aId)
+	bool PinBase::ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, NodeInstanceId aId, ImVec2& aOutAttachPoint)
 	{
 		const bool isIn = IsInPin();
 
-		const float yOffset = 1.4f * aScale;
-		const float xOffset = (8.f - (isIn ? 0.f : 26.f)) * aScale;
+		const float yOffset = 11.4f * aScale;
+		const float xOffset = (10.f - (isIn ? 0.f : 30.f)) * aScale;
 
 		const float bigCircleSize = 4.1f * aScale;
 		const float bigCircleThickness = 3.2f * aScale;
@@ -67,14 +75,15 @@ namespace engine::graph
 		bool isInteracting = false;
 		ImGui::PushID(this);
 
+		aOutAttachPoint = ImVec2(aLocation.x, aLocation.y + 10.f * aScale);
 
 		const std::type_info& type = Type();
 
 		ImDrawList * drawList = ImGui::GetWindowDrawList();
 		ImColor color = ColorFromHashCode(type.hash_code());
 
-		ImVec2 interactableRegionTopLeft = ImVec2(aLocation.x + xOffset - ImGui::GetStyle().FramePadding.x * aScale - 4.f * aScale, aLocation.y - 8.f * aScale);
-		ImVec2 interactableRegionSize = ImVec2(26 * aScale, 20 * aScale);
+		ImVec2 interactableRegionTopLeft = ImVec2(aLocation.x + xOffset - ImGui::GetStyle().FramePadding.x * aScale - 4.f * aScale, aLocation.y + 2.f * aScale);
+		ImVec2 interactableRegionSize = ImVec2(26.f * aScale, 18.f * aScale);
 
 		ImGui::SetCursorScreenPos(interactableRegionTopLeft);
 		ImGui::InvisibleButton("drag_source", interactableRegionSize);
@@ -114,15 +123,16 @@ namespace engine::graph
 			ourNextHoveredType = &type;
 			ourHoverIn = isIn;
 
-			const float bendyness = 50.f * aScale * (isIn ? -1.f : 1.f);
 			ImVec2 target = ImGui::GetMousePos();
 			if (ourIsHoveringTarget)
 			{
 				target = ourHoverTarget;
 			}
 
+			const float bendyness = (std::min)(50.f * aScale, std::abs(aOutAttachPoint.x - target.x)) * (isIn ? -1.f : 1.f);
+
 			isInteracting |= true;
-			drawList->AddBezierCubic(aLocation, ImVec2(aLocation.x + bendyness, aLocation.y), ImVec2(target.x - bendyness, target.y), target, ImColor(0.8f, 0.8f, 0.8f, 0.8f), 2.f * aScale);
+			drawList->AddBezierCubic(aOutAttachPoint, ImVec2(aOutAttachPoint.x + bendyness, aOutAttachPoint.y), ImVec2(target.x - bendyness, target.y), target, ImColor(0.8f, 0.8f, 0.8f, 0.8f), 2.f * aScale);
 		}
 
 		if (ImGui::BeginDragDropTarget())
@@ -141,7 +151,7 @@ namespace engine::graph
 						drawList->AddRect(interactableRegionTopLeft, ImVec2(interactableRegionTopLeft.x + interactableRegionSize.x, interactableRegionTopLeft.y + interactableRegionSize.y), tools::GetImColor(ImGuiCol_Border), 3.f, 0, 2.f * aScale);
 
 						ourNextIsHoveringTarget = true;
-						ourHoverTarget = aLocation;
+						ourHoverTarget = aOutAttachPoint;
 					}
 
 					if(payload->IsDelivery())
@@ -214,7 +224,10 @@ namespace engine::graph
 			textOffset = -textSize.x - 26.f;
 		}
 
-		drawList->AddText(ImGui::GetFont(), ImGui::GetFontSize() * aScale, ImVec2(aLocation.x + textOffset * aScale, aLocation.y - 5.f * aScale), ImColor(1.f, 1.f, 1.f, 1.f), Name());
+		drawList->AddText(ImGui::GetFont(), ImGui::GetFontSize() * aScale, ImVec2(aLocation.x + textOffset * aScale, aLocation.y + 5.f * aScale), ImColor(1.f, 1.f, 1.f, 1.f), Name());
+
+		if (isIn)
+			GetInPinInstance(aId)->CustomImgui(aScale, ImVec2(aLocation.x, aLocation.y + 20.f * aScale));
 
 		if(popupOpen)
 		{
@@ -238,7 +251,7 @@ namespace engine::graph
 		return isInteracting;
 	}
 
-	void PinBase::Imgui()
+	void PinBase::UpdateImGui()
 	{
 		static float lastTick = tools::GetTotalTime();
 		static float sum = 0;
@@ -300,6 +313,22 @@ namespace engine::graph
 	{
 		aPin->GetStorage().RemoveDependent(this);
 		AttachConstant();
+	}
+
+	ImVec2 InPinInstanceBase::CustomImguiSize()
+	{
+		if (!myTarget->IsConstant())
+			return ImVec2(0, 0);
+
+		return myTarget->ImGuiSize();
+	}
+
+	void InPinInstanceBase::CustomImgui(float aScale, ImVec2 aLocation)
+	{
+		if (!myTarget->IsConstant())
+			return;
+
+		myTarget->ImGui(aScale, aLocation);
 	}
 
 	namespace node_pin_helpers

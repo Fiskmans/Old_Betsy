@@ -3,6 +3,8 @@
 
 #include "engine/graph/Dependable.h"
 
+#include "imgui/imgui.h"
+
 #include <functional>
 
 namespace engine::graph
@@ -11,6 +13,7 @@ namespace engine::graph
 	{
 	public:
 		virtual ~PinValueBase() = default;
+		virtual bool IsConstant() { return false;  }
 
 		template <class T>
 		T& As() { return *reinterpret_cast<T*>(myValue); }
@@ -23,6 +26,8 @@ namespace engine::graph
 
 		virtual void Unlink() {}
 
+		virtual ImVec2 ImGuiSize() { return ImVec2(0, 0); };
+		virtual void ImGui(float aScale, ImVec2 aLocation) {};
 		void SetRefreshCallback(std::function<void()> aCallback) { myCallback = aCallback; }
 	protected:
 		template <class T>
