@@ -323,8 +323,9 @@ namespace engine::graph
 		ImVec2 rawCustomSize = CustomImguiSize();
 		ImVec2 customSize = ImVec2(rawCustomSize.x * aScale, rawCustomSize.y * aScale);
 
+		const float separatorSize = 7.f * aScale;
 
-		ImVec2 size = ImVec2(15.f * aScale + (std::max)(leftPinBlockSize.x + rightPinBlockSize.x + customSize.x, (HeaderTextSize.x + 8.f) * aScale), headerSize + (std::max)({ customSize.y, leftPinBlockSize.y, rightPinBlockSize.y }) + 2.f * aScale);
+		ImVec2 size = ImVec2(separatorSize * 2.f + (std::max)(leftPinBlockSize.x + rightPinBlockSize.x + customSize.x, (HeaderTextSize.x + 8.f) * aScale), headerSize + (std::max)({ customSize.y, leftPinBlockSize.y, rightPinBlockSize.y }) + 2.f * aScale);
 		ImVec2 topLeft = ImVec2((myPosition.x + aPosition.x) * aScale + offset.x, (myPosition.y + aPosition.y) * aScale + offset.y);
 		ImVec2 bottomRight = ImVec2(topLeft.x + size.x, topLeft.y + size.y);
 
@@ -407,7 +408,7 @@ namespace engine::graph
 			}
 		}
 
-		ImVec2 customLocation = ImVec2(topLeft.x + leftPinBlockSize.x, topLeft.y + headerSize);
+		ImVec2 customLocation = ImVec2(topLeft.x + leftPinBlockSize.x + separatorSize, topLeft.y + headerSize);
 
 		CustomImgui(aScale, customLocation);
 

@@ -64,21 +64,32 @@ namespace engine::graph
 			static bool Imgui(float aScale, ImVec2 aLocation, int& aValue) 
 			{
 				bool changed = false;
-				//ImDrawList* drawlist = ImGui::GetWindowDrawList();
+				ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-				ImGui::SetCursorScreenPos(ImVec2(aLocation.x, aLocation.y));
-				if (ImGui::Button("+", ImVec2(20, 20)))
-				{
-					aValue++;
-					changed = true;
-				}
-
-				ImGui::SameLine();
-				if (ImGui::Button("-", ImVec2(20, 20)))
+				ImVec2 pos = ImVec2(aLocation.x + 1.f * aScale, aLocation.y);
+				ImGui::SetCursorScreenPos(pos);
+				if (ImGui::InvisibleButton("-", ImVec2(20.f * aScale, 20.f * aScale)))
 				{
 					aValue--;
 					changed = true;
 				}
+
+				drawlist->AddRectFilled(pos, ImVec2(pos.x + 20.f * aScale, pos.y + 20.f * aScale), tools::GetImColor(ImGui::IsItemHovered() ? ImGuiCol_ButtonHovered : ImGuiCol_Button));
+				drawlist->AddText(ImGui::GetFont(), ImGui::GetFontSize() * aScale, ImVec2(pos.x + 6.f * aScale, pos.y + 4.f * aScale), tools::GetImColor(ImGuiCol_Text), "-");
+
+				pos.x += 23.f * aScale;
+
+				ImGui::SetCursorScreenPos(ImVec2(aLocation.x + 24.f * aScale, aLocation.y));
+				if (ImGui::InvisibleButton("+", ImVec2(20.f * aScale, 20.f * aScale)))
+				{
+					aValue++;
+					changed = true;
+				}
+				drawlist->AddRectFilled(pos, ImVec2(pos.x + 20.f * aScale, pos.y + 20.f * aScale), tools::GetImColor(ImGui::IsItemHovered() ? ImGuiCol_ButtonHovered : ImGuiCol_Button));
+				drawlist->AddText(ImGui::GetFont(), ImGui::GetFontSize() * aScale, ImVec2(pos.x + 6.f * aScale, pos.y + 4.f * aScale), tools::GetImColor(ImGuiCol_Text), "+");
+
+				pos.x += 21.f * aScale;
+				drawlist->AddText(ImGui::GetFont(), ImGui::GetFontSize()* aScale, ImVec2(pos.x + 6.f * aScale, pos.y + 4.f * aScale), tools::GetImColor(ImGuiCol_Text), std::to_string(aValue).c_str());
 
 				return changed;
 			};
