@@ -12,9 +12,10 @@ namespace engine::graph::node
 		if (!stashed.IsValid() || myInResolution.GetInPinInstance(aId)->IsDirty() || myInFormat.GetInPinInstance(aId)->IsDirty())
 		{
 			DXGI_FORMAT format = myInFormat.Get(aId);
-			if (format != DXGI_FORMAT_UNKNOWN)
+			tools::V2ui size = myInResolution.Get(aId);
+			if (format != DXGI_FORMAT_UNKNOWN && size != tools::V2ui(0,0))
 			{
-				stashed = AssetManager::GetInstance().MakeTexture(myInResolution.Get(aId), format);
+				stashed = AssetManager::GetInstance().MakeTexture(size, format);
 			}
 			else
 			{

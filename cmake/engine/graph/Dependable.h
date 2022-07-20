@@ -10,7 +10,7 @@ namespace engine::graph
 	public:
 		virtual ~Dependable() = default;
 
-		void AddDependent(Dependable* aDependent) { myDependents.push_back(aDependent); }
+		void AddDependent(Dependable* aDependent);
 		void RemoveDependent(Dependable* aDependent);
 
 		void MarkRefreshed();

@@ -129,7 +129,7 @@ namespace engine::graph
 				target = ourHoverTarget;
 			}
 
-			const float bendyness = (std::min)(50.f * aScale, std::abs(aOutAttachPoint.x - target.x)) * (isIn ? -1.f : 1.f);
+			const float bendyness = (std::min)(50.f * aScale, std::abs(aOutAttachPoint.x - target.x) / 2.f) * (isIn ? -1.f : 1.f);
 
 			isInteracting |= true;
 			drawList->AddBezierCubic(aOutAttachPoint, ImVec2(aOutAttachPoint.x + bendyness, aOutAttachPoint.y), ImVec2(target.x - bendyness, target.y), target, ImColor(0.8f, 0.8f, 0.8f, 0.8f), 2.f * aScale);

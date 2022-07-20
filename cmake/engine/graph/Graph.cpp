@@ -312,7 +312,7 @@ namespace engine::graph
 		}
 
 		ImVec2 rightPinBlockSize = ImVec2(pinSpacing, 0);
-		for (PinBase* pin : aInPins)
+		for (PinBase* pin : aOutPins)
 		{
 			ImVec2 size = pin->ImGuiSize(aId);
 			rightPinBlockSize.y += size.y * aScale + pinSpacing;
@@ -324,7 +324,7 @@ namespace engine::graph
 		ImVec2 customSize = ImVec2(rawCustomSize.x * aScale, rawCustomSize.y * aScale);
 
 
-		ImVec2 size = ImVec2((std::max)(leftPinBlockSize.x + rightPinBlockSize.x + customSize.x, (HeaderTextSize.x + 8.f) * aScale), headerSize + (std::max)({ customSize.y, leftPinBlockSize.y, rightPinBlockSize.y }) + 2.f * aScale);
+		ImVec2 size = ImVec2(15.f * aScale + (std::max)(leftPinBlockSize.x + rightPinBlockSize.x + customSize.x, (HeaderTextSize.x + 8.f) * aScale), headerSize + (std::max)({ customSize.y, leftPinBlockSize.y, rightPinBlockSize.y }) + 2.f * aScale);
 		ImVec2 topLeft = ImVec2((myPosition.x + aPosition.x) * aScale + offset.x, (myPosition.y + aPosition.y) * aScale + offset.y);
 		ImVec2 bottomRight = ImVec2(topLeft.x + size.x, topLeft.y + size.y);
 
@@ -450,7 +450,7 @@ namespace engine::graph
 		ImVec2 start = aLocations.find(myFrom)->second;
 		ImVec2 end = aLocations.find(myTo)->second;
 
-		const float bendyness = (std::min)(50.f * aScale, std::abs(start.x - end.x));
+		const float bendyness = (std::min)(50.f * aScale, std::abs(start.x - end.x) / 2.f);
 
 		ImVec2 q1 = ImVec2(start.x + bendyness, start.y);
 		ImVec2 q2 = ImVec2(end.x - bendyness, end.y);

@@ -73,7 +73,8 @@ namespace engine::graph::node
 		{
 			"engine/error.dds",
 			"engine/SSAONormal.dds",
-			"engine/Vignette.dds"
+			"engine/Vignette.dds",
+			"engine/NoImage.dds"
 		};
 
 		int index = mySelection.Get(aId);
