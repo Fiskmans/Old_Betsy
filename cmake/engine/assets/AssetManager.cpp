@@ -1,5 +1,6 @@
-
 #include "engine/assets/AssetManager.h"
+
+#include "engine/graphics/TextureFactory.h"
 
 #include "tools/StringManipulation.h"
 
@@ -30,6 +31,10 @@
 
 namespace engine
 {
+    AssetManager::AssetManager()
+        : myCustomTextureCounter(0)
+    {
+    }
     void AssetManager::Init(const std::string& aBaseFolder, const std::string& aBakeFolder)
     {
         myBaseFolder = aBaseFolder;
@@ -76,6 +81,12 @@ namespace engine
 	{
 		return GetTextureInternal(myBaseFolder + TEXTURE_FOLDER + aPath, aFailSilent);
 	}
+
+    AssetHandle AssetManager::MakeTexture(const tools::V2ui& aResolution, DXGI_FORMAT aFormat)
+    {
+        Texture tex = TextureFactory::GetInstance().CreateTexture(aResolution, aFormat, "CustomTexture" + std::to_string(myCustomTextureCounter++));
+        return AssetHandle(new DrawableTextureAsset(tex));
+    }
 
     //AssetHandle AssetManager::GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty)
     //{

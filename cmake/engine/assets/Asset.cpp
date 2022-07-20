@@ -123,6 +123,12 @@ namespace engine
 		myTexture = aTexture;
 	}
 
+	DrawableTextureAsset::DrawableTextureAsset(Texture& aTexture)
+		: TextureAsset(aTexture.GetResourceView())
+	{
+		myDrawableTexture = aTexture;
+	}
+
 	PixelShaderAsset::PixelShaderAsset(ID3D11PixelShader* aShader)
 	{
 		myShader = aShader;
@@ -137,6 +143,11 @@ namespace engine
 	GeometryShaderAsset::GeometryShaderAsset(ID3D11GeometryShader* aShader)
 	{
 		myShader = aShader;
+	}
+
+	DrawableTextureAsset::~DrawableTextureAsset()
+	{
+		myTexture->Release();
 	}
 
 	//JSONAsset::JSONAsset(FiskJSON::Object* aObject, const std::string& aPath)

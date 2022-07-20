@@ -26,7 +26,6 @@ namespace engine
 
 		virtual void OnResolutionChanged(tools::V2ui aResolution);
 
-		bool Init(tools::V3f aBoundingBox);
 		void SetTransform(tools::V4f aPosition, tools::V3f aRotation);
 		void SetTransform(tools::M44f aTransform);
 		void SetRotation(tools::V3f aRotation);

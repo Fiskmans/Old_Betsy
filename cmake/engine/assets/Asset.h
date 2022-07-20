@@ -1,6 +1,8 @@
 #ifndef ENGINE_ASSETS_ASSET_H
 #define ENGINE_ASSETS_ASSET_H
 
+#include "engine/graphics/Texture.h"
+
 #include <vector>
 #include <string>
 #include <atomic>
@@ -9,6 +11,7 @@
 #include <concepts>
 
 #include <d3d11.h>
+
 
 //#include "ShaderFlags.h"
 //#include "SpriteFontInclude.h"
@@ -94,13 +97,24 @@ namespace engine
 		Model* mySkybox;
 	};
 
-	class TextureAsset final
+	class TextureAsset
 		: public Asset
 	{
 	public:
 		TextureAsset(ID3D11ShaderResourceView* aTexture);
 
 		ID3D11ShaderResourceView* myTexture;
+	};
+
+	class DrawableTextureAsset final
+		: public TextureAsset
+	{
+	public:
+		DrawableTextureAsset(Texture& aTexture);
+
+		~DrawableTextureAsset();
+
+		Texture myDrawableTexture;
 	};
 
 	class PixelShaderAsset final

@@ -20,6 +20,12 @@
 
 namespace engine
 {
+	RenderManager::TextureMapping::TextureMapping(const AssetHandle& aHandle, size_t aIndex)
+		: myResource(aHandle.Get<TextureAsset>().myTexture)
+		, mySlot(aIndex)
+	{
+	}
+
 	RenderManager::RenderManager()
 		//: myStateManager(RenderStateManager())
 	{
@@ -128,6 +134,18 @@ namespace engine
 
 		myTextures[static_cast<int>(Textures::BackBuffer)].SetAsActiveTarget();
 		myFullscreenRenderer.Render(FullscreenRenderer::Shader::COPY);
+	}
+
+	void RenderManager::MapTextures(AssetHandle& aTarget, const std::vector<TextureMapping>& aTextures)
+	{
+		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
+
+		UnbindTargets();
+		UnbindResources();
+
+		aTarget.Get<DrawableTextureAsset>().myDrawableTexture.SetAsActiveTarget();
+		for (const TextureMapping& tex : aTextures)
+			context->PSSetShaderResources(tex.mySlot, 1, &tex.myResource);
 	}
 
 

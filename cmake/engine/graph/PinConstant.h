@@ -3,7 +3,11 @@
 
 #include "engine/graph/PinValue.h"
 
+#include "tools/ImGuiHelpers.h"
+
 #include <string>
+
+#include <d3d11.h>
 
 namespace engine::graph
 {
@@ -74,6 +78,85 @@ namespace engine::graph
 				{
 					aValue--;
 					changed = true;
+				}
+
+				return changed;
+			};
+		};
+
+
+		template<>
+		class EditableField<DXGI_FORMAT>
+		{
+		public:
+			static ImVec2 Size(DXGI_FORMAT& aValue) { return ImVec2(10.f * 5.f, 10.f); };
+			static bool Imgui(float aScale, ImVec2 aLocation, DXGI_FORMAT& aValue)
+			{
+				bool changed = false;
+				ImDrawList* drawlist = ImGui::GetWindowDrawList();
+
+				ImGui::SetCursorScreenPos(ImVec2(aLocation.x, aLocation.y));
+
+				size_t channels = 0;
+
+				switch (aValue)
+				{
+				case DXGI_FORMAT_R16_FLOAT:
+					channels = 1;
+					break;
+				case DXGI_FORMAT_R16G16_FLOAT:
+					channels = 2;
+					break;
+				case DXGI_FORMAT_R16G16B16A16_FLOAT:
+					channels = 3;
+					break;
+				default:
+					break;
+				}
+
+				ImVec2 pos = aLocation;
+				ImGui::SetCursorScreenPos(pos);
+				if (ImGui::InvisibleButton("down", ImVec2(10.f * aScale, 10.f * aScale)) && channels > 1)
+				{
+					changed = true;
+					channels--;
+				}
+				drawlist->AddRectFilled(pos, ImVec2(pos.x + 10 * aScale, pos.y + 10 * aScale), tools::GetImColor(ImGui::IsItemHovered() ? ImGuiCol_ButtonHovered : ImGuiCol_Button), 2.f * aScale);
+				pos.x += 10.f * aScale;
+
+				float activeIntensity = 1.f;
+				float inactiveIntensity = 0.4f;
+				float passiveInstesity = 0.2f;
+
+				drawlist->AddRectFilled(pos, ImVec2(pos.x + 10 * aScale, pos.y + 10 * aScale), ImColor(channels > 0 ? activeIntensity : inactiveIntensity, passiveInstesity, passiveInstesity, 1.f), 2.f * aScale);
+				pos.x += 10.f * aScale;
+				drawlist->AddRectFilled(pos, ImVec2(pos.x + 10 * aScale, pos.y + 10 * aScale), ImColor(passiveInstesity, channels > 1 ? activeIntensity : inactiveIntensity, passiveInstesity, 1.f), 2.f * aScale);
+				pos.x += 10.f * aScale;
+				drawlist->AddRectFilled(pos, ImVec2(pos.x + 10 * aScale, pos.y + 10 * aScale), ImColor(passiveInstesity, passiveInstesity, channels > 2 ? activeIntensity : inactiveIntensity, 1.f), 2.f * aScale);
+				pos.x += 10.f * aScale;
+
+				if (channels == 0)
+					drawlist->AddLine(ImVec2(aLocation.x + 10.f * aScale, aLocation.y), ImVec2(pos.x, pos.y + 10.f * aScale), ImColor(0.7f, 0.7f, 0.7f, 1.f), 1.f * aScale);
+
+				ImGui::SetCursorScreenPos(pos);
+				if (ImGui::InvisibleButton("up", ImVec2(10.f * aScale, 10.f * aScale)) && channels < 3)
+				{
+					changed = true;
+					channels++;
+				}
+				drawlist->AddRectFilled(pos, ImVec2(pos.x + 10 * aScale, pos.y + 10 * aScale), tools::GetImColor(ImGui::IsItemHovered() ? ImGuiCol_ButtonHovered : ImGuiCol_Button), 2.f * aScale);
+				pos.x += 10.f * aScale;
+
+				if (changed)
+				{
+
+					const DXGI_FORMAT formatMapping[] =
+					{
+						DXGI_FORMAT_R16_FLOAT,
+						DXGI_FORMAT_R16G16_FLOAT,
+						DXGI_FORMAT_R16G16B16A16_FLOAT
+					};
+					aValue = formatMapping[channels - 1];
 				}
 
 				return changed;

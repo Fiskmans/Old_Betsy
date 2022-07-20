@@ -26,7 +26,7 @@ namespace engine
 		myContext->ClearDepthStencilView(myDepth, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, aClearDepth, static_cast<UINT8>(aClearStencil));
 	}
 
-	void Texture::SetAsActiveTarget(Texture* aDepth)
+	void Texture::SetAsActiveTarget(Texture* aDepth) const
 	{
 		if (aDepth)
 		{

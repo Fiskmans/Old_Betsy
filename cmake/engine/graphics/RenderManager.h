@@ -40,6 +40,17 @@ namespace engine
 		: public tools::Singleton<RenderManager>
 	{
 	public:
+		class TextureMapping
+		{
+		public:
+			TextureMapping(const AssetHandle& aHandle, size_t aIndex);
+
+		private:
+			friend RenderManager;
+			ID3D11ShaderResourceView* myResource;
+			size_t mySlot;
+		};
+
 		RenderManager();
 		~RenderManager() = default;
 
@@ -51,9 +62,13 @@ namespace engine
 
 		void Render();
 
+		void MapTextures(AssetHandle& aTarget, const std::vector<TextureMapping>& aTextures);
 
 		void Imgui();
 		bool myDoDebugLines = true;
+
+		FullscreenRenderer& GetFullscreenRender() { return myFullscreenRenderer; }
+
 	private:
 		float myStartedAt = 0.f;
 		bool myIsReady = false;;

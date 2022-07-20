@@ -6,7 +6,11 @@
 
 #include "engine/graphics/Texture.h"
 
+#include "engine/assets/Asset.h"
+
 #include "tools/MathVector.h"
+
+#include <d3d11.h>
 
 namespace engine::graph::node
 {
@@ -15,14 +19,16 @@ namespace engine::graph::node
 	public:
 		void Activate(NodeInstanceId aId) override;
 
+		ImVec2 ImguiSize(NodeInstanceId aId) override { return ImVec2(40, 40); }
+		void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) override;
+
 	private:
-		InPin<Texture> myInTexture1 = "Tex 1";
-		InPin<Texture> myInTexture2 = "Tex 2";
+		InPin<AssetHandle> myInTexture1 = "Tex 1";
+		InPin<AssetHandle> myInTexture2 = "Tex 2";
 		InPin<tools::V2ui> myInResolution = "Resolution";
+		InPin<DXGI_FORMAT> myInFormat = "Format";
 
-		OutPin<Texture> myOutTexture = "Res";
-
-		NodeInstandeDataCollection<Texture> myTextureInstances;
+		OutPin<AssetHandle> myOutTexture = "Res";
 	};
 
 }

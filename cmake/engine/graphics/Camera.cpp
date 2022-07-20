@@ -43,7 +43,7 @@ namespace engine
 
 	void Camera::OnResolutionChanged(tools::V2ui aResolution)
 	{
-		// TODO Resize textures
+		myResolutionExport.Write(WindowManager::GetInstance().GetSize());
 	}
 
 	void Camera::SetTransform(tools::V4f aPosition, tools::V3f aRotation)
@@ -259,6 +259,7 @@ namespace engine
 
 	void PerspectiveCamera::OnResolutionChanged(tools::V2ui aResolution)
 	{
+		Camera::OnResolutionChanged(aResolution);
 		myProjection.Row(1)[1] = myProjection.Row(0)[1] * (static_cast<float>(aResolution[0]) / static_cast<float>(aResolution[1]));
 	}
 

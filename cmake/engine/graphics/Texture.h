@@ -18,7 +18,7 @@ namespace engine
 
 		void ClearTexture(tools::V4f aClearColor = tools::V4f(0.f, 0.f, 0.f, 1.f));
 		void ClearDepth(float aClearDepth = 1.0f, unsigned int aClearStencil = 0);
-		void SetAsActiveTarget(Texture* aDepth = nullptr);
+		void SetAsActiveTarget(Texture* aDepth = nullptr) const;
 		void SetAsResourceOnSlot(unsigned int aSlot);
 
 		ID3D11ShaderResourceView* GetResourceView();

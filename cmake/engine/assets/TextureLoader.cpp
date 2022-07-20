@@ -23,6 +23,11 @@ namespace engine::assets
 		return LoadTextureInternal(aFile, D3D11_RESOURCE_MISC_TEXTURECUBE, false);
 	}
 
+	Asset* TextureLoader::MakeTexture(tools::V2ui aResolution, DXGI_FORMAT aFormat)
+	{
+		return nullptr;
+	}
+
 	//Asset* TextureLoader::GeneratePerlin(V2ui aSize, V2f aScale, unsigned int aSeed)
 	//{
 	//	V4F* color = new V4F[aSize.x * aSize.y];

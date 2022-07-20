@@ -72,7 +72,8 @@ namespace engine::graph::node
 		const char* options[] =
 		{
 			"engine/error.dds",
-			"engine/SSAONormal.dds"
+			"engine/SSAONormal.dds",
+			"engine/Vignette.dds"
 		};
 
 		int index = mySelection.Get(aId);

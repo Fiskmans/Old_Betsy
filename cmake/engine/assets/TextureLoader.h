@@ -12,6 +12,7 @@ namespace engine::assets
 	public:
 		Asset* LoadTexture(const std::string& aFile, bool aFailSilenty = false);
 		Asset* LoadCubeTexture(const std::string& aFile);
+		Asset* MakeTexture(tools::V2ui aResolution, DXGI_FORMAT aFormat);
 		//Asset* GeneratePerlin(V2ui aSize, V2f aScale = { 1.f, 1.f }, unsigned int aSeed = 0);
 
 	private:

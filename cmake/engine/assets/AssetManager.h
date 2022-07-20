@@ -22,6 +22,7 @@ namespace engine
 		: public tools::Singleton<AssetManager>
 	{
 	public:
+		AssetManager();
 
 		void Init(const std::string& aBaseFolder, const std::string& aBakeFolder);
 
@@ -30,6 +31,7 @@ namespace engine
 		void FlushChanges();
 
 		AssetHandle GetTexture(const std::string& aPath, bool aFailSilent = false);
+		AssetHandle MakeTexture(const tools::V2ui& aResolution, DXGI_FORMAT aFormat);
 		//AssetHandle GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty = false);
 	
 		//AssetHandle GetCubeTexture(const std::string& aPath);
@@ -61,6 +63,8 @@ namespace engine
 		AssetHandle GetTextureInternal(const std::string& aPath, bool aFailSilenty);
 		//AssetHandle GetJSONInternal(const std::string& aPath);
 		//AssetHandle GetAnimationInternal(const std::string& aPath);
+
+		size_t myCustomTextureCounter;
 
 		//Tools::FileWatcher myFileWatcher;
 
