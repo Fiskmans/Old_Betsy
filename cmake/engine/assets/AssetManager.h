@@ -29,7 +29,7 @@ namespace engine
 
 		void FlushChanges();
 
-		AssetHandle GetTexture(const std::string& aPath);
+		AssetHandle GetTexture(const std::string& aPath, bool aFailSilent = false);
 		//AssetHandle GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty = false);
 	
 		//AssetHandle GetCubeTexture(const std::string& aPath);

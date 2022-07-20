@@ -28,6 +28,7 @@ namespace engine::graph
 		node::IntPassThrough UNIQUENAME;
 
 		node::ImageNode UNIQUENAME;
+		node::EngineTextureNode UNIQUENAME;
 	};
 }
 

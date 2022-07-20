@@ -72,9 +72,9 @@ namespace engine
         //myFileWatcher.FlushChanges();
     }
 
-	AssetHandle AssetManager::GetTexture(const std::string& aPath)
+	AssetHandle AssetManager::GetTexture(const std::string& aPath, bool aFailSilent)
 	{
-		return GetTextureInternal(myBaseFolder + TEXTURE_FOLDER + aPath, false);
+		return GetTextureInternal(myBaseFolder + TEXTURE_FOLDER + aPath, aFailSilent);
 	}
 
     //AssetHandle AssetManager::GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty)

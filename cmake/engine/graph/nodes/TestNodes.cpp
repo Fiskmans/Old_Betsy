@@ -66,4 +66,23 @@ namespace engine::graph::node
 
 		drawList->AddText(ImGui::GetFont(), ImGui::GetFontSize() * aScale, ImVec2(aTopLeft.x, aTopLeft.y + 20), ImColor(1.f, 1.f, 1.f, 1.f), std::to_string(myValue.Get(aId)).c_str());
 	}
+
+	void EngineTextureNode::Activate(NodeInstanceId aId)
+	{
+		const char* options[] =
+		{
+			"engine/error.dds",
+			"engine/SSAONormal.dds"
+		};
+
+		int index = mySelection.Get(aId);
+
+		if (index < 0 || index >= (sizeof(options) / sizeof(*options)))
+		{
+			myPath.Write(aId, "");
+			return;
+		}
+
+		myPath.Write(aId, options[index]);
+	}
 }

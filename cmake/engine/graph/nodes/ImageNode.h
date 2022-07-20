@@ -16,6 +16,9 @@ namespace engine::graph::node
 
 		void Activate(NodeInstanceId aId) override;
 
+		ImVec2 ImguiSize(NodeInstanceId aId) override { return ImVec2(40, 40); }
+		void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) override;
+
 	private:
 		InPin<std::string> myFilePath = "File path";
 

@@ -321,7 +321,7 @@ namespace engine::graph
 
 
 		ImVec2 rawCustomSize = CustomImguiSize();
-		ImVec2 customSize = ImVec2(rawCustomSize.x, rawCustomSize.y);
+		ImVec2 customSize = ImVec2(rawCustomSize.x * aScale, rawCustomSize.y * aScale);
 
 
 		ImVec2 size = ImVec2((std::max)(leftPinBlockSize.x + rightPinBlockSize.x + customSize.x, (HeaderTextSize.x + 8.f) * aScale), headerSize + (std::max)({ customSize.y, leftPinBlockSize.y, rightPinBlockSize.y }) + 2.f * aScale);

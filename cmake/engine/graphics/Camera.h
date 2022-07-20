@@ -54,14 +54,16 @@ namespace engine
 
 		virtual tools::PlaneVolume<float> GenerateFrustum() const = 0;
 
+		AssetHandle GetTexture() { return myRenderTexture.Get(); }
+
 	private:
 		void SetResolution(tools::V2ui aResolution);
 
 		engine::graph::Graph myRenderGraph;
 
 		engine::graph::CustomInPin<AssetHandle> myRenderTexture = "Texture to Render";
-	protected:
 
+	protected:
 		engine::graph::CustomOutPin<tools::V2ui> myResolutionExport = "Resolution";
 		
 		tools::M44f myTransform;

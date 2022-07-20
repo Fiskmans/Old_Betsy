@@ -140,7 +140,7 @@ namespace engine::graph
 
 		InPinInstanceBase* GetInPinInstance(NodeInstanceId aId) override { return &myValue; }
 
-		PinType& Get() { return myValue.Fetch().As<PinType>(); }
+		PinType& Get() { return myValue.Fetch().template As<PinType>(); }
 	private:
 		std::string myPinName;
 		InPinInstance<PinType> myValue;

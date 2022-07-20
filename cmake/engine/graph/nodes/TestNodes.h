@@ -41,6 +41,16 @@ namespace engine::graph::node
 		InPin<int> myIn = "In";
 		OutPin<int> myOut = "Out";
 	};
+	
+	class EngineTextureNode : public NodeBase 
+	{
+	public:
+		void Activate(NodeInstanceId aId) override;
+
+	private:
+		InPin<int> mySelection = "Index";
+		OutPin<std::string> myPath = "Tex Path";
+	};
 }
 
 #endif

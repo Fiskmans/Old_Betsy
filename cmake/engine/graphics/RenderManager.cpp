@@ -113,154 +113,21 @@ namespace engine
 			EXECUTE_ONCE({ LOG_ERROR("Main scene has no camera"); });
 			return;
 		}
-		
 
-		std::vector<ModelInstance*> modelsLeftToRender;
-		//std::vector<SpriteInstance*> sprites;
-		std::vector<std::array<PointLight*, NUMBEROFPOINTLIGHTS>> affectingLights;
+		AssetHandle textureHandle = camera->GetTexture();
+		if (!textureHandle.IsValid())
 		{
-			PERFORMANCETAG("Culling");
-			modelsLeftToRender = scene.Cull(camera);
-		}
-		//std::vector<ModelInstance*> modelsToHighlight;
-		//std::vector<ModelInstance*> shadowCasters = modelsLeftToRender;
-		//for (auto& mod : modelsLeftToRender)
-		//{
-		//	if (mod->GetIsHighlighted())
-		//	{
-		//		modelsToHighlight.push_back(mod);
-		//	}
-		//}
-		//sprites = RenderScene::GetInstance().GetSprites();
-		//for (auto& sprite : myExtraSpritesToRenderThisFrame)
-		//{
-		//	sprites.push_back(sprite);
-		//}
-		//
-		affectingLights.clear();
-
-		//{
-		//	PERFORMANCETAG("BoneTexture Generation");
-		//	std::vector<ModelInstance*> buffer;
-		//	buffer.clear();
-		//	std::copy_if(RenderScene::GetInstance().begin(), RenderScene::GetInstance().end(), std::back_inserter(buffer), [](ModelInstance* aInstance) { return !!(aInstance->GetModelAsset().Get<ModelAsset>().myModel->myAnimations.IsValid()); });
-		//	SetupBoneTexture(buffer);
-		//}
-
-
-		//myStateManager.SetAllStates();
-		//
-		//if (myShouldRenderWireFrame)
-		//{
-		//	myStateManerger.SetRasterizerState(RenderStateManager::RasterizerState::Wireframe);;
-		//}
-		//
-		//{
-		//	PERFORMANCETAG("Deferred Gbuffer");
-		//	UnbindTargets();
-		//	UnbindResources();
-		//	myStateManager.SetDepthStencilState(RenderStateManager::DepthStencilState::Default);
-		//	GraphicsEngine::GetInstance().GetFrameWork().GetContext()->VSSetShaderResources(5, 1, &myBoneTextureView);
-		//	modelsLeftToRender = myDeferredRenderer.GenerateGBuffer(RenderScene::GetInstance().GetMainCamera(), modelsLeftToRender, myBoneBuffer, myBoneOffsetMap, &myTextures[static_cast<int>(Textures::BackFaceBuffer)], &myStateManager, RenderScene::GetInstance().GetDecals(), &myGBuffer, &myBufferGBuffer, myFullscreenRenderer, &myTextures[ENUM_CAST(Textures::IntermediateDepth)], myBoneBuffer);
-		//	myStateManager.SetAllStates();
-		//}
-
-
-		//{
-		//	PERFORMANCETAG("Deferred render");
-		//	UnbindTargets();
-		//	myGBuffer.SetAllAsResources();
-		//	myTextures[static_cast<int>(Textures::IntermediateTexture)].SetAsActiveTarget();
-		//	myTextures[static_cast<int>(Textures::IntermediateDepth)].SetAsResourceOnSlot(15);
-		//	myStateManager.SetSamplerState(RenderStateManager::SamplerState::Point);
-		//	myStateManager.SetRasterizerState(RenderStateManager::RasterizerState::Default);
-		//	myDeferredRenderer.Render(myFullscreenRenderer, RenderScene::GetInstance().GetPointLights(), RenderScene::GetInstance().GetSpotLights(), &myStateManager, myBoneBuffer, myBoneOffsetMap);
-		//	myStateManager.SetSamplerState(RenderStateManager::SamplerState::Trilinear);
-		//}
-		//
-		//for (auto& model : modelsLeftToRender)
-		//{
-		//	affectingLights.push_back(RenderScene::GetInstance().CullPointLights(model));
-		//}
-		//
-		//ModelInstance* skybox = RenderScene::GetInstance().GetSkybox();
-		//if (skybox)
-		//{
-		//	myForwardRenderer.SetSkybox(skybox);
-		//}
-		//
-		//
-		//myStateManager.SetAllStates();
-		//
-		//if (myShouldRenderWireFrame)
-		//{
-		//	myStateManerger.SetRasterizerState(RenderStateManager::RasterizerState::Wireframe);;
-		//}
-		//
-		//{
-		//	PERFORMANCETAG("Forward render");
-		//	UnbindResources();
-		//	myStateManager.SetBlendState(RenderStateManager::BlendState::AlphaBlend);
-		//	myGBuffer.SetAsResourceOnSlot(GBuffer::Textures::Postion, 8);
-		//	myTextures[static_cast<int>(Textures::IntermediateTexture)].SetAsActiveTarget(&myTextures[static_cast<int>(Textures::IntermediateDepth)]);
-		//	myForwardRenderer.Render(modelsLeftToRender, camera, affectingLights, myBoneOffsetMap, myStateManager, myBoneBuffer);
-		//	myStateManager.SetBlendState(RenderStateManager::BlendState::Disable);
-		//}
-		//
-		//{
-		//	PERFORMANCETAG("Particles");
-		//	myStateManager.SetBlendState(RenderStateManager::BlendState::AlphaBlend);
-		//	myStateManager.SetDepthStencilState(RenderStateManager::DepthStencilState::ReadOnly);
-		//	ID3D11ShaderResourceView* arr[16] = { nullptr };
-		//	myFrameworkPtr->GetContext()->PSSetShaderResources(0, 16, arr);
-		//	myTextures[static_cast<int>(Textures::IntermediateTexture)].SetAsActiveTarget(&myTextures[static_cast<int>(Textures::IntermediateDepth)]);
-		//	myParticleRenderer.Render(RenderScene::GetInstance().GetMainCamera(), RenderScene::GetInstance().GetParticles());
-		//}
-		//
-		//
-		//if (myDoDebugLines)
-		//{
-		//	PERFORMANCETAG("Debuglines");
-		//	myStateManerger.SetAllStates();
-		//	myStateManerger.SetBlendState(RenderStateManager::BlendState::AlphaBlend);
-		//	myTextures[static_cast<int>(Textures::IntermediateTexture)].SetAsActiveTarget(&myTextures[static_cast<int>(Textures::IntermediateDepth)]);
-		//	DebugDrawer::GetInstance().Render(RenderScene::GetInstance().GetMainCamera());
-		//	myStateManerger.SetBlendState(RenderStateManager::BlendState::Disable);
-		//}
-		//
-		//
-		//{
-		//	PERFORMANCETAG("Bloom");
-		//	FullscreenPass({ Textures::IntermediateTexture }, Textures::Luminance, FullscreenRenderer::Shader::LUMINANCE);
-		//	FullscreenPass({ Textures::Luminance }, Textures::HalfSize, FullscreenRenderer::Shader::COPY);
-		//	FullscreenPass({ Textures::HalfSize }, Textures::QuaterSize, FullscreenRenderer::Shader::COPY);
-		//	FullscreenPass({ Textures::QuaterSize }, Textures::HalfQuaterSize, FullscreenRenderer::Shader::COPY);
-		//	FullscreenPass({ Textures::HalfQuaterSize }, Textures::Guassian1, FullscreenRenderer::Shader::GAUSSIANHORIZONTAL);
-		//	FullscreenPass({ Textures::Guassian1 }, Textures::Guassian2, FullscreenRenderer::Shader::GAUSSIANVERTICAL);
-		//	FullscreenPass({ Textures::Guassian2 }, Textures::HalfQuaterSize, FullscreenRenderer::Shader::COPY);
-		//	FullscreenPass({ Textures::HalfQuaterSize }, Textures::QuaterSize, FullscreenRenderer::Shader::COPY);
-		//	FullscreenPass({ Textures::QuaterSize }, Textures::HalfSize, FullscreenRenderer::Shader::MERGE);
-		//	FullscreenPass({ Textures::IntermediateTexture ,Textures::HalfSize }, Textures::BackBuffer, FullscreenRenderer::Shader::MERGE);
-		//}
-		//
-		//if (myDoAA)
-		//{
-		//	myStateManager.SetAllStates();
-		//	myStateManager.SetBlendState(RenderStateManager::BlendState::Disable);
-		//	PERFORMANCETAG("AA");
-		//	FullscreenPass({ Textures::IntermediateTexture }, Textures::Edges, FullscreenRenderer::Shader::EdgeDetection);
-		//	FullscreenPass({ Textures::IntermediateTexture ,Textures::Edges }, Textures::AAHorizontal, FullscreenRenderer::Shader::ConditionalGAUSSIANHORIZONTAL);
-		//	FullscreenPass({ Textures::AAHorizontal ,Textures::Edges }, Textures::BackBuffer, FullscreenRenderer::Shader::ConditionalGAUSSIANVERTICAL);
-		//}
-		//else
-		//{
 			FullscreenPass({ Textures::IntermediateTexture }, Textures::BackBuffer, FullscreenRenderer::Shader::COPY);
-		//}
-		//
-		//RenderSelection(modelsToHighlight, RenderScene::GetInstance().GetMainCamera());
-		//
-		//RenderSprites(sprites);
-		//RenderText(RenderScene::GetInstance().GetText());
+			return;
+		}
+
+		UnbindTargets();
+		UnbindResources();
+		
+		GraphicsEngine::GetInstance().GetFrameWork().GetContext()->PSSetShaderResources(0, 1, &textureHandle.Get<TextureAsset>().myTexture);
+
+		myTextures[static_cast<int>(Textures::BackBuffer)].SetAsActiveTarget();
+		myFullscreenRenderer.Render(FullscreenRenderer::Shader::COPY);
 	}
 
 
