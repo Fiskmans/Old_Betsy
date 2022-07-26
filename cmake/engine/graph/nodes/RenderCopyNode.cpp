@@ -3,12 +3,12 @@
 
 namespace engine::graph::node 
 {
-	void RenderCopyNode::Activate(NodeInstanceId aId)
+	void RenderCopyNode::Activate()
 	{
-		myOutTexture.Write(aId, myInTexture.Get(aId));
+		myOutTexture = myInTexture;
 
-		myIntPin.Write(aId, 5);
-		myFloatPin.Write(aId, 3.f);
-		myRandom.Write(aId, this);
+		myIntPin = 5;
+		myFloatPin = 3.f;
+		myRandom = this;
 	}
 }

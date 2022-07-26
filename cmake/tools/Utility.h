@@ -20,6 +20,12 @@ namespace tools
 	{
 		return aValue * aValue;
 	}
+
+	template<typename Type>
+	inline Type CeilToMultiple(const Type aValue, const Type aMultiple)
+	{
+		return ((aValue + aMultiple - 1) / aMultiple) * aMultiple;
+	}
 }
 
 #endif

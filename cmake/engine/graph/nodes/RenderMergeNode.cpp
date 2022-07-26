@@ -6,32 +6,30 @@
 
 namespace engine::graph::node
 {
-	void RenderMergeNode::Activate(NodeInstanceId aId)
+	void RenderMergeNode::Activate()
 	{
-		AssetHandle& stashed = myOutTexture.GetOutStorage(aId)->template As<AssetHandle>();
-		if (!stashed.IsValid() || myInResolution.GetInPinInstance(aId)->IsDirty() || myInFormat.GetInPinInstance(aId)->IsDirty())
+		AssetHandle& stashed = myOutTexture.GetOutStorage()->template As<AssetHandle>();
+		if (!stashed.IsValid() || myInResolution.GetInPinInstance()->IsDirty() || myInFormat.GetInPinInstance()->IsDirty())
 		{
-			DXGI_FORMAT format = myInFormat.Get(aId);
-			tools::V2ui size = myInResolution.Get(aId);
-			if (format != DXGI_FORMAT_UNKNOWN && size != tools::V2ui(0,0))
+			if (myInFormat != DXGI_FORMAT_UNKNOWN && myInResolution != tools::V2ui(0,0))
 			{
-				stashed = AssetManager::GetInstance().MakeTexture(size, format);
+				stashed = AssetManager::GetInstance().MakeTexture(myInResolution, myInFormat);
 			}
 			else
 			{
-				myOutTexture.GetOutStorage(aId)->MarkRefreshed();
+				myOutTexture.GetOutStorage()->MarkRefreshed();
 				return;
 			}
 		}
 
 		std::vector<RenderManager::TextureMapping> mappings;
 
-		AssetHandle first = myInTexture1.Get(aId);
+		AssetHandle first = myInTexture1;
 		
 		if (first.IsValid())
 			mappings.emplace_back(first, 0);
 
-		AssetHandle second = myInTexture2.Get(aId);
+		AssetHandle second = myInTexture2;
 
 		if (second.IsValid())
 			mappings.emplace_back(second, 1);
@@ -39,15 +37,15 @@ namespace engine::graph::node
 		RenderManager::GetInstance().MapTextures(stashed, mappings);
 		RenderManager::GetInstance().GetFullscreenRender().Render(FullscreenRenderer::Shader::MERGE);
 
-		myOutTexture.Write(aId, stashed);
+		myOutTexture.Write(stashed);
 	}
 
-	void RenderMergeNode::Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft)
+	void RenderMergeNode::Imgui(float aScale, ImVec2 aTopLeft)
 	{
 		ImGui::SetCursorScreenPos(aTopLeft);
 		ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-		AssetHandle handle = myOutTexture.GetOutStorage(aId)->template As<AssetHandle>();
+		AssetHandle handle = myOutTexture.GetOutStorage()->template As<AssetHandle>();
 
 		if (!handle.IsValid())
 		{

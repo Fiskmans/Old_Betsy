@@ -16,7 +16,7 @@ namespace engine::graph
 		virtual bool IsConstant() { return false;  }
 
 		template <class T>
-		T& As() { return *reinterpret_cast<T*>(myValue); }
+		T& As() { return *reinterpret_cast<T*>(GetRaw()); }
 
 		void Load()
 		{
@@ -30,14 +30,9 @@ namespace engine::graph
 		virtual void ImGui(float aScale, ImVec2 aLocation) {};
 		void SetRefreshCallback(std::function<void()> aCallback) { myCallback = aCallback; }
 	protected:
-		template <class T>
-		PinValueBase(T & aValue)
-			: myValue(&aValue)
-		{
-		}
+		virtual void* GetRaw() = 0;
 
 	private:
-		void* myValue = nullptr;
 		std::function<void()> myCallback;
 	};
 
@@ -45,10 +40,7 @@ namespace engine::graph
 	class PinValue : public PinValueBase
 	{
 	public:
-		PinValue()
-			: PinValueBase(myStorage)
-		{
-		}
+		PinValue() = default;
 
 		void operator=(const Type& aValue) 
 		{ 
@@ -59,6 +51,8 @@ namespace engine::graph
 		Type& Get() { return myStorage; }
 
 	private:
+		void* GetRaw() override { return &myStorage; }
+
 		Type myStorage;
 	};
 }

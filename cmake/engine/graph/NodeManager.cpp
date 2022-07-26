@@ -29,9 +29,9 @@ namespace engine::graph
 		myCurrent->AddOutPin(aOutPin);
 	}
 
-	void NodeManager::AddData(NodeDataBase* aData)
+	size_t NodeManager::AddData(InstancedNodeDataBase* aData, size_t aSize, size_t aAligment)
 	{
-		myCurrent->AddData(aData);
+		return myCurrent->AddData(aData, aSize, aAligment);
 	}
 	
 	void NodeManager::EndNode()

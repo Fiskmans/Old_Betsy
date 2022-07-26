@@ -11,15 +11,19 @@ namespace engine::graph::node
 	class RenderCopyNode : public NodeBase
 	{
 	public:
-		void Activate(NodeInstanceId aId) override;
+		void Activate() override;
 
 	private:
-		InPin<Texture> myInTexture = "In Texture";
+		InPin<Texture> myInTexture = PinInformation("In Texture");
 
-		OutPin<Texture> myOutTexture = "Out Texture";
-		OutPin<int> myIntPin = "strickty pal";
-		OutPin<float> myFloatPin = "floaty boy";
-		OutPin<RenderCopyNode*> myRandom = "a node";
+		OutPin<Texture> myOutTexture = PinInformation("Out Texture");
+		OutPin<int> myIntPin = PinInformation("strickty pal");
+		OutPin<float> myFloatPin = PinInformation("floaty boy");
+		OutPin<RenderCopyNode*> myRandom = PinInformation("a node");
+
+		InstancedNodeData<char> mySmall = std::string("char");
+		InstancedNodeData<int> myMedium = std::string("int");
+		InstancedNodeData<void*> myLarge = std::string("void*");
 	};
 }
 

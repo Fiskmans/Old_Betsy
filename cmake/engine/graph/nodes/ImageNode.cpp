@@ -4,16 +4,16 @@
 
 namespace engine::graph::node
 {
-	void ImageNode::Activate(NodeInstanceId aId)
+	void ImageNode::Activate()
 	{
-		myTexture.Write(aId, AssetManager::GetInstance().GetTexture(myFilePath.Get(aId), true));
+		myTexture = AssetManager::GetInstance().GetTexture(myFilePath, true);
 	}
 
-	void ImageNode::Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft)
+	void ImageNode::Imgui(float aScale, ImVec2 aTopLeft)
 	{
 		ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-		AssetHandle handle = myTexture.GetOutStorage(aId)->template As<AssetHandle>();
+		AssetHandle handle = myTexture.GetOutStorage()->template As<AssetHandle>();
 
 		ImVec2 size = ImVec2(40.f * aScale, 40.f * aScale);
 		ImVec2 bottomRight(aTopLeft.x + size.x, aTopLeft.y + size.y);

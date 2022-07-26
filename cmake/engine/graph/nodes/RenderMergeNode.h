@@ -17,18 +17,18 @@ namespace engine::graph::node
 	class RenderMergeNode : engine::graph::NodeBase
 	{
 	public:
-		void Activate(NodeInstanceId aId) override;
+		void Activate() override;
 
-		ImVec2 ImguiSize(NodeInstanceId aId) override { return ImVec2(40, 40); }
-		void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) override;
+		ImVec2 ImguiSize() override { return ImVec2(40, 40); }
+		void Imgui(float aScale, ImVec2 aTopLeft) override;
 
 	private:
-		InPin<AssetHandle> myInTexture1 = "Tex 1";
-		InPin<AssetHandle> myInTexture2 = "Tex 2";
-		InPin<tools::V2ui> myInResolution = "Resolution";
-		InPin<DXGI_FORMAT> myInFormat = "Format";
+		InPin<AssetHandle> myInTexture1 = PinInformation("Tex 1");
+		InPin<AssetHandle> myInTexture2 = PinInformation("Tex 2");
+		InPin<tools::V2ui> myInResolution = PinInformation("Resolution");
+		InPin<DXGI_FORMAT> myInFormat = PinInformation("Format");
 
-		OutPin<AssetHandle> myOutTexture = "Res";
+		OutPin<AssetHandle> myOutTexture = PinInformation("Res");
 	};
 
 }

@@ -6,6 +6,7 @@
 #include "engine/graph/NodeManager.h"
 #include "engine/graph/BuiltNode.h"
 #include "engine/graph/NodeInstanceId.h"
+#include "engine/graph/DrawablePinBlock.h"
 
 #include "imgui/imgui.h"
 
@@ -17,49 +18,13 @@
 #include <optional>
 #include <unordered_set>
 
+
 namespace engine::graph
 {
 
 	class Graph;
 	class PinLink;
-	
-	class DrawablePinBlock
-	{
-	public:
-		DrawablePinBlock(ImVec2 aPosition)
-			: myPosition(aPosition)
-		{
-		}
-		virtual ~DrawablePinBlock() = default;
 
-		bool Imgui(const char* aName, Graph* aGraph, NodeInstanceId aId, float aScale, ImVec2 aPosition, const std::vector<PinBase*>& aInPins, const std::vector<PinBase*>& aOutPins);
-
-		virtual ImVec2 CustomImguiSize() { return ImVec2(0, 0); }
-		virtual void CustomImgui(float aScale, ImVec2 aTopLeft) { }
-
-		void Move(ImVec2 aDelta);
-
-		ImVec2 myPosition;
-		bool myIsMoving = false;
-	};
-
-	class NodeInstance : public DrawablePinBlock
-	{
-	public:
-		NodeInstance(BuiltNode& aType, ImVec2 aPosition);
-		virtual ~NodeInstance() = default;
-
-		bool Imgui(Graph* aGraph, float aScale, ImVec2 aPosition);
-		
-		ImVec2 CustomImguiSize() override { return myType->ImguiSize(myId); }
-		void CustomImgui(float aScale, ImVec2 aTopLeft) override { myType->Imgui(myId, aScale, aTopLeft); }
-
-		void RemoveAllRelatedLinks(std::vector<std::unique_ptr<PinLink>>& aLinks);
-
-	private:
-		BuiltNode* myType;
-		NodeInstanceId myId;
-	};
 
 	class GraphExportPinBlock : private DrawablePinBlock
 	{

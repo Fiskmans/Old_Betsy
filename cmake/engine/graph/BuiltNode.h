@@ -10,7 +10,18 @@
 namespace engine::graph
 {
 	class NodeBase;
-	class NodeDataBase;
+	class NodeInstance;
+	class InstancedNodeDataBase;
+
+	class NodeInstanceDataBlobTemplate
+	{
+	public:
+		size_t AddItem(size_t aSize, size_t aAligment);
+		size_t Size() { return mySize; }
+
+	private:
+		size_t mySize = 0;
+	};
 
 	class BuiltNode
 	{
@@ -21,26 +32,27 @@ namespace engine::graph
 
 		void AddInPin(PinBase* aInPin);
 		void AddOutPin(PinBase* aOutPin);
-		void AddData(NodeDataBase* aData);
+		size_t AddData(InstancedNodeDataBase* aData, size_t aSize, size_t aAligment);
 
 		void Imgui();
 
-		ImVec2 ImguiSize(NodeInstanceId aId);
-		void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft);
+		ImVec2 ImguiSize();
+		void Imgui(float aScale, ImVec2 aTopLeft);
 		
 		std::vector<PinBase*>& InPins() { return myInPins; }
 		std::vector<PinBase*>& OutPins() { return myOutPins; }
 
-		void AddInstance(NodeInstanceId aId);
-		void RemoveInstance(NodeInstanceId aId);
-
+		void Construct(NodeInstance* aInstance);
+		void Destruct(NodeInstance* aInstance);
 	private:
+		friend NodeInstance;
 
 		NodeBase* myBaseNode;
 
+		NodeInstanceDataBlobTemplate myMemoryLayoutTemplate;
 		std::vector<PinBase*> myInPins;
 		std::vector<PinBase*> myOutPins;
-		std::vector<NodeDataBase*> myData;
+		std::vector<InstancedNodeDataBase*> myData;
 	};
 }
 

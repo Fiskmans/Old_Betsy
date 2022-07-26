@@ -14,15 +14,15 @@ namespace engine::graph::node
 	{
 	public:
 
-		void Activate(NodeInstanceId aId) override;
+		void Activate() override;
 
-		ImVec2 ImguiSize(NodeInstanceId aId) override { return ImVec2(40, 40); }
-		void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) override;
+		ImVec2 ImguiSize() override { return ImVec2(40, 40); }
+		void Imgui(float aScale, ImVec2 aTopLeft) override;
 
 	private:
-		InPin<std::string> myFilePath = "File path";
+		InPin<std::string> myFilePath = PinInformation("File path");
 
-		OutPin<AssetHandle> myTexture = "Texture";
+		OutPin<AssetHandle> myTexture = PinInformation("Texture");
 	};
 }
 

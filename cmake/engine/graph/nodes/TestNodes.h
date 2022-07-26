@@ -9,47 +9,47 @@ namespace engine::graph::node
 	class PrintNode : public NodeBase
 	{
 	public:
-		void Activate(NodeInstanceId aId) override;
+		void Activate() override;
 
-		ImVec2 ImguiSize(NodeInstanceId aId) override;
-		void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) override;
+		ImVec2 ImguiSize() override;
+		void Imgui(float aScale, ImVec2 aTopLeft) override;
 	private:
-		InPin<int> myIn = "Val";
+		InPin<int> myIn = PinInformation("Val");
 
-		NodeData<int> myStored;
+		InstancedNodeData<int> myStored = std::string("Storage");
 	};
 
 	class IntConstant : public NodeBase
 	{
 	public:
-		void Activate(NodeInstanceId aId) override;
+		void Activate() override;
 
-		ImVec2 ImguiSize(NodeInstanceId aId) override;
-		void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) override;
+		ImVec2 ImguiSize() override;
+		void Imgui(float aScale, ImVec2 aTopLeft) override;
 	private:
-		OutPin<int> myOut = "Val";
+		OutPin<int> myOut = PinInformation("Val");
 
-		NodeData<int> myValue;
+		InstancedNodeData<int> myValue = std::string("Storage");
 	};
 
 	class IntPassThrough : public NodeBase
 	{
 	public:
-		void Activate(NodeInstanceId aId) override { myOut.Write(aId, myIn.Get(aId)); }
+		void Activate() override { myOut = myIn; }
 
 	private:
-		InPin<int> myIn = "In";
-		OutPin<int> myOut = "Out";
+		InPin<int> myIn = PinInformation("In");
+		OutPin<int> myOut = PinInformation("Out");
 	};
-	
-	class EngineTextureNode : public NodeBase 
+
+	class EngineTextureNode : public NodeBase
 	{
 	public:
-		void Activate(NodeInstanceId aId) override;
+		void Activate() override;
 
 	private:
-		InPin<int> mySelection = "Index";
-		OutPin<std::string> myPath = "Tex Path";
+		InPin<int> mySelection = PinInformation("Index");
+		OutPin<std::string> myPath = PinInformation("Tex Path");
 	};
 }
 

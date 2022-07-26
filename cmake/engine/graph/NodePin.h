@@ -2,10 +2,11 @@
 #define ENGINE_GRAPH_NODE_PIN_H
 
 #include "engine/graph/NodeInstanceId.h"
-#include "engine/graph/NodeInstanceDataCollection.h"
+
 #include "engine/graph/PinValue.h"
 #include "engine/graph/Dependable.h"
 #include "engine/graph/PinConstant.h"
+#include "engine/graph/InstancedNodeData.h"
 
 #include "imgui/imgui.h"
 
@@ -18,30 +19,43 @@ namespace engine::graph
 	class OutPinInstanceBase;
 	class InPinInstanceBase;
 
+	class PinInformation
+	{
+	public:
+		PinInformation(const std::string& aName)
+			: myName(aName)
+		{
+		};
+
+		const char* Name() const { return myName.c_str(); }
+	private:
+		std::string myName;
+	};
+
 	class PinBase
 	{
 	public:
+		explicit PinBase(const PinInformation& aInformation) : myInformation(aInformation) {}
 		virtual ~PinBase() = default;
-		virtual const char*		Name() const = 0;
+
+		const char* Name() const { return myInformation.Name(); };
 		virtual const std::type_info& Type() const = 0;
 		virtual bool IsInPin() const = 0;
 
-		virtual void AddInstance(NodeInstanceId aId) {}
-		virtual void RemoveInstance(NodeInstanceId aId) {}
+		virtual OutPinInstanceBase* GetOutPinInstance() { return nullptr; }
+		virtual InPinInstanceBase* GetInPinInstance() { return nullptr; }
 
-		virtual OutPinInstanceBase* GetOutPinInstance(NodeInstanceId aId) { return nullptr; }
-		virtual InPinInstanceBase* GetInPinInstance(NodeInstanceId aId) { return nullptr; }
-
-		virtual PinValueBase* GetOutStorage(NodeInstanceId aId) { return nullptr; }
+		virtual PinValueBase* GetOutStorage() { return nullptr; }
 
 		bool CanConnectTo(const PinBase& aOther) const;
 
-		ImVec2 ImGuiSize(NodeInstanceId aId);
-		bool ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, NodeInstanceId aId, ImVec2& aOutAttachPoint);
+		ImVec2 ImGuiSize();
+		bool ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, ImVec2& aOutAttachPoint);
 		//static void Setup();
 
 		static void UpdateImGui();
 	private:
+		PinInformation myInformation;
 		bool myIsHovered = false;
 
 		static const std::type_info* ourHoveredType;
@@ -130,19 +144,17 @@ namespace engine::graph
 	class CustomInPin : public PinBase
 	{
 	public:
-		CustomInPin(const char* aPinName) : myPinName(aPinName)
+		CustomInPin(PinInformation aPinInformation) : PinBase(aPinInformation)
 		{
 		}
 
-		const char* Name() const override { return myPinName.c_str(); }
 		const std::type_info& Type() const override { return typeid(PinType); }
 		bool IsInPin() const override { return true; }
 
-		InPinInstanceBase* GetInPinInstance(NodeInstanceId aId) override { return &myValue; }
+		InPinInstanceBase* GetInPinInstance() override { return &myValue; }
 
 		PinType& Get() { return myValue.Fetch().template As<PinType>(); }
 	private:
-		std::string myPinName;
 		InPinInstance<PinType> myValue;
 	};
 
@@ -150,82 +162,72 @@ namespace engine::graph
 	class CustomOutPin : public PinBase
 	{
 	public:
-		CustomOutPin(const char* aPinName) : myPinName(aPinName)
+		CustomOutPin(PinInformation aPinInformation) : PinBase(aPinInformation)
 		{
 		}
 
-		const char* Name() const override { return myPinName.c_str(); }
 		const std::type_info& Type() const override { return typeid(PinType); }
 		bool IsInPin() const override { return false; }
 
-		PinValueBase* GetOutStorage(NodeInstanceId aId) override { return &myValue.GetStorage(); }
-		OutPinInstanceBase* GetOutPinInstance(NodeInstanceId /*aId*/) override { return &myValue; }
-		
-		void Write(const PinType& aValue) 
+		PinValueBase* GetOutStorage() override { return &myValue.GetStorage(); }
+		OutPinInstanceBase* GetOutPinInstance() override { return &myValue; }
+
+		void Write(const PinType& aValue)
 		{
 			myValue = aValue;
 		}
 
 		PinType& Get() { return myValue.GetStorage().template As<PinType>(); }
 	private:
-		std::string myPinName;
 		OutPinInstance<PinType> myValue;
 	};
 
-	template<class PinType> 
+	template<class PinType>
 	class InPin : public PinBase
 	{
 	public:
-		InPin(const char* aPinName) : myPinName(aPinName) 
-		{ 
-				node_pin_helpers::RegisterInPin(this); 
+		InPin(PinInformation aPinInformation) 
+			: PinBase(aPinInformation)
+			, myInstances(std::string("InPin-") + Name())
+		{
+			node_pin_helpers::RegisterInPin(this);
 		}
-		
-		const char* Name() const override { return myPinName.c_str(); }
+
 		const std::type_info& Type() const override { return typeid(PinType); }
 		bool IsInPin() const override { return true; }
 
-		void AddInstance(NodeInstanceId aId) override 
-		{ 
-			myInstances.AddInstance(aId); 
-		}
+		InPinInstanceBase* GetInPinInstance() override { return &myInstances.Get(); }
 
-		void RemoveInstance(NodeInstanceId aId) override { myInstances.RemoveInstance(aId); };
-
-		InPinInstanceBase* GetInPinInstance(NodeInstanceId aId) override { return &myInstances.Get(aId); }
-
-		PinType& Get(NodeInstanceId aId) { return myInstances.Get(aId).Fetch().template As<PinType>(); }
+		PinType& Get() { return myInstances.Get().Fetch().template As<PinType>(); }
+		operator PinType& () { return Get(); }
 
 	private:
-		std::string myPinName;
-		NodeInstandeDataCollection<InPinInstance<PinType>> myInstances;
+		InstancedNodeData<InPinInstance<PinType>> myInstances;
 	};
 
 	template<class PinType>
 	class OutPin : public PinBase
 	{
 	public:
-		OutPin(const char* aPinName) : myPinName(aPinName)
+		OutPin(PinInformation aPinInformation) 
+			: PinBase(aPinInformation)
+			, myInstances(std::string("OutPin-") + Name())
 		{
-				node_pin_helpers::RegisterOutPin(this); 
+			node_pin_helpers::RegisterOutPin(this); 
 		}
 		
-		const char* Name() const override { return myPinName.c_str(); }
 		const std::type_info& Type() const override { return typeid(PinType); }
 		bool IsInPin() const override { return false; }
  
-		PinValueBase* GetOutStorage(NodeInstanceId aId) override { return &myInstances.Get(aId).GetStorage(); }
+		PinValueBase* GetOutStorage() override { return &myInstances.Get().GetStorage(); }
 
-		void AddInstance(NodeInstanceId aId) override { myInstances.AddInstance(aId); }
-		void RemoveInstance(NodeInstanceId aId) override { myInstances.RemoveInstance(aId); };
+		OutPinInstanceBase* GetOutPinInstance() override { return &myInstances.Get(); }
 
-		OutPinInstanceBase* GetOutPinInstance(NodeInstanceId aId) override { return &myInstances.Get(aId); }
-
-		void Write(NodeInstanceId aId, const PinType& aValue) { return myInstances.Get(aId) = aValue; }
+		void Write(const PinType& aValue) { return myInstances.Get() = aValue; }
+		void operator=(const PinType& aValue) { Write(aValue); }
 
 	private:
-		std::string											myPinName;
-		NodeInstandeDataCollection<OutPinInstance<PinType>> myInstances;
+		InstancedNodeData<OutPinInstance<PinType>> myInstances;
 	};
 }
 

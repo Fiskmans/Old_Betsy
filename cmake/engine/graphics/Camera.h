@@ -60,10 +60,10 @@ namespace engine
 
 		engine::graph::Graph myRenderGraph;
 
-		engine::graph::CustomInPin<AssetHandle> myRenderTexture = "Texture to Render";
+		engine::graph::CustomInPin<AssetHandle> myRenderTexture = engine::graph::PinInformation("Texture to Render");
 
 	protected:
-		engine::graph::CustomOutPin<tools::V2ui> myResolutionExport = "Resolution";
+		engine::graph::CustomOutPin<tools::V2ui> myResolutionExport = engine::graph::PinInformation("Resolution");
 		
 		tools::M44f myTransform;
 		tools::M44f myProjection;

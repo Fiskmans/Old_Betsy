@@ -1,7 +1,9 @@
 #include "engine/graph/NodePin.h"
+
 #include "engine/graph/Node.h"
 #include "engine/graph/NodeManager.h"
 #include "engine/graph/Graph.h"
+#include "engine/graph/NodeInstance.h"
 
 #include "tools/ImGuiHelpers.h"
 #include "tools/TimeHelper.h"
@@ -43,20 +45,20 @@ namespace engine::graph
 		return true;
 	}
 
-	ImVec2 PinBase::ImGuiSize(NodeInstanceId aId)
+	ImVec2 PinBase::ImGuiSize()
 	{
 		ImVec2 namesize = ImGui::CalcTextSize(Name());
 		if (!IsInPin())
 			return ImVec2(28.f + namesize.x, (std::max)(namesize.y, 22.f));
 
-		InPinInstanceBase* instance = GetInPinInstance(aId);
+		InPinInstanceBase* instance = GetInPinInstance();
 
 		ImVec2 customSize = instance->CustomImguiSize();
 
 		return ImVec2((std::max)(28.f + namesize.x, customSize.x), (std::max)(namesize.y, 22.f) + customSize.y);
 	}
 
-	bool PinBase::ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, NodeInstanceId aId, ImVec2& aOutAttachPoint)
+	bool PinBase::ImGui(Graph* aGraph, float aScale, ImVec2 aLocation, ImVec2& aOutAttachPoint)
 	{
 		const bool isIn = IsInPin();
 
@@ -103,7 +105,7 @@ namespace engine::graph
 		struct PinPayload
 		{
 			PinBase* myPin;
-			NodeInstanceId myId;
+			std::byte* myContext;
 		};
 
 		static_assert(std::is_trivial_v<PinPayload>);
@@ -112,7 +114,7 @@ namespace engine::graph
 		{
 			PinPayload payload;
 			payload.myPin = this;
-			payload.myId = aId;
+			payload.myContext = globalCurrentInstanceContext;
 
 			ImGui::Text("%s", Name());
 			ImGui::Text("%s", type.name());
@@ -142,7 +144,7 @@ namespace engine::graph
 			{
 				PinPayload& translatedPayload = *reinterpret_cast<PinPayload*>(payload->Data);
 				PinBase* sourcePin = translatedPayload.myPin;
-				NodeInstanceId sourceId = translatedPayload.myId;
+				std::byte* sourceContext = translatedPayload.myContext;
 				
 				if (CanConnectTo(*sourcePin))
 				{
@@ -161,13 +163,17 @@ namespace engine::graph
 
 						if (isIn)
 						{
-							in = this->GetInPinInstance(aId);
-							out = sourcePin->GetOutPinInstance(sourceId);
+							in = this->GetInPinInstance();
+							NodeInstanceScopedContext context(sourceContext);
+							out = sourcePin->GetOutPinInstance();
 						}
 						else
 						{
-							in = sourcePin->GetInPinInstance(sourceId);
-							out = this->GetOutPinInstance(aId);
+							{
+								NodeInstanceScopedContext context(sourceContext);
+								in = sourcePin->GetInPinInstance();
+							}
+							out = this->GetOutPinInstance();
 						}
 
 						aGraph->AddLink(out, in);
@@ -203,9 +209,9 @@ namespace engine::graph
 
 		bool dirty = false;
 		if (isIn)
-			dirty = GetInPinInstance(aId)->IsDirty();
+			dirty = GetInPinInstance()->IsDirty();
 		else
-			dirty = GetOutPinInstance(aId)->GetStorage().IsDirty();
+			dirty = GetOutPinInstance()->GetStorage().IsDirty();
 
 		if (dirty)
 			drawList->AddRect(interactableRegionTopLeft, ImVec2(interactableRegionTopLeft.x + interactableRegionSize.x, interactableRegionTopLeft.y + interactableRegionSize.y), ImColor(1.f,0.8f,0.8f,0.3f), 3.f, 0, 2.f * aScale);
@@ -227,7 +233,7 @@ namespace engine::graph
 		drawList->AddText(ImGui::GetFont(), ImGui::GetFontSize() * aScale, ImVec2(aLocation.x + textOffset * aScale, aLocation.y + 5.f * aScale), ImColor(1.f, 1.f, 1.f, 1.f), Name());
 
 		if (isIn)
-			GetInPinInstance(aId)->CustomImgui(aScale, ImVec2(aLocation.x, aLocation.y + 20.f * aScale));
+			GetInPinInstance()->CustomImgui(aScale, ImVec2(aLocation.x, aLocation.y + 20.f * aScale));
 
 		if(popupOpen)
 		{

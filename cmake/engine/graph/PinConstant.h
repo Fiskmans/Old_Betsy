@@ -37,13 +37,14 @@ namespace engine::graph
 		void ImGui(float aScale, ImVec2 aLocation) override { if (pin_constant_helpers::EditableField<Type>::Imgui(aScale, aLocation, myStorage)) MarkRefreshed(); }
 
 	private:
+		void* GetRaw() override { return &myStorage; }
+
 		Type myStorage;
 	};
 
 	template<class Type>
 	PinConstant<Type>::PinConstant(Dependable* aChild)
-		: PinValueBase(myStorage)
-		, myStorage{}
+		: myStorage{}
 		
 	{
 		AddDependent(aChild);

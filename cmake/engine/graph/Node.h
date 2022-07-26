@@ -17,10 +17,10 @@ namespace engine::graph
 		}
 		virtual ~NodeBase() = default;
 		
-		virtual void Activate(NodeInstanceId aId) = 0;
+		virtual void Activate() = 0;
 
-		virtual ImVec2 ImguiSize(NodeInstanceId aId) { return ImVec2(0, 0); }
-		virtual void Imgui(NodeInstanceId aId, float aScale, ImVec2 aTopLeft) {};
+		virtual ImVec2 ImguiSize() { return ImVec2(0, 0); }
+		virtual void Imgui(float aScale, ImVec2 aTopLeft) {};
 	};
 }
 
