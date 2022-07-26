@@ -7,6 +7,7 @@
 #include "engine/graph/nodes/RenderMergeNode.h"
 #include "engine/graph/nodes/TestNodes.h"
 #include "engine/graph/nodes/ImageNode.h"
+#include "engine/graph/Nodes/MulNode.h"
 
 #include "common/Macros.h"
 
@@ -29,6 +30,7 @@ namespace engine::graph
 
 		node::ImageNode UNIQUENAME;
 		node::EngineTextureNode UNIQUENAME;
+		node::MulNode UNIQUENAME;
 	};
 }
 

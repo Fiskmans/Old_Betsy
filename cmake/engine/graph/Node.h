@@ -3,8 +3,7 @@
 
 #include "engine/graph/NodeManager.h"
 
-#include "tools/Singleton.h"
-
+#include "engine/graph/NodePin.h"
 
 namespace engine::graph
 {

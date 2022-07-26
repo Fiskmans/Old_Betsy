@@ -76,6 +76,7 @@ list(APPEND SOURCE_FILES "graph/Nodes/TestNodes.h")
 list(APPEND SOURCE_FILES "graph/Nodes/TestNodes.cpp")
 list(APPEND SOURCE_FILES "graph/Nodes/ImageNode.h")
 list(APPEND SOURCE_FILES "graph/Nodes/ImageNode.cpp")
+list(APPEND SOURCE_FILES "graph/Nodes/MulNode.h")
 
 list(APPEND SOURCE_FILES "GameEngine.h")
 list(APPEND SOURCE_FILES "GameEngine.cpp")
