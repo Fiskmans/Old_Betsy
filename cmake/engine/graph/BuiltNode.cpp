@@ -188,9 +188,9 @@ namespace engine::graph
 		{
 			out->GetOutStorage()->SetRefreshCallback(std::bind(&NodeInstance::Activate, aInstance));
 
-			OutPinInstanceBase* outInstance = out->GetOutPinInstance();
+			Dependable* outInstance = out->GetOutStorage();
 			for (PinBase* in : myInPins)
-				outInstance->GetStorage().AddDependent(in->GetInPinInstance());
+				in->GetInPinInstance()->AddDependent(outInstance);
 		}
 	}
 

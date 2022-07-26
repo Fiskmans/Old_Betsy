@@ -47,6 +47,7 @@ namespace engine::graph
 
 	void NodeInstance::RemoveAllRelatedLinks(std::vector<std::unique_ptr<PinLink>>& aLinks)
 	{
+		NodeInstanceScopedContext context(myMemory.data());
 		for (PinBase* pin : myType.InPins())
 		{
 			InPinInstanceBase* item = pin->GetInPinInstance();
