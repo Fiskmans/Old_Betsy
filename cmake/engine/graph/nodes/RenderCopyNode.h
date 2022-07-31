@@ -1,12 +1,12 @@
-#ifndef ENGINE_GRAPH_NODE_RENDER_COPY_NODE_H
-#define ENGINE_GRAPH_NODE_RENDER_COPY_NODE_H
+#ifndef ENGINE_GRAPH_NODES_RENDER_COPY_NODE_H
+#define ENGINE_GRAPH_NODES_RENDER_COPY_NODE_H
 
 #include "engine/graph/Node.h"
 #include "engine/graph/NodePin.h"
 
 #include "engine/graphics/Texture.h"
 
-namespace engine::graph::node
+namespace engine::graph::nodes
 {
 	class RenderCopyNode : public NodeBase
 	{
@@ -14,9 +14,9 @@ namespace engine::graph::node
 		void Activate() override;
 
 	private:
-		InPin<Texture> myInTexture = PinInformation("In Texture");
+		InPin<graphics::Texture> myInTexture = PinInformation("In Texture");
 
-		OutPin<Texture> myOutTexture = PinInformation("Out Texture");
+		OutPin<graphics::Texture> myOutTexture = PinInformation("Out Texture");
 		OutPin<int> myIntPin = PinInformation("strickty pal");
 		OutPin<float> myFloatPin = PinInformation("floaty boy");
 		OutPin<RenderCopyNode*> myRandom = PinInformation("a node");

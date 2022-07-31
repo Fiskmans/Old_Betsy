@@ -8,7 +8,7 @@
 
 #include <string>
 
-namespace engine::graph::node
+namespace engine::graph::nodes
 {
 	class ImageNode : public NodeBase
 	{

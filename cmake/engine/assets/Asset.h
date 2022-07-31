@@ -110,11 +110,11 @@ namespace engine
 		: public TextureAsset
 	{
 	public:
-		DrawableTextureAsset(Texture& aTexture);
+		DrawableTextureAsset(graphics::Texture& aTexture);
 
 		~DrawableTextureAsset();
 
-		Texture myDrawableTexture;
+		graphics::Texture myDrawableTexture;
 	};
 
 	class PixelShaderAsset final

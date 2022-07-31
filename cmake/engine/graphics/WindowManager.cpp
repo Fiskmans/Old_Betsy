@@ -42,7 +42,7 @@ namespace engine
 		{
 			GetInstance().mySize = tools::V2ui(LOWORD(aLParam), HIWORD(aLParam));
 			GetInstance().ResolutionChanged.Fire(GetInstance().mySize);
-			RenderManager::GetInstance().Resize(WindowManager::GetInstance().mySize);
+			graphics::RenderManager::GetInstance().Resize(WindowManager::GetInstance().mySize);
 		}
 
 		LRESULT imguiResult = ImGui_ImplWin32_WndProcHandler(aHWND, aUMsg, aWParam, aLParam);

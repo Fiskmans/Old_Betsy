@@ -16,7 +16,7 @@ namespace engine::graph
 		if (myCurrent)
 			EndNode();
 
-		myCurrent = new BuiltNode(aBaseNode);
+		myCurrent = new BuiltNode(aBaseNode, myCurrentGroup);
 	}
 
 	void NodeManager::AddInPin(PinBase* aInPin)
@@ -36,7 +36,7 @@ namespace engine::graph
 	
 	void NodeManager::EndNode()
 	{
-		myNodes.emplace(PrettyfyName(myCurrent->Name()), myCurrent);
+		myNodes.emplace(myCurrent->Name(), myCurrent);
 		myCurrent = nullptr;
 	}
 
@@ -45,7 +45,7 @@ namespace engine::graph
 		old_betsy_imgui::WindowControl::Window("Nodes",
 			[&]()
 		{
-			for (std::pair<std::string,BuiltNode*> node : myNodes)
+			for (std::pair<std::string, BuiltNode*> node : myNodes)
 			{
 				node.second->Imgui();
 			}
@@ -105,24 +105,22 @@ namespace engine::graph
 		{
 			ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-			ImVec2 size = ImVec2(150.f, 16.f * myNodes.size());
+			ImVec2 padding = ImGui::GetStyle().FramePadding;
+
+			ImVec2 size = ImVec2(150.f + padding.x * 2, (16.f + padding.y) * myNodes.size() + padding.y);
 			drawList->AddRectFilled(root, ImVec2(root.x + size.x, root.y + size.y), tools::GetImColor(ImGuiCol_WindowBg), 2.f);
 			drawList->AddRect(root, ImVec2(root.x + size.x, root.y + size.y), tools::GetImColor(ImGuiCol_Border), 2.f);
 
 
 			ImVec2 pos = root;
+			pos.x += padding.x;
+			pos.y += padding.y;
+
 			for (std::pair<std::string, BuiltNode*> node : myNodes)
 			{
 				ImGui::SetCursorScreenPos(pos);
 				if (ImGui::Selectable(node.first.c_str(), false, 0, ImVec2(150,16)))
 				{
-					//ImVec2 topLeft = ImVec2((myPosition.x + aPosition.x) * aScale + offset.x, (myPosition.y + aPosition.y) * aScale + offset.y);
-
-					//(mypos + apos) * aScale + offset = mousepos
-					//mousepos - offset = (mypos + apos) * aScale
-					//(mousepos - offset) / aScale = mypos + apos
-					//(mousepos - offset) / aScale - apos = mypos
-
 					ImVec2 offset = ImGui::GetWindowPos();
 					ImVec2 translated = ImVec2((root.x	- offset.x) / aScale - aPosition.x, (root.y - offset.y) / aScale - aPosition.y);
 					aGraph->AddNode(*node.second, translated);

@@ -1,5 +1,5 @@
-#ifndef ENGINE_GRAPH_NODE_DATA_H
-#define ENGINE_GRAPH_NODE_DATA_H
+#ifndef ENGINE_GRAPH_NODES_DATA_H
+#define ENGINE_GRAPH_NODES_DATA_H
 
 #include <cstddef>
 #include <utility>

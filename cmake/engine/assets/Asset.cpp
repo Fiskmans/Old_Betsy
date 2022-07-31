@@ -123,7 +123,7 @@ namespace engine
 		myTexture = aTexture;
 	}
 
-	DrawableTextureAsset::DrawableTextureAsset(Texture& aTexture)
+	DrawableTextureAsset::DrawableTextureAsset(graphics::Texture& aTexture)
 		: TextureAsset(aTexture.GetResourceView())
 	{
 		myDrawableTexture = aTexture;

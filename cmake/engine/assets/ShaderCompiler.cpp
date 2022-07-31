@@ -29,7 +29,7 @@ namespace engine::assets
 		std::vector<char> blob = LoadOrCompileFromFile(aBaseFolder, aShader, "pixelShader", "ps_5_0", aFlags);
 
 		ID3D11PixelShader* shader;
-		HRESULT result = GraphicsEngine::GetInstance().GetFrameWork().GetDevice()->CreatePixelShader(blob.data(), blob.size(), nullptr, &shader);
+		HRESULT result = graphics::GraphicsEngine::GetInstance().GetFrameWork().GetDevice()->CreatePixelShader(blob.data(), blob.size(), nullptr, &shader);
 		if (FAILED(result))
 		{
 			return nullptr;
@@ -43,7 +43,7 @@ namespace engine::assets
 		std::vector<char> blob = LoadOrCompileFromFile(aBaseFolder, aShader, "vertexShader", "vs_5_0", aFlags);
 
 		ID3D11VertexShader* shader;
-		HRESULT result = GraphicsEngine::GetInstance().GetFrameWork().GetDevice()->CreateVertexShader(blob.data(), blob.size(), nullptr, &shader);
+		HRESULT result = graphics::GraphicsEngine::GetInstance().GetFrameWork().GetDevice()->CreateVertexShader(blob.data(), blob.size(), nullptr, &shader);
 		if (FAILED(result))
 		{
 			return nullptr;
@@ -57,7 +57,7 @@ namespace engine::assets
 		std::vector<char> blob = LoadOrCompileFromFile(aBaseFolder, aShader, "geometryShader", "gs_5_0", aFlags);
 
 		ID3D11GeometryShader* shader;
-		HRESULT result = GraphicsEngine::GetInstance().GetFrameWork().GetDevice()->CreateGeometryShader(blob.data(), blob.size(), nullptr, &shader);
+		HRESULT result = graphics::GraphicsEngine::GetInstance().GetFrameWork().GetDevice()->CreateGeometryShader(blob.data(), blob.size(), nullptr, &shader);
 		if (FAILED(result))
 		{
 			return nullptr;

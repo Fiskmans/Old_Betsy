@@ -5,15 +5,18 @@
 
 #include "tools/MathVector.h"
 
+#include "imgui/imgui.h"
+
 #include <array>
 
 #include <d3d11.h>
-namespace engine
+
+namespace engine::graphics
 {
 	class GBuffer
 	{
 	public:
-		enum class Textures
+		enum class Channel
 		{
 			Postion,
 			Albedo,
@@ -26,24 +29,27 @@ namespace engine
 			Count
 		};
 
+		bool IsValid() { return !!myViewport; };
+
 		void ClearTextures(const tools::V4f aClearColor = tools::V4f(0.f, 0.f, 0.f, 0.f));
-		void SetAsActiveTarget(class Texture* aDepth = nullptr);
-		void SetAsActiveTarget(const Textures aResource, class Texture* aDepth = nullptr);
-		void SetAsResourceOnSlot(const Textures aResource, const unsigned int aSlot);
+		void SetAsActiveTarget(class DepthTexture* aDepth = nullptr);
+		void SetAsActiveTarget(const Channel aResource, class DepthTexture* aDepth = nullptr);
+		void SetAsResourceOnSlot(const Channel aResource, const unsigned int aSlot);
 		void SetAllAsResources();
 		void CopyTo(GBuffer* aOther, ID3D11DeviceContext* aContext);
+
+		void Imgui(ImVec2 aTopLeft, ImVec2 aBottomRight);
 
 		void Release();
 
 	private:
 		friend class TextureFactory;
 
-		std::array<ID3D11Texture2D*, static_cast<int>(Textures::Count)> myTextures;
-		std::array<ID3D11RenderTargetView*, static_cast<int>(Textures::Count)> myRenderTargets;
-		std::array<ID3D11ShaderResourceView*, static_cast<int>(Textures::Count)> myShaderResources;
+		std::array<ID3D11Texture2D*, static_cast<int>(Channel::Count)> myTextures;
+		std::array<ID3D11RenderTargetView*, static_cast<int>(Channel::Count)> myRenderTargets;
+		std::array<ID3D11ShaderResourceView*, static_cast<int>(Channel::Count)> myShaderResources;
 
-		D3D11_VIEWPORT* myViewport;
-		ID3D11DeviceContext* myContext;
+		D3D11_VIEWPORT* myViewport = nullptr;
 	};
 }
 #endif

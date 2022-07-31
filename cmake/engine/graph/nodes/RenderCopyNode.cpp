@@ -1,7 +1,7 @@
 #include "engine/graph/nodes/RenderCopyNode.h"
 
 
-namespace engine::graph::node 
+namespace engine::graph::nodes
 {
 	void RenderCopyNode::Activate()
 	{

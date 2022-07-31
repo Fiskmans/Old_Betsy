@@ -1,4 +1,5 @@
 #include "engine/graphics/Camera.h"
+#include "engine/graphics/RenderScene.h"
 
 #include "engine/graphics/WindowManager.h"
 
@@ -11,14 +12,12 @@ namespace engine
 {
 	const tools::V2ui Camera::AdaptToScreen = tools::V2ui(0, 0);
 
-	Camera::Camera(float aNearPlane, float aFarPlane, tools::V2ui aResolution)
-		: myRenderGraph("Render graph", { &myRenderTexture }, { &myResolutionExport })
+	Camera::Camera(RenderScene& aScene, float aNearPlane, float aFarPlane, tools::V2ui aResolution)
+		: myRenderGraph("Render graph", { &myRenderTexture }, { &mySelf, &myScene, &myResolutionExport })
 		, myTransform(tools::M44f::Identity())
 		, myNearPlane(aNearPlane)
 		, myFarPlane(aFarPlane)
 	{
-		myRenderGraph.AddNode<graph::node::RenderMergeNode>(ImVec2(0, 0));
-
 		if (aResolution == AdaptToScreen)
 		{
 			myResolutionExport.Write(WindowManager::GetInstance().GetSize());
@@ -29,7 +28,8 @@ namespace engine
 			myResolutionExport.Write(aResolution);
 		}
 
-
+		mySelf = this;
+		myScene = &aScene;
 	}
 
 	Camera::~Camera()
@@ -202,13 +202,18 @@ namespace engine
 		return myTransform.Row(3);
 	}
 
+	std::vector<ModelInstance*> Camera::Cull() const
+	{
+		return myScene.Get()->CullByFrustum(GenerateFrustum());
+	}
+
 	void Camera::SetResolution(tools::V2ui aResolution)
 	{
 		myResolutionExport.Write(aResolution);
 	}
 
-	PerspectiveCamera::PerspectiveCamera(float aNearPlane, float aFarPlane, float aFOV, tools::V2ui aResolution)
-		: Camera(aNearPlane, aFarPlane, aResolution)
+	PerspectiveCamera::PerspectiveCamera(RenderScene& aScene, float aNearPlane, float aFarPlane, float aFOV, tools::V2ui aResolution)
+		: Camera(aScene, aNearPlane, aFarPlane, aResolution)
 	{
 		myProjection = tools::M44f::Identity();
 		myProjection.Row(2)[2] = aFarPlane / (aFarPlane - aNearPlane);
@@ -239,9 +244,9 @@ namespace engine
 		myProjection.Row(1)[1] = 1.f / tan(myYFOV);
 	}
 
-	tools::PlaneVolume<float> PerspectiveCamera::GenerateFrustum() const
+	tools::Frustum<float> PerspectiveCamera::GenerateFrustum() const
 	{
-		tools::PlaneVolume<float> frustum;
+		tools::Frustum<float> frustum;
 
 		frustum.AddPlane(tools::Plane<float>(GetPosition(), tools::V4f(0.f, 0.f, 1.f, 0.f) * tools::M44f::CreateRotationAroundY((PI_F + myXFOV) * 0.5f) * myTransform));
 		frustum.AddPlane(tools::Plane<float>(GetPosition(), tools::V4f(0.f, 0.f, 1.f, 0.f) * tools::M44f::CreateRotationAroundY((PI_F + myXFOV) * -0.5f) * myTransform));
@@ -263,8 +268,8 @@ namespace engine
 		myProjection.Row(1)[1] = myProjection.Row(0)[1] * (static_cast<float>(aResolution[0]) / static_cast<float>(aResolution[1]));
 	}
 
-	OrthogonalCamera::OrthogonalCamera(tools::V3f aSize, tools::V2ui aResolution)
-		: Camera(0, aSize[2], aResolution)
+	OrthogonalCamera::OrthogonalCamera(RenderScene& aScene, tools::V3f aSize, tools::V2ui aResolution)
+		: Camera(aScene, 0, aSize[2], aResolution)
 	{
 		myProjection = tools::M44f::Identity();
 		myProjection.Row(1)[1] = 2.f / aSize[0];
@@ -275,7 +280,7 @@ namespace engine
 
 	tools::PlaneVolume<float> OrthogonalCamera::GenerateFrustum() const
 	{
-		tools::PlaneVolume<float> frustum;
+		tools::Frustum<float> frustum;
 		tools::V3f forward = GetForward();
 		tools::V3f right = GetRight();
 		tools::V3f up = GetUp();

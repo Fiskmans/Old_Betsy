@@ -12,7 +12,7 @@ namespace engine::graph
 {
 	ImColor ColorFromPointer(void* aPointer)
 	{
-		float value = reinterpret_cast<std::uintptr_t>(aPointer) * 501 % 20000;
+		float value = reinterpret_cast<std::uintptr_t>(aPointer) * 503 % 20000;
 		return ImColor(
 			0.6f + 0.4f * cos(value),
 			0.6f + 0.4f * cos(value / 1.8f),
@@ -20,14 +20,17 @@ namespace engine::graph
 			1.f);
 	}
 
-	BuiltNode::BuiltNode(NodeBase* aBaseNode)
+	BuiltNode::BuiltNode(NodeBase* aBaseNode, std::shared_ptr<NodeVarianceGroup>& aGroup)
 		: myBaseNode(aBaseNode)
+		, myGroup(aGroup)
 	{
+		if (myGroup)
+			myGroup->AddNode(this);
 	}
 
-	const char* BuiltNode::Name() 
+	std::string BuiltNode::Name() 
 	{ 
-		return typeid(*myBaseNode).name(); 
+		return myBaseNode->Name();
 	}
 
 	void BuiltNode::AddInPin(PinBase* aInPin)
@@ -48,7 +51,7 @@ namespace engine::graph
 
 	void BuiltNode::Imgui()
 	{
-		if (ImGui::TreeNode(Name()))
+		if (ImGui::TreeNode(Name().c_str()))
 		{
 			ImDrawList* drawlist = ImGui::GetWindowDrawList();
 

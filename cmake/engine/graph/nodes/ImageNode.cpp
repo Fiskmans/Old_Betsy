@@ -2,7 +2,7 @@
 
 #include "engine/assets/AssetManager.h"
 
-namespace engine::graph::node
+namespace engine::graph::nodes
 {
 	void ImageNode::Activate()
 	{

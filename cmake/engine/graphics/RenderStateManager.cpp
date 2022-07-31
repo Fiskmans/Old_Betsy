@@ -4,7 +4,7 @@
 
 #include "logger/Logger.h"
 
-namespace engine
+namespace engine::graphics
 {
 	bool RenderStateManager::Init()
 	{

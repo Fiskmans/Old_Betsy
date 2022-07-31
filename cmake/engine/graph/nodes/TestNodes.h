@@ -1,10 +1,10 @@
-#ifndef ENGINE_GRAPH_NODE_TEST_NODES_H
-#define ENGINE_GRAPH_NODE_TEST_NODES_H
+#ifndef ENGINE_GRAPH_NODES_TEST_NODES_H
+#define ENGINE_GRAPH_NODES_TEST_NODES_H
 
 #include "engine/graph/Node.h"
 #include "engine/graph/NodePin.h"
 
-namespace engine::graph::node 
+namespace engine::graph::nodes
 {
 	class PrintNode : public NodeBase
 	{

@@ -1,5 +1,5 @@
-#ifndef ENGINE_GRAPH_NODE_RENDER_MERGE_NODE_H
-#define ENGINE_GRAPH_NODE_RENDER_MERGE_NODE_H
+#ifndef ENGINE_GRAPH_NODES_RENDER_MERGE_NODE_H
+#define ENGINE_GRAPH_NODES_RENDER_MERGE_NODE_H
 
 #include "engine/graph/Node.h"
 #include "engine/graph/NodePin.h"
@@ -12,7 +12,7 @@
 
 #include <d3d11.h>
 
-namespace engine::graph::node
+namespace engine::graph::nodes
 {
 	class RenderMergeNode : engine::graph::NodeBase
 	{

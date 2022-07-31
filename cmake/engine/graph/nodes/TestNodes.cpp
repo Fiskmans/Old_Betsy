@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace engine::graph::node
+namespace engine::graph::nodes
 {
 	void PrintNode::Activate()
 	{

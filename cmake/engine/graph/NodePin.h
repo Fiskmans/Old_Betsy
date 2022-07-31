@@ -1,5 +1,5 @@
-#ifndef ENGINE_GRAPH_NODE_PIN_H
-#define ENGINE_GRAPH_NODE_PIN_H
+#ifndef ENGINE_GRAPH_NODES_PIN_H
+#define ENGINE_GRAPH_NODES_PIN_H
 
 #include "engine/graph/NodeInstanceId.h"
 
@@ -38,6 +38,7 @@ namespace engine::graph
 		explicit PinBase(const PinInformation& aInformation) : myInformation(aInformation) {}
 		virtual ~PinBase() = default;
 
+		void UpdateInformation(const PinInformation& aInformation) { myInformation = aInformation; }
 		const char* Name() const { return myInformation.Name(); };
 		virtual const std::type_info& Type() const = 0;
 		virtual bool IsInPin() const = 0;
@@ -78,6 +79,7 @@ namespace engine::graph
 	public:
 		virtual ~OutPinInstanceBase() = default;
 		virtual PinValueBase& GetStorage() = 0;
+		virtual const PinValueBase& GetStorage() const = 0;
 	};
 
 	template<class T>
@@ -88,6 +90,7 @@ namespace engine::graph
 
 		void operator=(const T& aValue) { myStorage = aValue; }
 		PinValueBase& GetStorage() override { return myStorage; }
+		const PinValueBase& GetStorage() const override { return myStorage; }
 
 	private:
 		PinValue<T> myStorage;
@@ -172,12 +175,11 @@ namespace engine::graph
 		PinValueBase* GetOutStorage() override { return &myValue.GetStorage(); }
 		OutPinInstanceBase* GetOutPinInstance() override { return &myValue; }
 
-		void Write(const PinType& aValue)
-		{
-			myValue = aValue;
-		}
+		void Write(const PinType& aValue) { myValue = aValue; }
+		void operator=(const PinType& aValue) { Write(aValue); }
 
 		PinType& Get() { return myValue.GetStorage().template As<PinType>(); }
+		const PinType& Get() const { return myValue.GetStorage().template As<PinType>(); }
 	private:
 		OutPinInstance<PinType> myValue;
 	};
@@ -186,7 +188,7 @@ namespace engine::graph
 	class InPin : public PinBase
 	{
 	public:
-		InPin(PinInformation aPinInformation) 
+		InPin(PinInformation aPinInformation = PinInformation("in"))
 			: PinBase(aPinInformation)
 			, myInstances(std::string("InPin-") + Name())
 		{
@@ -209,7 +211,7 @@ namespace engine::graph
 	class OutPin : public PinBase
 	{
 	public:
-		OutPin(PinInformation aPinInformation) 
+		OutPin(PinInformation aPinInformation = PinInformation("Out"))
 			: PinBase(aPinInformation)
 			, myInstances(std::string("OutPin-") + Name())
 		{

@@ -6,13 +6,12 @@
 
 #include "logger/Logger.h"
 
-namespace engine
+namespace engine::graphics
 {
 	UpdatableTexture* TextureFactory::CreateUpdatableTexture(tools::V2ui aSize, const std::string& aName)
 	{
 		GraphicsFramework& framework = GraphicsEngine::GetInstance().GetFrameWork();
 		ID3D11Device* device = framework.GetDevice();
-		ID3D11DeviceContext* context = framework.GetContext();
 
 		HRESULT result;
 
@@ -50,7 +49,6 @@ namespace engine
 			return nullptr;
 		}
 		returnVal->myShaderResource = shaderResource;
-		returnVal->myContext = context;
 		returnVal->myTexture = texture;
 		returnVal->myViewport = new D3D11_VIEWPORT({ 0.f, 0.f, static_cast<float>(aSize[0]), static_cast<float>(aSize[1]), 0.f, 1.f });
 
@@ -105,7 +103,6 @@ namespace engine
 	{
 		GraphicsFramework& framework = GraphicsEngine::GetInstance().GetFrameWork();
 		ID3D11Device* device = framework.GetDevice();
-		ID3D11DeviceContext* context = framework.GetContext();
 
 		HRESULT result;
 
@@ -124,17 +121,14 @@ namespace engine
 			aTexture->GetDesc(&desc);
 			viewport = new D3D11_VIEWPORT({ 0.f, 0.f, static_cast<float>(desc.Width), static_cast<float>(desc.Height), 0.f, 1.f });
 		}
-
-		aTextureObject.myContext = context;
 		aTextureObject.myTexture = aTexture;
 		aTextureObject.myViewport = viewport;
 	}
 
-	Texture TextureFactory::CreateDepth(tools::V2ui aSize, const std::string& aName)
+	DepthTexture TextureFactory::CreateDepth(tools::V2ui aSize, const std::string& aName)
 	{
 		GraphicsFramework& framework = GraphicsEngine::GetInstance().GetFrameWork();
 		ID3D11Device* device = framework.GetDevice();
-		ID3D11DeviceContext* context = framework.GetContext();
 
 		HRESULT result;
 
@@ -185,27 +179,23 @@ namespace engine
 			LOG_SYS_ERROR("Could not create depth stencil");
 		}
 
-		D3D11_VIEWPORT* viewport = new D3D11_VIEWPORT({ 0.f, 0.f, static_cast<float>(aSize[0]), static_cast<float>(aSize[1]), 0.f, 1.f });
+		DepthTexture returnVal;
 
-		Texture returnVal;
-		returnVal.myContext = context;
 		returnVal.myTexture = texture;
 		returnVal.myDepth = depth;
-		returnVal.myViewport = viewport;
 		returnVal.myShaderResource = resourceView;
 
 		return returnVal;
 	}
 
-	GBuffer TextureFactory::CreateGBuffer(const tools::V2ui& aSize, const std::string& aName)
+	graphics::GBuffer TextureFactory::CreateGBuffer(const tools::V2ui& aSize, const std::string& aName)
 	{
-		GraphicsFramework& framework = GraphicsEngine::GetInstance().GetFrameWork();
+		GraphicsFramework& framework = graphics::GraphicsEngine::GetInstance().GetFrameWork();
 		ID3D11Device* device = framework.GetDevice();
-		ID3D11DeviceContext* context = framework.GetContext();
 
 		HRESULT result;
 
-		std::array<DXGI_FORMAT, ENUM_CAST(GBuffer::Textures::Count)> formats =
+		std::array<DXGI_FORMAT, static_cast<int>(graphics::GBuffer::Channel::Count)> formats =
 		{
 			DXGI_FORMAT_R32G32B32A32_FLOAT,
 			DXGI_FORMAT_R8G8B8A8_UNORM,
@@ -241,7 +231,7 @@ namespace engine
 		}
 
 		GBuffer buffer;
-		for (size_t i = 0; i < ENUM_CAST(GBuffer::Textures::Count); i++)
+		for (size_t i = 0; i < ENUM_CAST(GBuffer::Channel::Count); i++)
 		{
 			desc.Format = formats[i];
 			result = device->CreateTexture2D(&desc, nullptr, &buffer.myTextures[i]);
@@ -267,7 +257,6 @@ namespace engine
 		}
 
 
-		buffer.myContext = context;
 		buffer.myViewport = new D3D11_VIEWPORT({ 0.f, 0.f, static_cast<float>(aSize[0]), static_cast<float>(aSize[1]), 0.f, 1.f });
 
 		return buffer;

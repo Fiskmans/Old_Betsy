@@ -18,7 +18,7 @@
 #include "tools/TimeHelper.h"
 
 
-namespace engine
+namespace engine::graphics
 {
 	RenderManager::TextureMapping::TextureMapping(const AssetHandle& aHandle, size_t aIndex)
 		: myResource(aHandle.Get<TextureAsset>().myTexture)
@@ -33,10 +33,13 @@ namespace engine
 
 	bool RenderManager::Init()
 	{
-		if (!myStateManager.Init())
+		if (!myRenderStateManager.Init())
 			return false;
 		
 		if (!myFullscreenRenderer.Init())
+			return false;
+
+		if (!myDeferredRenderer.Init())
 			return false;
 		
 		//myPerlinView = AssetManager::GetInstance().GetPerlinTexture({ 1024,1024 }, { 2,2 }, 2);
@@ -54,10 +57,6 @@ namespace engine
 		//	return false;
 		//}
 		//if (!myParticleRenderer.Init(aFramework))
-		//{
-		//	return false;
-		//}
-		//if (!myDeferredRenderer.Init(aFramework, myPerlinView, &myShadowRenderer))
 		//{
 		//	return false;
 		//}
@@ -90,16 +89,8 @@ namespace engine
 	{
 		tools::V4f transparent = tools::V4f(0.f, 0.f, 0.f, 0.f);
 
-		myTextures[static_cast<int>(Textures::BackBuffer)].ClearTexture(transparent);
-		myTextures[static_cast<int>(Textures::IntermediateTexture)].ClearTexture(aClearColor);
-		myTextures[static_cast<int>(Textures::IntermediateDepth)].ClearDepth();
-		myTextures[static_cast<int>(Textures::Selection)].ClearTexture(transparent);
-		myTextures[static_cast<int>(Textures::Selection2)].ClearTexture(transparent);
-		myTextures[static_cast<int>(Textures::SelEdges)].ClearTexture(transparent);
-		myTextures[static_cast<int>(Textures::SelEdgesHalf)].ClearTexture(transparent);
-		myTextures[static_cast<int>(Textures::BackFaceBuffer)].ClearTexture(transparent);
-		myGBuffer.ClearTextures();
-		myBufferGBuffer.ClearTextures();
+		myTextures[static_cast<int>(Channel::BackBuffer)].ClearTexture(transparent);
+		myTextures[static_cast<int>(Channel::IntermediateTexture)].ClearTexture(aClearColor);
 	}
 
 	void RenderManager::EndFrame()
@@ -123,7 +114,7 @@ namespace engine
 		AssetHandle textureHandle = camera->GetTexture();
 		if (!textureHandle.IsValid())
 		{
-			FullscreenPass({ Textures::IntermediateTexture }, Textures::BackBuffer, FullscreenRenderer::Shader::COPY);
+			FullscreenPass({ Channel::IntermediateTexture }, Channel::BackBuffer, FullscreenRenderer::Shader::COPY);
 			return;
 		}
 
@@ -132,18 +123,30 @@ namespace engine
 		
 		GraphicsEngine::GetInstance().GetFrameWork().GetContext()->PSSetShaderResources(0, 1, &textureHandle.Get<TextureAsset>().myTexture);
 
-		myTextures[static_cast<int>(Textures::BackBuffer)].SetAsActiveTarget();
+		myTextures[static_cast<int>(Channel::BackBuffer)].SetAsActiveTarget();
 		myFullscreenRenderer.Render(FullscreenRenderer::Shader::COPY);
 	}
 
-	void RenderManager::MapTextures(AssetHandle& aTarget, const std::vector<TextureMapping>& aTextures)
+	void RenderManager::MapTextures(AssetHandle& aTarget, const std::vector<TextureMapping>& aTextures, DepthTexture* aDepth)
 	{
 		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 
 		UnbindTargets();
 		UnbindResources();
 
-		aTarget.Get<DrawableTextureAsset>().myDrawableTexture.SetAsActiveTarget();
+		aTarget.Get<DrawableTextureAsset>().myDrawableTexture.SetAsActiveTarget(aDepth);
+		for (const TextureMapping& tex : aTextures)
+			context->PSSetShaderResources(tex.mySlot, 1, &tex.myResource);
+	}
+
+	void RenderManager::MapTextures(GBuffer& aTarget, const std::vector<TextureMapping>& aTextures, DepthTexture* aDepth)
+	{
+		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
+
+		UnbindTargets();
+		UnbindResources();
+
+		aTarget.SetAsActiveTarget(aDepth);
 		for (const TextureMapping& tex : aTextures)
 			context->PSSetShaderResources(tex.mySlot, 1, &tex.myResource);
 	}
@@ -223,6 +226,39 @@ namespace engine
 		ImGui::EndGroup();
 	}
 
+	bool RenderManager::CreateGenericShaderBuffer(ID3D11Buffer*& aBuffer, size_t aSize)
+	{
+		D3D11_BUFFER_DESC bufferDescription;
+		ZeroMemory(&bufferDescription, sizeof(bufferDescription));
+		bufferDescription.Usage = D3D11_USAGE_DYNAMIC;
+		bufferDescription.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bufferDescription.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		bufferDescription.ByteWidth = aSize;
+
+		return SUCCEEDED(GraphicsEngine::GetInstance().GetFrameWork().GetDevice()->CreateBuffer(&bufferDescription, nullptr, &aBuffer));
+	}
+
+	bool RenderManager::OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize)
+	{
+		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
+
+		D3D11_MAPPED_SUBRESOURCE bufferData;
+		WIPE(bufferData);
+
+		HRESULT result = context->Map(aBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
+
+		if (FAILED(result))
+		{
+			LOG_ERROR("Failed to map buffer");
+			return false;
+		}
+
+		memcpy(bufferData.pData, aData, aSize);
+		context->Unmap(aBuffer, 0);
+
+		return true;
+	}
+
 	/*
 	void RenderManager::RenderSelection(const std::vector<ModelInstance*>& aModelsToHighlight, Camera* aCamera)
 	{
@@ -250,50 +286,19 @@ namespace engine
 		ID3D11Texture2D* backBufferTexture = GraphicsEngine::GetInstance().GetFrameWork().GetBackbufferTexture();
 		if (!backBufferTexture)
 		{
-			LOG_SYS_ERROR("Could not get back buffer texture");
+			LOG_SYS_CRASH("Failed to get get back buffer texture");
 			return false;
 		}
 
-		TextureFactory::GetInstance().CreateTexture(backBufferTexture, myTextures[static_cast<int>(Textures::BackBuffer)]);
-		myTextures[static_cast<int>(Textures::IntermediateDepth)] = TextureFactory::GetInstance().CreateDepth(aSize, "Main Depth");
+		TextureFactory::GetInstance().CreateTexture(backBufferTexture, myTextures[static_cast<int>(Channel::BackBuffer)]);
 
-		myTextures[static_cast<int>(Textures::IntermediateTexture)] = TextureFactory::GetInstance().CreateTexture(aSize, DXGI_FORMAT_R8G8B8A8_UNORM, "Intermediate texture");
-		myTextures[static_cast<int>(Textures::HalfSize)] = TextureFactory::GetInstance().CreateTexture(aSize / 2, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/2 size");
-		myTextures[static_cast<int>(Textures::QuaterSize)] = TextureFactory::GetInstance().CreateTexture(aSize / 4, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/4 size");
-		myTextures[static_cast<int>(Textures::HalfQuaterSize)] = TextureFactory::GetInstance().CreateTexture(aSize / 8, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom 1/8 size");
-
-		myTextures[static_cast<int>(Textures::SSAOBuffer)] = TextureFactory::GetInstance().CreateTexture(aSize, DXGI_FORMAT_R8_UNORM, "SSAO buffer");
-		myTextures[static_cast<int>(Textures::BackFaceBuffer)] = TextureFactory::GetInstance().CreateTexture(aSize, DXGI_FORMAT_R8G8B8A8_UNORM, "Backface buffer");
-
-#if ENABLEBLOOM
-		myTextures[static_cast<int>(Textures::Guassian1)] = TextureFactory::GetInstance().CreateTexture(aSize / 8, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom Gaussian 1");
-		myTextures[static_cast<int>(Textures::Guassian2)] = TextureFactory::GetInstance().CreateTexture(aSize / 8, DXGI_FORMAT_R8G8B8A8_UNORM, "bloom Gaussian 2");
-
-		myTextures[static_cast<int>(Textures::Luminance)] = TextureFactory::GetInstance().CreateTexture(aSize, DXGI_FORMAT_R8G8B8A8_UNORM, "luminance");
-#endif
-
-		myTextures[static_cast<int>(Textures::SelectionScaleDown1)] = TextureFactory::GetInstance().CreateTexture(aSize / 2, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 1/2");
-		myTextures[static_cast<int>(Textures::SelectionScaleDown2)] = TextureFactory::GetInstance().CreateTexture(aSize / 4, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 1/4");
-
-		myTextures[static_cast<int>(Textures::Selection)] = TextureFactory::GetInstance().CreateTexture(aSize / 2, DXGI_FORMAT_R8G8B8A8_UNORM, "selection");
-		myTextures[static_cast<int>(Textures::SelEdgesHalf)] = TextureFactory::GetInstance().CreateTexture(aSize / 2, DXGI_FORMAT_R8G8B8A8_UNORM, "selection edges half");
-		myTextures[static_cast<int>(Textures::SelEdges)] = TextureFactory::GetInstance().CreateTexture(aSize / 2, DXGI_FORMAT_R8G8B8A8_UNORM, "selection edges all");
-		myTextures[static_cast<int>(Textures::Selection2)] = TextureFactory::GetInstance().CreateTexture(aSize, DXGI_FORMAT_R8G8B8A8_UNORM, "selection 2");
-
-		myTextures[static_cast<int>(Textures::Edges)] = TextureFactory::GetInstance().CreateTexture(aSize, DXGI_FORMAT_R8_UNORM, "Edges");
-		myTextures[static_cast<int>(Textures::AAHorizontal)] = TextureFactory::GetInstance().CreateTexture(aSize, DXGI_FORMAT_R8G8B8A8_UNORM, "AA horizontal");
-
-		myTextures[static_cast<int>(Textures::LUT)] = TextureFactory::GetInstance().CreateTexture(aSize, DXGI_FORMAT_R8G8B8A8_UNORM, "LUT buffer");
-
-		//myRandomNormal = AssetManager::GetInstance().GetTexture("engine/SSAONormal.dds");
-		myGBuffer = TextureFactory::GetInstance().CreateGBuffer(aSize, "main gBuffer");
-		myBufferGBuffer = TextureFactory::GetInstance().CreateGBuffer(aSize, "secondary GBuffer");
+		myTextures[static_cast<int>(Channel::IntermediateTexture)] = TextureFactory::GetInstance().CreateTexture(aSize, DXGI_FORMAT_R8G8B8A8_UNORM, "Intermediate texture");
 
 		for (Texture& tex : myTextures)
 		{
-			if (!tex)
+			if (!tex.IsValid())
 			{
-				LOG_SYS_CRASH("Could not initialize all fullscreen textures");
+				LOG_SYS_CRASH("Failed to initialize all fullscreen textures");
 				return false;
 			}
 		}
@@ -354,9 +359,6 @@ namespace engine
 		{
 			tex.Release();
 		}
-		myGBuffer.Release();
-		myBufferGBuffer.Release();
-
 
 		HRESULT result;
 		IDXGISwapChain* chain = framework.GetSwapChain();
@@ -371,10 +373,10 @@ namespace engine
 		}
 
 		CreateTextures(aSize);
-		myTextures[static_cast<int>(Textures::BackBuffer)].SetAsActiveTarget();
+		myTextures[static_cast<int>(Channel::BackBuffer)].SetAsActiveTarget();
 	}
 		
-	void RenderManager::FullscreenPass(std::vector<Textures> aSources, Textures aTarget, FullscreenRenderer::Shader aShader)
+	void RenderManager::FullscreenPass(std::vector<Channel> aSources, Channel aTarget, FullscreenRenderer::Shader aShader)
 	{
 		UnbindTargets();
 		UnbindResources();

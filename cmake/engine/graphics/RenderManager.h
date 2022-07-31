@@ -7,6 +7,7 @@
 #include "engine/graphics/FullscreenRenderer.h"
 #include "engine/graphics/RenderStateManager.h"
 #include "engine/graphics/BoneBuffer.h"
+#include "engine/graphics/DeferredRenderer.h"
 
 #include "engine/assets/ModelInstance.h"
 
@@ -26,14 +27,13 @@
 //#include "FullscreenRenderer.h"
 //#include "SpriteRenderer.h"
 //#include "ParticleRenderer.h"
-//#include "DeferredRenderer.h"
 //#include "HighlightRenderer.h"
 //#include "DepthRenderer.h"
 
 //#include "GBuffer.h"
 //#include "TextRenderer.h"
 
-namespace engine
+namespace engine::graphics
 {
 
 	class RenderManager
@@ -62,64 +62,46 @@ namespace engine
 
 		void Render();
 
-		void MapTextures(AssetHandle& aTarget, const std::vector<TextureMapping>& aTextures);
+		void MapTextures(AssetHandle& aTarget, const std::vector<TextureMapping>& aTextures, DepthTexture* aDepth = nullptr);
+		void MapTextures(GBuffer& aTarget, const std::vector<TextureMapping>& aTextures, DepthTexture* aDepth = nullptr);
 
 		void Imgui();
 		bool myDoDebugLines = true;
 
-		FullscreenRenderer& GetFullscreenRender() { return myFullscreenRenderer; }
+		RenderStateManager& GetRenderStateManager() { return myRenderStateManager; }
 
+		FullscreenRenderer& GetFullscreenRender() { return myFullscreenRenderer; }
+		DeferredRenderer& GetDeferredRenderer() { return myDeferredRenderer; }
+
+		template<class BufferType>
+		static bool CreateGenericShaderBuffer(ID3D11Buffer*& aBuffer) { return CreateGenericShaderBuffer(aBuffer, sizeof(BufferType)); }
+		static bool CreateGenericShaderBuffer(ID3D11Buffer*& aBuffer, size_t aSize);
+
+		static bool OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize);
 	private:
 		float myStartedAt = 0.f;
 		bool myIsReady = false;;
 
-		std::unordered_map<ModelInstance*, short> myBoneOffsetMap;
-
-		RenderStateManager myStateManager;
+		RenderStateManager myRenderStateManager;
 
 		FullscreenRenderer myFullscreenRenderer;
+		DeferredRenderer myDeferredRenderer;
 		//ForwardRenderer myForwardRenderer;
 		//SpriteRenderer mySpriteRenderer;
 		//ParticleRenderer myParticleRenderer;
-		//DeferredRenderer myDeferredRenderer;
 		//TextRenderer myTextRenderer;
 		//HighlightRenderer myHighlightRenderer;
 		//DepthRenderer myShadowRenderer;
 		//AssetHandle myPerlinView;
 		//AssetHandle myRandomNormal;
 
-		ID3D11Texture2D* myBoneBufferTexture = nullptr;
-		ID3D11ShaderResourceView* myBoneTextureView = nullptr;
-
-		enum class Textures
+		enum class Channel
 		{
 			BackBuffer,
 			IntermediateTexture,
-			HalfSize,
-			QuaterSize,
-			HalfQuaterSize,
-			IntermediateDepth,
-#if ENABLEBLOOM
-			Guassian1,
-			Guassian2,
-			Luminance,
-#endif
-			Selection,
-			SelEdgesHalf,
-			SelEdges,
-			Selection2,
-			SelectionScaleDown1,
-			SelectionScaleDown2,
-			SSAOBuffer,
-			BackFaceBuffer,
-			Edges,
-			AAHorizontal,
-			LUT,
 			Count
 		};
-		std::array<Texture, static_cast<int>(Textures::Count)> myTextures;
-		GBuffer myGBuffer;
-		GBuffer myBufferGBuffer;
+		std::array<Texture, static_cast<int>(Channel::Count)> myTextures;
 		BoneTextureCPUBuffer myBoneBuffer;
 
 #if ENABLESSAO
@@ -132,7 +114,7 @@ namespace engine
 		//void RenderSelection(const std::vector<ModelInstance*>& aModelsToHighlight, Camera* aCamera);
 		bool CreateTextures(const tools::V2ui& aSize);
 
-		void FullscreenPass(std::vector<Textures> aSources, Textures aTarget, FullscreenRenderer::Shader aShader);
+		void FullscreenPass(std::vector<Channel> aSources, Channel aTarget, FullscreenRenderer::Shader aShader);
 		void UnbindResources();
 		void UnbindTargets();
 	};

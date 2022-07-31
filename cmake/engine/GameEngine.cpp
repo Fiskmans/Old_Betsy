@@ -50,14 +50,14 @@ namespace engine
 			AssetManager::GetInstance().Preload();
 #endif // _DEBUG
 
-			GraphicsEngine::GetInstance().Init(SettingsManager::GetInstance().myWindowSize.Get());
+			graphics::GraphicsEngine::GetInstance().Init(SettingsManager::GetInstance().myWindowSize.Get());
 
 
 			IMGUI_CHECKVERSION();
 			ImGui::CreateContext();
 
 			SettingsManager::GetInstance().LoadOrDefaultImGuiStyle();
-			ImGui_ImplDX11_Init(GraphicsEngine::GetInstance().GetFrameWork().GetDevice(), GraphicsEngine::GetInstance().GetFrameWork().GetContext());
+			ImGui_ImplDX11_Init(graphics::GraphicsEngine::GetInstance().GetFrameWork().GetDevice(), graphics::GraphicsEngine::GetInstance().GetFrameWork().GetContext());
 			ImGui_ImplWin32_Init(WindowManager::GetInstance().GetWindowHandle());
 		}
 
@@ -180,8 +180,8 @@ namespace engine
 			
 			{
 				PERFORMANCETAG("Render frame");
-				GraphicsEngine::GetInstance().BeginFrame(tools::V4f(0.14f, 0.14f, 0.14f, 1.f));
-				GraphicsEngine::GetInstance().RenderFrame();
+				graphics::GraphicsEngine::GetInstance().BeginFrame(tools::V4f(0.14f, 0.14f, 0.14f, 1.f));
+				graphics::GraphicsEngine::GetInstance().RenderFrame();
 			}
 
 			{
@@ -205,7 +205,7 @@ namespace engine
 
 			{
 				PERFORMANCETAG("End frame");
-				GraphicsEngine::GetInstance().EndFrame();
+				graphics::GraphicsEngine::GetInstance().EndFrame();
 			}
 		}
 	}

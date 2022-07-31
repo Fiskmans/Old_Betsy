@@ -84,8 +84,18 @@ namespace engine
 
     AssetHandle AssetManager::MakeTexture(const tools::V2ui& aResolution, DXGI_FORMAT aFormat)
     {
-        Texture tex = TextureFactory::GetInstance().CreateTexture(aResolution, aFormat, "CustomTexture" + std::to_string(myCustomTextureCounter++));
+         graphics::Texture tex = graphics::TextureFactory::GetInstance().CreateTexture(aResolution, aFormat, "CustomTexture" + std::to_string(myCustomTextureCounter++));
         return AssetHandle(new DrawableTextureAsset(tex));
+    }
+
+    graphics::DepthTexture AssetManager::MakeDepthTexture(const tools::V2ui& aResolution)
+    {
+        return graphics::TextureFactory::GetInstance().CreateDepth(aResolution, "Depth");
+    }
+
+    graphics::GBuffer AssetManager::MakeGBuffer(const tools::V2ui& aResolution)
+    {
+        return graphics::TextureFactory::GetInstance().CreateGBuffer(aResolution, "GBuffer");
     }
 
     //AssetHandle AssetManager::GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty)
@@ -93,21 +103,21 @@ namespace engine
     //    return GetTextureInternal(tools::PathWithoutFile(aBase) + aPath, aFailSilenty);
     //}
 
-    //AssetHandle AssetManager::GetCubeTexture(const std::string& aPath)
-    //{
-    //    if (myCachedCubeTextures.count(aPath) == 0)
-    //    {
-    //        Asset* texture = myTextureLoader->LoadCubeTexture(myBaseFolder + SKYBOX_FOLDER + aPath);
-    //        if (!texture)
-    //        {
-    //            SYSERROR("Failed to load Cube Texture", aPath);
-    //        }
-    //        myCachedCubeTextures[aPath] = texture;
-    //        return AssetHandle(texture);
-    //    }
-    //    return AssetHandle(myCachedCubeTextures[aPath]);
-    //}
-    //
+	AssetHandle AssetManager::GetCubeTexture(const std::string& aPath)
+	{
+		if (myCachedCubeTextures.count(aPath) == 0)
+		{
+			Asset* texture = myTextureLoader->LoadCubeTexture(myBaseFolder + SKYBOX_FOLDER + aPath);
+			if (!texture)
+			{
+				LOG_SYS_ERROR("Failed to load Cube Texture", aPath);
+			}
+			myCachedCubeTextures[aPath] = texture;
+			return AssetHandle(texture);
+		}
+		return AssetHandle(myCachedCubeTextures[aPath]);
+	}
+
     //AssetHandle AssetManager::GetModel(const std::string& aPath)
     //{
     //    if (myCachedModels.count(aPath) == 0)

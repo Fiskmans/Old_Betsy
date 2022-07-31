@@ -23,12 +23,26 @@ namespace engine::graph
 		size_t mySize = 0;
 	};
 
+	class BuiltNode;
+
+	class NodeVarianceGroup
+	{
+	public:
+		NodeVarianceGroup() = default;
+
+	private:
+		void AddNode(BuiltNode* aNode) { myVariances.push_back(aNode); };
+
+		friend BuiltNode;
+		std::vector<BuiltNode*> myVariances;
+	};
+
 	class BuiltNode
 	{
 	public:
-		BuiltNode(NodeBase* aBaseNode);
+		BuiltNode(NodeBase* aBaseNode, std::shared_ptr<NodeVarianceGroup>& aGroup);
 
-		const char* Name();
+		std::string Name();
 
 		void AddInPin(PinBase* aInPin);
 		void AddOutPin(PinBase* aOutPin);
@@ -48,6 +62,7 @@ namespace engine::graph
 		friend NodeInstance;
 
 		NodeBase* myBaseNode;
+		std::shared_ptr<NodeVarianceGroup> myGroup;
 
 		NodeInstanceDataBlobTemplate myMemoryLayoutTemplate;
 		std::vector<PinBase*> myInPins;

@@ -4,6 +4,7 @@
 #include "engine/graph/Graph.h"
 
 #include "engine/assets/Asset.h"
+#include "engine/assets/ModelInstance.h"
 
 #include "tools/MathVector.h"
 #include "tools/Matrix4x4.h"
@@ -15,13 +16,15 @@
 
 namespace engine
 {
+	class RenderScene;
+
 	class Camera
 	{
 	public:
 
 		const static tools::V2ui AdaptToScreen;
 	
-		Camera(float aNearPlane, float aFarPlane, tools::V2ui aResolution);
+		Camera(RenderScene& aScene, float aNearPlane, float aFarPlane, tools::V2ui aResolution);
 		virtual ~Camera();
 
 		virtual void OnResolutionChanged(tools::V2ui aResolution);
@@ -51,9 +54,13 @@ namespace engine
 
 		tools::V3f GetPosition() const;
 
-		virtual tools::PlaneVolume<float> GenerateFrustum() const = 0;
+		RenderScene& GetScene() { return *myScene.Get(); }
+
+		virtual tools::Frustum<float> GenerateFrustum() const = 0;
 
 		AssetHandle GetTexture() { return myRenderTexture.Get(); }
+
+		std::vector<ModelInstance*> Cull() const;
 
 	private:
 		void SetResolution(tools::V2ui aResolution);
@@ -63,6 +70,8 @@ namespace engine
 		engine::graph::CustomInPin<AssetHandle> myRenderTexture = engine::graph::PinInformation("Texture to Render");
 
 	protected:
+		engine::graph::CustomOutPin<Camera*> mySelf = engine::graph::PinInformation("Camera");
+		engine::graph::CustomOutPin<RenderScene*> myScene = engine::graph::PinInformation("Scene");
 		engine::graph::CustomOutPin<tools::V2ui> myResolutionExport = engine::graph::PinInformation("Resolution");
 		
 		tools::M44f myTransform;
@@ -77,11 +86,11 @@ namespace engine
 	class PerspectiveCamera final : public Camera
 	{
 	public:
-		PerspectiveCamera(float aNearPlane, float aFarPlane, float aFOV, tools::V2ui aResolution = AdaptToScreen);
+		PerspectiveCamera(RenderScene& aScene, float aNearPlane, float aFarPlane, float aFOV, tools::V2ui aResolution = AdaptToScreen);
 
 		void SetFOVRad(float aFOV);
 
-		tools::PlaneVolume<float> GenerateFrustum() const override;
+		tools::Frustum<float> GenerateFrustum() const override;
 
 	protected:
 		void OnResolutionChanged(tools::V2ui aResolution) override;
@@ -92,9 +101,9 @@ namespace engine
 	class OrthogonalCamera final : public Camera
 	{
 	public:
-		OrthogonalCamera(tools::V3f aSize, tools::V2ui aResolution = AdaptToScreen);
+		OrthogonalCamera(RenderScene& aScene, tools::V3f aSize, tools::V2ui aResolution = AdaptToScreen);
 
-		tools::PlaneVolume<float> GenerateFrustum() const override;
+		tools::Frustum<float> GenerateFrustum() const override;
 
 	private:
 		tools::V3f myOrthoBounds;

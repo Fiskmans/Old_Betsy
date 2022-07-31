@@ -77,7 +77,7 @@ namespace tools
 	{
 		for (size_t y = 0; y < 3; y++)
 		{
-			myRows[y] = aMatrix[y];
+			myRows[y] = aMatrix.myRows[y];
 		}
 	}
 

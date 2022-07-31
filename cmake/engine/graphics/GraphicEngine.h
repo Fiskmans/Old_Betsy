@@ -8,7 +8,7 @@
 
 #include <memory>
 
-namespace engine
+namespace engine::graphics
 {
 	class GraphicsEngine : public tools::Singleton<GraphicsEngine>
 	{

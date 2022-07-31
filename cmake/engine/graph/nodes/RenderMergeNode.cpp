@@ -4,7 +4,7 @@
 
 #include "engine/assets/AssetManager.h"
 
-namespace engine::graph::node
+namespace engine::graph::nodes
 {
 	void RenderMergeNode::Activate()
 	{
@@ -22,7 +22,7 @@ namespace engine::graph::node
 			}
 		}
 
-		std::vector<RenderManager::TextureMapping> mappings;
+		std::vector<graphics::RenderManager::TextureMapping> mappings;
 
 		AssetHandle first = myInTexture1;
 		
@@ -34,8 +34,8 @@ namespace engine::graph::node
 		if (second.IsValid())
 			mappings.emplace_back(second, 1);
 
-		RenderManager::GetInstance().MapTextures(stashed, mappings);
-		RenderManager::GetInstance().GetFullscreenRender().Render(FullscreenRenderer::Shader::MERGE);
+		graphics::RenderManager::GetInstance().MapTextures(stashed, mappings);
+		graphics::RenderManager::GetInstance().GetFullscreenRender().Render(graphics::FullscreenRenderer::Shader::MERGE);
 
 		myOutTexture.Write(stashed);
 	}

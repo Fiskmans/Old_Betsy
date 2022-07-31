@@ -3,7 +3,9 @@
 
 #include "engine/GameEngine.h"
 
+
 #include "engine/graphics/Camera.h"
+#include "engine/graphics/Environmentlight.h"
 
 
 class Demo_game1 final : public engine::Game
@@ -28,6 +30,7 @@ public:
 
 private:
 	engine::PerspectiveCamera myCamera;
+	engine::graphics::EnvironmentLight myEnvironmentLight;
 };
 
 #endif

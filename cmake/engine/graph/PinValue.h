@@ -17,6 +17,8 @@ namespace engine::graph
 
 		template <class T>
 		T& As() { return *reinterpret_cast<T*>(GetRaw()); }
+		template <class T>
+		const T& As() const { return *reinterpret_cast<const T*>(GetRaw()); }
 
 		void Load()
 		{
@@ -31,6 +33,7 @@ namespace engine::graph
 		void SetRefreshCallback(std::function<void()> aCallback) { myCallback = aCallback; }
 	protected:
 		virtual void* GetRaw() = 0;
+		virtual const void* GetRaw() const = 0;
 
 	private:
 		std::function<void()> myCallback;
@@ -52,6 +55,7 @@ namespace engine::graph
 
 	private:
 		void* GetRaw() override { return &myStorage; }
+		const void* GetRaw() const override { return &myStorage; }
 
 		Type myStorage;
 	};

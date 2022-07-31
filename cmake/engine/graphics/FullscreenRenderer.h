@@ -5,7 +5,7 @@
 
 #include <array>
 
-namespace engine
+namespace engine::graphics
 {
 	class FullscreenRenderer
 	{

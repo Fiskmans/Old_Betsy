@@ -187,7 +187,7 @@ namespace tools
 		T c = static_cast<T>(cos(anAngle));
 		T s = static_cast<T>(sin(anAngle));
 
-		return Matrix4x4(c, s, 0, 0,
+		return Matrix4x4(c, -s, 0, 0,
 			-s, c, 0, 0,
 			0, 0, 1, 0,
 			0, 0, 0, 1);
@@ -284,7 +284,7 @@ namespace tools
 		return Matrix4x4(	trot.Row(0).Extend(myRows[0][3]),
 							trot.Row(1).Extend(myRows[1][3]),
 							trot.Row(2).Extend(myRows[2][3]),	
-							(rot *  myRows[3]).Extend(myRows[3][3]));
+							(MathVector<T, 3>(myRows[3]) * rot).Extend(myRows[3][3]));
 	}
 
 	template<class T>

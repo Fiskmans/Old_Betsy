@@ -2,6 +2,7 @@
 #define ENGINE_GRAPHICS_RENDER_SCENE_H
 
 #include "engine/graphics/Camera.h"
+#include "engine/graphics/Environmentlight.h"
 
 #include "common/Macros.h"
 
@@ -30,7 +31,7 @@ namespace engine
 		//void AddToScene(ParticleInstance* aParticle);
 
 		void SetMainCamera(Camera* aCamera) { myMainCamera = aCamera; }
-		//void SetEnvironmentLight(EnvironmentLight* aLight);
+		void SetEnvironmentLight(engine::graphics::EnvironmentLight* aLight) { myEnvironmentLight = aLight; };
 
 		void RemoveFromScene(ModelInstance* aModel);
 		void RemoveFromScene(PointLight* aLight);
@@ -46,11 +47,9 @@ namespace engine
 
 		inline ModelInstance* GetSkybox() { return mySkybox; }
 		inline Camera* GetMainCamera() { return myMainCamera; }
-		//EnvironmentLight*	GetEnvironmentLight();
+		engine::graphics::EnvironmentLight* GetEnvironmentLight() const { return myEnvironmentLight; }
 
-		std::vector<ModelInstance*> Cull(Camera* aCamera);
-		std::vector<ModelInstance*> Cull(Camera* aCamera, const std::vector<ModelInstance*>& aSelection, float aRangeModifier = 1.f);
-		std::vector<ModelInstance*> Cull(const tools::PlaneVolume<float>& aPlaneVolume, const std::vector<ModelInstance*>& aSelection, float aRangeModifier = 1.f);
+		std::vector<ModelInstance*> CullByFrustum(const tools::Frustum<float>& aPlaneVolume);
 		std::vector<ModelInstance*> Cull(const tools::Sphere<float>& aBoundingSphere);
 
 		std::array<PointLight*, NUMBEROFPOINTLIGHTS> CullPointLights(ModelInstance* aModel);
@@ -75,7 +74,7 @@ namespace engine
 		//std::vector<TextInstance*> myTexts;
 		Camera* myMainCamera = nullptr;
 		ModelInstance* mySkybox = nullptr;
-		//EnvironmentLight* myEnvironmentLight = nullptr;
+		engine::graphics::EnvironmentLight* myEnvironmentLight = nullptr;
 	};
 
 }

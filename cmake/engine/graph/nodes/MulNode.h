@@ -5,6 +5,7 @@
 
 namespace engine::graph::node
 {
+	template<typename T>
 	class MulNode : public NodeBase
 	{
 	public:
@@ -14,10 +15,10 @@ namespace engine::graph::node
 		}
 
 	private:
-		InPin<int> myA = PinInformation("A");
-		InPin<int> myB = PinInformation("B");
+		InPin<T> myA = PinInformation("A");
+		InPin<T> myB = PinInformation("B");
 
-		OutPin<int> myResult = PinInformation("Result");
+		OutPin<T> myResult = PinInformation("Result");
 	};
 }
 

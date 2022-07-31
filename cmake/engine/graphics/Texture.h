@@ -7,47 +7,66 @@
 
 #include <d3d11.h>
 
-namespace engine
+namespace engine::graphics
 {
+	class TextureFactory;
+	class GBuffer;
+	class DepthTexture;
+
 	class Texture
 	{
 	public:
 		Texture() = default;
 		virtual ~Texture() = default;
 		void Release();
+		bool IsValid() { return !!myTexture && !!myRenderTarget && !!myViewport; }
 
 		void ClearTexture(tools::V4f aClearColor = tools::V4f(0.f, 0.f, 0.f, 1.f));
-		void ClearDepth(float aClearDepth = 1.0f, unsigned int aClearStencil = 0);
-		void SetAsActiveTarget(Texture* aDepth = nullptr) const;
+		void SetAsActiveTarget(DepthTexture* aDepth = nullptr) const;
 		void SetAsResourceOnSlot(unsigned int aSlot);
 
 		ID3D11ShaderResourceView* GetResourceView();
 
-		operator bool()
-		{
-			return !!myContext && !!myTexture && (!!myRenderTarget || !!myDepth) && !!myViewport;
-		}
-
 	protected:
-		friend class TextureFactory;
-		friend class GBuffer;
+		friend TextureFactory;
 
-		struct ID3D11DeviceContext* myContext = nullptr;
-		struct ID3D11Texture2D* myTexture = nullptr;
-		struct ID3D11RenderTargetView* myRenderTarget = nullptr;
-		struct ID3D11DepthStencilView* myDepth = nullptr;
-		struct ID3D11ShaderResourceView* myShaderResource = nullptr;
-		struct D3D11_VIEWPORT* myViewport = nullptr;
+		ID3D11Texture2D* myTexture = nullptr;
+		ID3D11RenderTargetView* myRenderTarget = nullptr;
+		ID3D11ShaderResourceView* myShaderResource = nullptr;
+		D3D11_VIEWPORT* myViewport = nullptr;
 	};
 
+	class DepthTexture
+	{
+	public:
+		void ClearDepth(float aClearDepth = 1.0f, unsigned int aClearStencil = 0);
+		void Release();
+		bool IsValid() const { return !!myDepth; }
+
+		ID3D11DepthStencilView* GetDepth() { return myDepth; }
+
+	private:
+		friend TextureFactory;
+		friend GBuffer;
+		friend Texture;
+
+		ID3D11Texture2D* myTexture = nullptr;
+		ID3D11DepthStencilView* myDepth = nullptr;
+		ID3D11ShaderResourceView* myShaderResource = nullptr;
+	};
 
 	class UpdatableTexture
 		: public Texture
 	{
 	public:
+		UpdatableTexture();
 		UpdatableTexture(tools::V2ui aSize);
 
 		template<class Func>
+		requires requires(Func&& aFunctor)
+		{
+			{ aFunctor(0, 0) } -> std::convertible_to<float>;
+		}
 		void GenerateAllPixels(Func&& aFunctor)
 		{
 			for (unsigned int y = 0; y < mySize[1]; y++)
@@ -58,6 +77,8 @@ namespace engine
 				}
 			}
 		}
+
+		void DrawDirect(size_t x, size_t y, float* aData, size_t length);
 
 		void Upload();
 		float Sample(tools::V2ui aPosition);

@@ -1,6 +1,10 @@
-
 #include "engine/assets/ModelInstance.h"
+
 #include "engine/assets/Model.h"
+
+#include "engine/graphics/GraphicEngine.h"
+#include "engine/graphics/RenderManager.h"
+#include "engine/graphics/ShaderBuffers.h"
 
 #include "tools/TimeHelper.h"
 
@@ -14,6 +18,24 @@
 
 namespace engine
 {
+	ID3D11Buffer* ModelInstance::ourAnimationBuffer = nullptr;
+	unsigned int ModelInstance::ourIdCounter = 0;
+
+	bool ModelInstance::InitShared()
+	{
+		if (!graphics::RenderManager::CreateGenericShaderBuffer<graphics::AnimationBuffer>(ourAnimationBuffer))
+		{
+			LOG_SYS_CRASH("Failed to create animation buffer");
+			return false;
+		}
+
+		return true;
+	}
+
+	void ModelInstance::ReleaseShared()
+	{
+		SAFE_RELEASE(ourAnimationBuffer);
+	}
 
 	ModelInstance::ModelInstance(const AssetHandle& aModel)
 	{
@@ -21,6 +43,7 @@ namespace engine
 		{
 			LOG_SYS_CRASH("Asset was not a model");
 		}
+		myId = ++ourIdCounter;
 		myModel = aModel;
 		myScale = { 1.0f,1.0f,1.0f };
 		myAnimator = nullptr;
@@ -29,39 +52,14 @@ namespace engine
 		ResetSpawnTime();
 	}
 
-	AssetHandle& ModelInstance::GetModelAsset()
+	const ModelAsset& ModelInstance::GetModelAsset() const 
 	{
-		return myModel;
+		return myModel.Get<ModelAsset>();
 	}
 
 	void ModelInstance::ResetSpawnTime()
 	{
 		mySpawnTime = tools::GetTotalTime();
-	}
-
-	std::array<tools::V4f, NUMBEROFANIMATIONBONES> ModelInstance::GetBonePositions()
-	{
-		static std::array<tools::M44f, NUMBEROFANIMATIONBONES> transforms;
-		SetupanimationMatrixes(transforms);
-		static std::array<tools::V4f, NUMBEROFANIMATIONBONES> positions;
-		for (auto& i : positions)
-		{
-			i = tools::V4f(0, 0, 0, 1);
-		}
-
-		auto& boneData = myModel.Get<ModelAsset>().myModel->myBoneData;
-		auto toWorld = GetModelToWorldTransform();
-
-		for (size_t i = 0; i < boneData.size(); i++)
-		{
-			const tools::M44f& finalTrans = transforms[i];
-			const tools::M44f& offset = boneData[i].BoneOffset;
-			tools::M44f total = finalTrans * offset.RealInverse();
-			positions[i] = positions[i] * total.Transposed();
-			positions[i] = positions[i] * toWorld;
-		}
-
-		return positions;
 	}
 
 	tools::M44f ModelInstance::GetModelToWorldTransform()
@@ -146,8 +144,9 @@ namespace engine
 		return myTransform.Row(3);
 	}
 
-	void ModelInstance::SetupanimationMatrixes(std::array<tools::M44f, NUMBEROFANIMATIONBONES>& aMatrixes)
+	void ModelInstance::SetupanimationMatrixes()
 	{
+		thread_local graphics::AnimationBuffer bones;
 		//if (myAnimator)
 		//{
 		//	myAnimator->BoneTransform(aMatrixes);
@@ -161,6 +160,7 @@ namespace engine
 		//		onetimeWarning = false;
 		//	}
 		//}
+		graphics::RenderManager::OverWriteBuffer(ourAnimationBuffer, bones.myTransforms, sizeof(graphics::AnimationBuffer));
 	}
 
 	/*

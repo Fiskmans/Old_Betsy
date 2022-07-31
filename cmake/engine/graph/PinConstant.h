@@ -38,6 +38,7 @@ namespace engine::graph
 
 	private:
 		void* GetRaw() override { return &myStorage; }
+		const void* GetRaw() const override { return &myStorage; }
 
 		Type myStorage;
 	};

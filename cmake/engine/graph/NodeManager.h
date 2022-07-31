@@ -1,5 +1,5 @@
-#ifndef ENGINE_GRAPH_NODE_MANAGER_H
-#define ENGINE_GRAPH_NODE_MANAGER_H
+#ifndef ENGINE_GRAPH_NODES_MANAGER_H
+#define ENGINE_GRAPH_NODES_MANAGER_H
 
 #include "engine/graph/NodePin.h"
 #include "engine/graph/BuiltNode.h"
@@ -8,6 +8,7 @@
 #include "tools/Singleton.h"
 
 #include <vector>
+#include <memory>
 
 namespace engine::graph
 {
@@ -16,6 +17,9 @@ namespace engine::graph
 	class NodeManager : public tools::Singleton<NodeManager>
 	{
 	public:
+
+		void BeginGroup() { myCurrentGroup = std::make_shared<NodeVarianceGroup>(); };
+		void EndGroup() { myCurrentGroup = nullptr; }
 
 		void BeginNode(NodeBase* aBaseNode);
 		
@@ -37,6 +41,7 @@ namespace engine::graph
 		void ImguiAddNodes(Graph* aGraph, float aScale, ImVec2 aPosition);
 	private:
 
+		std::shared_ptr<NodeVarianceGroup> myCurrentGroup = nullptr;
 		BuiltNode* myCurrent = nullptr;
 		std::unordered_map<std::string, BuiltNode*> myNodes;
 	};

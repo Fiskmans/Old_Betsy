@@ -1,5 +1,5 @@
-#ifndef ENGINE_GRAPH_NODE_INSTANCE_H
-#define ENGINE_GRAPH_NODE_INSTANCE_H
+#ifndef ENGINE_GRAPH_NODES_INSTANCE_H
+#define ENGINE_GRAPH_NODES_INSTANCE_H
 
 #include "engine/graph/DrawablePinBlock.h"
 #include "engine/graph/BuiltNode.h"	

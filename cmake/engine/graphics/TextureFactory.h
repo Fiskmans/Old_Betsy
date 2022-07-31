@@ -10,7 +10,7 @@
 
 #include <d3d11.h>
 
-namespace engine
+namespace engine::graphics
 {
 	class TextureFactory
 		: public tools::Singleton<TextureFactory>
@@ -22,7 +22,7 @@ namespace engine
 		UpdatableTexture* CreateUpdatableTexture(tools::V2ui aSize, const std::string& aName);
 		Texture CreateTexture(tools::V2ui aSize, DXGI_FORMAT aFormat, const std::string& aName);
 		void CreateTexture(ID3D11Texture2D* aTexture, Texture& aTextureObject);
-		Texture CreateDepth(tools::V2ui aSize, const std::string& aName);
+		DepthTexture CreateDepth(tools::V2ui aSize, const std::string& aName);
 		GBuffer CreateGBuffer(const tools::V2ui& aSize, const std::string& aName);
 	};
 

@@ -32,9 +32,11 @@ namespace engine
 
 		AssetHandle GetTexture(const std::string& aPath, bool aFailSilent = false);
 		AssetHandle MakeTexture(const tools::V2ui& aResolution, DXGI_FORMAT aFormat);
+		graphics::DepthTexture MakeDepthTexture(const tools::V2ui& aResolution);
+		graphics::GBuffer MakeGBuffer(const tools::V2ui& aResolution);
 		//AssetHandle GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty = false);
 	
-		//AssetHandle GetCubeTexture(const std::string& aPath);
+		AssetHandle GetCubeTexture(const std::string& aPath);
 		//AssetHandle GetModel(const std::string& aPath);
 		//AssetHandle GetSkybox(const std::string& aPath);
 

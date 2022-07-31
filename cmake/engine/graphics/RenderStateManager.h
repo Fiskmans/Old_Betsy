@@ -5,7 +5,7 @@
 
 #include <d3d11.h>
 
-namespace engine
+namespace engine::graphics
 {
 	class RenderStateManager
 	{

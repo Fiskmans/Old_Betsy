@@ -7,7 +7,7 @@
 
 #include "logger/Logger.h"
 
-namespace engine
+namespace engine::graphics
 {
 	GraphicsEngine::GraphicsEngine()
 	{
@@ -35,6 +35,12 @@ namespace engine
 			if (!RenderManager::GetInstance().Init())
 			{
 				LOG_SYS_CRASH("Unable to initialize RenderManager");
+				return false;
+			}
+
+			if (!ModelInstance::InitShared())
+			{
+				LOG_SYS_CRASH("Failed to initialize modelinstance shared resources");
 				return false;
 			}
 		}

@@ -238,27 +238,17 @@ namespace engine
 	//	return myParticles;
 	//}
 
-	std::vector<ModelInstance*> RenderScene::Cull(Camera* aCamera)
+	std::vector<ModelInstance*> RenderScene::CullByFrustum(const tools::Frustum<float>& aPlaneVolume)
 	{
-		return Cull(aCamera, myModels, 2.f);
-	}
-
-	std::vector<ModelInstance*> RenderScene::Cull(Camera* aCamera, const std::vector<ModelInstance*>& aSelection, float aRangeModifier)
-	{
-		return Cull(aCamera->GenerateFrustum(), aSelection, aRangeModifier);
-	}
-
-	std::vector<ModelInstance*> RenderScene::Cull(const tools::PlaneVolume<float>& aPlaneVolume, const std::vector<ModelInstance*>& aSelection, float aRangeModifier)
-	{
-		static std::vector<ModelInstance*> culledModels;
+		thread_local std::vector<ModelInstance*> culledModels;
 		culledModels.clear();
-		culledModels.reserve(aSelection.size());
+		culledModels.reserve(myModels.size());
 
-		for (size_t i = 0; i < aSelection.size(); ++i)
+		for (size_t i = 0; i < myModels.size(); ++i)
 		{
-			if (aSelection[i]->ShouldRender() && tools::IntersectionSphereFrustum(aSelection[i]->GetBoundingSphere(aRangeModifier), aPlaneVolume))
+			if (myModels[i]->ShouldRender() && tools::IntersectionSphereFrustum(myModels[i]->GetBoundingSphere(), aPlaneVolume))
 			{
-				culledModels.push_back(aSelection[i]);
+				culledModels.push_back(myModels[i]);
 			}
 		}
 
@@ -313,11 +303,6 @@ namespace engine
 	const std::vector<TextInstance*>& RenderScene::GetText()
 	{
 		return myTexts;
-	}
-
-	EnvironmentLight* RenderScene::GetEnvironmentLight()
-	{
-		return myEnvironmentLight;
 	}
 
 	void RenderScene::AddToScene(ParticleInstance* aParticle)

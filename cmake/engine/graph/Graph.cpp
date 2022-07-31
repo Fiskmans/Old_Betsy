@@ -170,7 +170,7 @@ namespace engine::graph
 			if (!ImGui::GetIO().MouseDown[0])
 				windowPosition = newWindowPosition;
 		}, 
-		ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar,
+		ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse,
 			[&]()
 		{
 			ImGui::SetNextWindowPos(newWindowPosition, ImGuiCond_Always);
@@ -208,7 +208,6 @@ namespace engine::graph
 		ImVec2 topLeft = ImGui::GetCursorScreenPos();
 		ImVec2 bottomRight = ImVec2(windowPos.x + windowSize.x - padding.x, windowPos.y + windowSize.y - padding.y);
 
-
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 
 		static float scale = 1.f;
@@ -230,6 +229,9 @@ namespace engine::graph
 		{
 			position = newPosition;
 		}
+
+		if (ImGui::GetIO().KeysDown['H'])
+			newPosition = ImVec2(0, 0);
 
 		ImGui::PushClipRect(topLeft, bottomRight, true);
 		drawList->AddRectFilled(topLeft, bottomRight, ImColor(0.2f, 0.2f, 0.2f, 1.f), 1.f);

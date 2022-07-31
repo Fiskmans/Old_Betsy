@@ -17,8 +17,11 @@ namespace engine
 	class ModelInstance
 	{
 	public:
-		ModelInstance(const engine::AssetHandle& aModel);
-		engine::AssetHandle& GetModelAsset();
+		static bool InitShared();
+		static void ReleaseShared();
+
+		ModelInstance(const AssetHandle& aModel);
+		const ModelAsset& GetModelAsset() const;
 		tools::M44f GetModelToWorldTransform();
 		void SetPosition(const tools::V4f& aPosition);
 		void Rotate(tools::V3f aRotation);
@@ -30,10 +33,7 @@ namespace engine
 		void SetShouldRender(const bool aFlag);
 		//void AttachAnimator(Animator* aAnimator);
 		void ResetSpawnTime();
-		void AttachToBone(engine::ModelInstance* aParentModel, size_t aBone);
 		void SetCastsShadows(bool aValue);
-
-		std::array<tools::V4f, NUMBEROFANIMATIONBONES> GetBonePositions();
 
 
 		bool ShouldRender() const;
@@ -41,8 +41,9 @@ namespace engine
 		bool GetCastsShadows() const;
 
 		tools::V4f GetPosition();
+		unsigned int GetId() const { return myId; }
 
-		void SetupanimationMatrixes(std::array<tools::M44f, NUMBEROFANIMATIONBONES>& aMatrixes);
+		void SetupanimationMatrixes();
 
 		tools::Sphere<float> GetBoundingSphere(float aRangeModifier = 1.f);
 		const float GetSpawnTime();
@@ -51,6 +52,11 @@ namespace engine
 		bool GetIsHighlighted();
 
 	private:
+
+		static ID3D11Buffer* ourAnimationBuffer;
+		static unsigned int ourIdCounter;
+
+		unsigned int myId;
 
 		bool myIsHighlighted = false;
 

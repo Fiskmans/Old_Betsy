@@ -199,6 +199,10 @@ namespace engine::graph
 			color = ImColor(LERP(color.Value.x, 1.f, hoverIntensity), LERP(color.Value.y, 1.f, hoverIntensity), LERP(color.Value.z, 1.f, hoverIntensity), 1.f);
 			ourNextHoveredType = &type;
 			ourHoverIn = isIn;
+
+			if (!isIn)
+				if (ImGui::GetIO().MouseClicked[0] && ImGui::GetIO().KeyShift)
+					GetOutStorage()->Load();
 		}
 
 		if (ourHoveredType && *ourHoveredType == type && ourHoverIn != isIn)
