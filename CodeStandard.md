@@ -63,7 +63,7 @@ ImGui files count as part of the project
 #### 3.2.4 External files
 Always include external files with `<>`
 
-The two final include blocks are `std` files and `platform` files
+The two final include blocks are `std` files and `platform/external` files
 
 ```cpp
 #include <string>
