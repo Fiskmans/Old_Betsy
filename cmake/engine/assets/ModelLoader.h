@@ -3,11 +3,15 @@
 
 #include "engine/assets/Asset.h"
 
+#include "tools/MathVector.h"
+
 #include <vector>
 #include <thread>
 #include <atomic>
 #include <string>
 #include <unordered_map>
+
+#include <assimp/scene.h>
 
 namespace engine::assets
 {
@@ -19,11 +23,8 @@ namespace engine::assets
 		~ModelLoader();
 
 		[[nodiscard]] Asset* LoadModel(const std::string& aFilePath);
-		[[nodiscard]] Asset* LoadSkybox(const std::string& aFilePath);
 
 	private:
-		bool myWarnAboutTrash = false;
-
 		void PrepareModel(Model* aModel, const std::string& aPath);
 
 		void LoadLoop();
@@ -32,7 +33,7 @@ namespace engine::assets
 
 		void LoadNode(const aiScene* aScene, const aiNode* aNode, aiMatrix4x4 aTransform, Model* aModel, std::unordered_map<std::string, std::string>& aInOutAttributes, const std::string& aFilePath);
 		void LoadMesh(const aiScene* aScene, const aiNode* aNode, aiMatrix4x4 aTransform, const aiMesh* aMesh, Model* aModel, std::unordered_map<std::string, std::string>& aInOutAttributes, const std::string& aFilePath);
-		void LoadAttributes(const aiNode* aNode, const aiMaterial* aMaterial, std::unordered_map<std::string, std::string>& aInOutAttributes, std::unordered_map<std::string, V3F>& aInOutColors);
+		void LoadAttributes(const aiNode* aNode, const aiMaterial* aMaterial, std::unordered_map<std::string, std::string>& aInOutAttributes, std::unordered_map<std::string, tools::V3f>& aInOutColors);
 
 		void QueueLoad(Model* aModel, std::string aFilePath);
 
@@ -44,7 +45,7 @@ namespace engine::assets
 			std::string myFilePath = "";
 			std::atomic<bool> myEmpty = true;
 
-			LoadRequest& operator=(const LoadPackage& another)
+			LoadRequest& operator=(const LoadRequest& another)
 			{
 				myModel = another.myModel;
 				myFilePath = another.myFilePath;

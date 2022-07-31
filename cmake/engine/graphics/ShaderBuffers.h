@@ -33,12 +33,13 @@ namespace engine::graphics
 	struct ObjectBufferData
 	{
 		tools::M44f myModelToWorldSpace;
-		tools::V4f myTint;
+		tools::V4f myDiffuseColor;
+
+		float myObjectLifeTime;
+		unsigned int myObjectId;
 
 		unsigned int padding_1;
 		unsigned int padding_2;
-		float myObjectLifeTime;
-		unsigned int myObjectId;
 	};
 
 	struct PointLightBuffer

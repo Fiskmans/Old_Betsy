@@ -1,10 +1,12 @@
-#pragma once
-#include "FiskJSON.h"
+#ifndef TOOLS_FISK_JSON_CUSTOM_TYPES_H
+#define TOOLS_FISK_JSON_CUSTOM_TYPES_H
 
-namespace FiskJSON
+#include "tools/FiskJSON.h"
+
+namespace tools
 {
 	template<>
-	inline void Object::AddValueChild(const std::string& aKey, V3F aValue)
+	inline void Object::AddValueChild(const std::string& aKey, tools::V3f aValue)
 	{
 		Object* child = new Object();
 		child->AddValueChild("x", aValue.x);
@@ -26,3 +28,5 @@ namespace FiskJSON
 		return false;
 	}
 }
+
+#endif

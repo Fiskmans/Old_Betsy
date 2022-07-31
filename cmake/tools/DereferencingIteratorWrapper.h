@@ -5,7 +5,7 @@
 #include <concepts>
 #include <iterator>
 
-namespace Tools 
+namespace tools 
 {
 	template<std::forward_iterator BaseIterator>
 	class DereferencingIteratorWrapper : public BaseIterator

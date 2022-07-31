@@ -1,6 +1,8 @@
 
-#ifndef TOOLS_FISK_JSON_H
-#define TOOLS_FISK_JSON_H
+#ifndef TOOLS_JSON_H
+#define TOOLS_JSON_H
+
+#include "tools/DereferencingIteratorWrapper.h"
 
 #include <string>
 #include <unordered_map>
@@ -8,9 +10,7 @@
 #include <variant>
 #include <vector>
 
-#include "DereferencingIteratorWrapper.h"
-
-namespace Tools::FiskJSON
+namespace tools
 {
 	class Key_Unavailable : public std::exception
 	{
@@ -24,69 +24,69 @@ namespace Tools::FiskJSON
 		Invalid_JSON(const std::string& aMessage) : std::exception(aMessage.c_str()) {}
 	};
 
-	class Invalid_Object : public std::exception
+	class Invalid_JSONObject : public std::exception
 	{
 	public:
-		Invalid_Object(const std::string& aMessage) : std::exception(("This object has been severely invalidated: " + aMessage).c_str()) {}
+		Invalid_JSONObject(const std::string& aMessage) : std::exception(("This object has been severely invalidated: " + aMessage).c_str()) {}
 	};
 
-	class Invalid_Get: public std::exception
+	class Invalid_Get : public std::exception
 	{
 	public:
 		Invalid_Get(const std::string& aMessage) : std::exception(aMessage.c_str()) {}
 	};
 
 	void replaceAll(std::string& str, const std::string& from, const std::string& to);
-	
-	class Object
+
+	class JSONObject
 	{
 		friend class ArrayWrapper;
 		friend class ConstArrayWrapper;
 	public:
-		Object& Parse(const std::string& aDocument);
-		Object& Parse(const char* aBegin, const char* aEnd);
+		JSONObject& Parse(const std::string& aDocument);
+		JSONObject& Parse(const char* aBegin, const char* aEnd);
 
-		~Object();
-		Object() = default;
-		Object(const Object& aOther) = delete;
+		~JSONObject();
+		JSONObject() = default;
+		JSONObject(const JSONObject& aOther) = delete;
 
-		Object& operator[](const std::string& aKey);
-		Object& operator[](const char* aKey);
+		JSONObject& operator[](const std::string& aKey);
+		JSONObject& operator[](const char* aKey);
 
-		Object& operator[](size_t aIndex);
-		Object& operator[](int aIndex);
-		Object& operator[](long aIndex);
+		JSONObject& operator[](size_t aIndex);
+		JSONObject& operator[](int aIndex);
+		JSONObject& operator[](long aIndex);
 
-		const Object& operator[](const std::string& aKey) const;
-		const Object& operator[](const char* aKey) const;
+		const JSONObject& operator[](const std::string& aKey) const;
+		const JSONObject& operator[](const char* aKey) const;
 
 		bool Has(const std::string& aKey) const;
 
 		template<typename T>
 		void AddValueChild(const std::string& aKey, T aValue);
-		void AddChild(const std::string& aKey, Object* aChild);
+		void AddChild(const std::string& aKey, JSONObject* aChild);
 
 		void MakeObject();
-		void PushChild(Object* aChild);
+		void PushChild(JSONObject* aChild);
 		template<typename T>
 		void PushValueChild(T aValue);
 		void MakeArray();
 
-		static Object& Null() { static Object null; return null; }
+		static JSONObject& Null() { static JSONObject null; return null; }
 		bool NotNull() const { return !IsNull(); }
 		bool IsNull() const { return this == &Null() || !myValue.has_value(); }
 
 		std::string Serialize(bool aPretty = false);
 
-		Object& operator=(const long long& aValue);
-		Object& operator=(const long& aValue);
-		Object& operator=(const size_t& aValue);
-		Object& operator=(const int& aValue);
-		Object& operator=(const double& aValue);
-		Object& operator=(const float& aValue);
-		Object& operator=(const std::string& aValue);
-		Object& operator=(const char*& aValue);
-		Object& operator=(const bool& aValue);
+		JSONObject& operator=(const long long& aValue);
+		JSONObject& operator=(const long& aValue);
+		JSONObject& operator=(const size_t& aValue);
+		JSONObject& operator=(const int& aValue);
+		JSONObject& operator=(const double& aValue);
+		JSONObject& operator=(const float& aValue);
+		JSONObject& operator=(const std::string& aValue);
+		JSONObject& operator=(const char*& aValue);
+		JSONObject& operator=(const bool& aValue);
 
 		bool operator !() const;
 		operator bool() const;
@@ -97,14 +97,14 @@ namespace Tools::FiskJSON
 		template<class Type>
 		Type Get()
 		{
-			return static_cast<const Object* const>(this)->Get<Type>();
+			return static_cast<const JSONObject* const>(this)->Get<Type>();
 		};
 
 		template<class Type>
 		Type Get() const;
 
 		template<typename Type>
-		inline bool GetIf(Type& aValueToPlaceIn) const 
+		inline bool GetIf(Type& aValueToPlaceIn) const
 		{
 			if (NotNull() && Is<Type>())
 			{
@@ -114,8 +114,8 @@ namespace Tools::FiskJSON
 			return false;
 		}
 
-		std::unordered_map<std::string, Object*>::iterator begin();
-		std::unordered_map<std::string, Object*>::iterator end();
+		std::unordered_map<std::string, JSONObject*>::iterator begin();
+		std::unordered_map<std::string, JSONObject*>::iterator end();
 
 	private:
 
@@ -127,77 +127,77 @@ namespace Tools::FiskJSON
 		{
 			None,
 			Array,
-			Object,
+			JSONObject,
 			Value
 		};
 		Type myType = Type::None;
 
 		std::optional<
 			std::variant<
-				long long,
-				double, 
-				std::string, 
-				bool,
-				std::vector<Object*>,
-				std::unordered_map<std::string, Object*>>> myValue;
+			long long,
+			double,
+			std::string,
+			bool,
+			std::vector<JSONObject*>,
+			std::unordered_map<std::string, JSONObject*>>> myValue;
 
 	};
 
 	class ArrayWrapper
 	{
-		friend Object;
+		friend JSONObject;
 	public:
 
-		Object& operator[](size_t aIndex);
-		DereferencingIteratorWrapper<std::vector<Object*>::iterator> begin();
-		DereferencingIteratorWrapper<std::vector<Object*>::iterator> end();
+		JSONObject& operator[](size_t aIndex);
+		DereferencingIteratorWrapper<std::vector<JSONObject*>::iterator> begin();
+		DereferencingIteratorWrapper<std::vector<JSONObject*>::iterator> end();
 
-		void PushChild(FiskJSON::Object* aObject);
-		
+		void PushChild(JSONObject* aJSONObject);
+
 		template<class T>
 		void PushValue(T&& aValue);
 
 	private:
-		ArrayWrapper(Object* aParent);
+		ArrayWrapper(JSONObject* aParent);
 
-		std::vector<Object*>* myArrayRef = nullptr;
+		std::vector<JSONObject*>* myArrayRef = nullptr;
 	};
 
 	class ConstArrayWrapper
 	{
-		friend Object;
+		friend JSONObject;
 	public:
 
-		const Object& operator[](size_t aIndex);
-		DereferencingIteratorWrapper<std::vector<Object*>::const_iterator> begin();
-		DereferencingIteratorWrapper<std::vector<Object*>::const_iterator> end();
+		const JSONObject& operator[](size_t aIndex);
+		DereferencingIteratorWrapper<std::vector<JSONObject*>::const_iterator> begin();
+		DereferencingIteratorWrapper<std::vector<JSONObject*>::const_iterator> end();
 
 	private:
-		ConstArrayWrapper(const Object* aParent);
+		ConstArrayWrapper(const JSONObject* aParent);
 
-		const std::vector<Object*>* myArrayRef = nullptr;
+		const std::vector<JSONObject*>* myArrayRef = nullptr;
 	};
 
 #pragma region Is
 
 #pragma region number
 	template<>
-	inline bool Object::Is<size_t>() const
+	inline bool JSONObject::Is<size_t>() const
 	{
 		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
 	}
 	template<>
-	inline bool Object::Is<long long>() const
+	inline bool JSONObject::Is<long long>() const
 	{
 		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
 	}
 	template<>
-	inline bool Object::Is<long>() const
+	inline bool JSONObject::Is<long>() const
 	{
 		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
 	}
 	template<>
-	inline bool Object::Is<int>() const
+	inline bool JSONObject::Is<int>() const
 	{
 		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 0;
 	}
@@ -205,12 +205,12 @@ namespace Tools::FiskJSON
 
 #pragma region floatingPoint
 	template<>
-	inline bool Object::Is<float>() const
+	inline bool JSONObject::Is<float>() const
 	{
 		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 1;
 	}
 	template<>
-	inline bool Object::Is<double>() const
+	inline bool JSONObject::Is<double>() const
 	{
 		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 1;
 	}
@@ -218,17 +218,17 @@ namespace Tools::FiskJSON
 
 #pragma region text
 	template<>
-	inline bool Object::Is<std::string>() const
+	inline bool JSONObject::Is<std::string>() const
 	{
 		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 2;
 	}
 	template<>
-	inline bool Object::Is<const char*>() const
+	inline bool JSONObject::Is<const char*>() const
 	{
 		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 2;
 	}
 	template<>
-	inline bool Object::Is<char*>() const
+	inline bool JSONObject::Is<char*>() const
 	{
 		return  NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 2;
 	}
@@ -236,12 +236,12 @@ namespace Tools::FiskJSON
 
 #pragma region Array
 	template<>
-	inline bool Object::Is<std::vector<Object*>>() const
+	inline bool JSONObject::Is<std::vector<JSONObject*>>() const
 	{
 		return NotNull() && myType == Type::Array;
 	}
 	template<>
-	inline bool Object::Is<ArrayWrapper>() const
+	inline bool JSONObject::Is<ArrayWrapper>() const
 	{
 		return NotNull() && myType == Type::Array;
 	}
@@ -249,7 +249,7 @@ namespace Tools::FiskJSON
 
 #pragma region Bool
 	template<>
-	inline bool Object::Is<bool>() const
+	inline bool JSONObject::Is<bool>() const
 	{
 		return NotNull() && myType == Type::Value && myValue.has_value() && myValue.value().index() == 3;
 	}
@@ -262,7 +262,7 @@ namespace Tools::FiskJSON
 
 #pragma region Number
 	template<>
-	inline size_t Object::Get<size_t>() const
+	inline size_t JSONObject::Get<size_t>() const
 	{
 		if (!Is<size_t>())
 		{
@@ -272,7 +272,7 @@ namespace Tools::FiskJSON
 	}
 
 	template<>
-	inline long long Object::Get<long long>() const
+	inline long long JSONObject::Get<long long>() const
 	{
 		if (!Is<long long>())
 		{
@@ -282,7 +282,7 @@ namespace Tools::FiskJSON
 	}
 
 	template<>
-	inline long Object::Get<long>() const
+	inline long JSONObject::Get<long>() const
 	{
 		if (!Is<long long>())
 		{
@@ -293,7 +293,7 @@ namespace Tools::FiskJSON
 
 
 	template<>
-	inline int Object::Get<int>() const
+	inline int JSONObject::Get<int>() const
 	{
 		if (!Is<long long>())
 		{
@@ -306,7 +306,7 @@ namespace Tools::FiskJSON
 
 #pragma region FloatingPoint
 	template<>
-	inline double Object::Get<double>() const
+	inline double JSONObject::Get<double>() const
 	{
 		if (!Is<double>())
 		{
@@ -316,7 +316,7 @@ namespace Tools::FiskJSON
 	}
 
 	template<>
-	inline float Object::Get<float>() const
+	inline float JSONObject::Get<float>() const
 	{
 		if (!Is<double>())
 		{
@@ -328,7 +328,7 @@ namespace Tools::FiskJSON
 
 #pragma region Text
 	template<>
-	inline std::string Object::Get<std::string>() const
+	inline std::string JSONObject::Get<std::string>() const
 	{
 		if (!Is<std::string>())
 		{
@@ -338,7 +338,7 @@ namespace Tools::FiskJSON
 	}
 	template<>
 	///This pointer will only be valid until the object changes
-	inline const char* Object::Get<const char*>() const
+	inline const char* JSONObject::Get<const char*>() const
 	{
 		if (!Is<std::string>())
 		{
@@ -347,7 +347,7 @@ namespace Tools::FiskJSON
 		return std::get<std::string>(myValue.value()).c_str();
 	}
 	template<>
-	inline char* Object::Get<char*>() const
+	inline char* JSONObject::Get<char*>() const
 	{
 		if (!Is<std::string>())
 		{
@@ -359,13 +359,13 @@ namespace Tools::FiskJSON
 
 #pragma region Array
 	template<>
-	inline ArrayWrapper Object::Get<ArrayWrapper>()
+	inline ArrayWrapper JSONObject::Get<ArrayWrapper>()
 	{
 		return ArrayWrapper(this);
 	}
 
 	template<>
-	inline ConstArrayWrapper Object::Get<ConstArrayWrapper>() const
+	inline ConstArrayWrapper JSONObject::Get<ConstArrayWrapper>() const
 	{
 		return ConstArrayWrapper(this);
 	}
@@ -373,7 +373,7 @@ namespace Tools::FiskJSON
 
 #pragma region Bool
 	template<>
-	inline bool Object::Get<bool>() const
+	inline bool JSONObject::Get<bool>() const
 	{
 		if (!Is<bool>())
 		{
@@ -388,51 +388,51 @@ namespace Tools::FiskJSON
 #pragma region Equals
 
 #pragma region Number
-	inline Object& Object::operator=(const long long& aValue)
+	inline JSONObject& JSONObject::operator=(const long long& aValue)
 	{
 		if (IsNull()) { return Null(); }
 		MakeValue();
 		myValue = aValue;
 		return *this;
 	}
-	inline Object& Object::operator=(const long& aValue)
+	inline JSONObject& JSONObject::operator=(const long& aValue)
 	{
 		return operator= (static_cast<long long>(aValue));
 	}
-	inline Object& Object::operator=(const size_t& aValue)
+	inline JSONObject& JSONObject::operator=(const size_t& aValue)
 	{
 		return operator= (static_cast<long long>(aValue));
 	}
 
-	inline Object& Object::operator=(const int& aValue)
+	inline JSONObject& JSONObject::operator=(const int& aValue)
 	{
 		return operator= (static_cast<long long>(aValue));
 	}
 #pragma endregion
 
 #pragma region floatingPoint
-	inline Object& Object::operator=(const double& aValue)
+	inline JSONObject& JSONObject::operator=(const double& aValue)
 	{
-		if ( IsNull() ) { return Null(); }
+		if (IsNull()) { return Null(); }
 		MakeValue();
 		myValue = double(aValue);
 		return *this;
 	}
-	inline Object& Object::operator=(const float& aValue)
+	inline JSONObject& JSONObject::operator=(const float& aValue)
 	{
 		return operator= (double(aValue));
 	}
 #pragma endregion
 
 #pragma region Text
-	inline Object& Object::operator=(const std::string& aValue)
+	inline JSONObject& JSONObject::operator=(const std::string& aValue)
 	{
 		if (IsNull()) { return Null(); }
 		MakeValue();
 		myValue = aValue;
 		return *this;
 	}
-	inline Object& Object::operator=(const char*& aValue)
+	inline JSONObject& JSONObject::operator=(const char*& aValue)
 	{
 		return operator= (std::string(aValue));
 	}
@@ -440,7 +440,7 @@ namespace Tools::FiskJSON
 
 #pragma region bool
 
-	inline Object& Object::operator=(const bool& aValue)
+	inline JSONObject& JSONObject::operator=(const bool& aValue)
 	{
 		if (IsNull()) { return Null(); }
 		MakeValue();
@@ -448,12 +448,12 @@ namespace Tools::FiskJSON
 		return *this;
 	}
 
-	inline bool Object::operator!() const
+	inline bool JSONObject::operator!() const
 	{
 		return !operator bool();
 	}
 
-	inline Object::operator bool() const
+	inline JSONObject::operator bool() const
 	{
 		return NotNull();
 	}
@@ -461,9 +461,9 @@ namespace Tools::FiskJSON
 
 #pragma endregion
 
-	
+
 	template<>
-	inline bool Object::GetIf<float>(float& aValueToPlaceIn) const
+	inline bool JSONObject::GetIf<float>(float& aValueToPlaceIn) const
 	{
 		if (Is<float>())
 		{
@@ -479,27 +479,27 @@ namespace Tools::FiskJSON
 	}
 
 	template<typename T>
-	inline void Object::AddValueChild(const std::string& aKey, T aValue)
+	inline void JSONObject::AddValueChild(const std::string& aKey, T aValue)
 	{
-		Object* child = new Object();
+		JSONObject* child = new JSONObject();
 		*child = aValue;
 		AddChild(aKey, child);
-	}	
+	}
 
 	template<typename T>
-	inline void Object::PushValueChild(T aValue)
+	inline void JSONObject::PushValueChild(T aValue)
 	{
-		Object* child = new Object();
+		JSONObject* child = new JSONObject();
 		*child = aValue;
 		PushChild(child);
 	}
-	
+
 	template<class T>
 	inline void ArrayWrapper::PushValue(T&& aValue)
 	{
 		if (!myArrayRef) { return; }
 
-		FiskJSON::Object* obj = new FiskJSON::Object();
+		FiskJSON::JSONObject* obj = new FiskJSON::JSONObject();
 		*obj = std::forward<T>(aValue);
 		myArrayRef->push_back(obj);
 	}

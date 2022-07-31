@@ -33,6 +33,7 @@ namespace engine
 
 			AssetHandle myTextures[3];
 			std::vector<AssetHandle> myCustomTextures;
+			tools::V4f myDiffuseColor;
 
 			bool myIsIndexed = true;
 			UINT myNumberOfIndexes = 0;

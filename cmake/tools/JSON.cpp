@@ -1,13 +1,13 @@
-#include "FiskJSON.h"
+#include "tools/JSON.h"
 
 #include <stack>
 #include <sstream>
 #include <iostream>
 #include <charconv>
 
-namespace Tools::FiskJSON
+namespace tools
 {
-	namespace FiskJson_Help
+	namespace json_help
 	{
 		bool IsWhiteSpace(char aChar)
 		{
@@ -171,16 +171,16 @@ namespace Tools::FiskJSON
 		}
 	}
 
-	Object& Object::Parse(const std::string& aDocument)
+	JSONObject& JSONObject::Parse(const std::string& aDocument)
 	{
 		Parse(aDocument.c_str(), aDocument.c_str() + aDocument.length());
 		return *this;
 	}
-										 
-	Object& Object::Parse(const char* aBegin, const char* aEnd)
+
+	JSONObject& JSONObject::Parse(const char* aBegin, const char* aEnd)
 	{
-		const char* begin = FiskJson_Help::FindStart(aBegin, aEnd);
-		const char* end = FiskJson_Help::FindEnd(aBegin, aEnd);
+		const char* begin = json_help::FindStart(aBegin, aEnd);
+		const char* end = json_help::FindEnd(aBegin, aEnd);
 
 		if (begin == end)
 		{
@@ -212,12 +212,12 @@ namespace Tools::FiskJSON
 
 		if ((*end) != ((myType == Type::Array) ? ']' : '}'))
 		{
-			throw Invalid_JSON("Object end character wrongly matched");
+			throw Invalid_JSON("JSONObject end character wrongly matched");
 		}
 
 		while (begin < end)
 		{
-			const char* nextStart = FiskJson_Help::FindStart(begin, end);
+			const char* nextStart = json_help::FindStart(begin, end);
 			if (nextStart == end)
 			{
 				break;
@@ -225,49 +225,49 @@ namespace Tools::FiskJSON
 
 			const char* endOfValue;
 
-			if (myType == Type::Object)
+			if (myType == Type::JSONObject)
 			{
 				if ((*nextStart) != '"')
 				{
-					throw Invalid_JSON("Object contained malformed child");
+					throw Invalid_JSON("JSONObject contained malformed child");
 				}
-				const char* nameEnd = FiskJson_Help::FindEndOfString(nextStart + 1,end);
-				if(nameEnd == end)
+				const char* nameEnd = json_help::FindEndOfString(nextStart + 1, end);
+				if (nameEnd == end)
 				{
 					throw Invalid_JSON("Childname runs until end of object");
 				}
-				const char* colon = FiskJson_Help::FindStart(nameEnd + 1, end);
+				const char* colon = json_help::FindStart(nameEnd + 1, end);
 
 				if (colon == end)
 				{
 					throw Invalid_JSON("Child has no value after name");
 				}
-				if(*colon != ':')
+				if (*colon != ':')
 				{
 					throw Invalid_JSON("Child is missing :");
 				}
 
-				const char* startOfValue = FiskJson_Help::FindStart(colon + 1, end);
+				const char* startOfValue = json_help::FindStart(colon + 1, end);
 				if (startOfValue == end)
 				{
 					throw Invalid_JSON("Child does not have a value");
 				}
-				endOfValue = FiskJson_Help::FindFirstWhitespaceInSameScope(startOfValue, end);
+				endOfValue = json_help::FindFirstWhitespaceInSameScope(startOfValue, end);
 
-				Object* obj = new Object();
-				obj->Parse(startOfValue,endOfValue);
+				JSONObject* obj = new JSONObject();
+				obj->Parse(startOfValue, endOfValue);
 				AddChild(std::string(nextStart + 1, nameEnd), obj);
 			}
 			else
 			{
-				endOfValue = FiskJson_Help::FindFirstWhitespaceInSameScope(nextStart, end);
+				endOfValue = json_help::FindFirstWhitespaceInSameScope(nextStart, end);
 
-				Object* obj = new Object();
+				JSONObject* obj = new JSONObject();
 				obj->Parse(nextStart, endOfValue);
 				PushChild(obj);
 			}
 
-			const char* commaOrEnd = FiskJson_Help::FindStart(endOfValue, end);
+			const char* commaOrEnd = json_help::FindStart(endOfValue, end);
 			if (commaOrEnd == end)
 			{
 				break;
@@ -284,27 +284,27 @@ namespace Tools::FiskJSON
 		return *this;
 	}
 
-	Object::~Object()
+	JSONObject::~JSONObject()
 	{
 		CleanUpChildren();
 	}
 
-	Object& FiskJSON::Object::operator[](const std::string& aKey)
+	JSONObject& JSONObject::operator[](const std::string& aKey)
 	{
 		if (IsNull() || !Has(aKey))
 		{
 			return Null();
 		}
-		auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+		auto& children = std::get<std::unordered_map<std::string, JSONObject*>>(myValue.value());
 		return *children[aKey];
 	}
 
-	Object& Object::operator[](const char* aKey)
+	JSONObject& JSONObject::operator[](const char* aKey)
 	{
 		return operator[](std::string(aKey));
 	}
 
-	Object& Object::operator[](size_t aIndex)
+	JSONObject& JSONObject::operator[](size_t aIndex)
 	{
 		if (NotNull() && Is<ArrayWrapper>())
 		{
@@ -313,49 +313,49 @@ namespace Tools::FiskJSON
 		return Null();
 	}
 
-	Object& Object::operator[](int aIndex)
+	JSONObject& JSONObject::operator[](int aIndex)
 	{
 		return operator[](size_t(aIndex));
 	}
 
-	Object& Object::operator[](long aIndex)
+	JSONObject& JSONObject::operator[](long aIndex)
 	{
 		return operator[](size_t(aIndex));
 	}
 
-	const Object& FiskJSON::Object::operator[](const std::string& aKey) const
+	const JSONObject& JSONObject::operator[](const std::string& aKey) const
 	{
 		if (IsNull() || !Has(aKey))
 		{
 			return Null();
 		}
-		const auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+		const auto& children = std::get<std::unordered_map<std::string, JSONObject*>>(myValue.value());
 		return *children.at(aKey);
 	}
 
-	const Object& Object::operator[](const char* aKey) const
+	const JSONObject& JSONObject::operator[](const char* aKey) const
 	{
 		return operator[](std::string(aKey));
 	}
 
-	bool Object::Has(const std::string& aKey) const
+	bool JSONObject::Has(const std::string& aKey) const
 	{
-		auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+		auto& children = std::get<std::unordered_map<std::string, JSONObject*>>(myValue.value());
 		return children.count(aKey) != 0;
 	}
 
-	void Object::AddChild(const std::string& aKey, Object* aChild)
+	void JSONObject::AddChild(const std::string& aKey, JSONObject* aChild)
 	{
 
 		if (myType == Type::Value || myType == Type::None)
 		{
 			MakeObject();
 		}
-		if (myType != Type::Object)
+		if (myType != Type::JSONObject)
 		{
-			throw Invalid_Object("Trying to add a child to a object that can't have children");
+			throw Invalid_JSONObject("Trying to add a child to a object that can't have children");
 		}
-		auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+		auto& children = std::get<std::unordered_map<std::string, JSONObject*>>(myValue.value());
 		if (children.count(aKey) != 0)
 		{
 			delete children[aKey];
@@ -363,36 +363,36 @@ namespace Tools::FiskJSON
 		children[aKey] = aChild;
 	}
 
-	void Object::MakeObject()
+	void JSONObject::MakeObject()
 	{
-		if (myType != Type::Object)
+		if (myType != Type::JSONObject)
 		{
 			CleanUpChildren();
-			myType = Type::Object;
-			myValue = std::unordered_map<std::string, Object*>();
+			myType = Type::JSONObject;
+			myValue = std::unordered_map<std::string, JSONObject*>();
 		}
 	}
 
-	void Object::PushChild(Object* aChild)
+	void JSONObject::PushChild(JSONObject* aChild)
 	{
 		if (myType != Type::Array)
 		{
-			throw Invalid_Object("Trying to push a arraychild to a object that is not an array");
+			throw Invalid_JSONObject("Trying to push a arraychild to a object that is not an array");
 		}
 		if (!myValue)
 		{
-			myValue = std::vector<Object*>();
+			myValue = std::vector<JSONObject*>();
 		}
-		std::get<std::vector<Object*>>(myValue.value()).push_back(aChild);
+		std::get<std::vector<JSONObject*>>(myValue.value()).push_back(aChild);
 	}
 
-	void Object::MakeArray()
+	void JSONObject::MakeArray()
 	{
 		if (myType != Type::Array)
 		{
 			CleanUpChildren();
 			myType = Type::Array;
-			myValue = std::vector<Object*>();
+			myValue = std::vector<JSONObject*>();
 		}
 	}
 
@@ -406,7 +406,7 @@ namespace Tools::FiskJSON
 		}
 	}
 
-	std::string Object::Serialize(bool aPretty)
+	std::string JSONObject::Serialize(bool aPretty)
 	{
 		std::stringstream stream;
 
@@ -416,22 +416,22 @@ namespace Tools::FiskJSON
 			replaceAll(out, "\n", "\n\t");
 			return out;
 		};
-		if (myType != Type::Object)
+		if (myType != Type::JSONObject)
 		{
 			if (!myValue.has_value())
 			{
-				throw Invalid_Object("value has no content");
+				throw Invalid_JSONObject("value has no content");
 			}
 		}
 
 		switch (myType)
 		{
-		case FiskJSON::Object::Type::Array:
+		case JSONObject::Type::Array:
 			stream << '[';
 			if (myValue)
 			{
 				bool containExpanded = false;
-				std::vector<Object*>& content = std::get<std::vector<Object*>>(myValue.value());
+				std::vector<JSONObject*>& content = std::get<std::vector<JSONObject*>>(myValue.value());
 				if (aPretty)
 				{
 					for (auto& i : content)
@@ -473,7 +473,7 @@ namespace Tools::FiskJSON
 			}
 			stream << ']';
 			break;
-		case FiskJSON::Object::Type::Object:
+		case JSONObject::Type::JSONObject:
 			stream << '{';
 			{
 				bool first = true;
@@ -503,7 +503,7 @@ namespace Tools::FiskJSON
 			}
 			stream << '}';
 			break;
-		case FiskJSON::Object::Type::Value:
+		case JSONObject::Type::Value:
 			if (myValue.has_value())
 			{
 
@@ -524,7 +524,7 @@ namespace Tools::FiskJSON
 
 				case 4: // array
 				default:
-					throw Invalid_Object("Value contains invalid datatype: " + std::to_string(myValue.value().index()));
+					throw Invalid_JSONObject("Value contains invalid datatype: " + std::to_string(myValue.value().index()));
 					break;
 				}
 			}
@@ -534,32 +534,32 @@ namespace Tools::FiskJSON
 			}
 			break;
 		default:
-			throw Invalid_Object("type should never be anything except [Array,Object,Value]");
+			throw Invalid_JSONObject("type should never be anything except [Array,JSONObject,Value]");
 			break;
 		}
 
 		return stream.str();
 	}
 
-	void Object::MakeValue()
+	void JSONObject::MakeValue()
 	{
 		CleanUpChildren();
 		myType = Type::Value;
 	}
 
-	void Object::CleanUpChildren()
+	void JSONObject::CleanUpChildren()
 	{
 		if (myType == Type::Array && myValue.has_value() && myValue.value().index() == 2)
 		{
 			for (auto& child : ArrayWrapper(this))
 			{
-				delete &child;
+				delete& child;
 			}
 			myValue.reset();
 		}
-		if (myType == Type::Object)
+		if (myType == Type::JSONObject)
 		{
-			auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+			auto& children = std::get<std::unordered_map<std::string, JSONObject*>>(myValue.value());
 			for (auto& child : children)
 			{
 				delete child.second;
@@ -568,12 +568,12 @@ namespace Tools::FiskJSON
 		}
 	}
 
-	void Object::ParseAsValue(const char* aBegin, const char* aEnd)
+	void JSONObject::ParseAsValue(const char* aBegin, const char* aEnd)
 	{
 		if (aEnd - aBegin > 1 && *aBegin == '"' && *(aEnd - 1) == '"')
 		{
 
-			myValue = std::string(aBegin + 1, FiskJson_Help::EscapeString(aBegin + 1, aEnd - 1));
+			myValue = std::string(aBegin + 1, json_help::EscapeString(aBegin + 1, aEnd - 1));
 		}
 		else if (aEnd - aBegin > 3 && memcmp(aBegin, "true", 4) == 0)
 		{
@@ -587,7 +587,7 @@ namespace Tools::FiskJSON
 		{
 			myValue.reset();
 		}
-		else if (FiskJson_Help::ContainsChar(aBegin,aEnd,'.')) // floating point
+		else if (json_help::ContainsChar(aBegin, aEnd, '.')) // floating point
 		{
 			double val;
 			auto result = std::from_chars(aBegin, aEnd, val);
@@ -601,7 +601,7 @@ namespace Tools::FiskJSON
 			}
 			myValue = val;
 		}
-		else 
+		else
 		{
 			long long val;
 			auto result = std::from_chars(aBegin, aEnd, val);
@@ -617,36 +617,36 @@ namespace Tools::FiskJSON
 		}
 	}
 
-	std::unordered_map<std::string, Object*>::iterator Object::begin()
+	std::unordered_map<std::string, JSONObject*>::iterator JSONObject::begin()
 	{
-		if (NotNull() && myType == Type::Object)
+		if (NotNull() && myType == Type::JSONObject)
 		{
-			auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+			auto& children = std::get<std::unordered_map<std::string, JSONObject*>>(myValue.value());
 			return children.begin();
 		}
-		return std::unordered_map<std::string, Object*>::iterator();
+		return std::unordered_map<std::string, JSONObject*>::iterator();
 	}
 
-	std::unordered_map<std::string, Object*>::iterator Object::end()
+	std::unordered_map<std::string, JSONObject*>::iterator JSONObject::end()
 	{
-		if (NotNull() && myType == Type::Object)
+		if (NotNull() && myType == Type::JSONObject)
 		{
-			auto& children = std::get<std::unordered_map<std::string, Object*>>(myValue.value());
+			auto& children = std::get<std::unordered_map<std::string, JSONObject*>>(myValue.value());
 			return children.end();
 		}
-		return std::unordered_map<std::string, Object*>::iterator();
+		return std::unordered_map<std::string, JSONObject*>::iterator();
 	}
 
 
-	Object& ArrayWrapper::operator[](size_t aIndex)
+	JSONObject& ArrayWrapper::operator[](size_t aIndex)
 	{
 		if (!myArrayRef || aIndex >= myArrayRef->size())
 		{
-			return Object::Null();
+			return JSONObject::Null();
 		}
 		return *(*myArrayRef)[aIndex];
 	}
-	DereferencingIteratorWrapper<std::vector<Object*>::iterator> ArrayWrapper::begin()
+	DereferencingIteratorWrapper<std::vector<JSONObject*>::iterator> ArrayWrapper::begin()
 	{
 		if (myArrayRef)
 		{
@@ -654,7 +654,7 @@ namespace Tools::FiskJSON
 		}
 		return {};
 	}
-	DereferencingIteratorWrapper<std::vector<Object*>::iterator> ArrayWrapper::end()
+	DereferencingIteratorWrapper<std::vector<JSONObject*>::iterator> ArrayWrapper::end()
 	{
 		if (myArrayRef)
 		{
@@ -663,34 +663,34 @@ namespace Tools::FiskJSON
 		return {};
 	}
 
-	void ArrayWrapper::PushChild(FiskJSON::Object* aObject)
+	void ArrayWrapper::PushChild(JSONObject* aJSONObject)
 	{
 		if (!myArrayRef)
 		{
-			delete aObject;
+			delete aJSONObject;
 			return;
 		}
-		myArrayRef->push_back(aObject);
+		myArrayRef->push_back(aJSONObject);
 	}
 
-	ArrayWrapper::ArrayWrapper(Object* aParent)
+	ArrayWrapper::ArrayWrapper(JSONObject* aParent)
 	{
 		if (aParent->NotNull() && aParent->Is<ArrayWrapper>())
 		{
-			myArrayRef = &std::get<std::vector<Object*>>(aParent->myValue.value());
+			myArrayRef = &std::get<std::vector<JSONObject*>>(aParent->myValue.value());
 		}
 	}
 
-	const Object& ConstArrayWrapper::operator[](size_t aIndex)
+	const JSONObject& ConstArrayWrapper::operator[](size_t aIndex)
 	{
 		if (!myArrayRef || aIndex >= myArrayRef->size())
 		{
-			return Object::Null();
+			return JSONObject::Null();
 		}
 		return *(*myArrayRef)[aIndex];
 	}
 
-	DereferencingIteratorWrapper<std::vector<Object*>::const_iterator> ConstArrayWrapper::begin()
+	DereferencingIteratorWrapper<std::vector<JSONObject*>::const_iterator> ConstArrayWrapper::begin()
 	{
 		if (myArrayRef)
 		{
@@ -699,7 +699,7 @@ namespace Tools::FiskJSON
 		return {};
 	}
 
-	DereferencingIteratorWrapper<std::vector<Object*>::const_iterator> ConstArrayWrapper::end()
+	DereferencingIteratorWrapper<std::vector<JSONObject*>::const_iterator> ConstArrayWrapper::end()
 	{
 		if (myArrayRef)
 		{
@@ -708,11 +708,11 @@ namespace Tools::FiskJSON
 		return {};
 	}
 
-	ConstArrayWrapper::ConstArrayWrapper(const Object* aParent)
+	ConstArrayWrapper::ConstArrayWrapper(const JSONObject* aParent)
 	{
 		if (aParent->NotNull() && aParent->Is<ArrayWrapper>())
 		{
-			myArrayRef = &std::get<std::vector<Object*>>(aParent->myValue.value());
+			myArrayRef = &std::get<std::vector<JSONObject*>>(aParent->myValue.value());
 		}
 	}
 }

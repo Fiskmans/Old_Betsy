@@ -1,12 +1,15 @@
 #ifndef ENGINE_ASSETS_SHADER_TYPES_H
 #define ENGINE_ASSETS_SHADER_TYPES_H
 
+#include "engine/assets/ShaderFlags.h"
+
 #include <string>
 
 #define NOMINMAX
 #include <windows.h>
-
 #include <d3d11.h>
+
+struct aiMesh;
 
 namespace engine
 {
@@ -21,7 +24,7 @@ namespace engine
 			size_t position, normal, tangent, bitanget, vertexcolor, uv, bones, boneweights;
 			size_t size;
 		};
-		//static ShaderFlags FlagsFromMesh(const aiMesh* aMesh);
+		static ShaderFlags FlagsFromMesh(const aiMesh* aMesh);
 
 		static std::string PostfixFromFlags(size_t aFlags);
 		static Offsets OffsetsFromFlags(size_t aFlags);

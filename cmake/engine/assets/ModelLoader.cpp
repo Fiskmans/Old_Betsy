@@ -1,9 +1,42 @@
 #include "engine/assets/ModelLoader.h"
 
+#include "engine/assets/ShaderTypes.h"
+#include "engine/assets/AnimationData.h"
+#include "engine/assets/ShaderFlags.h"
+#include "engine/assets/Model.h"
+#include "engine/assets/AssetManager.h"
 
+#include "engine/graphics/GraphicEngine.h"
+
+#include "logger/Logger.h"
+
+#include "tools/Functors.h"
+#include "tools/FileHelpers.h"
+#include "tools/TimeHelper.h"
+
+#include "common/Macros.h"
+
+#include <functional>
+#include <stack>
+
+#include <assimp/cimport.h>
+#include <assimp/postprocess.h>
 
 namespace engine::assets
 {
+	namespace modelloader_helpers
+	{
+		tools::M44f ConvertMatrix(aiMatrix4x4 aMatrix)
+		{
+			return tools::M44f(
+				aMatrix.a1, aMatrix.a2, aMatrix.a3, aMatrix.a4,
+				aMatrix.b1, aMatrix.b2, aMatrix.b3, aMatrix.b4,
+				aMatrix.c1, aMatrix.c2, aMatrix.c3, aMatrix.c4,
+				aMatrix.d1, aMatrix.d2, aMatrix.d3, aMatrix.d4);
+		}
+	}
+
+
 	struct Vertex
 	{
 		float x, y, z, w;
@@ -58,7 +91,7 @@ namespace engine::assets
 						aBoneInfo.push_back(bi);
 
 
-						CommonUtilities::Matrix4x4<float> NodeTransformation = AiHelpers::ConvertToEngineMatrix44(fbxMesh->mBones[i]->mOffsetMatrix);
+						tools::M44f NodeTransformation = modelloader_helpers::ConvertMatrix(fbxMesh->mBones[i]->mOffsetMatrix);
 
 						aBoneInfo[BoneIndex].BoneOffset = NodeTransformation;
 						aBoneInfo[BoneIndex].myName = BoneName;
@@ -107,18 +140,18 @@ namespace engine::assets
 			{
 				for (unsigned int i = offset; i < fbxMesh->mNumVertices; i += NUMTHREADS)
 				{
-					V4F* normal = reinterpret_cast<V4F*>(buffer + (offsets.size * i + offsets.normal));
-					V4F* tangent = reinterpret_cast<V4F*>(buffer + (offsets.size * i + offsets.tangent));
-					V4F* biTangent = reinterpret_cast<V4F*>(buffer + (offsets.size * i + offsets.bitanget));
-					if ((*normal) == V4F(0, 1, 0, 1))
+					tools::V4f* normal = reinterpret_cast<tools::V4f*>(buffer + (offsets.size * i + offsets.normal));
+					tools::V4f* tangent = reinterpret_cast<tools::V4f*>(buffer + (offsets.size * i + offsets.tangent));
+					tools::V4f* biTangent = reinterpret_cast<tools::V4f*>(buffer + (offsets.size * i + offsets.bitanget));
+					if ((*normal) == tools::V4f(0, 1, 0, 1))
 					{
-						*tangent = V4F(1, 0, 0, 1);
-						*biTangent = V4F(0, 0, 1, 1);
+						*tangent = tools::V4f(1, 0, 0, 1);
+						*biTangent = tools::V4f(0, 0, 1, 1);
 					}
 					else
 					{
-						*tangent = V4F(V3F(*normal).Cross({ 0, 1, 0 }).GetNormalized(), 1);
-						*biTangent = V4F(V3F(*normal).Cross(V3F(*tangent)).GetNormalized(), 1);
+						*tangent = tools::V3f(*normal).Cross({ 0, 1, 0 }).GetNormalized().Extend(1);
+						*biTangent = tools::V3f(*normal).Cross(*tangent).GetNormalized().Extend(1);
 					}
 				}
 			}
@@ -171,10 +204,9 @@ namespace engine::assets
 		return true;
 	}
 
-	ModelLoader::ModelLoader(ID3D11Device* aDevice, const std::string& aDefaultPixelShader)
+	ModelLoader::ModelLoader(const std::string& aDefaultPixelShader)
 	{
 		myDefaultPixelShader = aDefaultPixelShader;
-		myDevice = aDevice;
 		myWorkHorse = std::thread(std::bind(&ModelLoader::LoadLoop, this));
 	}
 
@@ -190,7 +222,7 @@ namespace engine::assets
 
 		while (myIsRunning)
 		{
-			LoadPackage package;
+			LoadRequest package;
 			package.myEmpty = true;
 			for (size_t i = 0; i < myHandoverSlots; i++)
 			{
@@ -211,7 +243,7 @@ namespace engine::assets
 		}
 	}
 
-	void ModelLoader::LoadAttributes(const aiNode* aNode, const aiMaterial* aMaterial, std::unordered_map<std::string, std::string>& aInOutValues, std::unordered_map<std::string, V3F>& aInOutColors)
+	void ModelLoader::LoadAttributes(const aiNode* aNode, const aiMaterial* aMaterial, std::unordered_map<std::string, std::string>& aInOutValues, std::unordered_map<std::string, tools::V3f>& aInOutColors)
 	{
 		const aiNode* node = aNode;
 
@@ -253,7 +285,7 @@ namespace engine::assets
 		}
 		if (aMaterial->Get(AI_MATKEY_TEXTURE_SHININESS(0), path) == aiReturn::aiReturn_SUCCESS)
 		{
-			aInOutValues["Shinyness"] = path.C_Str();
+			aInOutValues["Shininess"] = path.C_Str();
 		}
 		if (aMaterial->Get(AI_MATKEY_TEXTURE_SPECULAR(0), path) == aiReturn::aiReturn_SUCCESS)
 		{
@@ -263,7 +295,7 @@ namespace engine::assets
 		aiColor3D color;
 		if (aMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color) == aiReturn::aiReturn_SUCCESS)
 		{
-			aInOutColors["Diffuse"] = V3F(color.r, color.g, color.b);
+			aInOutColors["Diffuse"] = tools::V3f(color.r, color.g, color.b);
 		}
 	}
 
@@ -273,34 +305,34 @@ namespace engine::assets
 		static_assert(sizeof(float) * CHAR_BIT == 32, "float is not 32bit");
 		static_assert(sizeof(UINT) * CHAR_BIT == 32, "uint is not 32 bit");
 
-		SYSINFO("Loading model: " + aFilePath);
+		LOG_SYS_INFO("Loading model: " + aFilePath);
 
 
 #pragma region Importing
 
-		if (!Tools::FileExists(aFilePath))
+		if (!tools::FileExists(aFilePath))
 		{
-			SYSERROR("File not found", aFilePath);
+			LOG_ERROR("File not found", aFilePath);
 			return;
 		}
 		const aiScene* scene = aiImportFile(aFilePath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_ConvertToLeftHanded);
 
 		if (!scene)
 		{
-			SYSERROR(aiGetErrorString(), aFilePath);
+			LOG_ERROR(aiGetErrorString(), aFilePath);
 			return;
 		}
 
-		Tools::ExecuteOnDestruct releaseScene = Tools::ExecuteOnDestruct([scene]() -> void {aiReleaseImport(scene); });
+		EXECUTE_ON_DESTRUCT({ aiReleaseImport(scene); });
 
 		if ((scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) != 0)
 		{
-			SYSERROR("FBX is corrupt (Scene incomplete)", aFilePath);
+			LOG_ERROR("FBX is corrupt (Scene incomplete)", aFilePath);
 			return;
 		}
 		if (!scene->HasMeshes())
 		{
-			SYSERROR("FBX has no meshes", aFilePath);
+			LOG_ERROR("FBX has no meshes", aFilePath);
 			return;
 		}
 #pragma endregion
@@ -342,6 +374,8 @@ namespace engine::assets
 
 	void ModelLoader::LoadMesh(const aiScene* aScene, const aiNode* aNode, aiMatrix4x4 aTransform, const aiMesh* aMesh, Model* aModel, std::unordered_map<std::string, std::string>& aInOutAttributes, const std::string& aFilePath)
 	{
+		ID3D11Device* device = graphics::GraphicsEngine::GetInstance().GetFrameWork().GetDevice();
+
 		HRESULT result;
 
 		ShaderFlags flags = ShaderTypes::FlagsFromMesh(aMesh);
@@ -353,7 +387,7 @@ namespace engine::assets
 		aInOutAttributes["Material"] = "material.dds";
 		aInOutAttributes["Animations"] = "animations.json";
 
-		std::unordered_map<std::string, V3F> colorMappings;
+		std::unordered_map<std::string, tools::V3f> colorMappings;
 
 		LoadAttributes(aNode, aScene->mMaterials[aMesh->mMaterialIndex], aInOutAttributes, colorMappings);
 
@@ -367,7 +401,7 @@ namespace engine::assets
 
 		size_t vertexCount = 0;
 		char* verticies = nullptr;
-		Tools::ExecuteOnDestruct freeVerticies = Tools::ExecuteOnDestruct([verticies]() { free(verticies); });
+		EXECUTE_ON_DESTRUCT({ free(verticies); });
 
 		LoadVerticies(aMesh, &verticies, &vertexCount, flags, aModel->myBoneNameLookup, aModel->myBoneData);
 
@@ -376,14 +410,14 @@ namespace engine::assets
 
 		UINT* indexes = reinterpret_cast<UINT*>(malloc(sizeof(UINT) * indexCount));
 		assert(indexes);
-		Tools::ExecuteOnDestruct freeIndexes = Tools::ExecuteOnDestruct([indexes]() { free(indexes); });
+		tools::ExecuteOnDestruct freeIndexes = tools::ExecuteOnDestruct([indexes]() { free(indexes); });
 
 		size_t count = 0;
 		for (unsigned int j = 0; j < aMesh->mNumFaces; j++)
 		{
 			if (aMesh->mFaces[j].mNumIndices != 3)
 			{
-				SYSERROR("Ngon detected", aFilePath);
+				LOG_ERROR("Ngon detected", aFilePath);
 				return;
 			}
 
@@ -406,14 +440,14 @@ namespace engine::assets
 		WIPE(vertexSubresourceData);
 		vertexSubresourceData.pSysMem = verticies;
 
-		result = myDevice->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, &vertexBuffer);
+		result = device->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, &vertexBuffer);
 		if (FAILED(result))
 		{
-			SYSERROR("Couldn not create vertex buffer", aFilePath);
+			LOG_SYS_ERROR("Failed to create vertex buffer", aFilePath);
 			return;
 		}
 
-		Tools::ExecuteOnDestruct releaseVertexBuffer = Tools::ExecuteOnDestruct([vertexBuffer]() { vertexBuffer->Release(); });
+		tools::ExecuteOnDestruct releaseVertexBuffer = tools::ExecuteOnDestruct([vertexBuffer]() { vertexBuffer->Release(); });
 
 		CD3D11_BUFFER_DESC indexBufferDescription;
 		WIPE(indexBufferDescription);
@@ -425,26 +459,27 @@ namespace engine::assets
 		ZeroMemory(&indexSubresourceData, sizeof(indexSubresourceData));
 		indexSubresourceData.pSysMem = indexes;
 
-		result = myDevice->CreateBuffer(&indexBufferDescription, &indexSubresourceData, &indexBuffer);
+		result = device->CreateBuffer(&indexBufferDescription, &indexSubresourceData, &indexBuffer);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not create index buffer", aFilePath);
+			LOG_SYS_ERROR("Failed to create index buffer", aFilePath);
 			return;
 		}
-		Tools::ExecuteOnDestruct releaseIndexBuffer = Tools::ExecuteOnDestruct([indexBuffer]() { indexBuffer->Release(); });
+		tools::ExecuteOnDestruct releaseIndexBuffer = tools::ExecuteOnDestruct([indexBuffer]() { indexBuffer->Release(); });
 
 
 		D3D11_INPUT_ELEMENT_DESC layout[ShaderTypes::MaxInputElementSize];
 		UINT layoutElements = ShaderTypes::InputLayoutFromFlags(layout, flags);
 
 		ID3D11InputLayout* inputLayout;
-		result = myDevice->CreateInputLayout(layout, layoutElements, vertexShader.GetVertexShaderblob().data(), vertexShader.GetVertexShaderblob().size(), &inputLayout);
+		const VertexShaderAsset& vsAsset = vertexShader.Get<VertexShaderAsset>();
+		result = device->CreateInputLayout(layout, layoutElements, vsAsset.myBlob.data(), vsAsset.myBlob.size(), &inputLayout);
 		if (FAILED(result))
 		{
-			SYSERROR("Could not create inputlayout", aFilePath);
+			LOG_SYS_ERROR("Failed to create inputlayout", aFilePath);
 			return;
 		}
-		Tools::ExecuteOnDestruct releaseInputLayout = Tools::ExecuteOnDestruct([inputLayout]() { inputLayout->Release(); });
+		tools::ExecuteOnDestruct releaseInputLayout = tools::ExecuteOnDestruct([inputLayout]() { inputLayout->Release(); });
 
 		Model::ModelData* modelData = new Model::ModelData();
 		modelData->myshaderTypeFlags = flags;
@@ -465,7 +500,7 @@ namespace engine::assets
 		modelData->myTextures[2] = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Reflection"], true);
 		modelData->myUseForwardRenderer = (aInOutAttributes["PixelShader"] != myDefaultPixelShader);
 		modelData->myNumberOfIndexes = static_cast<UINT>(indexCount);
-		modelData->myDiffuseColor = colorMappings["Diffuse"];
+		modelData->myDiffuseColor = colorMappings["Diffuse"].Extend(1);
 
 		modelData->myVertexBuffer = vertexBuffer;
 		modelData->myIndexBuffer = indexBuffer;
@@ -509,151 +544,4 @@ namespace engine::assets
 		PrepareModel(model, aFilePath);
 		return new ModelAsset(model, aFilePath);
 	}
-
-
-	Asset* ModelLoader::LoadSkybox(const std::string& aFilePath)
-	{
-		static size_t skyBoxCounter = 0;
-		++skyBoxCounter;
-
-
-		HRESULT result;
-
-#pragma region BufferSetup
-
-		static_assert(sizeof(float) == 4, "Things are fucked beyond comprehension");
-
-		ID3D11Buffer* vertexBuffer;
-		ID3D11Buffer* indexBuffer;
-		UINT indexCount;
-
-		{
-
-			float sideLength = 2.6f;
-			Vertex verticies[] =
-			{
-				{ sideLength, sideLength, sideLength ,1,	1,0,0,1		,1.f,0.f}, // top left
-				{ sideLength, sideLength,-sideLength ,1,	0,1,0.4f,1	,1.f,0.f}, // top right
-				{ sideLength,-sideLength, sideLength ,1,	0,1,0.4f,1	,1.f,1.f}, // bottom left
-				{-sideLength, sideLength, sideLength ,1,	0.4f,1,0,1	,0.f,0.f}, // bottom right
-				{ sideLength,-sideLength,-sideLength ,1,	0.4f,1,0,1	,1.f,1.f}, // ^^ but back
-				{-sideLength, sideLength,-sideLength ,1,	0,1,0.4f,1	,0.f,0.f},
-				{-sideLength,-sideLength, sideLength ,1,	0,1,0.4f,1	,0.f,1.f},
-				{-sideLength,-sideLength,-sideLength ,1,	0,0,1,1		,0.f,1.f},
-			};
-
-			CD3D11_BUFFER_DESC vertexBufferDescription;
-			ZeroMemory(&vertexBufferDescription, sizeof(vertexBufferDescription));
-			vertexBufferDescription.ByteWidth = sizeof(verticies);
-			vertexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-			vertexBufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-			D3D11_SUBRESOURCE_DATA vertexSubresourceData;
-			ZeroMemory(&vertexSubresourceData, sizeof(vertexSubresourceData));
-			vertexSubresourceData.pSysMem = verticies;
-
-			GraphicsFramework::AddGraphicsMemoryUsage(vertexBufferDescription.ByteWidth, "SkyBox", "Model Vertex Buffer");
-			result = myDevice->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, &vertexBuffer);
-			if (FAILED(result))
-			{
-				SYSERROR("could not create vertex buffer for Skybox");
-				return nullptr;
-			}
-
-			UINT indexes[] =
-			{
-				2,0,  1,
-				1,0,  3,
-				3,0,  2,
-				2,1,  4,
-				3,2,  6,
-				1,3,  5,
-				5,4,  1,
-				6,5,  3,
-				4,6,  2,
-				6,7,  5,
-				5,7,  4,
-				4,7,  6
-			};
-
-			assert(sizeof(indexes) / sizeof(indexes[0]) % 3 == 0 && "Not Multiple of 3");
-
-			CD3D11_BUFFER_DESC indexBufferDescription;
-			ZeroMemory(&indexBufferDescription, sizeof(indexBufferDescription));
-			indexBufferDescription.ByteWidth = sizeof(indexes);
-			indexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-			indexBufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-			D3D11_SUBRESOURCE_DATA indexSubresourceData;
-			ZeroMemory(&indexSubresourceData, sizeof(indexSubresourceData));
-			indexSubresourceData.pSysMem = indexes;
-
-			GraphicsFramework::AddGraphicsMemoryUsage(indexBufferDescription.ByteWidth, "SkyBox", "Model Index Buffer");
-			result = myDevice->CreateBuffer(&indexBufferDescription, &indexSubresourceData, &indexBuffer);
-			if (FAILED(result))
-			{
-				SYSERROR("Could not create index buffer for Skybox");
-				return nullptr;
-			}
-
-			indexCount = sizeof(indexes) / sizeof(indexes[0]);
-		}
-
-
-#pragma endregion
-
-		//////////////////////////////////////////////
-
-#pragma region Shaders
-
-		AssetHandle vertexShader = AssetManager::GetInstance().GetVertexShader("Skybox.hlsl");
-		AssetHandle pixelShader = AssetManager::GetInstance().GetPixelShader("Skybox.hlsl");
-
-#pragma endregion
-
-		//////////////////////////////////////////////
-
-#pragma region Layout
-
-		D3D11_INPUT_ELEMENT_DESC layout[ShaderTypes::MaxInputElementSize];
-		UINT layoutelements = ShaderTypes::InputLayoutFromFlags(layout, ShaderFlags::HasUvSets);
-
-		ID3D11InputLayout* inputLayout;
-		result = myDevice->CreateInputLayout(layout, layoutelements, vertexShader.GetVertexShaderblob().data(), vertexShader.GetVertexShaderblob().size(), &inputLayout);
-		if (FAILED(result))
-		{
-			SYSERROR("could not create input layout", aFilePath);
-			return nullptr;
-		}
-#pragma endregion
-
-		//////////////////////////////////////////////
-
-#pragma region Model
-		Model* model = new Model();
-
-		Model::ModelData* modelData = new Model::ModelData();
-		modelData->myStride = sizeof(Vertex);
-		modelData->myOffset = M44f::Identity();
-		modelData->myVertexShader = vertexShader;
-		modelData->myPixelShader = pixelShader;
-		modelData->myPrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		modelData->myIndexBufferFormat = DXGI_FORMAT_R32_UINT;
-		modelData->myTextures[0] = AssetManager::GetInstance().GetCubeTexture(aFilePath);
-		modelData->myTextures[1] = nullptr;
-		modelData->myTextures[2] = nullptr;
-		modelData->myNumberOfIndexes = indexCount;
-
-		modelData->myInputLayout = inputLayout;
-		modelData->myVertexBuffer = vertexBuffer;
-		modelData->myIndexBuffer = indexBuffer;
-
-
-		model->AddModelPart(modelData);
-		model->MarkLoaded();
-
-		return new SkyboxAsset(model);
-	}
-
-
 }

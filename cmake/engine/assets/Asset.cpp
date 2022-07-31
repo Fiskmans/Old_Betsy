@@ -150,13 +150,12 @@ namespace engine
 		myTexture->Release();
 	}
 
-	//JSONAsset::JSONAsset(FiskJSON::Object* aObject, const std::string& aPath)
-	//	: Asset(AssetType::JSON)
-	//{
-	//	myObject = aObject;
-	//	myPath = aPath;
-	//}
-	//
+	JSONAsset::JSONAsset(tools::JSONObject* aObject, const std::string& aPath)
+	{
+		myObject = aObject;
+		myPath = aPath;
+	}
+
 	//FontAsset::FontAsset(DirectX::SpriteFont* aFont)
 	//	: Asset(AssetType::Font)
 	//{

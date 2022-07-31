@@ -46,12 +46,12 @@ namespace engine
 			tools::TimedScope scopeTimer(stopWatch);
 
 			AssetManager::GetInstance().Init("data/assets", "baked");
-#ifdef _DEBUG
-			AssetManager::GetInstance().Preload();
-#endif // _DEBUG
 
 			graphics::GraphicsEngine::GetInstance().Init(SettingsManager::GetInstance().myWindowSize.Get());
 
+#ifdef _DEBUG
+			AssetManager::GetInstance().Preload();
+#endif // _DEBUG
 
 			IMGUI_CHECKVERSION();
 			ImGui::CreateContext();
@@ -88,6 +88,7 @@ namespace engine
 
 		graph::NodeManager::GetInstance().Imgui();
 		graph::GraphManager::GetInstance().Imgui();
+		AssetManager::GetInstance().ImGui();
 	}
 
 	void GameEngine::EngineWindow()

@@ -26,15 +26,9 @@ namespace engine
 		virtual void PrepareRender() = 0;
 		virtual void RegisterNodes(){}
 
-		inline void Exit()
-		{
-			myWantsExit = true;
-		}
+		inline void Exit() { myWantsExit = true; }
 
-		inline bool WantsExit()
-		{
-			return myWantsExit;
-		};
+		inline bool WantsExit() { return myWantsExit; };
 
 	private:
 		bool myWantsExit = false;

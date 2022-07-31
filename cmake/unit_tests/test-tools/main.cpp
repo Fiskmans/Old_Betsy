@@ -3,7 +3,7 @@
 
 #include "catch2/catch_all.hpp"
 
-#include "tools/FiskJSON.h"
+#include "tools/JSON.h"
 #include "tools/FloatCompare.h"
 #include "tools/MathVector.h"
 #include "tools/StringManipulation.h"
@@ -14,36 +14,36 @@ TEST_CASE("Fiskjson", "[parsing]")
 
 	SECTION("Z")
 	{
-		REQUIRE(Tools::FiskJSON::Object().Parse("{}"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("null").IsNull());
-		REQUIRE(!Tools::FiskJSON::Object().Parse("null"));
-		REQUIRE_THROWS_AS(Tools::FiskJSON::Object().Parse(""), Tools::FiskJSON::Invalid_JSON);
-		REQUIRE_THROWS_AS(Tools::FiskJSON::Object().Parse("{"), Tools::FiskJSON::Invalid_JSON);
-		REQUIRE_THROWS_AS(Tools::FiskJSON::Object().Parse("["), Tools::FiskJSON::Invalid_JSON);
-		REQUIRE_THROWS_AS(Tools::FiskJSON::Object().Parse("{]"), Tools::FiskJSON::Invalid_JSON);
-		REQUIRE_THROWS_AS(Tools::FiskJSON::Object().Parse("[\"x\":1 }"), Tools::FiskJSON::Invalid_JSON);
-		REQUIRE_THROWS_AS(Tools::FiskJSON::Object().Parse("[1}"), Tools::FiskJSON::Invalid_JSON);
-		REQUIRE_THROWS_AS(Tools::FiskJSON::Object().Parse("{\"x"), Tools::FiskJSON::Invalid_JSON);
-		REQUIRE_THROWS_AS(Tools::FiskJSON::Object().Parse("{\"x\""), Tools::FiskJSON::Invalid_JSON);
-		REQUIRE_THROWS_AS(Tools::FiskJSON::Object().Parse("{\"x\":"), Tools::FiskJSON::Invalid_JSON);
-		REQUIRE_THROWS_AS(Tools::FiskJSON::Object().Parse("{\"x\":1"), Tools::FiskJSON::Invalid_JSON);
-		REQUIRE(Tools::FiskJSON::Object().Parse("{ }"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("{\n}"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("{\t}"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("{\r}"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("{\b}"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("{\f}"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("[ ]"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("[\n]"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("[\t]"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("[\r]"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("[\b]"));
-		REQUIRE(Tools::FiskJSON::Object().Parse("[\f]"));
+		REQUIRE(tools::JSONObject().Parse("{}"));
+		REQUIRE(tools::JSONObject().Parse("null").IsNull());
+		REQUIRE(!tools::JSONObject().Parse("null"));
+		REQUIRE_THROWS_AS(tools::JSONObject().Parse(""), tools::Invalid_JSON);
+		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{"), tools::Invalid_JSON);
+		REQUIRE_THROWS_AS(tools::JSONObject().Parse("["), tools::Invalid_JSON);
+		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{]"), tools::Invalid_JSON);
+		REQUIRE_THROWS_AS(tools::JSONObject().Parse("[\"x\":1 }"), tools::Invalid_JSON);
+		REQUIRE_THROWS_AS(tools::JSONObject().Parse("[1}"), tools::Invalid_JSON);
+		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{\"x"), tools::Invalid_JSON);
+		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{\"x\""), tools::Invalid_JSON);
+		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{\"x\":"), tools::Invalid_JSON);
+		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{\"x\":1"), tools::Invalid_JSON);
+		REQUIRE(tools::JSONObject().Parse("{ }"));
+		REQUIRE(tools::JSONObject().Parse("{\n}"));
+		REQUIRE(tools::JSONObject().Parse("{\t}"));
+		REQUIRE(tools::JSONObject().Parse("{\r}"));
+		REQUIRE(tools::JSONObject().Parse("{\b}"));
+		REQUIRE(tools::JSONObject().Parse("{\f}"));
+		REQUIRE(tools::JSONObject().Parse("[ ]"));
+		REQUIRE(tools::JSONObject().Parse("[\n]"));
+		REQUIRE(tools::JSONObject().Parse("[\t]"));
+		REQUIRE(tools::JSONObject().Parse("[\r]"));
+		REQUIRE(tools::JSONObject().Parse("[\b]"));
+		REQUIRE(tools::JSONObject().Parse("[\f]"));
 	}
 
 	SECTION("O")
 	{
-		Tools::FiskJSON::Object root;
+		tools::JSONObject root;
 		SECTION("int")
 		{
 			root.Parse("1");
@@ -82,9 +82,9 @@ TEST_CASE("Fiskjson", "[parsing]")
 			root.Parse("1.0");
 			REQUIRE(root);
 			REQUIRE(root.Is<float>());
-			REQUIRE(root.Get<float>() == Tools::FloatCompare(1.0f, 1.e-8f));
+			REQUIRE(root.Get<float>() == tools::FloatCompare(1.0f, 1.e-8f));
 			REQUIRE(root.Is<double>());
-			REQUIRE(root.Get<double>() == Tools::FloatCompare(1.0, 1.e-8));
+			REQUIRE(root.Get<double>() == tools::FloatCompare(1.0, 1.e-8));
 		}
 	}
 }

@@ -9,8 +9,7 @@
 
 #include "engine/assets/ShaderCompiler.h"
 #include "engine/assets/TextureLoader.h"
-
-//#include "ModelLoader.h"
+#include "engine/assets/ModelLoader.h"
 
 #include <string>
 #include <unordered_map>
@@ -34,10 +33,10 @@ namespace engine
 		AssetHandle MakeTexture(const tools::V2ui& aResolution, DXGI_FORMAT aFormat);
 		graphics::DepthTexture MakeDepthTexture(const tools::V2ui& aResolution);
 		graphics::GBuffer MakeGBuffer(const tools::V2ui& aResolution);
-		//AssetHandle GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty = false);
+		AssetHandle GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty = false);
 	
 		AssetHandle GetCubeTexture(const std::string& aPath);
-		//AssetHandle GetModel(const std::string& aPath);
+		AssetHandle GetModel(const std::string& aPath);
 		//AssetHandle GetSkybox(const std::string& aPath);
 
 		AssetHandle GetPixelShader(const std::string& aPath, ShaderFlags aFlags = ShaderFlags());
@@ -47,7 +46,7 @@ namespace engine
 		//AssetHandle GetPerlinTexture(tools::V2ui aSize, tools::V2f aScale, unsigned int aSeed);
 
 		//AssetHandle GetJSON(const std::string& aPath);
-		//AssetHandle GetJSONRelative(const std::string& aBase, const std::string& aPath);
+		AssetHandle GetJSONRelative(const std::string& aBase, const std::string& aPath);
 
 		//AssetHandle GetFont(const std::string& aPath);
 
@@ -60,10 +59,13 @@ namespace engine
 
 		void AssumeOwnershipOfCustomAsset(Asset* aCustomAsset);
 
+		void ImGui();
+		void Imguicontent();
+
 	private:
 
 		AssetHandle GetTextureInternal(const std::string& aPath, bool aFailSilenty);
-		//AssetHandle GetJSONInternal(const std::string& aPath);
+		AssetHandle GetJSONInternal(const std::string& aPath);
 		//AssetHandle GetAnimationInternal(const std::string& aPath);
 
 		size_t myCustomTextureCounter;
@@ -72,7 +74,7 @@ namespace engine
 
 		std::string myBaseFolder;
 
-	//	std::unique_ptr<ModelLoader> myModelLoader;
+		std::unique_ptr<assets::ModelLoader> myModelLoader;
 		std::unique_ptr<assets::TextureLoader> myTextureLoader;
 		std::unique_ptr<assets::ShaderCompiler> myShaderCompiler;
 

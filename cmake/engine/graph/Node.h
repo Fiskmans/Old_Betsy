@@ -100,12 +100,10 @@ namespace engine::graph
 	template<template<class T> class NodeType, typename... AcceptableTypes>
 	class NodeGroup
 	{
-		[[no_unique_address]] 
 		NodeBeginGroupType myBegin;
 
 		std::tuple<NodeType<AcceptableTypes>...> myNodes;
 
-		[[no_unique_address]] 
 		NodeEndGroupType myEnd;
 	};
 }

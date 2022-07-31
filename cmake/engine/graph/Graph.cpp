@@ -230,7 +230,7 @@ namespace engine::graph
 			position = newPosition;
 		}
 
-		if (ImGui::GetIO().KeysDown['H'])
+		if (ImGui::GetIO().KeysDown[static_cast<int>('H')])
 			newPosition = ImVec2(0, 0);
 
 		ImGui::PushClipRect(topLeft, bottomRight, true);

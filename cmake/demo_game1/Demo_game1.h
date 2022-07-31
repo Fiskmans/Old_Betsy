@@ -13,16 +13,8 @@ class Demo_game1 final : public engine::Game
 public:
 	Demo_game1();
 
-
-	std::string AsciiName() final
-	{
-		return "Demo game";
-	}
-
-	std::wstring Name() final
-	{
-		return L"Demo game";
-	}
+	std::string AsciiName() final { return "Demo game"; }
+	std::wstring Name() final { return L"Demo game"; }
 
 	void Setup() final;
 	void Update() final;

@@ -1,16 +1,16 @@
 
-#include "tools/FiskJSON.h"
+#include "tools/JSON.h"
 
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size) {
 	std::string data(reinterpret_cast<const char*>(Data), Size);
-	Tools::FiskJSON::Object obj;
+	tools::JSONObject obj;
 	try
 	{
 		obj.Parse(data);
 	}
-	catch (Tools::FiskJSON::Invalid_JSON&) {}
-	catch (Tools::FiskJSON::Invalid_Object&) {}
+	catch (tools::Invalid_JSON&) {}
+	catch (tools::Invalid_JSONObject&) {}
 
 	return 0;  // Non-zero return values are reserved for future use.
 }

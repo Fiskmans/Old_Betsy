@@ -3,10 +3,10 @@
 
 #include "common/Macros.h"
 
-
-//#include "AssImp/mesh.h"
+#include <vector>
 
 #include <d3d11.h>
+#include <assimp/mesh.h>
 
 namespace engine
 {
@@ -54,7 +54,7 @@ namespace engine
 		return out;
 	}
 
-	/*
+	
 	ShaderFlags ShaderTypes::FlagsFromMesh(const aiMesh* aMesh)
 	{
 		std::underlying_type_t<ShaderFlags> result = 0;
@@ -94,7 +94,7 @@ namespace engine
 
 		return static_cast<ShaderFlags>(result);
 	}
-	*/
+	
 
 	std::string ShaderTypes::PostfixFromFlags(size_t aFlags)
 	{

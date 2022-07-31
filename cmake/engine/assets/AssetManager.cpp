@@ -3,12 +3,12 @@
 #include "engine/graphics/TextureFactory.h"
 
 #include "tools/StringManipulation.h"
+#include "tools/JSON.h"
+#include "tools/FileHelpers.h"
+
+#include "imgui/WindowControl.h"
 
 #include "logger/Logger.h"
-
-//#include "LevelLoader.h"
-//#include "NavMeshLoader.h"
-//#include "AnimationLoader.h"
 
 #include <filesystem>
 #include <mutex>
@@ -38,7 +38,7 @@ namespace engine
     void AssetManager::Init(const std::string& aBaseFolder, const std::string& aBakeFolder)
     {
         myBaseFolder = aBaseFolder;
-        //myModelLoader = new ModelLoader(aDevice, DEFAULT_PIXEL_SHADER);
+        myModelLoader = std::make_unique<assets::ModelLoader>(DEFAULT_PIXEL_SHADER);
         myTextureLoader = std::make_unique<assets::TextureLoader>();
         myShaderCompiler = std::make_unique<assets::ShaderCompiler>(aBakeFolder + BAKED_SHADER_FOLDER);
 
@@ -47,26 +47,26 @@ namespace engine
 
     void AssetManager::Preload()
     {
-        std::filesystem::path path(myBaseFolder + MODEL_FOLDER);
+        std::filesystem::path rootPath(myBaseFolder + MODEL_FOLDER);
 
-        if (path.is_relative())
+        if (rootPath.is_relative())
         {
-            path = std::filesystem::current_path() / path;
+            rootPath = std::filesystem::current_path() / rootPath;
         }
 
-        if (!std::filesystem::exists(path))
+        if (!std::filesystem::exists(rootPath))
         {
-            LOG_SYS_ERROR("Failed to perload assets, folder doesn't exist", path.string());
+            LOG_SYS_ERROR("Failed to perload assets, folder doesn't exist", rootPath.string());
             return;
         }
 
-        std::filesystem::recursive_directory_iterator iter = std::filesystem::recursive_directory_iterator(path);
+        std::filesystem::recursive_directory_iterator iter = std::filesystem::recursive_directory_iterator(rootPath);
         while (iter != std::filesystem::recursive_directory_iterator())
         {
             if (iter->path().extension() == ".fbx")
             {
                 LOG_SYS_INFO("Preloading asset", iter->path().string());
-                //GetModel(iter->path().string().substr((myBaseFolder + MODEL_FOLDER).length()));
+                GetModel(iter->path().string().substr(rootPath.string().length()));
             }
             iter++;
         }
@@ -98,10 +98,10 @@ namespace engine
         return graphics::TextureFactory::GetInstance().CreateGBuffer(aResolution, "GBuffer");
     }
 
-    //AssetHandle AssetManager::GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty)
-    //{
-    //    return GetTextureInternal(tools::PathWithoutFile(aBase) + aPath, aFailSilenty);
-    //}
+    AssetHandle AssetManager::GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty)
+    {
+        return GetTextureInternal(tools::PathWithoutFile(aBase) + aPath, aFailSilenty);
+    }
 
 	AssetHandle AssetManager::GetCubeTexture(const std::string& aPath)
 	{
@@ -118,21 +118,21 @@ namespace engine
 		return AssetHandle(myCachedCubeTextures[aPath]);
 	}
 
-    //AssetHandle AssetManager::GetModel(const std::string& aPath)
-    //{
-    //    if (myCachedModels.count(aPath) == 0)
-    //    {
-    //        Asset* model = myModelLoader->LoadModel(myBaseFolder + MODEL_FOLDER + aPath);
-    //        if (!model)
-    //        {
-    //            SYSERROR("Failed to load Model", aPath);
-    //        }
-    //        myCachedModels[aPath] = model;
-    //        return AssetHandle(model);
-    //    }
-    //    return AssetHandle(myCachedModels[aPath]);
-    //}
-    //
+	AssetHandle AssetManager::GetModel(const std::string& aPath)
+	{
+		if (myCachedModels.count(aPath) == 0)
+		{
+			Asset* model = myModelLoader->LoadModel(myBaseFolder + MODEL_FOLDER + aPath);
+			if (!model)
+			{
+				LOG_ERROR("Failed to load Model", aPath);
+			}
+			myCachedModels[aPath] = model;
+			return AssetHandle(model);
+		}
+		return AssetHandle(myCachedModels[aPath]);
+	}
+    
     //AssetHandle AssetManager::GetSkybox(const std::string& aPath)
     //{
     //    if (myCachedSkyboxes.count(aPath) == 0)
@@ -261,11 +261,11 @@ namespace engine
     //    return GetJSONInternal(myBaseFolder + JSON_FOLDER + aPath);
     //}
     //
-    //AssetHandle AssetManager::GetJSONRelative(const std::string& aBase, const std::string& aPath)
-    //{
-    //    return GetJSONInternal(Tools::PathWithoutFile(aBase) + aPath);
-    //}
-    //
+    AssetHandle AssetManager::GetJSONRelative(const std::string& aBase, const std::string& aPath)
+    {
+        return GetJSONInternal(tools::PathWithoutFile(aBase) + aPath);
+    }
+    
     //AssetHandle AssetManager::GetFont(const std::string& aPath)
     //{
     //    if (myCachedfonts.count(aPath) == 0)
@@ -327,68 +327,70 @@ namespace engine
         myCustomAssets.push_back(aCustomAsset);
     }
 
-    //void AssetManager::ImGui()
-    //{
-    //    WindowControl::Window("AssetManager", [this]()
-    //        {
-    //            if (ImGui::TreeNode("Shaders"))
-    //            {
-    //                ImGui::Button("Reload", ImVec2(60, 40));
-    //                if (ImGui::BeginDragDropTarget())
-    //                {
-    //                    const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Select_Pixelshader");
-    //                    if (payload)
-    //                    {
-    //                        std::string path = std::string(reinterpret_cast<const char*>(payload->Data), payload->DataSize);
-    //                    
-    //                        myShaderCompiler->ForceRecompile();
-    //                        if (myCachedPixelShaders.count(path) != 0)
-    //                        {
-    //                            for (auto& i : myCachedPixelShaders[path])
-    //                            {
-    //                                myFileWatcher.Trigger(i.second->myFileHandle);
-    //                            }
-    //                        }
-    //                        myShaderCompiler->DontForceRecompile();
-    //                    }
-    //
-    //                    ImGui::EndDragDropTarget();
-    //                }
-    //
-    //                for (auto& ShaderList : myCachedPixelShaders)
-    //                {
-    //                    ImGui::Button(ShaderList.first.c_str());
-    //                    if (ImGui::BeginDragDropSource())
-    //                    {
-    //                        ImGui::SetDragDropPayload("Select_Pixelshader", ShaderList.first.c_str(), ShaderList.first.length(), ImGuiCond_Once);
-    //
-    //                        ImGui::Text(ShaderList.first.c_str());
-    //
-    //                        ImGui::EndDragDropSource();
-    //                    }
-    //                }
-    //
-    //                ImGui::TreePop();
-    //            }
-    //
-    //            if (ImGui::TreeNode("Models"))
-    //            {
-    //                for (auto& model : myCachedModels)
-    //                {
-    //                    ImGui::Button(model.first.c_str());
-    //                    if (ImGui::BeginDragDropSource())
-    //                    {
-    //                        ImGui::SetDragDropPayload("Asset", &model.second, sizeof(Asset*), ImGuiCond_Once);
-    //
-    //                        ImGui::Text(model.first.c_str());
-    //
-    //                        ImGui::EndDragDropSource();
-    //                    }
-    //                }
-    //                ImGui::TreePop();
-    //            }
-    //        });
-    //}
+    void AssetManager::ImGui()
+    {
+        old_betsy_imgui::WindowControl::Window("AssetManager", [this]() { Imguicontent(); });
+    }
+
+    void AssetManager::Imguicontent()
+	{
+		if (ImGui::TreeNode("Shaders"))
+		{
+			ImGui::Button("Reload", ImVec2(60, 40));
+			//if (ImGui::BeginDragDropTarget())
+			//{
+			//	const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Select_Pixelshader");
+			//	if (payload)
+			//	{
+			//		std::string path = std::string(reinterpret_cast<const char*>(payload->Data), payload->DataSize);
+            //
+			//		myShaderCompiler->ForceRecompile();
+			//		if (myCachedPixelShaders.count(path) != 0)
+			//		{
+			//			for (auto& i : myCachedPixelShaders[path])
+			//			{
+			//				myFileWatcher.Trigger(i.second->myFileHandle);
+			//			}
+			//		}
+			//		myShaderCompiler->DontForceRecompile();
+			//	}
+            //
+			//	ImGui::EndDragDropTarget();
+			//}
+
+			for (auto& ShaderList : myCachedPixelShaders)
+			{
+				ImGui::Button(ShaderList.first.c_str());
+				//if (ImGui::BeginDragDropSource())
+				//{
+				//	ImGui::SetDragDropPayload("Select_Pixelshader", ShaderList.first.c_str(), ShaderList.first.length(), ImGuiCond_Once);
+                //
+				//	ImGui::Text(ShaderList.first.c_str());
+                //
+				//	ImGui::EndDragDropSource();
+				//}
+			}
+
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("Models"))
+		{
+			for (auto& model : myCachedModels)
+			{
+				ImGui::Button(model.first.c_str());
+				if (ImGui::BeginDragDropSource())
+				{
+					ImGui::SetDragDropPayload("Asset", &model.second, sizeof(Asset*), ImGuiCond_Once);
+
+					ImGui::Text("%s", model.first.c_str());
+
+					ImGui::EndDragDropSource();
+				}
+			}
+			ImGui::TreePop();
+		}
+    }
     
 	AssetHandle AssetManager::GetTextureInternal(const std::string& aPath, bool aFailSilenty)
 	{
@@ -409,30 +411,30 @@ namespace engine
 		return AssetHandle(myCachedTextures[aPath]);
 	}
 
-    //AssetHandle AssetManager::GetJSONInternal(const std::string& aPath)
-    //{
-    //    if (myCachedJSON.count(aPath) == 0)
-    //    {
-    //        Asset* json = nullptr;
-    //        FiskJSON::Object* obj = new FiskJSON::Object();
-    //        try
-    //        {
-    //            obj->Parse(Tools::ReadWholeFile(aPath));
-    //            json = new JSONAsset(obj,aPath);
-    //        }
-    //        catch (const std::exception& e)
-    //        {
-    //            SYSERROR("Failed to load json", aPath, e.what());
-    //
-    //            delete obj;
-    //        }
-    //
-    //        myCachedJSON[aPath] = json;
-    //        return AssetHandle(json);
-    //    }
-    //    return AssetHandle(myCachedJSON[aPath]);
-    //}
-    //
+	AssetHandle AssetManager::GetJSONInternal(const std::string& aPath)
+	{
+		if (myCachedJSON.count(aPath) == 0)
+		{
+			Asset* json = nullptr;
+			tools::JSONObject* obj = new tools::JSONObject();
+			try
+			{
+				obj->Parse(tools::ReadWholeFile(aPath));
+				json = new JSONAsset(obj, aPath);
+			}
+			catch (const std::exception& e)
+			{
+				LOG_ERROR("Failed to load json", aPath, e.what());
+
+				delete obj;
+			}
+
+			myCachedJSON[aPath] = json;
+			return AssetHandle(json);
+		}
+		return AssetHandle(myCachedJSON[aPath]);
+	}
+
     //AssetHandle AssetManager::GetAnimationInternal(const std::string& aPath)
     //{
     //    if (myCachedAnimations.count(aPath) == 0)

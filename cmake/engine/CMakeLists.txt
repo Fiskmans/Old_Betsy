@@ -120,3 +120,13 @@ configure_file(config.h.in config.h)
 target_include_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR})
 target_include_directories(Engine PUBLIC ${CMAKE_BINARY_DIR})
 target_include_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR}/DirectxTK/inc/)
+target_include_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR}/assimp/include/)
+target_include_directories(Engine PUBLIC ${CMAKE_BINARY_DIR}/assimp/include/)
+
+target_link_libraries(Engine PUBLIC Tools)
+target_link_libraries(Engine PUBLIC Logger)
+target_link_libraries(Engine PUBLIC Imgui)
+
+target_link_libraries(Engine PUBLIC DirectXTK)
+target_link_libraries(Engine PUBLIC assimp)
+target_link_libraries(Engine PUBLIC d3d11.lib)

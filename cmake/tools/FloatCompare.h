@@ -3,7 +3,7 @@
 
 #include <concepts>
 
-namespace Tools
+namespace tools
 {
 	template<typename T>
 	requires std::is_floating_point_v<T>

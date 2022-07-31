@@ -3,6 +3,8 @@
 
 #include "engine/graphics/Texture.h"
 
+#include "tools/JSON.h"
+
 #include <vector>
 #include <string>
 #include <atomic>
@@ -145,16 +147,16 @@ namespace engine
 		ID3D11GeometryShader* myShader;
 	};
 
-	//class JSONAsset
-	//	: public Asset
-	//{
-	//public:
-	//	JSONAsset(FiskJSON::Object* aObject,const std::string& aPath);
-	//
-	//	FiskJSON::Object* myObject;
-	//	std::string myPath;
-	//};
-	//
+	class JSONAsset
+		: public Asset
+	{
+	public:
+		JSONAsset(tools::JSONObject* aObject, const std::string& aPath);
+
+		tools::JSONObject* myObject;
+		std::string myPath;
+	};
+
 	//class FontAsset
 	//	: public Asset
 	//{

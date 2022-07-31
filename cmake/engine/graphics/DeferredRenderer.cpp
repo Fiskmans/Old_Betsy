@@ -155,7 +155,7 @@ namespace engine::graphics
 					ObjectBufferData oData;
 					WIPE(oData);
 					oData.myModelToWorldSpace = modelInstance->GetModelToWorldTransform().Transposed() * modelData->myOffset;
-					oData.myTint = tools::V4f(0, 0, 0, 1);
+					oData.myDiffuseColor = modelData->myDiffuseColor;
 					oData.myObjectId = modelInstance->GetId();
 
 
@@ -288,16 +288,16 @@ namespace engine::graphics
 	void DeferredRenderer::Render(Camera* aCamera)
 	{
 
-		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
+		//ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 		{
 			PERFORMANCETAG("Environmentlight");
 
-			ID3D11RenderTargetView* oldView;
-			ID3D11DepthStencilView* oldDepth;
-			ID3D11ShaderResourceView* oldShaderResources[16];
-
-			D3D11_VIEWPORT oldPort[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
-			UINT oldPortCount = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
+			//ID3D11RenderTargetView* oldView;
+			//ID3D11DepthStencilView* oldDepth;
+			//ID3D11ShaderResourceView* oldShaderResources[16];
+			//
+			//D3D11_VIEWPORT oldPort[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
+			//UINT oldPortCount = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
 
 			//context->PSGetShaderResources(0, 16, oldShaderResources);
 			//context->RSGetViewports(&oldPortCount, oldPort);

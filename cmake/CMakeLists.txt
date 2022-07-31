@@ -22,14 +22,17 @@ project(oldBetsy VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
+set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(tools)
 add_subdirectory(imgui)
-add_subdirectory(launcher)
 add_subdirectory(logger)
 add_subdirectory(engine)
-add_subdirectory(demo_game1)
 
 add_subdirectory(DirectXTK)
+
+set(ASSIMP_INSTALL OFF)
+set(ASSIMP_BUILD_TESTS OFF)
+add_subdirectory(assimp)
 
 if(DEFINED CLANG_COMPILER_RT)
 	message("Clang runtime directory specified, enabling fuzzers")
@@ -48,6 +51,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 
 add_subdirectory(unit_tests)
+
+add_subdirectory(demo_game1)
 
 configure_file(versionConfig.h.in versionConfig.h)
 
