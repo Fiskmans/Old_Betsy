@@ -57,4 +57,4 @@
 
 ### Is this a Ticket system? 
 [0] Dependable.h Replace   with small flag-able vector implementation, lowest bit for single-item mode and second lowest bit for dirty marking
-[1] EnderGeometryNode.cpp  register for resolution changes
+[1] RenderGeometryNode.cpp  register for resolution changes
