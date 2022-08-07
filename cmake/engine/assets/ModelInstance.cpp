@@ -39,13 +39,14 @@ namespace engine
 
 	ModelInstance::ModelInstance(const AssetHandle& aModel)
 	{
-		if (!aModel.Is<ModelAsset>() && !aModel.Is<SkyboxAsset>())
+		if (!aModel.Is<ModelAsset>())
 		{
 			LOG_SYS_CRASH("Asset was not a model");
 		}
 		myId = ++ourIdCounter;
 		myModel = aModel;
-		myScale = { 1.0f,1.0f,1.0f };
+		myScale = { 1.0f, 1.0f, 1.0f };
+		myGraphicBoundsModifier = 1.f;
 		myAnimator = nullptr;
 		myShouldRender = true;
 		SetCastsShadows(true);

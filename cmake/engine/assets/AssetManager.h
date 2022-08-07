@@ -80,15 +80,15 @@ namespace engine
 
 		Asset* myErrorTexture = nullptr;
 
-		std::unordered_map<std::string, Asset*> myCachedModels;
-		std::unordered_map<std::string, Asset*> myCachedSkyboxes;
-		std::unordered_map<std::string, Asset*> myCachedTextures;
-		std::unordered_map<std::string, Asset*> myCachedCubeTextures;
-		std::unordered_map<std::string, Asset*> myCachedJSON;
-		std::unordered_map<std::string, Asset*> myCachedfonts;
-		std::unordered_map<std::string, Asset*> myCachedLevels;
-		std::unordered_map<std::string, Asset*> myCachedNavMeshes;
-		std::unordered_map<std::string, Asset*> myCachedAnimations;
+		std::unordered_map<std::string, AssetHandle> myCachedModels;
+		std::unordered_map<std::string, AssetHandle> myCachedSkyboxes;
+		std::unordered_map<std::string, AssetHandle> myCachedTextures;
+		std::unordered_map<std::string, AssetHandle> myCachedCubeTextures;
+		std::unordered_map<std::string, AssetHandle> myCachedJSON;
+		std::unordered_map<std::string, AssetHandle> myCachedfonts;
+		std::unordered_map<std::string, AssetHandle> myCachedLevels;
+		std::unordered_map<std::string, AssetHandle> myCachedNavMeshes;
+		std::unordered_map<std::string, AssetHandle> myCachedAnimations;
 
 		std::unordered_map<std::string, std::unordered_map<ShaderFlags, Asset*>> myCachedPixelShaders;
 		std::unordered_map<std::string, std::unordered_map<ShaderFlags, Asset*>> myCachedVertexShaders;

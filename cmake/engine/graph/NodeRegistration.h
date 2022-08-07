@@ -24,9 +24,7 @@ namespace engine::graph
 	public:
 		static void Register()
 		{
-			NodeRegistration& instance = GetInstance();
-
-			instance.RegisterMemberFunctionBasedNode(&Camera::Cull, "Cull", "Models", {"Camera"});
+			GetInstance();
 		}
 
 	private:

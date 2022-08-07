@@ -8,29 +8,21 @@
 
 namespace engine::graphics 
 {
-	struct FrameBufferData
+	constexpr size_t FRAME_BUFFER_INDEX = 0;
+	constexpr size_t OBJECT_BUFFER_INDEX = 1;
+	constexpr size_t POINT_LIGHT_BUFFER_INDEX = 2;
+	constexpr size_t ANIMATION_BUFFER_INDEX = 3;
+
+	struct FrameBuffer
 	{
 		tools::M44f myWorldToCamera;
 		tools::M44f myCameraToProjection;
 
-		tools::V3f myEnvironmentLightDirection;
-		float myShadowIntensity;
-
-		tools::V3f myEnvironmentLightColor;
-		float myEnviromentLightIntensity; 
-
-		tools::V3f myCameraPosition;
 		float myTotalTime;
-
-		tools::M44f myWorldToShadowCamera;
-		tools::M44f myCameraToShadowProjection;
-
-		tools::V3f myCameraDirection;
-
-		float padding;
+		float myPadding[3];
 	};
 
-	struct ObjectBufferData
+	struct ObjectBuffer
 	{
 		tools::M44f myModelToWorldSpace;
 		tools::V4f myDiffuseColor;
@@ -38,24 +30,24 @@ namespace engine::graphics
 		float myObjectLifeTime;
 		unsigned int myObjectId;
 
-		unsigned int padding_1;
-		unsigned int padding_2;
+		float myPadding[2];
+	};
+	
+	struct PointLight
+	{
+		tools::V3f myPosition;
+		float myIntensity;
+
+		tools::V3f mycolor;
+		float myRange;
 	};
 
 	struct PointLightBuffer
 	{
-		struct PointLight
-		{
-			tools::V3f position;
-			float intensity;
-
-			tools::V3f color;
-			float range;
-
-		} myPointLights[NUMBEROFPOINTLIGHTS];
+		PointLight myPointLights[NUMBEROFPOINTLIGHTS];
 
 		unsigned int myNumOfUsedPointLights;
-		float padding[3];
+		float myPadding[3];
 	};
 
 	struct AnimationBuffer

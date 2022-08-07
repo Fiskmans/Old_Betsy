@@ -1,5 +1,6 @@
 #include "engine/assets/ShaderTypes.h"
 #include "engine/assets/ShaderFlags.h"
+#include "engine/graphics/ShaderBuffers.h"
 
 #include "common/Macros.h"
 
@@ -160,35 +161,49 @@ namespace engine
 		return ((aFlags & ShaderFlags::UvMask) >> ShaderFlags::NumUvSetsOffset) + 1;
 	}
 
-	void ShaderTypes::DefinesFromFlags(_D3D_SHADER_MACRO* aBuffer, size_t aFlags)
+	ShaderDefines::ShaderDefines(size_t aFlags)
 	{
-		static const char* numberLookup[] =
+		AddMacro("NUMBEROFPOINTLIGHTS", std::to_string(NUMBEROFPOINTLIGHTS) );
+		AddMacro("NUMBEROFANIMATIONBONES", std::to_string(NUMBEROFANIMATIONBONES) );
+		AddMacro("NUMBEROFANIMATIONBONES", std::to_string(NUMBEROFANIMATIONBONES) );
+
+		AddMacro("VERTEXCOLOR", ((aFlags & ShaderFlags::HasVertexColors) != 0) ? "true" : "false");
+
+		AddMacro("HAS_UV_SETS", ((aFlags & ShaderFlags::HasUvSets) != 0) ? "true" : "false");
+		AddMacro("UV_SETS_COUNT", std::to_string(ShaderTypes::UvSetsCountFromFlags(aFlags)));
+
+		AddMacro("HAS_BONES", ((aFlags & ShaderFlags::HasBones) != 0) ? "true" : "false");
+		AddMacro("BONESPERVERTEX", std::to_string(ShaderTypes::BonePerVertexCountFromFlags(aFlags)));
+
+		AddMacro("FRAME_BUFFER", "b" + std::to_string(graphics::FRAME_BUFFER_INDEX));
+		AddMacro("OBJECT_BUFFER", "b" + std::to_string(graphics::OBJECT_BUFFER_INDEX));
+		AddMacro("POINT_LIGHT_BUFFER", "b" + std::to_string(graphics::POINT_LIGHT_BUFFER_INDEX));
+		AddMacro("ANIMATION_BUFFER", "b" + std::to_string(graphics::ANIMATION_BUFFER_INDEX));
+	}
+
+	_D3D_SHADER_MACRO* ShaderDefines::Get()
+	{
+		myMacros.clear();
+
+		for (size_t i = 0; i + 1 < myDataStorage.size(); i += 2)
 		{
-			"0", "1",  "2",  "3",  "4",  "5",  "6",  "7",
-			"8", "9", "10", "11", "12", "13", "14", "15"
-		};
-
-		size_t at = 0;
-
-		aBuffer[at++] = _D3D_SHADER_MACRO{ STRING(NUMBEROFPOINTLIGHTS), STRINGVALUE(NUMBEROFPOINTLIGHTS) };
-		aBuffer[at++] = _D3D_SHADER_MACRO{ STRING(NUMBEROFANIMATIONBONES), STRINGVALUE(NUMBEROFANIMATIONBONES) };
-		aBuffer[at++] = _D3D_SHADER_MACRO{ STRING(MODELSAMOUNTOFCommonUtilitiesSTOMDATA), STRINGVALUE(MODELSAMOUNTOFCommonUtilitiesSTOMDATA) };
-
-		if (aFlags & ShaderFlags::HasVertexColors)
-		{
-			aBuffer[at++] = _D3D_SHADER_MACRO{ "VERTEXCOLOR", "true" };
+			_D3D_SHADER_MACRO macro;
+			macro.Name = myDataStorage[i].c_str();
+			macro.Definition = myDataStorage[i + 1].c_str();
+			myMacros.push_back(macro);
 		}
 
-		if (aFlags & ShaderFlags::HasUvSets)
-		{
-			aBuffer[at++] = _D3D_SHADER_MACRO{ "HAS_UV_SETS", "true" };
-			aBuffer[at++] = _D3D_SHADER_MACRO{ "UV_SETS_COUNT", numberLookup[UvSetsCountFromFlags(aFlags)] };
-		}
-		if (aFlags & ShaderFlags::HasBones)
-		{
-			aBuffer[at++] = _D3D_SHADER_MACRO{ "HAS_BONES", "true" };
-			aBuffer[at++] = _D3D_SHADER_MACRO{ "BONESPERVERTEX", numberLookup[BonePerVertexCountFromFlags(aFlags)] };
-		}
-		WIPE(aBuffer[at]);
+		_D3D_SHADER_MACRO nullTerminand;
+		nullTerminand.Name = nullptr;
+		nullTerminand.Definition = nullptr;
+		myMacros.push_back(nullTerminand);
+
+		return myMacros.data();
+	}
+
+	void ShaderDefines::AddMacro(std::string aName, std::string aValue)
+	{
+		myDataStorage.push_back(aName);
+		myDataStorage.push_back(aValue);
 	}
 }

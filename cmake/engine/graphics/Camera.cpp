@@ -46,6 +46,12 @@ namespace engine
 		myResolutionExport.Write(WindowManager::GetInstance().GetSize());
 	}
 
+	void Camera::ForceRedraw()
+	{
+		myResolutionExport.GetOutStorage()->MarkRefreshed();
+		mySelf.GetOutStorage()->MarkRefreshed();
+	}
+
 	void Camera::SetTransform(tools::V4f aPosition, tools::V3f aRotation)
 	{
 		SetPosition(aPosition);
@@ -226,21 +232,24 @@ namespace engine
 
 	void PerspectiveCamera::SetFOVRad(float aFOV)
 	{
-		tools::V2ui resolution = myResolutionExport.Get();
-		const float maxFOV = (PI_F / 2.f) * (179.f / 180.f);
 		myXFOV = aFOV / 2.f;
-		myYFOV = aFOV / 2.f * (static_cast<float>(resolution[0]) / static_cast<float>(resolution[1]));
-		if (myXFOV > maxFOV)
+		if (myXFOV > ourMaxFOV)
 		{
-			myXFOV = maxFOV;
+			myXFOV = ourMaxFOV;
 		}
-		if (myYFOV > maxFOV)
-		{
-			myYFOV = maxFOV;
-		}
-
+		UpdateYFOV();
 
 		myProjection.Row(0)[0] = 1.f / tan(myXFOV);
+	}
+
+	void PerspectiveCamera::UpdateYFOV()
+	{
+		tools::V2ui resolution = myResolutionExport.Get();
+		myYFOV = myXFOV * (static_cast<float>(resolution[0]) / static_cast<float>(resolution[1]));
+		if (myYFOV > ourMaxFOV)
+		{
+			myYFOV = ourMaxFOV;
+		}
 		myProjection.Row(1)[1] = 1.f / tan(myYFOV);
 	}
 
@@ -265,7 +274,7 @@ namespace engine
 	void PerspectiveCamera::OnResolutionChanged(tools::V2ui aResolution)
 	{
 		Camera::OnResolutionChanged(aResolution);
-		myProjection.Row(1)[1] = myProjection.Row(0)[1] * (static_cast<float>(aResolution[0]) / static_cast<float>(aResolution[1]));
+		UpdateYFOV();
 	}
 
 	OrthogonalCamera::OrthogonalCamera(RenderScene& aScene, tools::V3f aSize, tools::V2ui aResolution)

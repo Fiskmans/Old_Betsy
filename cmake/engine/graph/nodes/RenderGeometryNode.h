@@ -27,7 +27,6 @@ namespace engine::graph::nodes
 
 	private:
 		InPin<Camera*> myInCamera = PinInformation("Camera");
-		InPin<std::vector<ModelInstance*>> myInModels = PinInformation("Models");
 		InPin<tools::V2ui> myInResolution = PinInformation("Resolution");
 		InPin<graphics::DepthTexture> myInDepth = PinInformation("Depth");
 
@@ -36,7 +35,6 @@ namespace engine::graph::nodes
 		OutPin<graphics::DepthTexture> myOutDepth = PinInformation("Depth");
 		OutPin<graphics::GBuffer> myOutGeometry = PinInformation("Geometry");
 	};
-
 }
 
 #endif

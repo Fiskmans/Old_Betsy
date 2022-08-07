@@ -27,7 +27,7 @@ namespace engine::graphics
 
 		FilterResult Filter(const std::vector<ModelInstance*>& aModels);
 
-		void GenerateGBuffer(Camera* aCamera, const std::vector<ModelInstance*>& aModelList);
+		void GenerateGBuffer(Camera* aCamera);
 
 		void Render(Camera* aCamera);
 

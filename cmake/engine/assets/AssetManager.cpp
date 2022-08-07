@@ -42,6 +42,9 @@ namespace engine
         myTextureLoader = std::make_unique<assets::TextureLoader>();
         myShaderCompiler = std::make_unique<assets::ShaderCompiler>(aBakeFolder + BAKED_SHADER_FOLDER);
 
+        if (::GetAsyncKeyState(VK_SHIFT) && ::GetAsyncKeyState(VK_SHIFT))
+            myShaderCompiler->ForceRecompile();
+
         //myErrorTexture = myTextureLoader->LoadTexture(aBaseFolder + TEXTURE_FOLDER + "engine/error.dds");
     }
 
@@ -66,7 +69,7 @@ namespace engine
             if (iter->path().extension() == ".fbx")
             {
                 LOG_SYS_INFO("Preloading asset", iter->path().string());
-                GetModel(iter->path().string().substr(rootPath.string().length()));
+                GetModel(tools::NormalizeSlashes(iter->path().string().substr(rootPath.string().length())));
             }
             iter++;
         }

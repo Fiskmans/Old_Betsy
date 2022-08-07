@@ -11,15 +11,11 @@ namespace engine::graph::nodes
 		graphics::GBuffer& stashed = myOutGeometry.GetOutStorage()->template As<graphics::GBuffer>();
 		if (!stashed.IsValid() || myInResolution.GetInPinInstance()->IsDirty())
 		{
-			if (myInResolution != tools::V2ui(0, 0))
-			{
-				stashed = AssetManager::GetInstance().MakeGBuffer(myInResolution);
-			}
-			else
-			{
-				myOutGeometry.GetOutStorage()->MarkRefreshed();
-				return;
-			}
+			tools::V2ui resolution = myInResolution;
+			if (resolution == tools::V2ui(0, 0))
+				resolution = WindowManager::GetInstance().GetSize(); //TODO [1]: register for resolution changes
+
+			stashed = AssetManager::GetInstance().MakeGBuffer(resolution);
 		}
 		
 		graphics::DepthTexture depth;
@@ -49,7 +45,7 @@ namespace engine::graph::nodes
 		}
 
 		graphics::RenderManager::GetInstance().MapTextures(stashed, {}, &depth);
-		graphics::RenderManager::GetInstance().GetDeferredRenderer().GenerateGBuffer(myInCamera, myInModels);
+		graphics::RenderManager::GetInstance().GetDeferredRenderer().GenerateGBuffer(myInCamera);
 		myOutGeometry = stashed;
 		myOutDepth = depth;
 	}

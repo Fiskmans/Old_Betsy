@@ -173,12 +173,11 @@ namespace engine::assets
 			D3DCOMPILE_OPTIMIZATION_LEVEL3 |
 			D3DCOMPILE_WARNINGS_ARE_ERRORS;
 
-		D3D_SHADER_MACRO macros[ShaderTypes::MaxDefineSize];
-		ShaderTypes::DefinesFromFlags(macros, aFlags);
+		ShaderDefines defines(aFlags);
 
 		HRESULT result = D3DCompileFromFile(
 			(std::wstring(filePath.begin(), filePath.end())).c_str(),
-			macros,
+			defines.Get(),
 			D3D_COMPILE_STANDARD_FILE_INCLUDE,
 			aEntryPoint.c_str(),
 			aCompiler.c_str(),

@@ -65,7 +65,7 @@
 #define ENABLEBLOOM false
 #define ENABLESSAO true
 #define EDITFARMBOUNDS false
-#define TRACKGFXMEM true
+#define TRACKGFXMEM false // TODO: Memory to track memory needs to be deleted
 
 #define USEITERATABLEQUEUE USEIMGUI
 

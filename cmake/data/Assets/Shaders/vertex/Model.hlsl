@@ -1,30 +1,17 @@
 #include "../ShaderStructs.hlsli"
 
-float4x4 ExtractBoneMatrix(uint aIndex)
-{
-	return transpose(float4x4(
-		BoneTexture.Load(int3((aIndex * 4 + 0), myBoneOffsetIndex, 0)),
-		BoneTexture.Load(int3((aIndex * 4 + 1), myBoneOffsetIndex, 0)),
-		BoneTexture.Load(int3((aIndex * 4 + 2), myBoneOffsetIndex, 0)),
-		BoneTexture.Load(int3((aIndex * 4 + 3), myBoneOffsetIndex, 0))
-		));
-}
 
 VertexToPixel vertexShader(VertexInput input)
 {
 	VertexToPixel returnValue;
 
 #if HAS_BONES
-#if BONESPERVERTEX == 1
-	input.myPosition = mul(input.myPosition, ExtractBoneMatrix(input.myBones[0])) * input.myBoneWeights[0];
-#else
 	float4 skinnedPosition = float4(0, 0, 0, 0);
 	for (uint i = 0; i < BONESPERVERTEX; i++)
 	{
-		skinnedPosition += mul(input.myPosition, ExtractBoneMatrix(input.myBones[i])) * input.myBoneWeights[i];
+		skinnedPosition += mul(input.myPosition, AnimationBuffer.myTransforms[i] * input.myBoneWeights[i];
 	}
 	input.myPosition = skinnedPosition;
-#endif
 #endif
 
 	float4x4 packedPosition = {
@@ -34,9 +21,9 @@ VertexToPixel vertexShader(VertexInput input)
 		input.myBiTangent.x,input.myBiTangent.y,input.myBiTangent.z,0
 	};
 
-	float4x4 worldPosition = mul(packedPosition, modelToWorldMatrix);
-	float4x4 cameraPosition = mul(worldPosition, worldToCameraMatrix);
-	float4x4 screenPosition = mul(cameraPosition, cameraToProjectionMatrix);
+	float4x4 worldPosition = mul(packedPosition, ObjectBuffer.myModelToWorldSpace);
+	float4x4 cameraPosition = mul(worldPosition, FrameBuffer.myWorldToCamera);
+	float4x4 screenPosition = mul(cameraPosition, FrameBuffer.myCameraToProjection);
 
 
 	returnValue.myPosition = screenPosition[0];
@@ -44,7 +31,7 @@ VertexToPixel vertexShader(VertexInput input)
 	returnValue.myTangent = worldPosition[2];
 	returnValue.myBiTangent = worldPosition[3];
 
-#ifdef HAS_UV_SETS
+#if HAS_UV_SETS
 	[unroll] for (uint i = 0; i < UV_SETS_COUNT; i++)
 	{	
 		returnValue.myUV[0] = input.myUV[0];
@@ -52,7 +39,7 @@ VertexToPixel vertexShader(VertexInput input)
 #endif
 
 	returnValue.myWorldPos = worldPosition[0];
-#ifdef VERTEXCOLOR
+#if VERTEXCOLOR
 	returnValue.myColor = input.myColor;
 #endif
 

@@ -4,6 +4,7 @@
 #include "engine/assets/ShaderFlags.h"
 
 #include <string>
+#include <vector>
 
 #define NOMINMAX
 #include <windows.h>
@@ -29,13 +30,25 @@ namespace engine
 		static std::string PostfixFromFlags(size_t aFlags);
 		static Offsets OffsetsFromFlags(size_t aFlags);
 
-		static void DefinesFromFlags(_D3D_SHADER_MACRO* aBuffer, size_t aFlags);
 		static UINT InputLayoutFromFlags(D3D11_INPUT_ELEMENT_DESC* aOutDesc, size_t aFlags);
 
 		static size_t BonePerVertexCountFromFlags(size_t aFlags);
 		static size_t UvSetsCountFromFlags(size_t aFlags);
 	};
 
+	class ShaderDefines
+	{
+	public:
+		ShaderDefines(size_t aFlags);
+
+		_D3D_SHADER_MACRO* Get();
+
+	private:
+
+		void AddMacro(std::string aName, std::string aValue);
+		std::vector<_D3D_SHADER_MACRO> myMacros;
+		std::vector<std::string> myDataStorage;
+	};
 }
 
 

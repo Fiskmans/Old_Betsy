@@ -201,8 +201,16 @@ namespace engine::graph
 			ourHoverIn = isIn;
 
 			if (!isIn)
-				if (ImGui::GetIO().MouseClicked[0] && ImGui::GetIO().KeyShift)
-					GetOutStorage()->Load();
+			{
+				if (ImGui::GetIO().MouseClicked[0])
+				{
+					if (ImGui::GetIO().KeyShift)
+					{
+						GetOutStorage()->Load();
+						GetOutStorage()->MarkRefreshed();
+					}
+				}
+			}
 		}
 
 		if (ourHoveredType && *ourHoveredType == type && ourHoverIn != isIn)

@@ -17,7 +17,7 @@ namespace engine::graph
 		bool IsDirty() { return myIsDirty; }
 	private:
 		void MarkDirty();
-		std::vector<Dependable*> myDependents; // TODO: Replace with small flag-able vector implementation, lowest bit for single-item mode and second lowest bit for dirty marking
+		std::vector<Dependable*> myDependents; // TODO [0]: Replace with small flag-able vector implementation, lowest bit for single-item mode and second lowest bit for dirty marking
 		bool myIsDirty = true;
 	};
 }

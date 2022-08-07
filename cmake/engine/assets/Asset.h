@@ -39,16 +39,15 @@ namespace engine
 		inline virtual bool CheckLoaded() { return true; }
 
 		template<std::derived_from<Asset> AssetType>
-		inline bool Is() const { return typeid(AssetType) == myType; }
+		inline bool Is() const { return typeid(AssetType) == typeid(*this); }
 
 	private:
 		friend class AssetManager;
 		friend class AssetHandle;
 
 		void IncRefCount();
-		void DecRefCount();
+		bool DecRefCount();
 
-		const std::type_info& myType;
 		std::atomic<int32_t> myRefCount;
 		std::atomic<bool> myIsLoaded;
 
@@ -90,22 +89,16 @@ namespace engine
 		std::string myFilePath;
 	};
 
-	class SkyboxAsset
-		: public Asset
-	{
-	public:
-		SkyboxAsset(Model* aSkyBox);
-
-		Model* mySkybox;
-	};
-
 	class TextureAsset
 		: public Asset
 	{
 	public:
 		TextureAsset(ID3D11ShaderResourceView* aTexture);
+		~TextureAsset();
 
 		ID3D11ShaderResourceView* myTexture;
+	protected:
+		bool myOwns = true;
 	};
 
 	class DrawableTextureAsset final
@@ -124,6 +117,7 @@ namespace engine
 	{
 	public:
 		PixelShaderAsset(ID3D11PixelShader* aShader);
+		~PixelShaderAsset();
 
 		ID3D11PixelShader* myShader;
 	};
@@ -133,6 +127,7 @@ namespace engine
 	{
 	public:
 		VertexShaderAsset(ID3D11VertexShader* aShader, const std::vector<char>& aBlob);
+		~VertexShaderAsset();
 
 		ID3D11VertexShader* myShader;
 		std::vector<char> myBlob;
@@ -143,6 +138,7 @@ namespace engine
 	{
 	public:
 		GeometryShaderAsset(ID3D11GeometryShader* aShader);
+		~GeometryShaderAsset();
 
 		ID3D11GeometryShader* myShader;
 	};
@@ -152,6 +148,7 @@ namespace engine
 	{
 	public:
 		JSONAsset(tools::JSONObject* aObject, const std::string& aPath);
+		~JSONAsset();
 
 		tools::JSONObject* myObject;
 		std::string myPath;

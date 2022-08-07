@@ -7,7 +7,6 @@
 namespace engine
 {
 	Asset::Asset(bool aIsLoaded)
-		: myType(typeid(*this))
 	{
 		myRefCount = 0;
 		myIsLoaded = aIsLoaded;
@@ -18,9 +17,10 @@ namespace engine
 		myRefCount++;
 	}
 
-	void Asset::DecRefCount()
+	bool Asset::DecRefCount()
 	{
 		myRefCount--;
+		return myRefCount == 0;
 	}
 
 	AssetHandle::AssetHandle(Asset* aAsset)
@@ -35,9 +35,8 @@ namespace engine
 	AssetHandle::~AssetHandle()
 	{
 		if (myAsset)
-		{
-			myAsset->DecRefCount();
-		}
+			if (myAsset->DecRefCount())
+				delete myAsset;
 	}
 
 	AssetHandle::AssetHandle(const AssetHandle& aOther)
@@ -53,7 +52,8 @@ namespace engine
 	{
 		if (myAsset)
 		{
-			myAsset->DecRefCount();
+			if (myAsset->DecRefCount())
+				delete myAsset;
 		}
 		myAsset = aOther.myAsset;
 		if (myAsset)
@@ -113,19 +113,20 @@ namespace engine
 		myFilePath = aFilePath;
 	}
 
-	SkyboxAsset::SkyboxAsset(Model* aSkyBox)
-	{
-		mySkybox = aSkyBox;
-	}
-
 	TextureAsset::TextureAsset(ID3D11ShaderResourceView* aTexture)
 	{
 		myTexture = aTexture;
 	}
 
+	TextureAsset::~TextureAsset()
+	{
+		myTexture->Release();
+	}
+
 	DrawableTextureAsset::DrawableTextureAsset(graphics::Texture& aTexture)
 		: TextureAsset(aTexture.GetResourceView())
 	{
+		TextureAsset::myOwns = false;
 		myDrawableTexture = aTexture;
 	}
 
@@ -134,10 +135,20 @@ namespace engine
 		myShader = aShader;
 	}
 
+	PixelShaderAsset::~PixelShaderAsset()
+	{
+		myShader->Release();
+	}
+
 	VertexShaderAsset::VertexShaderAsset(ID3D11VertexShader* aShader, const std::vector<char>& aBlob)
 	{
 		myShader = aShader;
 		myBlob = aBlob;
+	}
+
+	VertexShaderAsset::~VertexShaderAsset()
+	{
+		myShader->Release();
 	}
 
 	GeometryShaderAsset::GeometryShaderAsset(ID3D11GeometryShader* aShader)
@@ -145,15 +156,25 @@ namespace engine
 		myShader = aShader;
 	}
 
+	GeometryShaderAsset::~GeometryShaderAsset()
+	{
+		myShader->Release();
+	}
+
 	DrawableTextureAsset::~DrawableTextureAsset()
 	{
-		myTexture->Release();
+		myDrawableTexture.Release();
 	}
 
 	JSONAsset::JSONAsset(tools::JSONObject* aObject, const std::string& aPath)
 	{
 		myObject = aObject;
 		myPath = aPath;
+	}
+
+	JSONAsset::~JSONAsset()
+	{
+		delete myObject;
 	}
 
 	//FontAsset::FontAsset(DirectX::SpriteFont* aFont)

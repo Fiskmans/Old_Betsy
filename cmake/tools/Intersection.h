@@ -253,11 +253,12 @@ namespace tools
 	template<typename T>
 	inline bool IntersectionSphereFrustum(const tools::Sphere<T>& aSphere, const tools::PlaneVolume<T>& aPlaneVolume)
 	{
-		return IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[0]) && 
-			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[1]) && 
-			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[2]) && 
-			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[3]) && 
-			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[4]) && 
+		return 
+			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[0]) &
+			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[1]) &
+			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[2]) &
+			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[3]) &
+			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[4]) &
 			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[5]);
 	}
 

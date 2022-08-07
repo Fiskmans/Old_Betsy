@@ -246,7 +246,11 @@ namespace tools
 	template<class T>
 	inline Matrix4x4<T> Matrix4x4<T>::Identity()
 	{
-		return Matrix4x4<T>();
+		return Matrix4x4<T>(
+			1,0,0,0,
+			0,1,0,0,
+			0,0,1,0,
+			0,0,0,1);
 	}
 
 
@@ -436,7 +440,7 @@ namespace tools
 	template<class T>
 	inline tools::MathVector<T, 4> operator*(const tools::MathVector<T, 4>& aVector, const Matrix4x4<T>& aMatrix)
 	{
-		return aVector * aMatrix.Row(0) + aVector * aMatrix.Row(1) + aVector * aMatrix.Row(2) + aVector * aMatrix.Row(3);
+		return tools::MathVector<T, 4>(aVector.Dot(aMatrix.Row(0)), aVector.Dot(aMatrix.Row(1)), aVector.Dot(aMatrix.Row(2)), aVector.Dot(aMatrix.Row(3)));
 	}
 
 	template<class T>

@@ -59,4 +59,14 @@ namespace tools
 
 		return -1;
 	}
+	std::string NormalizeSlashes(const std::string& aFilePath)
+	{
+		std::string out = aFilePath;
+
+		for (char& c : out)
+			if (c == '\\')
+				c = '/';
+
+		return out;
+	}
 }

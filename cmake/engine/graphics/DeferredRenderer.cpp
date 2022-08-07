@@ -80,8 +80,8 @@ namespace engine::graphics
 			UINT mySize;
 		};
 
-		if (!RenderManager::CreateGenericShaderBuffer< FrameBufferData>(myFrameBuffer)) { return false; }
-		if (!RenderManager::CreateGenericShaderBuffer< ObjectBufferData>(myObjectBuffer)) { return false; }
+		if (!RenderManager::CreateGenericShaderBuffer< FrameBuffer>(myFrameBuffer)) { return false; }
+		if (!RenderManager::CreateGenericShaderBuffer< ObjectBuffer>(myObjectBuffer)) { return false; }
 		if (!RenderManager::CreateGenericShaderBuffer< DeferredPixelEnvLightBuffer>(myPixelEnvLightBuffer)) { return false; }
 		if (!RenderManager::CreateGenericShaderBuffer< DeferredPixelPointLightBuffer>(myPixelPointLightBuffer)) { return false; }
 		if (!RenderManager::CreateGenericShaderBuffer< DeferredPixelSpotLightBuffer>(myPixelSpotLightBuffer)) { return false; }
@@ -121,17 +121,16 @@ namespace engine::graphics
 		return FilterResult();
 	}
 
-	void DeferredRenderer::GenerateGBuffer(Camera* aCamera, const std::vector<ModelInstance*>& aModelList)
+	void DeferredRenderer::GenerateGBuffer(Camera* aCamera)
 	{
 		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 
 		{
-			FrameBufferData fData;
+			FrameBuffer fData;
 			WIPE(fData);
 
 			fData.myWorldToCamera = aCamera->GetTransform().FastInverse();
-			fData.myCameraPosition = aCamera->GetPosition();
-			fData.myCameraDirection = aCamera->GetForward();
+
 			fData.myTotalTime = tools::GetTotalTime();
 			fData.myCameraToProjection = aCamera->GetProjection();
 
@@ -139,27 +138,26 @@ namespace engine::graphics
 				return;
 		}
 
-		context->VSSetConstantBuffers(0, 1, &myFrameBuffer);
-		context->PSSetConstantBuffers(0, 1, &myFrameBuffer);
+		context->VSSetConstantBuffers(graphics::FRAME_BUFFER_INDEX, 1, &myFrameBuffer);
+		context->PSSetConstantBuffers(graphics::FRAME_BUFFER_INDEX, 1, &myFrameBuffer);
 
 		context->GSSetShader(nullptr, nullptr, 0);
 
 		{
 			PERFORMANCETAG("standard");
-			for (ModelInstance* modelInstance : aModelList)
+			for (ModelInstance* modelInstance : aCamera->Cull())
 			{
 				Model* model = modelInstance->GetModelAsset().myModel;
 
 				for (Model::ModelData* modelData : model->GetModelData())
 				{
-					ObjectBufferData oData;
+					ObjectBuffer oData;
 					WIPE(oData);
 					oData.myModelToWorldSpace = modelInstance->GetModelToWorldTransform().Transposed() * modelData->myOffset;
 					oData.myDiffuseColor = modelData->myDiffuseColor;
-					oData.myObjectId = modelInstance->GetId();
-
 
 					oData.myObjectLifeTime = tools::GetTotalTime() - modelInstance->GetSpawnTime();
+					oData.myObjectId = modelInstance->GetId();
 
 					if (!RenderManager::OverWriteBuffer(myObjectBuffer, &oData, sizeof(oData))) { return; }
 
@@ -169,8 +167,8 @@ namespace engine::graphics
 					context->IASetPrimitiveTopology(modelData->myPrimitiveTopology);
 					context->IASetInputLayout(modelData->myInputLayout);
 
-					context->VSSetConstantBuffers(1, 1, &myObjectBuffer);
-					context->PSSetConstantBuffers(1, 1, &myObjectBuffer);
+					context->VSSetConstantBuffers(graphics::OBJECT_BUFFER_INDEX, 1, &myObjectBuffer);
+					context->PSSetConstantBuffers(graphics::OBJECT_BUFFER_INDEX, 1, &myObjectBuffer);
 
 					context->VSSetShader(modelData->myVertexShader.Get<VertexShaderAsset>().myShader, nullptr, 0);
 					context->PSSetShader(modelData->myPixelShader.Get<PixelShaderAsset>().myShader, nullptr, 0);
@@ -479,7 +477,7 @@ namespace engine::graphics
 				EXECUTE_ONCE({ LOG_WARNING("Environemnt light has no texture"); });
 			}
 		
-			context->PSSetShaderResources(shader_mappings::TEXTURE_INDEX_SKYBOX, 1, texture);
+			context->PSSetShaderResources(shader_mappings::TEXTURE_SKYBOX, 1, texture);
 		
 			fData.myLightColor = envlight->myColor;
 			fData.myLightDirection = envlight->myDirection;

@@ -29,6 +29,8 @@ namespace engine
 
 		virtual void OnResolutionChanged(tools::V2ui aResolution);
 
+		void ForceRedraw();
+
 		void SetTransform(tools::V4f aPosition, tools::V3f aRotation);
 		void SetTransform(tools::M44f aTransform);
 		void SetRotation(tools::V3f aRotation);
@@ -90,9 +92,13 @@ namespace engine
 
 		void SetFOVRad(float aFOV);
 
+		void UpdateYFOV();
+
 		tools::Frustum<float> GenerateFrustum() const override;
 
 	protected:
+		static constexpr float ourMaxFOV = (PI_F / 2.f) * (179.f / 180.f);
+
 		void OnResolutionChanged(tools::V2ui aResolution) override;
 		float myXFOV;
 		float myYFOV;
