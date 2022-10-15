@@ -22,7 +22,7 @@ Check out the [Code Standard](CodeStandard.md)
 If there is something you want to see added feel free to open a pull request.
 Only submit code or resources to this project that you have the permission to so with.
 
-# Tools
+# Verified working Tools
 - Visual Studio 2019 v16.10.00
   - Desktop Development with c++
   - Game Development with c++
