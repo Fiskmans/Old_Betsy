@@ -4,3 +4,9 @@
 [submodule "cmake/assimp"]
 	path = cmake/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "cmake/fisk_tools"]
+	path = cmake/fisk_tools
+	url = https://github.com/fiskmans/fisk_tools
+[submodule "cmake/fisk_input"]
+	path = cmake/fisk_input
+	url = https://github.com/fiskmans/fisk_input
