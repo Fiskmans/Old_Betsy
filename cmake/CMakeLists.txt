@@ -31,7 +31,11 @@ add_subdirectory(tools)
 add_subdirectory(imgui)
 add_subdirectory(engine)
 
-add_subdirectory(DirectXTK)
+
+#we're defining VCPKG_TARGET_ARCHITECTURE as a workaround for the vs2022 generator not defining VCPKG_TARGET_ARCHITECTURE
+set(VCPKG_TARGET_ARCHITECTURE x64)
+	add_subdirectory(DirectXTK)
+unset(VCPKG_TARGET_ARCHITECTURE)
 
 set(ASSIMP_INSTALL OFF)
 set(ASSIMP_BUILD_TESTS OFF)
