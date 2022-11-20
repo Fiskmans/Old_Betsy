@@ -43,7 +43,7 @@ namespace engine::graphics
 		class TextureMapping
 		{
 		public:
-			TextureMapping(const AssetHandle& aHandle, size_t aIndex);
+			TextureMapping(const AssetHandle<TextureAsset>& aHandle, size_t aIndex);
 
 		private:
 			friend RenderManager;
@@ -62,8 +62,8 @@ namespace engine::graphics
 
 		void Render();
 
-		void MapTextures(AssetHandle& aTarget, const std::vector<TextureMapping>& aTextures, DepthTexture* aDepth = nullptr);
-		void MapTextures(GBuffer& aTarget, const std::vector<TextureMapping>& aTextures, DepthTexture* aDepth = nullptr);
+		void MapTextures(AssetHandle<DrawableTextureAsset>& aTarget, const std::vector<TextureMapping>& aTextures, AssetHandle<DepthTextureAsset> aDepth = nullptr);
+		void MapTextures(AssetHandle<GBufferAsset>& aTarget, const std::vector<TextureMapping>& aTextures, AssetHandle<DepthTextureAsset> aDepth = nullptr);
 
 		void Imgui();
 		bool myDoDebugLines = true;

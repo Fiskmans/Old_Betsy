@@ -52,6 +52,7 @@ namespace engine::graph
 		nodes::ImageNode UNIQUENAME;
 		nodes::EngineTextureNode UNIQUENAME;
 
+		ConversionNode<AssetHandle<DrawableTextureAsset>, AssetHandle<TextureAsset>> UNIQUENAME;
 
 		std::vector<NodeBase*> myFreeNodes;
 	};

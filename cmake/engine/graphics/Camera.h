@@ -60,7 +60,7 @@ namespace engine
 
 		virtual tools::Frustum<float> GenerateFrustum() const = 0;
 
-		AssetHandle GetTexture() { return myRenderTexture.Get(); }
+		AssetHandle<TextureAsset> GetTexture() { return myRenderTexture.Get(); }
 
 		std::vector<ModelInstance*> Cull() const;
 
@@ -69,7 +69,7 @@ namespace engine
 
 		engine::graph::Graph myRenderGraph;
 
-		engine::graph::CustomInPin<AssetHandle> myRenderTexture = engine::graph::PinInformation("Texture to Render");
+		engine::graph::CustomInPin<AssetHandle<TextureAsset>> myRenderTexture = engine::graph::PinInformation("Texture to Render");
 
 	protected:
 		engine::graph::CustomOutPin<Camera*> mySelf = engine::graph::PinInformation("Camera");

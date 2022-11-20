@@ -22,7 +22,7 @@ namespace engine::graphics
 		bool IsValid() { return !!myTexture && !!myRenderTarget && !!myViewport; }
 
 		void ClearTexture(tools::V4f aClearColor = tools::V4f(0.f, 0.f, 0.f, 1.f));
-		void SetAsActiveTarget(DepthTexture* aDepth = nullptr) const;
+		void SetAsActiveTarget(const DepthTexture* aDepth = nullptr) const;
 		void SetAsResourceOnSlot(unsigned int aSlot);
 
 		ID3D11ShaderResourceView* GetResourceView();
@@ -43,7 +43,7 @@ namespace engine::graphics
 		void Release();
 		bool IsValid() const { return !!myDepth; }
 
-		ID3D11DepthStencilView* GetDepth() { return myDepth; }
+		const ID3D11DepthStencilView* GetDepth() const { return myDepth; }
 
 	private:
 		friend TextureFactory;

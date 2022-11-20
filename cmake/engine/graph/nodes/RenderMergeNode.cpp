@@ -8,7 +8,7 @@ namespace engine::graph::nodes
 {
 	void RenderMergeNode::Activate()
 	{
-		AssetHandle& stashed = myOutTexture.GetOutStorage()->template As<AssetHandle>();
+		AssetHandle<DrawableTextureAsset>& stashed = myOutTexture.GetOutStorage()->template As<AssetHandle<DrawableTextureAsset>>();
 		if (!stashed.IsValid() || myInResolution.GetInPinInstance()->IsDirty() || myInFormat.GetInPinInstance()->IsDirty())
 		{
 			if (myInFormat != DXGI_FORMAT_UNKNOWN && myInResolution != tools::V2ui(0,0))
@@ -24,12 +24,12 @@ namespace engine::graph::nodes
 
 		std::vector<graphics::RenderManager::TextureMapping> mappings;
 
-		AssetHandle first = myInTexture1;
+		AssetHandle<TextureAsset> first = myInTexture1;
 		
 		if (first.IsValid())
 			mappings.emplace_back(first, 0);
 
-		AssetHandle second = myInTexture2;
+		AssetHandle<TextureAsset> second = myInTexture2;
 
 		if (second.IsValid())
 			mappings.emplace_back(second, 1);
@@ -45,7 +45,7 @@ namespace engine::graph::nodes
 		ImGui::SetCursorScreenPos(aTopLeft);
 		ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-		AssetHandle handle = myOutTexture.GetOutStorage()->template As<AssetHandle>();
+		AssetHandle<DrawableTextureAsset> handle = myOutTexture.GetOutStorage()->template As<AssetHandle<DrawableTextureAsset>>();
 
 		if (!handle.IsValid())
 		{
@@ -53,6 +53,6 @@ namespace engine::graph::nodes
 			return;
 		}
 
-		ImGui::Image(handle.Get<TextureAsset>().myTexture, ImVec2(40.f * aScale, 40.f * aScale), ImVec2(0.f, 0.f), ImVec2(1.f, 1.f), ImVec4(1.f, 1.f, 1.f, 1.f), ImVec4(1.f, 1.f, 1.f, 0.4f));
+		ImGui::Image(handle.Access().myTexture, ImVec2(40.f * aScale, 40.f * aScale), ImVec2(0.f, 0.f), ImVec2(1.f, 1.f), ImVec4(1.f, 1.f, 1.f, 1.f), ImVec4(1.f, 1.f, 1.f, 0.4f));
 	}
 }

@@ -22,7 +22,7 @@ namespace engine::graphics
 		context->ClearRenderTargetView(myRenderTarget, aClearColor.Raw());
 	}
 
-	void Texture::SetAsActiveTarget(DepthTexture* aDepth) const
+	void Texture::SetAsActiveTarget(const DepthTexture* aDepth) const
 	{
 		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 		context->OMSetRenderTargets(1, &myRenderTarget, aDepth ? aDepth->myDepth : nullptr);

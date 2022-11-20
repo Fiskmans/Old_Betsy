@@ -79,6 +79,17 @@ namespace engine::graph
 	};
 
 
+	template<typename From, typename To>
+	class ConversionNode : public NodeBase
+	{
+	public:
+		void Activate() { myTo = static_cast<To>(myFrom.Get()); }
+
+	private:
+		InPin<From> myFrom = PinInformation("In");
+		OutPin<To> myTo = PinInformation("Out");
+	};
+
 	class NodeBeginGroupType
 	{
 	public:

@@ -2,8 +2,10 @@
 #define ENGINE_ASSETS_ASSET_H
 
 #include "engine/graphics/Texture.h"
+#include "engine/graphics/GBuffer.h"
 
 #include "tools/JSON.h"
+#include "tools/Logger.h"
 
 #include <vector>
 #include <string>
@@ -20,7 +22,6 @@
 //#include "LevelLoader.h"
 //#include "FileWatcher.h"
 
-//class ModelInstance;
 //class TextInstance;
 //struct NavMesh;
 //class Animation;
@@ -39,11 +40,11 @@ namespace engine
 		inline virtual bool CheckLoaded() { return true; }
 
 		template<std::derived_from<Asset> AssetType>
-		inline bool Is() const { return typeid(AssetType) == typeid(*this); }
+		inline bool Is() const { return dynamic_cast<const AssetType*>(this); }
 
 	private:
 		friend class AssetManager;
-		friend class AssetHandle;
+		friend class AssetHandleBase;
 
 		void IncRefCount();
 		bool DecRefCount();
@@ -56,15 +57,15 @@ namespace engine
 	};
 
 
-	class AssetHandle
+	class AssetHandleBase
 	{
 	public:
-		AssetHandle(Asset* aAsset = nullptr);
-		virtual ~AssetHandle();
+		AssetHandleBase(Asset* aAsset = nullptr);
+		virtual ~AssetHandleBase();
 
-		AssetHandle(const AssetHandle& aOther);
+		AssetHandleBase(const AssetHandleBase& aOther);
 
-		AssetHandle& operator=(const AssetHandle& aOther);
+		AssetHandleBase& operator=(const AssetHandleBase& aOther);
 
 		bool IsValid() const;
 		bool IsLoaded() const;
@@ -72,11 +73,26 @@ namespace engine
 		template<std::derived_from<Asset> AssetType>
 		inline bool Is() const { return myAsset->Is<AssetType>(); }
 
-		template<std::derived_from<Asset> AssetType>
-		inline const AssetType& Get() const { return *reinterpret_cast<const AssetType*>(myAsset); }
+	protected:
+		template<std::derived_from<Asset> BaseAsset>
+		friend class AssetHandle;
 
-	private:
 		Asset* myAsset = nullptr;
+	};
+
+	template<std::derived_from<Asset> BaseAsset>
+	class AssetHandle : public AssetHandleBase
+	{
+	public:
+		AssetHandle(AssetHandleBase& aOther) : AssetHandle(aOther.myAsset) {}
+		AssetHandle(Asset* aAsset = nullptr) : AssetHandleBase(aAsset) 
+		{
+			if (aAsset && !aAsset->Is<BaseAsset>())
+				LOG_SYS_ERROR("Handle created with wrong assettype");
+		}
+
+
+		const BaseAsset& Access() const { return *reinterpret_cast<BaseAsset*>(myAsset); }
 	};
 
 	class ModelAsset
@@ -99,6 +115,26 @@ namespace engine
 		ID3D11ShaderResourceView* myTexture;
 	protected:
 		bool myOwns = true;
+	};
+
+	class DepthTextureAsset
+		: public Asset
+	{
+	public:
+		DepthTextureAsset(graphics::DepthTexture aTexture);
+		~DepthTextureAsset();
+
+		graphics::DepthTexture myTexture;
+	};
+
+	class GBufferAsset
+		: public Asset
+	{
+	public:
+		GBufferAsset(graphics::GBuffer aGBuffer);
+		~GBufferAsset();
+
+		graphics::GBuffer myGBuffer;
 	};
 
 	class DrawableTextureAsset final

@@ -20,8 +20,8 @@
 
 namespace engine::graphics
 {
-	RenderManager::TextureMapping::TextureMapping(const AssetHandle& aHandle, size_t aIndex)
-		: myResource(aHandle.Get<TextureAsset>().myTexture)
+	RenderManager::TextureMapping::TextureMapping(const AssetHandle<TextureAsset>& aHandle, size_t aIndex)
+		: myResource(aHandle.Access().myTexture)
 		, mySlot(aIndex)
 	{
 	}
@@ -121,32 +121,32 @@ namespace engine::graphics
 		UnbindTargets();
 		UnbindResources();
 		
-		GraphicsEngine::GetInstance().GetFrameWork().GetContext()->PSSetShaderResources(0, 1, &textureHandle.Get<TextureAsset>().myTexture);
+		GraphicsEngine::GetInstance().GetFrameWork().GetContext()->PSSetShaderResources(0, 1, &textureHandle.Access().myTexture);
 
 		myTextures[static_cast<int>(Channel::BackBuffer)].SetAsActiveTarget();
 		myFullscreenRenderer.Render(FullscreenRenderer::Shader::COPY);
 	}
 
-	void RenderManager::MapTextures(AssetHandle& aTarget, const std::vector<TextureMapping>& aTextures, DepthTexture* aDepth)
+	void RenderManager::MapTextures(AssetHandle<DrawableTextureAsset>& aTarget, const std::vector<TextureMapping>& aTextures, AssetHandle<DepthTextureAsset> aDepth)
 	{
 		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 
 		UnbindTargets();
 		UnbindResources();
 
-		aTarget.Get<DrawableTextureAsset>().myDrawableTexture.SetAsActiveTarget(aDepth);
+		aTarget.Access().myDrawableTexture.SetAsActiveTarget(&aDepth.Access().myTexture);
 		for (const TextureMapping& tex : aTextures)
 			context->PSSetShaderResources(tex.mySlot, 1, &tex.myResource);
 	}
 
-	void RenderManager::MapTextures(GBuffer& aTarget, const std::vector<TextureMapping>& aTextures, DepthTexture* aDepth)
+	void RenderManager::MapTextures(AssetHandle<GBufferAsset>& aTarget, const std::vector<TextureMapping>& aTextures, AssetHandle<DepthTextureAsset> aDepth)
 	{
 		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 
 		UnbindTargets();
 		UnbindResources();
 
-		aTarget.SetAsActiveTarget(aDepth);
+		aTarget.Access().myGBuffer.SetAsActiveTarget(&aDepth.Access().myTexture);
 		for (const TextureMapping& tex : aTextures)
 			context->PSSetShaderResources(tex.mySlot, 1, &tex.myResource);
 	}

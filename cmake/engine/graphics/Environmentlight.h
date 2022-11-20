@@ -9,7 +9,7 @@ namespace engine::graphics
 {
 	struct EnvironmentLight
 	{
-		AssetHandle myTexture;
+		AssetHandle<TextureAsset> myTexture;
 		tools::V3f myDirection;
 		tools::V3f myColor;
 		tools::V3f myCenter;

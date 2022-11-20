@@ -23,12 +23,12 @@ namespace engine::graph::nodes
 		void Imgui(float aScale, ImVec2 aTopLeft) override;
 
 	private:
-		InPin<AssetHandle> myInTexture1 = PinInformation("Tex 1");
-		InPin<AssetHandle> myInTexture2 = PinInformation("Tex 2");
+		InPin<AssetHandle<TextureAsset>> myInTexture1 = PinInformation("Tex 1");
+		InPin<AssetHandle<TextureAsset>> myInTexture2 = PinInformation("Tex 2");
 		InPin<tools::V2ui> myInResolution = PinInformation("Resolution");
 		InPin<DXGI_FORMAT> myInFormat = PinInformation("Format");
 
-		OutPin<AssetHandle> myOutTexture = PinInformation("Res");
+		OutPin<AssetHandle<DrawableTextureAsset>> myOutTexture = PinInformation("Res");
 	};
 
 }

@@ -22,7 +22,7 @@ namespace engine::graph::nodes
 	private:
 		InPin<std::string> myFilePath = PinInformation("File path");
 
-		OutPin<AssetHandle> myTexture = PinInformation("Texture");
+		OutPin<AssetHandle<TextureAsset>> myTexture = PinInformation("Texture");
 	};
 }
 

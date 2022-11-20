@@ -21,13 +21,13 @@ namespace engine::graph::nodes
 		void Activate() override;
 
 	private:
-		InPin<graphics::GBuffer> myInGBuffer = PinInformation("Geometry");
+		InPin<AssetHandle<GBufferAsset>> myInGBuffer = PinInformation("Geometry");
 		InPin<Camera*> myInCamera = PinInformation("Camera");
 		InPin<tools::V2ui> myInResolution = PinInformation("Resolution");
 		InPin<DXGI_FORMAT> myInFormat = PinInformation("Format");
 
 
-		OutPin<AssetHandle> myOutTexture = PinInformation("Tex");
+		OutPin<AssetHandle<DrawableTextureAsset>> myOutTexture = PinInformation("Tex");
 	};
 }
 

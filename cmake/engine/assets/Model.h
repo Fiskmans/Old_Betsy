@@ -28,11 +28,11 @@ namespace engine
 			D3D_PRIMITIVE_TOPOLOGY myPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 			DXGI_FORMAT myIndexBufferFormat = DXGI_FORMAT::DXGI_FORMAT_UNKNOWN;
 
-			AssetHandle myPixelShader;
-			AssetHandle myVertexShader;
+			AssetHandle<PixelShaderAsset> myPixelShader;
+			AssetHandle<VertexShaderAsset> myVertexShader;
 
-			AssetHandle myTextures[3];
-			std::vector<AssetHandle> myCustomTextures;
+			AssetHandle<TextureAsset> myTextures[3];
+			std::vector<AssetHandle<TextureAsset>> myCustomTextures;
 			tools::V4f myDiffuseColor;
 
 			bool myIsIndexed = true;
@@ -47,7 +47,7 @@ namespace engine
 			tools::M44f myOffset;
 		};
 
-		AssetHandle myAnimations;
+		//AssetHandle<AnimationAsset> myAnimations;
 
 		std::vector<BoneInfo> myBoneData;
 		std::unordered_map<std::string, unsigned int> myBoneNameLookup;

@@ -55,13 +55,13 @@ namespace engine::graphics
 		context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
 		context->GSSetShader(nullptr, nullptr, 0);
 
-		context->VSSetShader(myVertexShader.Get<VertexShaderAsset>().myShader, nullptr, 0);
-		context->PSSetShader(myPixelShaders[static_cast<int>(aEffect)].Get<PixelShaderAsset>().myShader, nullptr, 0);
+		context->VSSetShader(myVertexShader.Access().myShader, nullptr, 0);
+		context->PSSetShader(myPixelShaders[static_cast<int>(aEffect)].Access().myShader, nullptr, 0);
 
 		context->Draw(3, 0);
 	}
 
-	void FullscreenRenderer::Render(const AssetHandle& aShader)
+	void FullscreenRenderer::Render(const AssetHandle<PixelShaderAsset>& aShader)
 	{
 		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 
@@ -71,8 +71,8 @@ namespace engine::graphics
 		context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
 		context->GSSetShader(nullptr, nullptr, 0);
 
-		context->VSSetShader(myVertexShader.Get<VertexShaderAsset>().myShader, nullptr, 0);
-		context->PSSetShader(aShader.Get<PixelShaderAsset>().myShader, nullptr, 0);
+		context->VSSetShader(myVertexShader.Access().myShader, nullptr, 0);
+		context->PSSetShader(aShader.Access().myShader, nullptr, 0);
 
 		context->Draw(3, 0);
 	}

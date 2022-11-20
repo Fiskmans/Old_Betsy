@@ -12,5 +12,6 @@ add_executable(Demo_game1 "${SOURCE_FILES}")
 configure_file(config.h.in config.h)
 target_include_directories(Demo_game1 PUBLIC ${CMAKE_SOURCE_DIR})
 target_include_directories(Demo_game1 PUBLIC ${CMAKE_BINARY_DIR})
+target_include_directories(Demo_game1 PUBLIC ${FISK_INCLUDE_DIRS})
 
 target_link_libraries(Demo_game1 PUBLIC Engine)

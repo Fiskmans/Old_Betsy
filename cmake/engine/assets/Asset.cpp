@@ -23,7 +23,7 @@ namespace engine
 		return myRefCount == 0;
 	}
 
-	AssetHandle::AssetHandle(Asset* aAsset)
+	AssetHandleBase::AssetHandleBase(Asset* aAsset)
 		: myAsset(aAsset)
 	{
 		if (myAsset)
@@ -32,14 +32,14 @@ namespace engine
 		}
 	}
 
-	AssetHandle::~AssetHandle()
+	AssetHandleBase::~AssetHandleBase()
 	{
 		if (myAsset)
 			if (myAsset->DecRefCount())
 				delete myAsset;
 	}
 
-	AssetHandle::AssetHandle(const AssetHandle& aOther)
+	AssetHandleBase::AssetHandleBase(const AssetHandleBase& aOther)
 	{
 		myAsset = aOther.myAsset;
 		if (myAsset)
@@ -48,7 +48,7 @@ namespace engine
 		}
 	}
 
-	AssetHandle& AssetHandle::operator=(const AssetHandle& aOther)
+	AssetHandleBase& AssetHandleBase::operator=(const AssetHandleBase& aOther)
 	{
 		if (myAsset)
 		{
@@ -64,12 +64,12 @@ namespace engine
 		return *this;
 	}
 
-	bool AssetHandle::IsValid() const
+	bool AssetHandleBase::IsValid() const
 	{
 		return !!myAsset;
 	}
 
-	bool AssetHandle::IsLoaded() const
+	bool AssetHandleBase::IsLoaded() const
 	{
 		return myAsset->myIsLoaded || myAsset->CheckLoaded();
 	}
@@ -122,6 +122,27 @@ namespace engine
 	{
 		myTexture->Release();
 	}
+
+	DepthTextureAsset::DepthTextureAsset(graphics::DepthTexture aTexture)
+	{
+		myTexture = aTexture;
+	}
+
+	DepthTextureAsset::~DepthTextureAsset()
+	{
+		myTexture.Release();
+	}
+
+	GBufferAsset::GBufferAsset(graphics::GBuffer aGBuffer)
+	{
+		myGBuffer = aGBuffer;
+	}
+
+	GBufferAsset::~GBufferAsset()
+	{
+		myGBuffer.Release();
+	}
+
 
 	DrawableTextureAsset::DrawableTextureAsset(graphics::Texture& aTexture)
 		: TextureAsset(aTexture.GetResourceView())

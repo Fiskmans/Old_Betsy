@@ -1,6 +1,10 @@
 #ifndef ENGINE_GRAPHICS_GRAPHICS_FRAMEWORK_H
 #define ENGINE_GRAPHICS_GRAPHICS_FRAMEWORK_H
 
+#include "engine/graphics/Releasable.h"
+
+#include "tools/Singleton.h"
+
 #include <d3d11.h>
 #include <unordered_map>
 #include <string>
@@ -9,10 +13,9 @@
 
 namespace engine
 {
-	class GraphicsFramework
+	class GraphicsFramework : tools::Singleton<GraphicsFramework>
 	{
 	public:
-		const static std::array<float, DXGI_FORMAT_V408 + 1> FormatToSizeLookup;
 		GraphicsFramework();
 		~GraphicsFramework();
 
@@ -20,31 +23,43 @@ namespace engine
 
 		void SetRenderTargetAndDepthStencil(ID3D11RenderTargetView* aRenterTarget, ID3D11DepthStencilView* aDepthStencil);
 
-
 		void EndFrame();
 
 		ID3D11DeviceContext* GetContext();
 		ID3D11Device* GetDevice();
-		struct ID3D11Texture2D* GetBackbufferTexture();
+		ID3D11Texture2D* GetBackbufferTexture();
 		IDXGISwapChain* GetSwapChain();
 
-		static void Imgui();
-		static void AddGraphicsMemoryUsage(size_t aAmount, const std::string& aName, const std::string& aCategory);
+		void Imgui();
+
+		void AddResource(void* aResource, std::string aName);
+
+		template<concepts::Releaseable T>
+		void ReleaseResource(T* aResource)
+		{
+			aResource->Release();
+
+			int b;
+			DoSomething([]() -> int { int a;  return &a; }, b);
+		}
+
+		template<class Callable, typename ReturnValue>
+			requires std::convertible_to<decltype(std::declval<Callable>()()), ReturnValue>
+		void DoSomething(Callable&& aCallable, ReturnValue& aValue)
+		{
+			//do stuff
+			new Callmanager<Callable>(aCallable, value);
+		}
+
+
 
 	private:
-		struct memoryUser
-		{
-			size_t aAmount = 0;
-			std::string myName;
-		};
-		static size_t ourTotalUsage;
-		static std::unordered_map<std::string, std::pair<size_t, std::vector<memoryUser>>> ourMemoryUsers;
+		size_t ourTotalUsage;
 
 		ID3D11Device* myDevice = nullptr;
 		IDXGISwapChain* mySwapChain = nullptr;
 		ID3D11DeviceContext* myDeviceContext = nullptr;
 		ID3D11RenderTargetView* myBackBuffer = nullptr;
-		ID3D11DepthStencilView* myDepthBuffer = nullptr;
 	};
 
 }

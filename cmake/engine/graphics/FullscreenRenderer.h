@@ -36,11 +36,11 @@ namespace engine::graphics
 		bool Init();
 
 		void Render(Shader aEffect);
-		void Render(const AssetHandle& aShader);
+		void Render(const AssetHandle<PixelShaderAsset>& aShader);
 
 	private:
-		AssetHandle myVertexShader = nullptr;
-		std::array<AssetHandle, static_cast<int>(Shader::COUNT)> myPixelShaders;
+		AssetHandle<VertexShaderAsset> myVertexShader = nullptr;
+		std::array<AssetHandle<PixelShaderAsset>, static_cast<int>(Shader::COUNT)> myPixelShaders;
 
 	};
 

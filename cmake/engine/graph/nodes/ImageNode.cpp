@@ -13,7 +13,7 @@ namespace engine::graph::nodes
 	{
 		ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-		AssetHandle handle = myTexture.GetOutStorage()->template As<AssetHandle>();
+		AssetHandle<TextureAsset> handle = myTexture.GetOutStorage()->template As<AssetHandle<TextureAsset>>();
 
 		ImVec2 size = ImVec2(40.f * aScale, 40.f * aScale);
 		ImVec2 bottomRight(aTopLeft.x + size.x, aTopLeft.y + size.y);
@@ -52,7 +52,7 @@ namespace engine::graph::nodes
 		}
 		ImGui::PopClipRect();
 
-		ImGui::Image(handle.Get<TextureAsset>().myTexture, size, ImVec2(0.f, 0.f), ImVec2(1.f, 1.f), ImVec4(1.f, 1.f, 1.f, 1.f), ImVec4(1.f, 1.f, 1.f, 0.4f));
+		ImGui::Image(handle.Access().myTexture, size, ImVec2(0.f, 0.f), ImVec2(1.f, 1.f), ImVec4(1.f, 1.f, 1.f, 1.f), ImVec4(1.f, 1.f, 1.f, 0.4f));
 		drawlist->AddRect(aTopLeft, bottomRight, ImColor(1.f, 1.f, 1.f, 1.f));
 	}
 

@@ -12,9 +12,9 @@ namespace engine::graphics
 	{
 		GraphicsFramework& framework = GraphicsEngine::GetInstance().GetFrameWork();
 		ID3D11Device* device = framework.GetDevice();
-
+		
 		HRESULT result;
-
+		
 		D3D11_TEXTURE2D_DESC desc;
 		WIPE(desc);
 		desc.Width = aSize[0];
@@ -28,9 +28,7 @@ namespace engine::graphics
 		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		desc.MiscFlags = 0;
-
-		GraphicsFramework::AddGraphicsMemoryUsage(static_cast<size_t>(aSize[0] * aSize[1] * sizeof(float)), aName, "Engine Texture");
-
+		
 		ID3D11Texture2D* texture;
 		result = device->CreateTexture2D(&desc, nullptr, &texture);
 		if (FAILED(result))
@@ -38,7 +36,7 @@ namespace engine::graphics
 			LOG_SYS_ERROR("Could not create texture");
 			return nullptr;
 		}
-
+		
 		UpdatableTexture* returnVal = new UpdatableTexture(aSize);
 
 		ID3D11ShaderResourceView* shaderResource;
@@ -74,7 +72,6 @@ namespace engine::graphics
 		desc.CPUAccessFlags = 0;
 		desc.MiscFlags = 0;
 
-		GraphicsFramework::AddGraphicsMemoryUsage(static_cast<size_t>(aSize[0] * aSize[1] * GraphicsFramework::FormatToSizeLookup[aFormat]), aName, "Engine Texture");
 
 		ID3D11Texture2D* texture;
 		result = device->CreateTexture2D(&desc, nullptr, &texture);
@@ -84,9 +81,6 @@ namespace engine::graphics
 			return {};
 		}
 
-		Texture returnVal;
-		CreateTexture(texture, returnVal);
-
 		ID3D11ShaderResourceView* shaderResource;
 		result = device->CreateShaderResourceView(texture, nullptr, &shaderResource);
 		if (FAILED(result))
@@ -94,6 +88,9 @@ namespace engine::graphics
 			LOG_SYS_ERROR("Could not create shader resource");
 			return {};
 		}
+
+		Texture returnVal;
+		CreateTexture(texture, returnVal);
 
 		returnVal.myShaderResource = shaderResource;
 		return returnVal;
@@ -145,7 +142,6 @@ namespace engine::graphics
 		desc.CPUAccessFlags = 0;
 		desc.MiscFlags = 0;
 
-		GraphicsFramework::AddGraphicsMemoryUsage(static_cast<size_t>(aSize[0] * aSize[1] * GraphicsFramework::FormatToSizeLookup[desc.Format]), aName, "Engine Depth");
 		ID3D11Texture2D* texture;
 		result = device->CreateTexture2D(&desc, nullptr, &texture);
 		if (FAILED(result))
@@ -220,15 +216,6 @@ namespace engine::graphics
 		desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 		desc.CPUAccessFlags = 0;
 		desc.MiscFlags = 0;
-		{
-			float bpp = 0;
-			for (DXGI_FORMAT& format : formats)
-			{
-				bpp += GraphicsFramework::FormatToSizeLookup[format];
-			}
-
-			GraphicsFramework::AddGraphicsMemoryUsage(static_cast<size_t>(aSize[0] * aSize[1] * bpp), aName, "Engine GBuffer");
-		}
 
 		GBuffer buffer;
 		for (size_t i = 0; i < ENUM_CAST(GBuffer::Channel::Count); i++)

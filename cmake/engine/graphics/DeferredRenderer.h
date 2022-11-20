@@ -34,7 +34,7 @@ namespace engine::graphics
 	private:
 		void MapEnvLightBuffer(Camera* aCamera);
 
-		AssetHandle myBackFaceShader;
+		AssetHandle<PixelShaderAsset> myBackFaceShader;
 		ID3D11Buffer* myFrameBuffer = nullptr;
 		ID3D11Buffer* myObjectBuffer = nullptr;
 		ID3D11Buffer* myPixelEnvLightBuffer = nullptr;

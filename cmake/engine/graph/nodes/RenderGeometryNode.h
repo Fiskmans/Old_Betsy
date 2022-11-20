@@ -28,12 +28,12 @@ namespace engine::graph::nodes
 	private:
 		InPin<Camera*> myInCamera = PinInformation("Camera");
 		InPin<tools::V2ui> myInResolution = PinInformation("Resolution");
-		InPin<graphics::DepthTexture> myInDepth = PinInformation("Depth");
+		InPin<AssetHandle<DepthTextureAsset>> myInDepth = PinInformation("Depth");
 
-		InstancedNodeData<graphics::DepthTexture> myStoredDepth = std::string("StoredDepth");
+		InstancedNodeData<AssetHandle<DepthTextureAsset>> myStoredDepth = std::string("StoredDepth");
 
-		OutPin<graphics::DepthTexture> myOutDepth = PinInformation("Depth");
-		OutPin<graphics::GBuffer> myOutGeometry = PinInformation("Geometry");
+		OutPin<AssetHandle<DepthTextureAsset>> myOutDepth = PinInformation("Depth");
+		OutPin<AssetHandle<GBufferAsset>> myOutGeometry = PinInformation("Geometry");
 	};
 }
 

@@ -104,29 +104,6 @@ namespace engine::assets
 			return nullptr;
 		}
 
-		ID3D11Resource* res;
-		tex->GetResource(&res);
-		ID3D11Texture2D* tex2d;
-		res->QueryInterface(&tex2d);
-		if (tex2d)
-		{
-			D3D11_TEXTURE2D_DESC desc;
-			tex2d->GetDesc(&desc);
-			tex2d->Release();
-			//DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(desc.Width * desc.Height * DirectX11Framework::FormatToSizeLookup[desc.Format]), aFile, "Texture2d");
-		}
-
-		ID3D11Texture3D* tex3d;
-		res->QueryInterface(&tex3d);
-		if (tex3d)
-		{
-			D3D11_TEXTURE3D_DESC desc;
-			tex3d->GetDesc(&desc);
-			tex3d->Release();
-			//DirectX11Framework::AddGraphicsMemoryUsage(static_cast<size_t>(desc.Width * desc.Height * desc.Depth * DirectX11Framework::FormatToSizeLookup[desc.Format]), aFile, "Texture3d");
-		}
-		res->Release();
-
 		return new TextureAsset(tex);
 	}
 

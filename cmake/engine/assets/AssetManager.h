@@ -29,24 +29,24 @@ namespace engine
 
 		void FlushChanges();
 
-		AssetHandle GetTexture(const std::string& aPath, bool aFailSilent = false);
-		AssetHandle MakeTexture(const tools::V2ui& aResolution, DXGI_FORMAT aFormat);
-		graphics::DepthTexture MakeDepthTexture(const tools::V2ui& aResolution);
-		graphics::GBuffer MakeGBuffer(const tools::V2ui& aResolution);
-		AssetHandle GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty = false);
+		AssetHandle<TextureAsset> GetTexture(const std::string& aPath, bool aFailSilent = false);
+		AssetHandle<TextureAsset> GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty = false);
+		AssetHandle<DrawableTextureAsset> MakeTexture(const tools::V2ui& aResolution, DXGI_FORMAT aFormat);
+		AssetHandle<DepthTextureAsset> MakeDepthTexture(const tools::V2ui& aResolution);
+		AssetHandle<GBufferAsset> MakeGBuffer(const tools::V2ui& aResolution);
 	
-		AssetHandle GetCubeTexture(const std::string& aPath);
-		AssetHandle GetModel(const std::string& aPath);
+		AssetHandle<TextureAsset> GetCubeTexture(const std::string& aPath);
+		AssetHandle<ModelAsset> GetModel(const std::string& aPath);
 		//AssetHandle GetSkybox(const std::string& aPath);
 
-		AssetHandle GetPixelShader(const std::string& aPath, ShaderFlags aFlags = ShaderFlags());
-		AssetHandle GetVertexShader(const std::string& aPath, ShaderFlags aFlags = ShaderFlags());
+		AssetHandle<PixelShaderAsset> GetPixelShader(const std::string& aPath, ShaderFlags aFlags = ShaderFlags());
+		AssetHandle<VertexShaderAsset> GetVertexShader(const std::string& aPath, ShaderFlags aFlags = ShaderFlags());
 		//AssetHandle GetGeometryShader(const std::string& aPath, ShaderFlags aFlags = ShaderFlags());
 
 		//AssetHandle GetPerlinTexture(tools::V2ui aSize, tools::V2f aScale, unsigned int aSeed);
 
 		//AssetHandle GetJSON(const std::string& aPath);
-		AssetHandle GetJSONRelative(const std::string& aBase, const std::string& aPath);
+		AssetHandle<JSONAsset> GetJSONRelative(const std::string& aBase, const std::string& aPath);
 
 		//AssetHandle GetFont(const std::string& aPath);
 
@@ -64,8 +64,8 @@ namespace engine
 
 	private:
 
-		AssetHandle GetTextureInternal(const std::string& aPath, bool aFailSilenty);
-		AssetHandle GetJSONInternal(const std::string& aPath);
+		AssetHandle<TextureAsset> GetTextureInternal(const std::string& aPath, bool aFailSilenty);
+		AssetHandle<JSONAsset> GetJSONInternal(const std::string& aPath);
 		//AssetHandle GetAnimationInternal(const std::string& aPath);
 
 		size_t myCustomTextureCounter;
@@ -80,19 +80,19 @@ namespace engine
 
 		Asset* myErrorTexture = nullptr;
 
-		std::unordered_map<std::string, AssetHandle> myCachedModels;
-		std::unordered_map<std::string, AssetHandle> myCachedSkyboxes;
-		std::unordered_map<std::string, AssetHandle> myCachedTextures;
-		std::unordered_map<std::string, AssetHandle> myCachedCubeTextures;
-		std::unordered_map<std::string, AssetHandle> myCachedJSON;
-		std::unordered_map<std::string, AssetHandle> myCachedfonts;
-		std::unordered_map<std::string, AssetHandle> myCachedLevels;
-		std::unordered_map<std::string, AssetHandle> myCachedNavMeshes;
-		std::unordered_map<std::string, AssetHandle> myCachedAnimations;
+		std::unordered_map<std::string, AssetHandle<ModelAsset>> myCachedModels;
+		std::unordered_map<std::string, AssetHandle<TextureAsset>> myCachedSkyboxes;
+		std::unordered_map<std::string, AssetHandle<TextureAsset>> myCachedTextures;
+		std::unordered_map<std::string, AssetHandle<TextureAsset>> myCachedCubeTextures;
+		std::unordered_map<std::string, AssetHandle<JSONAsset>> myCachedJSON;
+		//std::unordered_map<std::string, AssetHandle<FontAsset>> myCachedfonts;
+		//std::unordered_map<std::string, AssetHandle<LevelAsset>> myCachedLevels;
+		//std::unordered_map<std::string, AssetHandle<NavmeshAsset>> myCachedNavMeshes;
+		//std::unordered_map<std::string, AssetHandle<AnimationAsset>> myCachedAnimations;
 
-		std::unordered_map<std::string, std::unordered_map<ShaderFlags, Asset*>> myCachedPixelShaders;
-		std::unordered_map<std::string, std::unordered_map<ShaderFlags, Asset*>> myCachedVertexShaders;
-		std::unordered_map<std::string, std::unordered_map<ShaderFlags, Asset*>> myCachedGeometryShaders;
+		std::unordered_map<std::string, std::unordered_map<ShaderFlags, AssetHandle<PixelShaderAsset>>> myCachedPixelShaders;
+		std::unordered_map<std::string, std::unordered_map<ShaderFlags, AssetHandle<VertexShaderAsset>>> myCachedVertexShaders;
+		std::unordered_map<std::string, std::unordered_map<ShaderFlags, AssetHandle<GeometryShaderAsset>>> myCachedGeometryShaders;
 
 		std::vector<Asset*> myCustomAssets;
 	};

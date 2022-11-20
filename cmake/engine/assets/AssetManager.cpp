@@ -80,33 +80,33 @@ namespace engine
         //myFileWatcher.FlushChanges();
     }
 
-	AssetHandle AssetManager::GetTexture(const std::string& aPath, bool aFailSilent)
+	AssetHandle<TextureAsset> AssetManager::GetTexture(const std::string& aPath, bool aFailSilent)
 	{
 		return GetTextureInternal(myBaseFolder + TEXTURE_FOLDER + aPath, aFailSilent);
 	}
 
-    AssetHandle AssetManager::MakeTexture(const tools::V2ui& aResolution, DXGI_FORMAT aFormat)
+    AssetHandle<DrawableTextureAsset> AssetManager::MakeTexture(const tools::V2ui& aResolution, DXGI_FORMAT aFormat)
     {
-         graphics::Texture tex = graphics::TextureFactory::GetInstance().CreateTexture(aResolution, aFormat, "CustomTexture" + std::to_string(myCustomTextureCounter++));
-        return AssetHandle(new DrawableTextureAsset(tex));
+        graphics::Texture tex = graphics::TextureFactory::GetInstance().CreateTexture(aResolution, aFormat, "CustomTexture" + std::to_string(myCustomTextureCounter++));
+        return new DrawableTextureAsset(tex);
     }
 
-    graphics::DepthTexture AssetManager::MakeDepthTexture(const tools::V2ui& aResolution)
+    AssetHandle<DepthTextureAsset> AssetManager::MakeDepthTexture(const tools::V2ui& aResolution)
     {
-        return graphics::TextureFactory::GetInstance().CreateDepth(aResolution, "Depth");
+        return new DepthTextureAsset(graphics::TextureFactory::GetInstance().CreateDepth(aResolution, "Depth"));
     }
 
-    graphics::GBuffer AssetManager::MakeGBuffer(const tools::V2ui& aResolution)
+    AssetHandle<GBufferAsset> AssetManager::MakeGBuffer(const tools::V2ui& aResolution)
     {
-        return graphics::TextureFactory::GetInstance().CreateGBuffer(aResolution, "GBuffer");
+        return new GBufferAsset(graphics::TextureFactory::GetInstance().CreateGBuffer(aResolution, "GBuffer"));
     }
 
-    AssetHandle AssetManager::GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty)
+    AssetHandle<TextureAsset> AssetManager::GetTextureRelative(const std::string& aBase, const std::string& aPath, bool aFailSilenty)
     {
         return GetTextureInternal(tools::PathWithoutFile(aBase) + aPath, aFailSilenty);
     }
 
-	AssetHandle AssetManager::GetCubeTexture(const std::string& aPath)
+	AssetHandle<TextureAsset> AssetManager::GetCubeTexture(const std::string& aPath)
 	{
 		if (myCachedCubeTextures.count(aPath) == 0)
 		{
@@ -116,12 +116,12 @@ namespace engine
 				LOG_SYS_ERROR("Failed to load Cube Texture", aPath);
 			}
 			myCachedCubeTextures[aPath] = texture;
-			return AssetHandle(texture);
+			return texture;
 		}
-		return AssetHandle(myCachedCubeTextures[aPath]);
+		return myCachedCubeTextures[aPath];
 	}
 
-	AssetHandle AssetManager::GetModel(const std::string& aPath)
+	AssetHandle<ModelAsset> AssetManager::GetModel(const std::string& aPath)
 	{
 		if (myCachedModels.count(aPath) == 0)
 		{
@@ -131,9 +131,9 @@ namespace engine
 				LOG_ERROR("Failed to load Model", aPath);
 			}
 			myCachedModels[aPath] = model;
-			return AssetHandle(model);
+			return model;
 		}
-		return AssetHandle(myCachedModels[aPath]);
+		return myCachedModels[aPath];
 	}
     
     //AssetHandle AssetManager::GetSkybox(const std::string& aPath)
@@ -151,7 +151,7 @@ namespace engine
     //    return AssetHandle(myCachedSkyboxes[aPath]);
     //}
 
-    AssetHandle AssetManager::GetPixelShader(const std::string& aPath, ShaderFlags aFlags)
+    AssetHandle<PixelShaderAsset> AssetManager::GetPixelShader(const std::string& aPath, ShaderFlags aFlags)
     {
         static std::mutex mutex;
         std::lock_guard lock(mutex);
@@ -178,13 +178,13 @@ namespace engine
             shader->myFileHandle = myFileWatcher.RegisterCallback(myBaseFolder + PIXELSHADER_FOLDER + aPath, callback);
             */
 
-            return AssetHandle(shader);
+            return shader;
         }
 
-        return AssetHandle(myCachedPixelShaders[aPath][aFlags]);
+        return myCachedPixelShaders[aPath][aFlags];
     }
 
-    AssetHandle AssetManager::GetVertexShader(const std::string& aPath, ShaderFlags aFlags)
+    AssetHandle<VertexShaderAsset> AssetManager::GetVertexShader(const std::string& aPath, ShaderFlags aFlags)
     {
         static std::mutex mutex;
         std::lock_guard lock(mutex);
@@ -212,10 +212,10 @@ namespace engine
             shader->myFileHandle = myFileWatcher.RegisterCallback(myBaseFolder + VERTEXSHADER_FOLDER + aPath, callback);
             */
 
-            return AssetHandle(shader);
+            return shader;
         }
 
-        return AssetHandle(myCachedVertexShaders[aPath][aFlags]);
+        return myCachedVertexShaders[aPath][aFlags];
     }
 
     //AssetHandle AssetManager::GetGeometryShader(const std::string& aPath, ShaderFlags aFlags)
@@ -264,7 +264,7 @@ namespace engine
     //    return GetJSONInternal(myBaseFolder + JSON_FOLDER + aPath);
     //}
     //
-    AssetHandle AssetManager::GetJSONRelative(const std::string& aBase, const std::string& aPath)
+    AssetHandle<JSONAsset> AssetManager::GetJSONRelative(const std::string& aBase, const std::string& aPath)
     {
         return GetJSONInternal(tools::PathWithoutFile(aBase) + aPath);
     }
@@ -395,7 +395,7 @@ namespace engine
 		}
     }
     
-	AssetHandle AssetManager::GetTextureInternal(const std::string& aPath, bool aFailSilenty)
+	AssetHandle<TextureAsset> AssetManager::GetTextureInternal(const std::string& aPath, bool aFailSilenty)
 	{
 		if (myCachedTextures.count(aPath) == 0)
 		{
@@ -403,18 +403,17 @@ namespace engine
 			if (!texture)
 			{
 				if (!aFailSilenty)
-				{
 					LOG_ERROR("Failed to load Texture", aPath);
-				}
-				return AssetHandle(myErrorTexture);
+				
+                return myErrorTexture;
 			}
 			myCachedTextures[aPath] = texture;
-			return AssetHandle(texture);
+			return texture;
 		}
-		return AssetHandle(myCachedTextures[aPath]);
+		return myCachedTextures[aPath];
 	}
 
-	AssetHandle AssetManager::GetJSONInternal(const std::string& aPath)
+	AssetHandle<JSONAsset> AssetManager::GetJSONInternal(const std::string& aPath)
 	{
 		if (myCachedJSON.count(aPath) == 0)
 		{
@@ -433,9 +432,9 @@ namespace engine
 			}
 
 			myCachedJSON[aPath] = json;
-			return AssetHandle(json);
+			return json;
 		}
-		return AssetHandle(myCachedJSON[aPath]);
+		return myCachedJSON[aPath];
 	}
 
     //AssetHandle AssetManager::GetAnimationInternal(const std::string& aPath)

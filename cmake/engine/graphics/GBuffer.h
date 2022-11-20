@@ -32,13 +32,13 @@ namespace engine::graphics
 		bool IsValid() { return !!myViewport; };
 
 		void ClearTextures(const tools::V4f aClearColor = tools::V4f(0.f, 0.f, 0.f, 0.f));
-		void SetAsActiveTarget(class DepthTexture* aDepth = nullptr);
-		void SetAsActiveTarget(const Channel aResource, class DepthTexture* aDepth = nullptr);
+		void SetAsActiveTarget(const DepthTexture* aDepth = nullptr) const;
+		void SetAsActiveTarget(const Channel aResource, const DepthTexture* aDepth = nullptr) const;
 		void SetAsResourceOnSlot(const Channel aResource, const unsigned int aSlot);
-		void SetAllAsResources();
+		void SetAllAsResources() const;
 		void CopyTo(GBuffer* aOther, ID3D11DeviceContext* aContext);
 
-		void Imgui(ImVec2 aTopLeft, ImVec2 aBottomRight);
+		void Imgui(ImVec2 aTopLeft, ImVec2 aBottomRight) const;
 
 		void Release();
 

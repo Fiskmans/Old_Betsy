@@ -351,10 +351,10 @@ namespace engine::assets
 				break;
 			}
 		}
-		if (hasAnimation)
-		{
-			aModel->myAnimations = AssetManager::GetInstance().GetJSONRelative(aFilePath, attributes["Animations"]);
-		}
+		//if (hasAnimation)
+		//{
+		//	aModel->myAnimations = AssetManager::GetInstance().GetJSONRelative(aFilePath, attributes["Animations"]);
+		//}
 		aModel->MarkLoaded();
 	}
 
@@ -472,7 +472,7 @@ namespace engine::assets
 		UINT layoutElements = ShaderTypes::InputLayoutFromFlags(layout, flags);
 
 		ID3D11InputLayout* inputLayout;
-		const VertexShaderAsset& vsAsset = vertexShader.Get<VertexShaderAsset>();
+		const VertexShaderAsset& vsAsset = vertexShader.Access();
 		result = device->CreateInputLayout(layout, layoutElements, vsAsset.myBlob.data(), vsAsset.myBlob.size(), &inputLayout);
 		if (FAILED(result))
 		{

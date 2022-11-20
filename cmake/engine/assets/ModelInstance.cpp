@@ -37,7 +37,7 @@ namespace engine
 		SAFE_RELEASE(ourAnimationBuffer);
 	}
 
-	ModelInstance::ModelInstance(const AssetHandle& aModel)
+	ModelInstance::ModelInstance(const AssetHandle<ModelAsset>& aModel)
 	{
 		if (!aModel.Is<ModelAsset>())
 		{
@@ -55,7 +55,7 @@ namespace engine
 
 	const ModelAsset& ModelInstance::GetModelAsset() const 
 	{
-		return myModel.Get<ModelAsset>();
+		return myModel.Access();
 	}
 
 	void ModelInstance::ResetSpawnTime()
@@ -131,7 +131,7 @@ namespace engine
 
 	bool ModelInstance::HasAnimations() const
 	{
-		return !!(myModel.Get<ModelAsset>().myModel->GetModelData()[0]->myshaderTypeFlags & ShaderFlags::HasBones);
+		return !!(myModel.Access().myModel->GetModelData()[0]->myshaderTypeFlags & ShaderFlags::HasBones);
 	}
 
 
@@ -247,7 +247,7 @@ namespace engine
 
 	tools::Sphere<float> ModelInstance::GetBoundingSphere(float aRangeModifier)
 	{
-		return tools::Sphere<float>(myTransform.Row(3), myModel.Get<ModelAsset>().myModel->GetSize() * myGraphicBoundsModifier * aRangeModifier);
+		return tools::Sphere<float>(myTransform.Row(3), myModel.Access().myModel->GetSize() * myGraphicBoundsModifier * aRangeModifier);
 	}
 
 	const float ModelInstance::GetSpawnTime()
@@ -262,7 +262,7 @@ namespace engine
 
 	bool ModelInstance::GetIsHighlighted()
 	{
-		for (Model::ModelData* data : myModel.Get<ModelAsset>().myModel->GetModelData())
+		for (Model::ModelData* data : myModel.Access().myModel->GetModelData())
 		{
 			if (!data->myTextures[0].IsValid()) { return false; }
 			if (!data->myTextures[1].IsValid()) { return false; }

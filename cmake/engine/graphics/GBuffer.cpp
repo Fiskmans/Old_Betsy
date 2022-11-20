@@ -15,14 +15,14 @@ namespace engine::graphics
 		}
 	}
 
-	void GBuffer::SetAsActiveTarget(DepthTexture* aDepth)
+	void GBuffer::SetAsActiveTarget(const DepthTexture* aDepth) const
 	{
 		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 		context->OMSetRenderTargets(static_cast<int>(GBuffer::Channel::Count), myRenderTargets.data(), aDepth ? aDepth->myDepth : nullptr);
 		context->RSSetViewports(1, myViewport);
 	}
 
-	void GBuffer::SetAsActiveTarget(const Channel aResource, DepthTexture* aDepth)
+	void GBuffer::SetAsActiveTarget(const Channel aResource, const DepthTexture* aDepth) const
 	{
 		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 		context->OMSetRenderTargets(1, myRenderTargets.data() + static_cast<int>(aResource), aDepth ? aDepth->myDepth : nullptr);
@@ -34,7 +34,7 @@ namespace engine::graphics
 		GraphicsEngine::GetInstance().GetFrameWork().GetContext()->PSSetShaderResources(aSlor, 1, &myShaderResources[static_cast<int>(aResource)]);
 	}
 
-	void GBuffer::SetAllAsResources()
+	void GBuffer::SetAllAsResources() const
 	{
 		GraphicsEngine::GetInstance().GetFrameWork().GetContext()->PSSetShaderResources(0, static_cast<int>(GBuffer::Channel::Count), myShaderResources.data());
 	}
@@ -47,7 +47,7 @@ namespace engine::graphics
 		}
 	}
 
-	void GBuffer::Imgui(ImVec2 aTopLeft, ImVec2 aBottomRight)
+	void GBuffer::Imgui(ImVec2 aTopLeft, ImVec2 aBottomRight) const
 	{
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 		ImVec2 size = ImVec2((aBottomRight.x - aTopLeft.x) / 2.f, (aBottomRight.y - aTopLeft.y) / 4.f);

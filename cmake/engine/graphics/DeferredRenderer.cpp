@@ -170,15 +170,15 @@ namespace engine::graphics
 					context->VSSetConstantBuffers(graphics::OBJECT_BUFFER_INDEX, 1, &myObjectBuffer);
 					context->PSSetConstantBuffers(graphics::OBJECT_BUFFER_INDEX, 1, &myObjectBuffer);
 
-					context->VSSetShader(modelData->myVertexShader.Get<VertexShaderAsset>().myShader, nullptr, 0);
-					context->PSSetShader(modelData->myPixelShader.Get<PixelShaderAsset>().myShader, nullptr, 0);
+					context->VSSetShader(modelData->myVertexShader.Access().myShader, nullptr, 0);
+					context->PSSetShader(modelData->myPixelShader.Access().myShader, nullptr, 0);
 
 
 					ID3D11ShaderResourceView* resources[3] = { nullptr };
 
-					if (modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].Get<TextureAsset>().myTexture; }
-					if (modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].Get<TextureAsset>().myTexture; }
-					if (modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].Get<TextureAsset>().myTexture; }
+					if (modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].Access().myTexture; }
+					if (modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].Access().myTexture; }
+					if (modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].Access().myTexture; }
 
 					context->PSSetShaderResources(0, 3, resources);
 					context->VSSetShaderResources(0, 3, resources);
@@ -470,7 +470,7 @@ namespace engine::graphics
 
 			if (envlight->myTexture.IsValid()) 
 			{ 
-				texture[0] = envlight->myTexture.Get<TextureAsset>().myTexture;
+				texture[0] = envlight->myTexture.Access().myTexture;
 			}
 			else
 			{

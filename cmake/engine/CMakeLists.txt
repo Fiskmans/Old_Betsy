@@ -27,6 +27,7 @@ list(APPEND SOURCE_FILES "graphics/RenderScene.cpp")
 list(APPEND SOURCE_FILES "graphics/RenderScene.h")
 list(APPEND SOURCE_FILES "graphics/Camera.cpp")
 list(APPEND SOURCE_FILES "graphics/Camera.h")
+list(APPEND SOURCE_FILES "graphics/Releasable.h")
 
 list(APPEND SOURCE_FILES "assets/ShaderFlags.h")
 list(APPEND SOURCE_FILES "assets/ShaderCompiler.h")

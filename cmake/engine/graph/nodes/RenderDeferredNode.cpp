@@ -9,12 +9,16 @@ namespace engine::graph::nodes
 	void RenderDeferredNode::Activate()
 	{
 
-		AssetHandle stashed = myOutTexture.GetOutStorage()->template As<AssetHandle>();
+		AssetHandle<DrawableTextureAsset> stashed = myOutTexture.GetOutStorage()->template As<AssetHandle<DrawableTextureAsset>>();
 		if (!stashed.IsValid() || myInResolution.GetInPinInstance()->IsDirty())
 		{
-			if (myInFormat != DXGI_FORMAT_UNKNOWN && myInResolution != tools::V2ui(0, 0))
+			if (myInFormat != DXGI_FORMAT_UNKNOWN)
 			{
-				stashed = AssetManager::GetInstance().MakeTexture(myInResolution, myInFormat);
+				tools::V2ui resolution = myInResolution;
+				if (resolution == tools::V2ui(0, 0))
+					resolution = WindowManager::GetInstance().GetSize(); //TODO [2]: register for resolution changes
+
+				stashed = AssetManager::GetInstance().MakeTexture(resolution, myInFormat);
 			}
 			else
 			{
@@ -23,14 +27,14 @@ namespace engine::graph::nodes
 			}
 		}
 
-		graphics::GBuffer& buffer = myInGBuffer;
+		AssetHandle<GBufferAsset>& buffer = myInGBuffer;
 		if (!buffer.IsValid())
 		{
 			myOutTexture.GetOutStorage()->MarkRefreshed();
 			return;
 		}
 
-		buffer.SetAllAsResources();
+		buffer.Access().myGBuffer.SetAllAsResources();
 		graphics::RenderManager::GetInstance().GetDeferredRenderer().Render(myInCamera);
 		myOutTexture = stashed;
 	}

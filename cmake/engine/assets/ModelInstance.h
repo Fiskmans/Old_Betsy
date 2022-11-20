@@ -20,7 +20,7 @@ namespace engine
 		static bool InitShared();
 		static void ReleaseShared();
 
-		ModelInstance(const AssetHandle& aModel);
+		ModelInstance(const AssetHandle<ModelAsset>& aModel);
 		const ModelAsset& GetModelAsset() const;
 		tools::M44f GetModelToWorldTransform();
 		void SetPosition(const tools::V4f& aPosition);
@@ -65,7 +65,7 @@ namespace engine
 		tools::V3f myScale;
 
 		class Animator* myAnimator;
-		engine::AssetHandle myModel;
+		engine::AssetHandle<ModelAsset> myModel;
 
 		float myGraphicBoundsModifier;
 

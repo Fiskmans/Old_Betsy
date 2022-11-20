@@ -8,7 +8,7 @@ namespace engine::graph::nodes
 {
 	void RenderGeometryNode::Activate()
 	{
-		graphics::GBuffer& stashed = myOutGeometry.GetOutStorage()->template As<graphics::GBuffer>();
+		AssetHandle<GBufferAsset>& stashed = myOutGeometry.GetOutStorage()->template As<AssetHandle<GBufferAsset>>();
 		if (!stashed.IsValid() || myInResolution.GetInPinInstance()->IsDirty())
 		{
 			tools::V2ui resolution = myInResolution;
@@ -18,13 +18,11 @@ namespace engine::graph::nodes
 			stashed = AssetManager::GetInstance().MakeGBuffer(resolution);
 		}
 		
-		graphics::DepthTexture depth;
-		graphics::DepthTexture& depthStashed = myStoredDepth;
-		graphics::DepthTexture& depthIn = myInDepth;
+		AssetHandle<DepthTextureAsset> depth;
+		AssetHandle<DepthTextureAsset>& depthStashed = myStoredDepth;
+		AssetHandle<DepthTextureAsset>& depthIn = myInDepth;
 		if (depthIn.IsValid())
 		{
-			if (depthStashed.IsValid())
-				depthStashed.Release();
 			depth = depthIn;
 		}
 		else
@@ -44,7 +42,7 @@ namespace engine::graph::nodes
 			depth = depthStashed;
 		}
 
-		graphics::RenderManager::GetInstance().MapTextures(stashed, {}, &depth);
+		graphics::RenderManager::GetInstance().MapTextures(stashed, {}, depth);
 		graphics::RenderManager::GetInstance().GetDeferredRenderer().GenerateGBuffer(myInCamera);
 		myOutGeometry = stashed;
 		myOutDepth = depth;
@@ -55,7 +53,7 @@ namespace engine::graph::nodes
 		ImGui::SetCursorScreenPos(aTopLeft);
 		ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-		graphics::GBuffer& handle = myOutGeometry.GetOutStorage()->template As<graphics::GBuffer>();
+		AssetHandle<GBufferAsset>& handle = myOutGeometry.GetOutStorage()->template As<AssetHandle<GBufferAsset>>();
 
 		if (!handle.IsValid())
 		{
@@ -63,6 +61,6 @@ namespace engine::graph::nodes
 			return;
 		}
 
-		handle.Imgui(aTopLeft, ImVec2(aTopLeft.x + 80 * aScale, aTopLeft.y + 160 * aScale));
+		handle.Access().myGBuffer.Imgui(aTopLeft, ImVec2(aTopLeft.x + 80 * aScale, aTopLeft.y + 160 * aScale));
 	}
 }
