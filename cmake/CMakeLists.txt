@@ -26,7 +26,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(BUILD_SHARED_LIBS OFF)
 
 add_subdirectory(fisk_input)
-add_subdirectory(fisk_tools)
 
 add_subdirectory(tools)
 add_subdirectory(imgui)
