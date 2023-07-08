@@ -68,7 +68,7 @@ namespace engine
 
         if (!std::filesystem::exists(rootPath))
         {
-            LOG_SYS_ERROR("Failed to perload assets, folder doesn't exist", rootPath.string());
+            LOG_SYS_ERROR("Failed to preload assets, folder doesn't exist", rootPath.string());
             return;
         }
 
