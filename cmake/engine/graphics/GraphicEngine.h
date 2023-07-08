@@ -10,14 +10,13 @@
 
 namespace engine::graphics
 {
-	class GraphicsEngine : public tools::Singleton<GraphicsEngine>
+	class GraphicsEngine : public fisk::tools::Singleton<GraphicsEngine>
 	{
 	public:
 		GraphicsEngine();
 		~GraphicsEngine() = default;
 
 		bool Init(tools::V2ui aWindowSize = tools::V2ui(0, 0));
-		void BeginFrame(tools::V4f aClearcolor);
 		void RenderFrame();
 		void EndFrame();
 

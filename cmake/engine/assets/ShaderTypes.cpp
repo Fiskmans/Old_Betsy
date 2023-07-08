@@ -1,6 +1,8 @@
 #include "engine/assets/ShaderTypes.h"
 #include "engine/assets/ShaderFlags.h"
+
 #include "engine/graphics/ShaderBuffers.h"
+#include "engine/graphics/ShaderMappings.h"
 
 #include "common/Macros.h"
 
@@ -175,10 +177,11 @@ namespace engine
 		AddMacro("HAS_BONES", ((aFlags & ShaderFlags::HasBones) != 0) ? "true" : "false");
 		AddMacro("BONESPERVERTEX", std::to_string(ShaderTypes::BonePerVertexCountFromFlags(aFlags)));
 
-		AddMacro("FRAME_BUFFER", "b" + std::to_string(graphics::FRAME_BUFFER_INDEX));
-		AddMacro("OBJECT_BUFFER", "b" + std::to_string(graphics::OBJECT_BUFFER_INDEX));
-		AddMacro("POINT_LIGHT_BUFFER", "b" + std::to_string(graphics::POINT_LIGHT_BUFFER_INDEX));
-		AddMacro("ANIMATION_BUFFER", "b" + std::to_string(graphics::ANIMATION_BUFFER_INDEX));
+		AddMacro("FRAME_BUFFER", "b" + std::to_string(graphics::shader_mappings::BUFFER_FRAME));
+		AddMacro("OBJECT_BUFFER", "b" + std::to_string(graphics::shader_mappings::BUFFER_OBJECT));
+		AddMacro("POINT_LIGHT_BUFFER", "b" + std::to_string(graphics::shader_mappings::BUFFER_POINT_LIGHT));
+		AddMacro("ANIMATION_BUFFER", "b" + std::to_string(graphics::shader_mappings::BUFFER_ANIMATION));
+		AddMacro("DEFERRED_FRAME_BUFFER", "b" + std::to_string(graphics::shader_mappings::BUFFER_DEFFERED_FRAME));
 	}
 
 	_D3D_SHADER_MACRO* ShaderDefines::Get()

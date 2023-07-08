@@ -8,8 +8,6 @@
 #include "engine/graph/nodes/TestNodes.h"
 #include "engine/graph/nodes/ImageNode.h"
 #include "engine/graph/nodes/MulNode.h"
-#include "engine/graph/nodes/RenderGeometryNode.h"
-#include "engine/graph/nodes/RenderDeferredNode.h"
 
 #include "engine/graphics/Camera.h"
 #include "engine/graphics/RenderScene.h"
@@ -19,7 +17,7 @@
 namespace engine::graph
 {
 
-	class NodeRegistration : public tools::Singleton<NodeRegistration>
+	class NodeRegistration : public fisk::tools::Singleton<NodeRegistration>
 	{
 	public:
 		static void Register()
@@ -40,10 +38,8 @@ namespace engine::graph
 			float,
 			size_t> UNIQUENAME;
 
-		nodes::RenderCopyNode UNIQUENAME;
+		//nodes::RenderCopyNode UNIQUENAME;
 		nodes::RenderMergeNode UNIQUENAME;
-		nodes::RenderGeometryNode UNIQUENAME;
-		nodes::RenderDeferredNode UNIQUENAME;
 
 		nodes::PrintNode UNIQUENAME;
 		nodes::IntConstant UNIQUENAME;

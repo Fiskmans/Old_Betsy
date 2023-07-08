@@ -1,4 +1,4 @@
-#include "../ShaderStructs.hlsli"
+#include "ShaderStructs.hlsli"
 
 
 VertexToPixel vertexShader(VertexInput input)
@@ -26,7 +26,8 @@ VertexToPixel vertexShader(VertexInput input)
 	float4x4 screenPosition = mul(cameraPosition, FrameBuffer.myCameraToProjection);
 
 
-	returnValue.myPosition = screenPosition[0];
+	returnValue.myPosition = -screenPosition[0];
+	returnValue.myPosition.w = 1.0;
 	returnValue.myNormal = normalize(worldPosition[1]);
 	returnValue.myTangent = worldPosition[2];
 	returnValue.myBiTangent = worldPosition[3];

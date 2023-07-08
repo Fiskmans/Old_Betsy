@@ -1,6 +1,6 @@
-#include "../FullscreenShaderStructs.hlsli"
+#include "ShaderStructs.hlsli"
 
-VertexToPixel vertexShader(VertexInput input)
+FullscreenVertexToPixel vertexShader(FullscreenVertexInput input)
 {
 	float4 positions[3] =
 	{
@@ -16,7 +16,7 @@ VertexToPixel vertexShader(VertexInput input)
 		float2(2,1)
 	};
 
-	VertexToPixel returnValue;
+	FullscreenVertexToPixel returnValue;
 	returnValue.myPosition = positions[input.myIndex];
 	returnValue.myUV = uvs[input.myIndex];
 	return returnValue;

@@ -25,14 +25,6 @@ namespace tools
 	public:
 		ExecuteOnConstruct(T&& aFunctor) { aFunctor(); }
 	};
-
-	class ExecuteOnConstructWithoutCTAD
-	{
-	public:
-		ExecuteOnConstructWithoutCTAD(const std::function<void()>& aFunctor) { aFunctor(); }
-	};
-	
-
 }
 
 #define EXECUTE_ON_DESTRUCT(scope) tools::ExecuteOnDestruct CONCAT(executeOnDestruct, __LINE__)([&]() scope)

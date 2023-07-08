@@ -9,6 +9,8 @@
 
 #include <array>
 
+#define NOMINMAX
+#include <WinSock2.h>
 #include <d3d11.h>
 
 namespace engine::graphics
@@ -16,16 +18,21 @@ namespace engine::graphics
 	class GBuffer
 	{
 	public:
+		GBuffer() = default;
+		GBuffer(const GBuffer&) = delete;
+		void operator=(const GBuffer&) = delete;
+
+		~GBuffer();
+		GBuffer(GBuffer&&);
+		void operator=(GBuffer&&);
+
 		enum class Channel
 		{
 			Postion,
 			Albedo,
 			Normal,
 			VertexNormal,
-			Metalness,
-			Roughness,
-			AmbientOcclusion,
-			Emissive,
+			Material,
 			Count
 		};
 
@@ -40,14 +47,12 @@ namespace engine::graphics
 
 		void Imgui(ImVec2 aTopLeft, ImVec2 aBottomRight) const;
 
-		void Release();
-
 	private:
 		friend class TextureFactory;
 
-		std::array<ID3D11Texture2D*, static_cast<int>(Channel::Count)> myTextures;
-		std::array<ID3D11RenderTargetView*, static_cast<int>(Channel::Count)> myRenderTargets;
-		std::array<ID3D11ShaderResourceView*, static_cast<int>(Channel::Count)> myShaderResources;
+		std::array<ID3D11Texture2D*, static_cast<int>(Channel::Count)> myTextures = { nullptr };
+		std::array<ID3D11RenderTargetView*, static_cast<int>(Channel::Count)> myRenderTargets = { nullptr };
+		std::array<ID3D11ShaderResourceView*, static_cast<int>(Channel::Count)> myShaderResources = { nullptr };
 
 		D3D11_VIEWPORT* myViewport = nullptr;
 	};

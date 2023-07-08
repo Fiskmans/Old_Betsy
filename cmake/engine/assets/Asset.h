@@ -14,6 +14,8 @@
 #include <typeindex>
 #include <concepts>
 
+#define NOMINMAX
+#include <WinSock2.h>
 #include <d3d11.h>
 
 
@@ -92,7 +94,11 @@ namespace engine
 		}
 
 
-		const BaseAsset& Access() const { return *reinterpret_cast<BaseAsset*>(myAsset); }
+		const BaseAsset& Access() const 
+		{
+			assert(myAsset);
+			return *reinterpret_cast<BaseAsset*>(myAsset); 
+		}
 	};
 
 	class ModelAsset
@@ -121,8 +127,7 @@ namespace engine
 		: public Asset
 	{
 	public:
-		DepthTextureAsset(graphics::DepthTexture aTexture);
-		~DepthTextureAsset();
+		DepthTextureAsset(graphics::DepthTexture&& aTexture);
 
 		graphics::DepthTexture myTexture;
 	};
@@ -131,8 +136,7 @@ namespace engine
 		: public Asset
 	{
 	public:
-		GBufferAsset(graphics::GBuffer aGBuffer);
-		~GBufferAsset();
+		GBufferAsset(graphics::GBuffer&& aGBuffer);
 
 		graphics::GBuffer myGBuffer;
 	};
@@ -141,10 +145,7 @@ namespace engine
 		: public TextureAsset
 	{
 	public:
-		DrawableTextureAsset(graphics::Texture& aTexture);
-
-		~DrawableTextureAsset();
-
+		DrawableTextureAsset(graphics::Texture&& aTexture);
 		graphics::Texture myDrawableTexture;
 	};
 
@@ -179,14 +180,13 @@ namespace engine
 		ID3D11GeometryShader* myShader;
 	};
 
-	class JSONAsset
+	class JsonAsset
 		: public Asset
 	{
 	public:
-		JSONAsset(tools::JSONObject* aObject, const std::string& aPath);
-		~JSONAsset();
+		JsonAsset(const std::string& aPath);
 
-		tools::JSONObject* myObject;
+		fisk::tools::Json myObject;
 		std::string myPath;
 	};
 

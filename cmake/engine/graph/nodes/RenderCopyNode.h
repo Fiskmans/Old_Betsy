@@ -8,23 +8,23 @@
 
 namespace engine::graph::nodes
 {
-	class RenderCopyNode : public NodeBase
-	{
-	public:
-		void Activate() override;
-
-	private:
-		InPin<graphics::Texture> myInTexture = PinInformation("In Texture");
-
-		OutPin<graphics::Texture> myOutTexture = PinInformation("Out Texture");
-		OutPin<int> myIntPin = PinInformation("strickty pal");
-		OutPin<float> myFloatPin = PinInformation("floaty boy");
-		OutPin<RenderCopyNode*> myRandom = PinInformation("a node");
-
-		InstancedNodeData<char> mySmall = std::string("char");
-		InstancedNodeData<int> myMedium = std::string("int");
-		InstancedNodeData<void*> myLarge = std::string("void*");
-	};
+	//class RenderCopyNode : public NodeBase
+	//{
+	//public:
+	//	void Activate() override;
+	//
+	//private:
+	//	InPin<AssetHandle<graphics::Texture>> myInTexture = PinInformation("In Texture");
+	//
+	//	OutPin<AssetHandle<graphics::Texture>> myOutTexture = PinInformation("Out Texture");
+	//	OutPin<int> myIntPin = PinInformation("strickty pal");
+	//	OutPin<float> myFloatPin = PinInformation("floaty boy");
+	//	OutPin<RenderCopyNode*> myRandom = PinInformation("a node");
+	//
+	//	InstancedNodeData<char> mySmall = std::string("char");
+	//	InstancedNodeData<int> myMedium = std::string("int");
+	//	InstancedNodeData<void*> myLarge = std::string("void*");
+	//};
 }
 
 #endif	

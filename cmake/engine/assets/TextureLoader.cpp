@@ -3,7 +3,7 @@
 #include "engine/graphics/GraphicEngine.h"
 #include "engine/graphics/GraphicsFramework.h"
 
-#include "logger/Logger.h"
+#include "tools/Logger.h"
 
 #include <string>
 
@@ -93,7 +93,19 @@ namespace engine::assets
 		std::wstring wide = std::wstring(aFile.begin(), aFile.end());
 
 		ID3D11ShaderResourceView* tex;
-		HRESULT result = DirectX::CreateDDSTextureFromFileEx(graphics::GraphicsEngine::GetInstance().GetFrameWork().GetDevice() , nullptr, wide.c_str(), 0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, aFlags, false, nullptr, &tex);
+		HRESULT result = DirectX::CreateDDSTextureFromFileEx(
+			graphics::GraphicsEngine::GetInstance().GetFrameWork().GetDevice(),
+			graphics::GraphicsEngine::GetInstance().GetFrameWork().GetContext(),
+			wide.c_str(), 
+			0, 
+			D3D11_USAGE_IMMUTABLE, 
+			D3D11_BIND_SHADER_RESOURCE, 
+			0,
+			aFlags,
+			DirectX::DDS_LOADER_FORCE_SRGB,
+			nullptr,
+			&tex,
+			nullptr);
 
 		if (FAILED(result))
 		{

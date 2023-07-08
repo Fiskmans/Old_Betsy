@@ -8,16 +8,16 @@
 
 #include "engine/graphics/GraphicEngine.h"
 
-#include "logger/Logger.h"
-
-#include "tools/Functors.h"
 #include "tools/FileHelpers.h"
-#include "tools/TimeHelper.h"
+#include "tools/Functors.h"
+#include "tools/Logger.h"
+#include "tools/Time.h"
 
 #include "common/Macros.h"
 
 #include <functional>
 #include <stack>
+#include <filesystem>
 
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
@@ -310,7 +310,7 @@ namespace engine::assets
 
 #pragma region Importing
 
-		if (!tools::FileExists(aFilePath))
+		if (!std::filesystem::exists(aFilePath))
 		{
 			LOG_ERROR("File not found", aFilePath);
 			return;
@@ -391,8 +391,8 @@ namespace engine::assets
 
 		LoadAttributes(aNode, aScene->mMaterials[aMesh->mMaterialIndex], aInOutAttributes, colorMappings);
 
-		AssetHandle vertexShader = AssetManager::GetInstance().GetVertexShader(aInOutAttributes["VertexShader"], flags);
-		AssetHandle pixelShader = AssetManager::GetInstance().GetPixelShader(aInOutAttributes["PixelShader"], flags);
+		AssetHandle<VertexShaderAsset> vertexShader = AssetManager::GetInstance().GetVertexShader(aInOutAttributes["VertexShader"], flags);
+		AssetHandle<PixelShaderAsset> pixelShader = AssetManager::GetInstance().GetPixelShader(aInOutAttributes["PixelShader"], flags);
 
 		if (!vertexShader.IsValid() || !pixelShader.IsValid())
 		{
@@ -495,9 +495,9 @@ namespace engine::assets
 		modelData->myPixelShader = pixelShader;
 		modelData->myPrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		modelData->myIndexBufferFormat = DXGI_FORMAT_R32_UINT;
-		modelData->myTextures[0] = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Diffuse"], true);
-		modelData->myTextures[1] = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Normal"], true);
-		modelData->myTextures[2] = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Reflection"], true);
+		modelData->myAlbedo = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Diffuse"], true);
+		modelData->myNormal = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Normal"], true);
+		modelData->myMaterial = AssetManager::GetInstance().GetTextureRelative(aFilePath, aInOutAttributes["Reflection"], true);
 		modelData->myUseForwardRenderer = (aInOutAttributes["PixelShader"] != myDefaultPixelShader);
 		modelData->myNumberOfIndexes = static_cast<UINT>(indexCount);
 		modelData->myDiffuseColor = colorMappings["Diffuse"].Extend(1);

@@ -2,7 +2,9 @@
 #include "engine/graphics/RenderStateManager.h"
 #include "engine/graphics/GraphicEngine.h"
 
-#include "logger/Logger.h"
+#include "tools/Logger.h"
+
+#include "common/Macros.h"
 
 namespace engine::graphics
 {

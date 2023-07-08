@@ -6,7 +6,7 @@
 #include "engine/graph/NodeInstance.h"
 
 #include "tools/ImGuiHelpers.h"
-#include "tools/TimeHelper.h"
+#include "tools/Time.h"
 #include "tools/Utility.h"
 
 #include "common/Macros.h"
@@ -96,7 +96,7 @@ namespace engine::graph
 
 			if (hovered && !myIsHovered)
 			{
-				startHover = tools::GetTotalTime();
+				startHover = fisk::tools::GetTotalTime();
 			}
 
 			myIsHovered = hovered;
@@ -193,7 +193,7 @@ namespace engine::graph
 		{
 			const float hoverIntensity = 0.5f;
 
-			if (tools::GetTotalTime() - startHover > timeToPopUp)
+			if (fisk::tools::GetTotalTime() - startHover > timeToPopUp)
 				popupOpen = true;
 
 			color = ImColor(LERP(color.Value.x, 1.f, hoverIntensity), LERP(color.Value.y, 1.f, hoverIntensity), LERP(color.Value.z, 1.f, hoverIntensity), 1.f);
@@ -215,7 +215,7 @@ namespace engine::graph
 
 		if (ourHoveredType && *ourHoveredType == type && ourHoverIn != isIn)
 		{
-			float intensity = (0.3f + 0.3f * cos(tools::GetTotalTime() * TAU)) * ourHoverIntensity;
+			float intensity = (0.3f + 0.3f * cos(fisk::tools::GetTotalTime() * TAU)) * ourHoverIntensity;
 			color = ImColor(LERP(color.Value.x, 1.f, intensity), LERP(color.Value.y, 1.f, intensity), LERP(color.Value.z, 1.f, intensity), 1.f);
 		}
 
@@ -271,10 +271,10 @@ namespace engine::graph
 
 	void PinBase::UpdateImGui()
 	{
-		static float lastTick = tools::GetTotalTime();
+		static float lastTick = fisk::tools::GetTotalTime();
 		static float sum = 0;
 
-		float now = tools::GetTotalTime();
+		float now = fisk::tools::GetTotalTime();
 
 		ourHoveredType = ourNextHoveredType;
 		ourNextHoveredType = nullptr;

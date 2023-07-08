@@ -4,7 +4,7 @@
 #include "engine/graphics/RenderManager.h"
 #include "engine/GameEngine.h"
 
-#include "logger/Logger.h"
+#include "tools/Logger.h"
 
 #include "tools/Stopwatch.h"
 
@@ -35,7 +35,7 @@ namespace engine
 
 		if (aUMsg == WindowManager::GetInstance().myTaskbarButtonCreatedMessageId)
 		{
-			logger::SetupIcons(aHWND);
+			fisk::tools::SetupIcons(aHWND, "data/Icons/error.ico", "data/Icons/warning.ico");
 		}
 
 		if (aUMsg == WM_SIZE)

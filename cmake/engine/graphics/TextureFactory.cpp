@@ -4,7 +4,7 @@
 
 #include "common/Macros.h" 
 
-#include "logger/Logger.h"
+#include "tools/Logger.h"
 
 namespace engine::graphics
 {
@@ -197,10 +197,7 @@ namespace engine::graphics
 			DXGI_FORMAT_R8G8B8A8_UNORM,
 			DXGI_FORMAT_R16G16B16A16_SNORM,
 			DXGI_FORMAT_R16G16B16A16_SNORM,
-			DXGI_FORMAT_R8_UNORM,
-			DXGI_FORMAT_R8_UNORM,
-			DXGI_FORMAT_R8_UNORM,
-			DXGI_FORMAT_R8_UNORM
+			DXGI_FORMAT_R8G8B8A8_UNORM,
 		};
 
 		D3D11_TEXTURE2D_DESC desc;

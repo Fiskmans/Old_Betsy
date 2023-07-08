@@ -1,11 +1,12 @@
 #ifndef TOOLS_INTERSECTION_H
 #define TOOLS_INTERSECTION_H
 
+#include "tools/AABB3D.h"
 #include "tools/MathVector.h"
 #include "tools/Plane.h"
 #include "tools/PlaneVolume.h"
+#include "tools/Ray.h"
 #include "tools/Sphere.h"
-#include "tools/AABB3D.h"
 
 namespace tools
 {
@@ -214,52 +215,6 @@ namespace tools
 	{
 		T t;
 		return IntersectionSphereRay(aSphere, aRay, t);
-	}
-
-	template<typename T>
-	bool IntersectionSpherePlane(const tools::Sphere<T>& aSphere, const tools::Plane<T>& aPlane)
-	{
-		return aPlane.Inside(aSphere.Position() - aPlane.Normal() * aSphere.Radius());
-	}
-
-	template<typename T>
-	bool IntersectionSphereSphere(const tools::Sphere<T>& aSphere1, const tools::Sphere<T>& aSphere2)
-	{
-		return (aSphere1.myPosition - aSphere2.myPosition).LengthSqr() < aSphere1.myRadius * aSphere1.myRadius + aSphere2.myRadius * aSphere1.myRadius;
-	}
-
-	template<typename T>
-	inline bool IntersectionSpherePlaneVolume(const tools::Sphere<T>& aSphere, const tools::PlaneVolume<T>& aPlaneVolume)
-	{
-		for (auto& i : aPlaneVolume.myData)
-		{
-			if (!IntersectionSpherePlane(aSphere, i))
-			{
-				return false;
-			}
-
-#if VISUALIZESPHERETOPLANEVOLUMECHECK
-			//DebugDrawer::GetInstance().DrawArrow(aSphere.Position(), aSphere.Position() - aSphere.Radius() * i.Normal());
-#endif // VISUALIZESPHERETOPLANEVOLUMECHECK
-		}
-
-#if VISUALIZESPHERETOPLANEVOLUMECHECK
-		DebugDrawer::GetInstance().DrawSphere(aSphere);
-#endif // VISUALIZESPHERETOPLANEVOLUMECHECK
-
-		return true;
-	}
-
-	template<typename T>
-	inline bool IntersectionSphereFrustum(const tools::Sphere<T>& aSphere, const tools::PlaneVolume<T>& aPlaneVolume)
-	{
-		return 
-			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[0]) &
-			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[1]) &
-			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[2]) &
-			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[3]) &
-			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[4]) &
-			IntersectionSpherePlane(aSphere, aPlaneVolume.Planes()[5]);
 	}
 
 	template<typename T>

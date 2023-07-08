@@ -6,92 +6,92 @@ namespace tools
 	namespace size_literals
 	{
 
-		float operator""_m(long double aMeterValue)
+		Distance operator""_m(long double aMeterValue)
 		{
-			return static_cast<float>(aMeterValue * globalMeterScaleFactor);
+			return static_cast<Distance>(aMeterValue * globalMeterScaleFactor);
 		}
 
-		float operator""_dm(long double aDeciMeterValue)
+		Distance operator""_dm(long double aDeciMeterValue)
 		{
-			return static_cast<float>(aDeciMeterValue * globalMeterScaleFactor * 0.1);
+			return static_cast<Distance>(aDeciMeterValue * globalMeterScaleFactor * 0.1);
 		}
 
-		float operator""_cm(long double aCentiMeterValue)
+		Distance operator""_cm(long double aCentiMeterValue)
 		{
-			return static_cast<float>(aCentiMeterValue);
+			return static_cast<Distance>(aCentiMeterValue);
 		}
 
-		float operator""_m2(long double aMeterValue)
+		Distance operator""_m2(long double aMeterValue)
 		{
-			return static_cast<float>(aMeterValue) * 1_m * 1_m;
+			return static_cast<Distance>(aMeterValue) * 1_m * 1_m;
 		}
 
-		float operator""_dm2(long double aDeciMeterValue)
+		Distance operator""_dm2(long double aDeciMeterValue)
 		{
-			return static_cast<float>(aDeciMeterValue) * 1_dm * 1_dm;
+			return static_cast<Distance>(aDeciMeterValue) * 1_dm * 1_dm;
 		}
 
-		float operator""_cm2(long double aCentiMeterValue)
+		Distance operator""_cm2(long double aCentiMeterValue)
 		{
-			return static_cast<float>(aCentiMeterValue) * 1_cm * 1_cm;
+			return static_cast<Distance>(aCentiMeterValue) * 1_cm * 1_cm;
 		}
 
-		float operator""_m3(long double aMeterValue)
+		Distance operator""_m3(long double aMeterValue)
 		{
-			return static_cast<float>(aMeterValue) * 1_m * 1_m * 1_m;
+			return static_cast<Distance>(aMeterValue) * 1_m * 1_m * 1_m;
 		}
 
-		float operator""_dm3(long double aDeciMeterValue)
+		Distance operator""_dm3(long double aDeciMeterValue)
 		{
-			return static_cast<float>(aDeciMeterValue) * 1_dm * 1_dm * 1_dm;
+			return static_cast<Distance>(aDeciMeterValue) * 1_dm * 1_dm * 1_dm;
 		}
 
-		float operator""_cm3(long double aCentiMeterValue)
+		Distance operator""_cm3(long double aCentiMeterValue)
 		{
-			return static_cast<float>(aCentiMeterValue) * 1_cm * 1_cm * 1_cm;
+			return static_cast<Distance>(aCentiMeterValue) * 1_cm * 1_cm * 1_cm;
 		}
 
-		float operator""_m(size_t aMeterValue)
+		Distance operator""_m(size_t aMeterValue)
 		{
-			return static_cast<float>(aMeterValue * globalMeterScaleFactor);
+			return static_cast<Distance>(aMeterValue * globalMeterScaleFactor);
 		}
 
-		float operator""_dm(size_t aDeciMeterValue)
+		Distance operator""_dm(size_t aDeciMeterValue)
 		{
-			return static_cast<float>(aDeciMeterValue * globalMeterScaleFactor * 0.1);
+			return static_cast<Distance>(aDeciMeterValue * globalMeterScaleFactor * 0.1);
 		}
 
-		float operator""_cm(size_t aCentiMeterValue)
+		Distance operator""_cm(size_t aCentiMeterValue)
 		{
-			return static_cast<float>(aCentiMeterValue);
+			return static_cast<Distance>(aCentiMeterValue);
 		}
 
-		float operator""_m2(size_t aMeterValue)
+		Distance operator""_m2(size_t aMeterValue)
 		{
-			return static_cast<float>(aMeterValue) * 1_m * 1_m;
+			return static_cast<Distance>(aMeterValue) * 1_m * 1_m;
 		}
 
-		float operator""_dm2(size_t aDeciMeterValue)
+		Distance operator""_dm2(size_t aDeciMeterValue)
 		{
-			return static_cast<float>(aDeciMeterValue) * 1_dm * 1_dm;
+			return static_cast<Distance>(aDeciMeterValue) * 1_dm * 1_dm;
 		}
 
-		float operator""_cm2(size_t aCentiMeterValue)
+		Distance operator""_cm2(size_t aCentiMeterValue)
 		{
-			return static_cast<float>(aCentiMeterValue) * 1_cm * 1_cm;
+			return static_cast<Distance>(aCentiMeterValue) * 1_cm * 1_cm;
 		}
 
-		float operator""_m3(size_t aMeterValue)
+		Distance operator""_m3(size_t aMeterValue)
 		{
-			return static_cast<float>(aMeterValue) * 1_m * 1_m * 1_m;
+			return static_cast<Distance>(aMeterValue) * 1_m * 1_m * 1_m;
 		}
 
-		float operator""_dm3(size_t aDeciMeterValue)
+		Distance operator""_dm3(size_t aDeciMeterValue)
 		{
-			return static_cast<float>(aDeciMeterValue) * 1_dm * 1_dm * 1_dm;
+			return static_cast<Distance>(aDeciMeterValue) * 1_dm * 1_dm * 1_dm;
 		}
 
-		float operator""_cm3(size_t aCentiMeterValue)
+		Distance operator""_cm3(size_t aCentiMeterValue)
 		{
 			return static_cast<float>(aCentiMeterValue) * 1_cm * 1_cm * 1_cm;
 		}
@@ -126,4 +126,27 @@ namespace tools
 		}
 	}
 
+
+	namespace rotation_literals
+	{
+		Rotation operator""_deg(long double aValue)
+		{
+			return aValue * 0.0174533;
+		}
+
+		Rotation operator""_deg(size_t aValue)
+		{
+			return static_cast<Rotation>(aValue) * 0.0174533;
+		}
+
+		Rotation operator""_rad(long double aValue)
+		{
+			return aValue;
+		}
+
+		Rotation operator""_rad(size_t aValue)
+		{
+			return static_cast<Rotation>(aValue);
+		}
+	}
 }

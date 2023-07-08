@@ -2,7 +2,11 @@
 #ifndef IMGUI_IMGUI_HELPERS_H
 #define IMGUI_IMGUI_HELPERS_H
 
+
+#include "tools/Time.h"
+
 #include "imgui/imgui.h"
+
 #include <string>
 
 #include <d3d11.h>
@@ -15,7 +19,6 @@ namespace tools
 	}
 	extern thread_local bool dummy;
 
-	struct TimeTree;
 	void ZoomableImGuiImage(void* aTexture, ImVec2 aSize);
 
 	void ZoomableImGuiSnapshot(void* aTexture, ImVec2 aSize);
@@ -27,7 +30,7 @@ namespace tools
 
 	std::string PadOrTrimTo(const std::string& aString, int aLength);
 
-	void DrawTimeTree(tools::TimeTree* aTree);
+	void DrawTimeTree(fisk::tools::TimeTree* aTree);
 }
 
 #endif

@@ -31,7 +31,10 @@ namespace engine
 			AssetHandle<PixelShaderAsset> myPixelShader;
 			AssetHandle<VertexShaderAsset> myVertexShader;
 
-			AssetHandle<TextureAsset> myTextures[3];
+			AssetHandle<TextureAsset> myAlbedo;
+			AssetHandle<TextureAsset> myNormal;
+			AssetHandle<TextureAsset> myMaterial;
+
 			std::vector<AssetHandle<TextureAsset>> myCustomTextures;
 			tools::V4f myDiffuseColor;
 

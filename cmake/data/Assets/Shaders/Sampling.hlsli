@@ -30,7 +30,7 @@ SampleOutput Sample(VertexToPixel input)
 	outData.albedo = saturate(pow(abs(albedoData.rgb), 2.2) + tint.rgb);
 #endif
 #if !HAS_UV_SETS
-	outData.albedo = diffuseColor;
+	outData.albedo = ObjectBuffer.myDiffuseColor.rgb;
 
 	outData.ambientOcclusion = 0;
 	outData.metalness = 0;

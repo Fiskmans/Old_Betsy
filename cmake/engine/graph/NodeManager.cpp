@@ -6,7 +6,7 @@
 
 #include "tools/ImGuiHelpers.h"
 
-#include "logger/Logger.h"
+#include "tools/Logger.h"
 
 
 namespace engine::graph

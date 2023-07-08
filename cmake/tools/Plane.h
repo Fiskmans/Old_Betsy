@@ -2,6 +2,7 @@
 #define TOOLS_PLANE_H
 
 #include "tools/MathVector.h"
+#include "tools/Sphere.h"
 
 #define EPSILON 0.0001f
 #define EPSILON_D 0.0001
@@ -18,12 +19,15 @@ namespace tools
 		~Plane() = default;
 
 		bool Inside(const tools::MathVector<T, 3>& aPosition) const;
+		bool Intersects(const tools::Sphere<T>& aSpehere) const;
 
 		const tools::MathVector<T, 3>& Point() const;
 		const tools::MathVector<T, 3>& Normal() const;
 
 	private:
 		tools::MathVector<T, 3> myPoint;
+
+		// Normal points towards the outside
 		tools::MathVector<T, 3> myNormal;
 	};
 
@@ -65,6 +69,15 @@ namespace tools
 	{
 		return myNormal.Dot(aPosition - myPoint) <= EPSILON_D;
 	}
+
+	template<typename T>
+	inline bool Plane<T>::Intersects(const tools::Sphere<T>& aSphere) const
+	{
+		tools::MathVector<T, 3> closestPoint = aSphere.myPosition - myNormal * aSphere.myRadius;
+
+		return Inside(closestPoint);
+	}
+
 	template<typename T>
 	const tools::MathVector<T, 3>& Plane<T>::Point() const
 	{

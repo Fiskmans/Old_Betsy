@@ -3,19 +3,17 @@
 #include "engine/graphics/GraphicEngine.h"
 #include "engine/graphics/GraphicsFramework.h"
 #include "engine/graphics/RenderScene.h"
-
-#include "engine/assets/Model.h"
-#include "engine/assets/PointLight.h"
+#include "engine/graphics/ShaderMappings.h"
 
 #include "engine/GameEngine.h"
 
 #include "imgui/imgui.h"
 
-#include "logger/Logger.h"
+#include "tools/Logger.h"
 
 #include "tools/ImGuiHelpers.h"
 #include "tools/Functors.h"
-#include "tools/TimeHelper.h"
+#include "tools/Time.h"
 
 
 namespace engine::graphics
@@ -80,27 +78,19 @@ namespace engine::graphics
 			return false;
 		}
 
-		myStartedAt = tools::GetTotalTime();
+		myStartedAt = fisk::tools::GetTotalTime();
 		myIsReady = true;
 		return true;
 	}
 
-	void RenderManager::BeginFrame(tools::V4f aClearColor)
+	void RenderManager::Render()
 	{
 		tools::V4f transparent = tools::V4f(0.f, 0.f, 0.f, 0.f);
 
 		myTextures[static_cast<int>(Channel::BackBuffer)].ClearTexture(transparent);
-		myTextures[static_cast<int>(Channel::IntermediateTexture)].ClearTexture(aClearColor);
-	}
+		myTextures[static_cast<int>(Channel::IntermediateTexture)].ClearTexture();
 
-	void RenderManager::EndFrame()
-	{
-		tools::ImguiHelperGlobals::ResetCounter();
-	}
-
-	void RenderManager::Render()
-	{
-		tools::GetTotalTime();
+		fisk::tools::GetTotalTime();
 
 		RenderScene& scene = GameEngine::GetInstance().GetMainScene();
 		Camera* camera = scene.GetMainCamera();
@@ -111,18 +101,40 @@ namespace engine::graphics
 			return;
 		}
 
-		AssetHandle textureHandle = camera->GetTexture();
-		if (!textureHandle.IsValid())
+		RenderCamera(*camera);
+
+		tools::ImguiHelperGlobals::ResetCounter();
+	}
+
+	void RenderManager::RenderCamera(Camera& aCamera)
+	{
+		myDepthTexture.ClearDepth();
+
+
 		{
-			FullscreenPass({ Channel::IntermediateTexture }, Channel::BackBuffer, FullscreenRenderer::Shader::COPY);
-			return;
+			myGBuffer.SetAsActiveTarget(&myDepthTexture);
+			myDeferredRenderer.GenerateGBuffer(aCamera);
+			UnbindResources();
+			UnbindTargets();
 		}
 
-		UnbindTargets();
-		UnbindResources();
-		
-		GraphicsEngine::GetInstance().GetFrameWork().GetContext()->PSSetShaderResources(0, 1, &textureHandle.Access().myTexture);
+		{
+			myGBuffer.SetAllAsResources();
+			myTextures[static_cast<int>(Channel::IntermediateTexture)].SetAsActiveTarget();
 
+			ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
+			context->PSSetShaderResources(shader_mappings::TEXTURE_DEPTH, 1, myDepthTexture.GetResourceView());
+
+			myRenderStateManager.SetDepthStencilState(RenderStateManager::DepthStencilState::Default);
+			myRenderStateManager.SetRasterizerState(RenderStateManager::RasterizerState::NoBackfaceCulling);
+			myRenderStateManager.SetSamplerState(RenderStateManager::SamplerState::Point);
+			myRenderStateManager.SetBlendState(RenderStateManager::BlendState::AlphaBlend);
+			myDeferredRenderer.Render(aCamera);
+			UnbindResources();
+			UnbindTargets();
+		}
+
+		myTextures[static_cast<int>(Channel::IntermediateTexture)].SetAsResourceOnSlot(0);
 		myTextures[static_cast<int>(Channel::BackBuffer)].SetAsActiveTarget();
 		myFullscreenRenderer.Render(FullscreenRenderer::Shader::COPY);
 	}
@@ -259,6 +271,18 @@ namespace engine::graphics
 		return true;
 	}
 
+	bool RenderManager::SetShaderResource(size_t aSlot, AssetHandle<TextureAsset>& aAsset)
+	{
+		if (aAsset.IsValid())
+		{
+			ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
+			context->PSSetShaderResources(aSlot, 1, &aAsset.Access().myTexture);
+			context->VSSetShaderResources(aSlot, 1, &aAsset.Access().myTexture);
+			return true;
+		}
+		return false;
+	}
+
 	/*
 	void RenderManager::RenderSelection(const std::vector<ModelInstance*>& aModelsToHighlight, Camera* aCamera)
 	{
@@ -302,6 +326,10 @@ namespace engine::graphics
 				return false;
 			}
 		}
+
+
+		myGBuffer = TextureFactory::GetInstance().CreateGBuffer(aSize, "Engine GBuffer");
+		myDepthTexture = TextureFactory::GetInstance().CreateDepth(aSize, "Engine Depth");
 
 
 		//ID3D11Device* device = myFrameworkPtr->GetDevice();
@@ -354,11 +382,6 @@ namespace engine::graphics
 		}
 		GraphicsFramework& framework = GraphicsEngine::GetInstance().GetFrameWork();
 		framework.GetContext()->OMSetRenderTargets(0, nullptr, nullptr);
-
-		for (Texture& tex : myTextures)
-		{
-			tex.Release();
-		}
 
 		HRESULT result;
 		IDXGISwapChain* chain = framework.GetSwapChain();

@@ -4,11 +4,11 @@
 #include "imgui/WindowControl.h"
 
 #include "tools/MathVector.h"
-#include "tools/TimeHelper.h"
+#include "tools/Time.h"
 #include "tools/ImGuiHelpers.h"
 #include "tools/Stopwatch.h"
 
-#include "logger/Logger.h"
+#include "tools/Logger.h"
 
 #include "common/Macros.h"
 

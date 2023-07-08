@@ -5,15 +5,18 @@
 
 #include "tools/Singleton.h"
 
-#include <d3d11.h>
 #include <unordered_map>
 #include <string>
 #include <vector>
 #include <array>
 
+#define NOMINMAX
+#include <WinSock2.h>
+#include <d3d11.h>
+
 namespace engine
 {
-	class GraphicsFramework : tools::Singleton<GraphicsFramework>
+	class GraphicsFramework : fisk::tools::Singleton<GraphicsFramework>
 	{
 	public:
 		GraphicsFramework();
@@ -31,27 +34,6 @@ namespace engine
 		IDXGISwapChain* GetSwapChain();
 
 		void Imgui();
-
-		void AddResource(void* aResource, std::string aName);
-
-		template<concepts::Releaseable T>
-		void ReleaseResource(T* aResource)
-		{
-			aResource->Release();
-
-			int b;
-			DoSomething([]() -> int { int a;  return &a; }, b);
-		}
-
-		template<class Callable, typename ReturnValue>
-			requires std::convertible_to<decltype(std::declval<Callable>()()), ReturnValue>
-		void DoSomething(Callable&& aCallable, ReturnValue& aValue)
-		{
-			//do stuff
-			new Callmanager<Callable>(aCallable, value);
-		}
-
-
 
 	private:
 		size_t ourTotalUsage;

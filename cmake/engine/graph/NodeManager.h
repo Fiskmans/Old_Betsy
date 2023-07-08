@@ -14,7 +14,7 @@ namespace engine::graph
 {
 	class Graph;
 	class Nodebase;
-	class NodeManager : public tools::Singleton<NodeManager>
+	class NodeManager : public fisk::tools::Singleton<NodeManager>
 	{
 	public:
 

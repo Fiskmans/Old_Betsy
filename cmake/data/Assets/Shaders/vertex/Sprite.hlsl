@@ -1,4 +1,4 @@
-#include "../SpriteShaderStructs.hlsli"
+#include "SpriteShaderStructs.hlsli"
 
 
 const static float4 positions[6] =

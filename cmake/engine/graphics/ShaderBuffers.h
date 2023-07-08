@@ -8,18 +8,13 @@
 
 namespace engine::graphics 
 {
-	constexpr size_t FRAME_BUFFER_INDEX = 0;
-	constexpr size_t OBJECT_BUFFER_INDEX = 1;
-	constexpr size_t POINT_LIGHT_BUFFER_INDEX = 2;
-	constexpr size_t ANIMATION_BUFFER_INDEX = 3;
-
 	struct FrameBuffer
 	{
 		tools::M44f myWorldToCamera;
 		tools::M44f myCameraToProjection;
 
-		float myTotalTime;
-		float myPadding[3];
+		float myTotalTime = 1.f;
+		float myPadding[3] = { -1.f, -1.f, -1.f };
 	};
 
 	struct ObjectBuffer
@@ -27,32 +22,50 @@ namespace engine::graphics
 		tools::M44f myModelToWorldSpace;
 		tools::V4f myDiffuseColor;
 
-		float myObjectLifeTime;
-		unsigned int myObjectId;
+		float myObjectLifeTime = -1.f;
+		unsigned int myObjectId = std::numeric_limits<unsigned int>::max();
 
-		float myPadding[2];
+		float myPadding[2] = { -1.f, -1.f};
 	};
 	
 	struct PointLight
 	{
 		tools::V3f myPosition;
-		float myIntensity;
+		float myIntensity = -1.f;
 
 		tools::V3f mycolor;
-		float myRange;
+		float myRange = -1.f;
 	};
 
 	struct PointLightBuffer
 	{
 		PointLight myPointLights[NUMBEROFPOINTLIGHTS];
 
-		unsigned int myNumOfUsedPointLights;
-		float myPadding[3];
+		unsigned int myNumOfUsedPointLights = std::numeric_limits<unsigned int>::max();
+		float myPadding[3] = { -1.f, -1.f, -1.f };
 	};
 
 	struct AnimationBuffer
 	{
 		tools::M44f myTransforms[NUMBEROFANIMATIONBONES];
+	};
+
+	struct DeferredPixelEnvLightBuffer
+	{
+		tools::V3f myCameraPosition;
+		float myLightIntensity;
+
+		tools::V3f myLightColor;
+		float time;
+
+		tools::V3f myLightDirection;
+		float trash;
+
+		tools::M44f myToCamera;
+		tools::M44f myToProjection;
+
+		tools::V3f myCameraDirection;
+		float padding;
 	};
 }
 

@@ -7,6 +7,44 @@
 
 namespace engine::graphics
 {
+	GBuffer::~GBuffer()
+	{
+		for (ID3D11Texture2D*& i : myTextures)
+			SAFE_RELEASE(i);
+	
+		for (ID3D11RenderTargetView*& i : myRenderTargets)
+			SAFE_RELEASE(i);
+		
+		for (ID3D11ShaderResourceView*& i : myShaderResources)
+			SAFE_RELEASE(i);
+		
+		SAFE_DELETE(myViewport);
+	}
+
+	GBuffer::GBuffer(GBuffer&& aOther)
+	{
+		for(size_t i = 0; i < myTextures.size(); i++)
+			std::swap(myTextures[i], aOther.myTextures[i]);
+		for(size_t i = 0; i < myRenderTargets.size(); i++)
+			std::swap(myRenderTargets[i], aOther.myRenderTargets[i]);
+		for(size_t i = 0; i < myShaderResources.size(); i++)
+			std::swap(myShaderResources[i], aOther.myShaderResources[i]);
+
+		std::swap(myViewport, aOther.myViewport);
+	}
+
+	void GBuffer::operator=(GBuffer&& aOther)
+	{
+		for (size_t i = 0; i < myTextures.size(); i++)
+			std::swap(myTextures[i], aOther.myTextures[i]);
+		for (size_t i = 0; i < myRenderTargets.size(); i++)
+			std::swap(myRenderTargets[i], aOther.myRenderTargets[i]);
+		for (size_t i = 0; i < myShaderResources.size(); i++)
+			std::swap(myShaderResources[i], aOther.myShaderResources[i]);
+
+		std::swap(myViewport, aOther.myViewport);
+	}
+
 	void GBuffer::ClearTextures(const tools::V4f aClearColor)
 	{
 		for (auto& i : myRenderTargets)
@@ -29,9 +67,9 @@ namespace engine::graphics
 		context->RSSetViewports(1, myViewport);
 	}
 
-	void GBuffer::SetAsResourceOnSlot(const Channel aResource, const unsigned int aSlor)
+	void GBuffer::SetAsResourceOnSlot(const Channel aResource, const unsigned int aSlot)
 	{
-		GraphicsEngine::GetInstance().GetFrameWork().GetContext()->PSSetShaderResources(aSlor, 1, &myShaderResources[static_cast<int>(aResource)]);
+		GraphicsEngine::GetInstance().GetFrameWork().GetContext()->PSSetShaderResources(aSlot, 1, &myShaderResources[static_cast<int>(aResource)]);
 	}
 
 	void GBuffer::SetAllAsResources() const
@@ -69,22 +107,5 @@ namespace engine::graphics
 				ImGui::Image(myShaderResources[x * 4 + y], imageSize, ImVec2(0,0), ImVec2(1,1), ImVec4(1,1,1,1), tools::GetImColor(ImGuiCol_Border));
 			}
 		}
-	}
-
-	void GBuffer::Release()
-	{
-		for (ID3D11Texture2D*& i : myTextures)
-		{
-			SAFE_RELEASE(i);
-		}
-		for (ID3D11RenderTargetView*& i : myRenderTargets)
-		{
-			SAFE_RELEASE(i);
-		}
-		for (ID3D11ShaderResourceView*& i : myShaderResources)
-		{
-			SAFE_RELEASE(i);
-		}
-		SAFE_DELETE(myViewport);
 	}
 }

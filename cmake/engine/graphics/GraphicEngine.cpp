@@ -5,7 +5,7 @@
 
 #include "tools/Stopwatch.h"
 
-#include "logger/Logger.h"
+#include "tools/Logger.h"
 
 namespace engine::graphics
 {
@@ -49,11 +49,6 @@ namespace engine::graphics
 		return true;
 	}
 
-	void GraphicsEngine::BeginFrame(tools::V4f aClearColor)
-	{
-		RenderManager::GetInstance().BeginFrame(aClearColor);
-	}
-
 	void GraphicsEngine::RenderFrame()
 	{
 		RenderManager::GetInstance().Render();
@@ -61,7 +56,6 @@ namespace engine::graphics
 
 	void GraphicsEngine::EndFrame()
 	{
-		RenderManager::GetInstance().EndFrame();
 		myFrameWork->EndFrame();
 	}
 

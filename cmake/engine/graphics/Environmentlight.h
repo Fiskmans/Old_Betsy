@@ -3,6 +3,8 @@
 
 #include "engine/assets/Asset.h"
 
+#include "engine/graphics/Camera.h"
+
 #include "tools/MathVector.h"
 
 namespace engine::graphics

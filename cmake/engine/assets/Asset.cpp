@@ -1,5 +1,7 @@
 #include "engine/assets/Asset.h"
 
+#include "tools/File.h"
+
 //#include "ModelInstance.h"
 //#include "TextInstance.h"
 //#include "GamlaBettan\NavMeshLoader.h"
@@ -123,32 +125,21 @@ namespace engine
 		myTexture->Release();
 	}
 
-	DepthTextureAsset::DepthTextureAsset(graphics::DepthTexture aTexture)
+	DepthTextureAsset::DepthTextureAsset(graphics::DepthTexture&& aTexture)
+		: myTexture(std::move(aTexture))
 	{
-		myTexture = aTexture;
 	}
 
-	DepthTextureAsset::~DepthTextureAsset()
+	GBufferAsset::GBufferAsset(graphics::GBuffer&& aGBuffer)
+		: myGBuffer(std::move(aGBuffer))
 	{
-		myTexture.Release();
 	}
 
-	GBufferAsset::GBufferAsset(graphics::GBuffer aGBuffer)
-	{
-		myGBuffer = aGBuffer;
-	}
-
-	GBufferAsset::~GBufferAsset()
-	{
-		myGBuffer.Release();
-	}
-
-
-	DrawableTextureAsset::DrawableTextureAsset(graphics::Texture& aTexture)
+	DrawableTextureAsset::DrawableTextureAsset(graphics::Texture&& aTexture)
 		: TextureAsset(aTexture.GetResourceView())
+		, myDrawableTexture(std::move(aTexture))
 	{
 		TextureAsset::myOwns = false;
-		myDrawableTexture = aTexture;
 	}
 
 	PixelShaderAsset::PixelShaderAsset(ID3D11PixelShader* aShader)
@@ -182,20 +173,10 @@ namespace engine
 		myShader->Release();
 	}
 
-	DrawableTextureAsset::~DrawableTextureAsset()
+	JsonAsset::JsonAsset(const std::string& aPath)
 	{
-		myDrawableTexture.Release();
-	}
-
-	JSONAsset::JSONAsset(tools::JSONObject* aObject, const std::string& aPath)
-	{
-		myObject = aObject;
+		myObject.Parse(fisk::tools::ReadWholeFile(aPath).c_str());
 		myPath = aPath;
-	}
-
-	JSONAsset::~JSONAsset()
-	{
-		delete myObject;
 	}
 
 	//FontAsset::FontAsset(DirectX::SpriteFont* aFont)

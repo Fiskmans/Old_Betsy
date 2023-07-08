@@ -12,7 +12,7 @@
 namespace tools
 {
 
-	class ThreadNameManager : public tools::Singleton<ThreadNameManager>
+	class ThreadNameManager : public fisk::tools::Singleton<ThreadNameManager>
 	{
 	public:
 
@@ -28,7 +28,7 @@ namespace tools
 			myMap.erase(myMap.find(std::this_thread::get_id()));
 		}
 
-		LockedResource<std::unordered_map<std::thread::id, std::string>> Access() { return LockedResource<std::unordered_map<std::thread::id, std::string>>(myMutex, myMap); }
+		fisk::tools::LockedResource<std::unordered_map<std::thread::id, std::string>> Access() { return fisk::tools::LockedResource<std::unordered_map<std::thread::id, std::string>>(myMutex, myMap); }
 
 	private:
 		std::unordered_map<std::thread::id, std::string> myMap;
@@ -50,7 +50,7 @@ namespace tools
 
 	std::string GetNameOfThread(std::thread::id aThreadId)
 	{
-		LockedResource<std::unordered_map<std::thread::id, std::string>> map = ThreadNameManager::GetInstance().Access();
+		fisk::tools::LockedResource<std::unordered_map<std::thread::id, std::string>> map = ThreadNameManager::GetInstance().Access();
 		std::unordered_map<std::thread::id, std::string>::iterator it = map.Get().find(aThreadId);
 		
 		if (it != map.Get().end())

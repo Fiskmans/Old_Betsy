@@ -1,4 +1,7 @@
 
+#include "Textures.hlsli"
+#include "Buffers.hlsli"
+
 #if HAS_BONES && (BONESPERVERTEX == 0)
 #error "Invalid flags, has no bones"
 #endif
@@ -45,93 +48,6 @@ struct PixelOutput
 	float4 myColor		:	SV_TARGET;
 };
 
-#ifndef FRAME_BUFFER
-#error "Missing FRAME_BUFFER define"
-#endif
-
-struct FrameBufferType
-{
-	float4x4 myWorldToCamera;
-	float4x4 myCameraToProjection;
-
-	float myTotalTime;
-	float myPadding[3];
-};
-
-cbuffer FrameBuffer : register(FRAME_BUFFER)
-{
-	FrameBufferType FrameBuffer;
-};
-
-#ifndef OBJECT_BUFFER
-#error "Missing OBJECT_BUFFER define"
-#endif
-
-struct ObjectBufferType
-{
-	float4x4 myModelToWorldSpace;
-	float4 myDiffuseColor;
-
-	float myObjectLifeTime;
-	uint myObjectId;
-
-	float myPadding[2];
-};
-
-cbuffer ObjectBuffer : register(OBJECT_BUFFER)
-{
-	ObjectBufferType ObjectBuffer;
-};
-
-#ifndef POINT_LIGHT_BUFFER
-#error "Missing POINT_LIGHT_BUFFER define"
-#endif
-
-struct PointLight
-{
-	float3 myPosition;
-	float myIntensity;
-
-	float3 mycolor;
-	float myRange;
-};
-
-struct PointLightBufferType
-{
-	PointLight myPointLights[NUMBEROFPOINTLIGHTS];
-
-	uint myNumOfUsedPointLights;
-	float myPadding[3];
-};
-
-cbuffer PointLightBuffer : register(POINT_LIGHT_BUFFER)
-{
-	PointLightBufferType PointLightBuffer;
-}
-
-#ifndef ANIMATION_BUFFER
-#error "Missing ANIMATION _BUFFERdefine"
-#endif
-
-struct AnimationBufferType
-{
-	float4x4 myTransforms[NUMBEROFANIMATIONBONES];
-};
-
-cbuffer AnimationBuffer : register(ANIMATION_BUFFER)
-{
-	AnimationBufferType AnimationBuffer;
-}
-
-
-Texture2D Albedo						: register(t0);
-Texture2D Normal						: register(t1);
-Texture2D Material						: register(t2);
-
-TextureCube SkyBox						: register(t3);
-TextureCube Environment					: register(t4);
-
-Texture2D Perlin						: register(t7);
 
 SamplerState Sampler					: register(s0);
 
@@ -154,3 +70,40 @@ static const float2 PoissonSamples[64] =
 	float2(0.9670017f, 0.1293385f),		float2(0.9015037f, -0.3306949f),	float2(-0.5085648f, 0.7534177f),	float2(0.9055501f, 0.3758393f),
 	float2(0.7599946f, 0.1809109f),		float2(-0.2483695f, 0.7942952f),	float2(-0.4241052f, 0.5581087f),	float2(-0.1020106f, 0.6724468f),
 };
+
+int3 GetTextureSize(Texture2D tex)
+{
+	int width = 0;
+	int height = 0;
+	int numMips = 0;
+
+	tex.GetDimensions(0, width, height, numMips);
+	return int3(width, height, numMips);
+}
+
+
+struct FullscreenVertexInput
+{
+	unsigned int myIndex : SV_VertexID;
+};
+
+struct FullscreenVertexToPixel
+{
+	float4 myPosition	:	SV_POSITION;
+	float2 myUV			:	UV;
+};
+
+struct GBufferOutput
+{
+	float4 myWorldPosition		:	SV_TARGET0;
+	float4 myAlbedo				:	SV_TARGET1;
+	float4 myNormal				:	SV_TARGET2;
+	float4 myVertexNormal		:	SV_TARGET3;
+	float4 myMaterial 			:	SV_TARGET4;
+};
+
+static const unsigned int kernelSize = 5;
+static const float GaussianKernel[kernelSize] = { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
+
+static const unsigned int kernelSize2 = 3;
+static const float GaussianKernel2[kernelSize2] = { 1.0 / 4.0, 1.0 / 2.0, 1.0 / 4.0 };

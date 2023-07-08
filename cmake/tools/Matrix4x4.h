@@ -54,23 +54,27 @@ namespace tools
 		//Operators
 		Matrix4x4<T>& operator=(const Matrix4x4<T>& aMatrix) = default;
 
+		[[nodiscard]]
 		Matrix4x4<T> operator+(const Matrix4x4<T> &aMatrix) const;
-		Matrix4x4<T>& operator+=(const Matrix4x4<T> &aMatrix);
+		void operator+=(const Matrix4x4<T> &aMatrix);
 
+		[[nodiscard]]
 		Matrix4x4<T> operator-(const Matrix4x4<T> &aMatrix) const;
-		Matrix4x4<T> operator-=(const Matrix4x4<T> &aMatrix);
+		void operator-=(const Matrix4x4<T> &aMatrix);
 
+		[[nodiscard]]
 		Matrix4x4<T> operator*(const Matrix4x4<T> &aMatrix) const;
-		Matrix4x4<T>& operator*=(const Matrix4x4<T> &aMatrix);
+		void operator*=(const Matrix4x4<T> &aMatrix);
 
+		[[nodiscard]]
 		Matrix4x4<T> operator*(const T aScalar) const;
-		Matrix4x4<T>& operator*=(const T aScalar);
+		void operator*=(const T aScalar);
 
+		[[nodiscard]]
 		Matrix4x4<T> operator/(const T aScalar) const;
-		Matrix4x4<T>& operator/=(const T aScalar);
+		void operator/=(const T aScalar);
 
-		//tools::MathVector<T, 4> &operator*(const tools::MathVector<T, 4> &aVector, const Matrix4x4<T> &aMatrix) //has to be non-member
-
+		[[nodiscard]]
 		Matrix4x4<T> operator-(void);
 
 		tools::MathVector<T, 4>& Row(size_t aIndex);
@@ -393,7 +397,7 @@ namespace tools
 	}
 
 	template<class T>
-	inline Matrix4x4<T>& Matrix4x4<T>::operator+=(const Matrix4x4<T>& aMatrix)
+	inline void Matrix4x4<T>::operator+=(const Matrix4x4<T>& aMatrix)
 	{
 		for (size_t i = 0; i < sizeof(myRows) / sizeof(T); i++)
 		{
@@ -411,7 +415,7 @@ namespace tools
 	}
 
 	template<class T>
-	inline Matrix4x4<T> Matrix4x4<T>::operator-=(const Matrix4x4<T>& aMatrix)
+	inline void Matrix4x4<T>::operator-=(const Matrix4x4<T>& aMatrix)
 	{
 		for (size_t i = 0; i < sizeof(myRows) / sizeof(T); i++)
 		{
@@ -444,10 +448,9 @@ namespace tools
 	}
 
 	template<class T>
-	inline Matrix4x4<T>& Matrix4x4<T>::operator*=(const Matrix4x4<T>& aMatrix)
+	inline void Matrix4x4<T>::operator*=(const Matrix4x4<T>& aMatrix)
 	{
 		(*this) = (*this) * aMatrix;
-		return *this;
 	}
 
 	template<class T>
@@ -459,13 +462,10 @@ namespace tools
 	}
 
 	template<class T>
-	inline Matrix4x4<T>& Matrix4x4<T>::operator*=(const T aScalar)
+	inline void Matrix4x4<T>::operator*=(const T aScalar)
 	{
-		for (size_t i = 0; i < sizeof(myRows) / sizeof(T); i++)
-		{
-			myRows[i] *= aScalar;
-		}
-		return (*this);
+		for (MathVector<T,4>& row : myRows)
+			row *= aScalar;
 	}
 
 	template<class T>
@@ -475,9 +475,9 @@ namespace tools
 	}
 
 	template<class T>
-	inline Matrix4x4<T>& Matrix4x4<T>::operator/=(const T aScalar)
+	inline void Matrix4x4<T>::operator/=(const T aScalar)
 	{
-		return operator *=(1 / aScalar);
+		operator *=(1 / aScalar);
 	}
 
 	template<class T>

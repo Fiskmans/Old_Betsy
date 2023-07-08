@@ -4,16 +4,32 @@
 
 #include "common/Macros.h"
 
-#include "logger/Logger.h"
+#include "tools/Logger.h"
 
 namespace engine::graphics
 {
-	void Texture::Release()
+	Texture::~Texture()
 	{
 		SAFE_RELEASE(myTexture);
 		SAFE_RELEASE(myShaderResource);
 		SAFE_DELETE(myViewport);
 		SAFE_RELEASE(myRenderTarget);
+	}
+
+	Texture::Texture(Texture&& aOther)
+	{
+		std::swap(myTexture, aOther.myTexture);
+		std::swap(myShaderResource, aOther.myShaderResource);
+		std::swap(myViewport, aOther.myViewport);
+		std::swap(myRenderTarget, aOther.myRenderTarget);
+	}
+
+	void Texture::operator=(Texture&& aOther)
+	{
+		std::swap(myTexture, aOther.myTexture);
+		std::swap(myShaderResource, aOther.myShaderResource);
+		std::swap(myViewport, aOther.myViewport);
+		std::swap(myRenderTarget, aOther.myRenderTarget);
 	}
 
 	void Texture::ClearTexture(tools::V4f aClearColor)
@@ -40,15 +56,31 @@ namespace engine::graphics
 		return myShaderResource;
 	}
 
+	DepthTexture::~DepthTexture()
+	{
+		SAFE_RELEASE(myDepth);
+		SAFE_RELEASE(myShaderResource);
+		SAFE_RELEASE(myTexture);
+	}
+
+	DepthTexture::DepthTexture(DepthTexture&& aOther)
+	{
+		std::swap(myTexture, aOther.myTexture);
+		std::swap(myDepth, aOther.myDepth);
+		std::swap(myShaderResource, aOther.myShaderResource);
+	}
+
+	void DepthTexture::operator=(DepthTexture&& aOther)
+	{
+		std::swap(myTexture, aOther.myTexture);
+		std::swap(myDepth, aOther.myDepth);
+		std::swap(myShaderResource, aOther.myShaderResource);
+	}
+
 	void DepthTexture::ClearDepth(float aClearDepth, unsigned int aClearStencil)
 	{
 		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 		context->ClearDepthStencilView(myDepth, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, aClearDepth, static_cast<UINT8>(aClearStencil));
-	}
-
-	void DepthTexture::Release()
-	{
-		myDepth->Release();
 	}
 
 	graphics::UpdatableTexture::UpdatableTexture()

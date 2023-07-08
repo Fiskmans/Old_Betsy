@@ -37,7 +37,7 @@ namespace engine::graphics
 {
 
 	class RenderManager
-		: public tools::Singleton<RenderManager>
+		: public fisk::tools::Singleton<RenderManager>
 	{
 	public:
 		class TextureMapping
@@ -57,10 +57,9 @@ namespace engine::graphics
 		bool Init();
 		void Resize(const tools::V2ui& aSize);
 
-		void BeginFrame(tools::V4f aClearColor);
-		void EndFrame();
-
 		void Render();
+
+		void RenderCamera(engine::Camera& aCamera);
 
 		void MapTextures(AssetHandle<DrawableTextureAsset>& aTarget, const std::vector<TextureMapping>& aTextures, AssetHandle<DepthTextureAsset> aDepth = nullptr);
 		void MapTextures(AssetHandle<GBufferAsset>& aTarget, const std::vector<TextureMapping>& aTextures, AssetHandle<DepthTextureAsset> aDepth = nullptr);
@@ -78,6 +77,8 @@ namespace engine::graphics
 		static bool CreateGenericShaderBuffer(ID3D11Buffer*& aBuffer, size_t aSize);
 
 		static bool OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize);
+		static bool SetShaderResource(size_t aSlot, AssetHandle<TextureAsset>& aAsset);
+
 	private:
 		float myStartedAt = 0.f;
 		bool myIsReady = false;;
@@ -103,6 +104,8 @@ namespace engine::graphics
 		};
 		std::array<Texture, static_cast<int>(Channel::Count)> myTextures;
 		BoneTextureCPUBuffer myBoneBuffer;
+		DepthTexture myDepthTexture;
+		GBuffer myGBuffer;
 
 #if ENABLESSAO
 		bool myDoSSAO = false;

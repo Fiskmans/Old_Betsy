@@ -44,11 +44,6 @@ namespace tools
 		return buffer;
 	}
 
-	bool FileExists(const std::string& aFile)
-	{
-		return std::ifstream(aFile).operator bool();
-	}
-
 	time_t FileLastModified(const std::string& aFile)
 	{
 		struct stat result;

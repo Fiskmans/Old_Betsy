@@ -4,9 +4,9 @@
 
 #include "engine/graphics/GraphicEngine.h"
 
-#include "logger/Logger.h"
-
 #include "tools/FileHelpers.h"
+#include "tools/Logger.h"
+#include "tools/File.h"
 
 #include <d3dcompiler.h>
 
@@ -15,10 +15,27 @@
 #include <filesystem>
 
 
-
 #define SHADER_VERSION (2)
 namespace engine::assets
 {
+	class ShaderIncludes
+		: public ID3DInclude
+	{
+	public:
+
+		void AddAdditionalInclude(const std::string& aPath);
+
+		// Inherited via ID3DInclude
+		HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) override;
+
+		HRESULT __stdcall Close(LPCVOID pData) override;
+
+	private:
+		std::vector<std::string> myAdditionalIncludes;
+
+		std::unordered_map<std::filesystem::path, std::unique_ptr<std::string>> myOpenFiles;
+	};
+
 	ShaderCompiler::ShaderCompiler(const std::string& aBakedFolderPath)
 	{
 		myBakedFolderPath = aBakedFolderPath;
@@ -175,10 +192,13 @@ namespace engine::assets
 
 		ShaderDefines defines(aFlags);
 
+		ShaderIncludes includes;
+		includes.AddAdditionalInclude(aBaseFolder);
+
 		HRESULT result = D3DCompileFromFile(
 			(std::wstring(filePath.begin(), filePath.end())).c_str(),
 			defines.Get(),
-			D3D_COMPILE_STANDARD_FILE_INCLUDE,
+			&includes,
 			aEntryPoint.c_str(),
 			aCompiler.c_str(),
 			flags,
@@ -212,5 +232,53 @@ namespace engine::assets
 		}
 
 		return blob;
+	}
+	
+	void ShaderIncludes::AddAdditionalInclude(const std::string& aPath)
+	{
+		myAdditionalIncludes.push_back(aPath);
+	}
+	HRESULT __stdcall ShaderIncludes::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
+	{
+		std::vector<std::filesystem::path> candidates;
+
+		for (std::string& additional : myAdditionalIncludes)
+			candidates.push_back(additional + pFileName);
+
+		if (pParentData)
+		{
+			for (auto& [filepath, content] : myOpenFiles)
+			{
+				if (content->data() == pParentData)
+				{
+					std::filesystem::path p(filepath);
+					p.replace_filename(pFileName);
+					candidates.push_back(p);
+					break;
+				}
+			}
+		}
+
+		for (std::filesystem::path& candidate : candidates)
+		{
+			if (std::filesystem::exists(candidate))
+			{
+				std::unique_ptr<std::string> ptr = std::make_unique<std::string>();
+
+				*ptr = fisk::tools::ReadWholeFile(candidate);
+
+				*ppData = ptr->data();
+				*pBytes = ptr->length();
+
+				myOpenFiles.emplace(candidate, std::move(ptr));
+				return S_OK;
+			}
+		}
+
+		return E_FAIL;
+	}
+	HRESULT __stdcall ShaderIncludes::Close(LPCVOID pData)
+	{
+		return E_NOTIMPL;
 	}
 }

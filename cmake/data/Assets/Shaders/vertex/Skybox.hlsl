@@ -1,4 +1,4 @@
-#include "../ShaderStructs.hlsli"
+#include "ShaderStructs.hlsli"
 
 SamplerState SkyBoxSampler : register(s0);
 

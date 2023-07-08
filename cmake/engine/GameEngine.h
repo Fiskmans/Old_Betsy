@@ -5,6 +5,8 @@
 #include "engine/graphics/GraphicEngine.h"
 #include "engine/graphics/RenderScene.h"
 
+#include "fisk_input/Input.h"
+
 #include <string>
 
 namespace engine
@@ -25,6 +27,8 @@ namespace engine
 		virtual void Update() = 0;
 		virtual void PrepareRender() = 0;
 		virtual void RegisterNodes(){}
+		virtual void ImGui() {}
+		virtual std::vector<std::pair<std::reference_wrapper<fisk::input::Action>, std::string>> GetActions() = 0;
 
 		inline void Exit() { myWantsExit = true; }
 
@@ -34,7 +38,7 @@ namespace engine
 		bool myWantsExit = false;
 	};
 
-	class GameEngine : public tools::Singleton<GameEngine>
+	class GameEngine : public fisk::tools::Singleton<GameEngine>
 	{
 	public:
 		void Init(Game& aGame);
@@ -48,7 +52,10 @@ namespace engine
 		friend Game;
 
 		void Imgui();
-		void EngineWindow();
+		void DevicesImgui();
+		void EngineImgui();
+		void SceneImgui();
+
 		static void PerformanceWindow();
 
 		void RegisterEngineNodes();
@@ -57,6 +64,8 @@ namespace engine
 		void Update();
 		Game* myGame = nullptr;
 		RenderScene myMainScene;
+
+		fisk::input::Input myInput;
 	};
 }
 

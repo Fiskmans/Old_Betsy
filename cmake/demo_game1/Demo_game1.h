@@ -19,8 +19,13 @@ public:
 	void Setup() final;
 	void Update() final;
 	void PrepareRender() final;
+	void ImGui() final;
+	virtual std::vector<std::pair<std::reference_wrapper<fisk::input::Action>, std::string>> GetActions() final;
 
 private:
+
+	void SetupActionsDefaultBindings();
+	void InputImgui();
 	engine::PerspectiveCamera myCamera;
 	engine::graphics::EnvironmentLight myEnvironmentLight;
 	std::unique_ptr<engine::ModelInstance> myModel;

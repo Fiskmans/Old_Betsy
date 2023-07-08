@@ -27,12 +27,9 @@ namespace engine::graphics
 		filePaths[static_cast<int>(Shader::GAUSSIANHORIZONTAL)] = "fullscreen/GaussianHorizontal.hlsl";
 		filePaths[static_cast<int>(Shader::GAUSSIANVERTICAL)] = "fullscreen/GaussianVertical.hlsl";
 		filePaths[static_cast<int>(Shader::COPY)] = "fullscreen/Copy.hlsl";
-		filePaths[static_cast<int>(Shader::PBREnvironmentLight)] = "fullscreen_deferred/ToonShader.hlsl";
-		filePaths[static_cast<int>(Shader::PBRPointLight)] = "fullscreen_deferred/PBRPoint.hlsl";
+		filePaths[static_cast<int>(Shader::DeferedToToon)] = "fullscreen_deferred/ToonShader.hlsl";
 		filePaths[static_cast<int>(Shader::DiscardFull)] = "fullscreen/DiscardFull.hlsl";
-		filePaths[static_cast<int>(Shader::SSAO)] = "fullscreen/SSAO.hlsl";
-		filePaths[static_cast<int>(Shader::PBRSpotLight)] = "fullscreen_deferred/PBRspot.hlsl";
-		filePaths[static_cast<int>(Shader::Cloud)] = "fullscreen/Clouds.hlsl";
+		filePaths[static_cast<int>(Shader::SSAO)] = "fullscreen_deferred/SSAO.hlsl";
 		filePaths[static_cast<int>(Shader::EdgeDetection)] = "fullscreen/EdgeDetection.hlsl";
 		filePaths[static_cast<int>(Shader::ConditionalGAUSSIANHORIZONTAL)] = "fullscreen/ConditionalGaussianHorizontal.hlsl";
 		filePaths[static_cast<int>(Shader::ConditionalGAUSSIANVERTICAL)] = "fullscreen/ConditionalGaussianVertical.hlsl";

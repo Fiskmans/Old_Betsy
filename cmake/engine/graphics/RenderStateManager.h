@@ -3,6 +3,8 @@
 
 #include <array>
 
+#define NOMINMAX
+#include <WinSock2.h>
 #include <d3d11.h>
 
 namespace engine::graphics

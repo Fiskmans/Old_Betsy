@@ -10,7 +10,7 @@
 #include "tools/Matrix4x4.h"
 #include "tools/Matrix3x3.h"
 #include "tools/Literals.h"
-#include "tools/PlaneVolume.h"
+#include "tools/Frustum.h"
 #include "tools/Event.h"
 #include "tools/Ray.h"
 
@@ -25,11 +25,9 @@ namespace engine
 		const static tools::V2ui AdaptToScreen;
 	
 		Camera(RenderScene& aScene, float aNearPlane, float aFarPlane, tools::V2ui aResolution);
-		virtual ~Camera();
+		virtual ~Camera() = default;
 
-		virtual void OnResolutionChanged(tools::V2ui aResolution);
-
-		void ForceRedraw();
+		virtual void ChangeResolution(tools::V2ui aResolution);
 
 		void SetTransform(tools::V4f aPosition, tools::V3f aRotation);
 		void SetTransform(tools::M44f aTransform);
@@ -56,30 +54,23 @@ namespace engine
 
 		tools::V3f GetPosition() const;
 
-		RenderScene& GetScene() { return *myScene.Get(); }
+		RenderScene& GetScene() { return *myScene; }
 
 		virtual tools::Frustum<float> GenerateFrustum() const = 0;
-
-		AssetHandle<TextureAsset> GetTexture() { return myRenderTexture.Get(); }
 
 		std::vector<ModelInstance*> Cull() const;
 
 	private:
 		void SetResolution(tools::V2ui aResolution);
 
-		engine::graph::Graph myRenderGraph;
-
-		engine::graph::CustomInPin<AssetHandle<TextureAsset>> myRenderTexture = engine::graph::PinInformation("Texture to Render");
-
 	protected:
-		engine::graph::CustomOutPin<Camera*> mySelf = engine::graph::PinInformation("Camera");
-		engine::graph::CustomOutPin<RenderScene*> myScene = engine::graph::PinInformation("Scene");
-		engine::graph::CustomOutPin<tools::V2ui> myResolutionExport = engine::graph::PinInformation("Resolution");
+		tools::V2ui myResolution;
+		RenderScene* myScene;
 		
 		tools::M44f myTransform;
 		tools::M44f myProjection;
 
-		tools::EventID myResolutionEvent = tools::NullEventId;
+		fisk::tools::EventReg myResolutionEvent;
 
 		float myNearPlane;
 		float myFarPlane;
@@ -88,9 +79,9 @@ namespace engine
 	class PerspectiveCamera final : public Camera
 	{
 	public:
-		PerspectiveCamera(RenderScene& aScene, float aNearPlane, float aFarPlane, float aFOV, tools::V2ui aResolution = AdaptToScreen);
+		PerspectiveCamera(RenderScene& aScene, tools::Distance aNearPlane, tools::Distance aFarPlane, tools::Rotation aFOV, tools::V2ui aResolution = AdaptToScreen);
 
-		void SetFOVRad(float aFOV);
+		void SetFOV(tools::Rotation aFOV);
 
 		void UpdateYFOV();
 
@@ -99,7 +90,7 @@ namespace engine
 	protected:
 		static constexpr float ourMaxFOV = (PI_F / 2.f) * (179.f / 180.f);
 
-		void OnResolutionChanged(tools::V2ui aResolution) override;
+		void ChangeResolution(tools::V2ui aResolution) override;
 		float myXFOV;
 		float myYFOV;
 	};

@@ -161,7 +161,7 @@ namespace engine::graph
 	};
 
 
-	class GraphManager : public tools::Singleton<GraphManager>
+	class GraphManager : public fisk::tools::Singleton<GraphManager>
 	{
 	public:
 		void AddGraph(Graph* aGraph);

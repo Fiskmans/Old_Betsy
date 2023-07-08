@@ -33,9 +33,6 @@ namespace tools
 	};
 
 	template<typename T>
-	using Frustum = PlaneVolume<T>;
-
-	template<typename T>
 	inline PlaneVolume<T>::PlaneVolume(const std::vector<Plane<T>>& aPlaneList)
 	{
 		myData = aPlaneList;

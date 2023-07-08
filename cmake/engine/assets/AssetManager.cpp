@@ -2,30 +2,33 @@
 
 #include "engine/graphics/TextureFactory.h"
 
-#include "tools/StringManipulation.h"
-#include "tools/JSON.h"
 #include "tools/FileHelpers.h"
+#include "tools/JSON.h"
+#include "tools/Logger.h"
+#include "tools/StringManipulation.h"
 
 #include "imgui/WindowControl.h"
-
-#include "logger/Logger.h"
 
 #include <filesystem>
 #include <mutex>
 
-#define TEXTURE_FOLDER "/textures/"
-#define SKYBOX_FOLDER "/skyboxes/"
-#define MODEL_FOLDER "/models/"
-#define PIXELSHADER_FOLDER "/shaders/pixel/"
-#define VERTEXSHADER_FOLDER "/shaders/vertex/"
-#define GEOMETRYSHADER_FOLDER "/shaders/geometry/"
-#define JSON_FOLDER "/json/"
-#define FONT_FOLDER "/fonts/"
-#define LEVEL_FOLDER "/levels/"
-#define NAVMESH_FOLDER "/navmeshes/"
-#define ANIMATIONS_FOLDER "/animations/"
+#define TEXTURE_FOLDER "textures/"
+#define SKYBOX_FOLDER "skyboxes/"
+#define MODEL_FOLDER "models/"
 
-#define BAKED_SHADER_FOLDER "/shaders/"
+#define SHADER_BASE "shaders/"
+
+#define PIXELSHADER_FOLDER "pixel/"
+#define VERTEXSHADER_FOLDER "vertex/"
+#define GEOMETRYSHADER_FOLDER "geometry/"
+
+#define JSON_FOLDER "json/"
+#define FONT_FOLDER "fonts/"
+#define LEVEL_FOLDER "levels/"
+#define NAVMESH_FOLDER "navmeshes/"
+#define ANIMATIONS_FOLDER "animations/"
+
+#define BAKED_SHADER_FOLDER "shaders/"
 
 #define DEFAULT_PIXEL_SHADER "deferred/Deferred.hlsl"
 
@@ -37,6 +40,12 @@ namespace engine
     }
     void AssetManager::Init(const std::string& aBaseFolder, const std::string& aBakeFolder)
     {
+        assert(aBaseFolder.length() > 0);
+		assert(aBaseFolder.at(aBaseFolder.length() - 1) == '/');
+
+		assert(aBakeFolder.length() > 0);
+		assert(aBakeFolder.at(aBakeFolder.length() - 1) == '/');
+
         myBaseFolder = aBaseFolder;
         myModelLoader = std::make_unique<assets::ModelLoader>(DEFAULT_PIXEL_SHADER);
         myTextureLoader = std::make_unique<assets::TextureLoader>();
@@ -87,8 +96,7 @@ namespace engine
 
     AssetHandle<DrawableTextureAsset> AssetManager::MakeTexture(const tools::V2ui& aResolution, DXGI_FORMAT aFormat)
     {
-        graphics::Texture tex = graphics::TextureFactory::GetInstance().CreateTexture(aResolution, aFormat, "CustomTexture" + std::to_string(myCustomTextureCounter++));
-        return new DrawableTextureAsset(tex);
+        return new DrawableTextureAsset(graphics::TextureFactory::GetInstance().CreateTexture(aResolution, aFormat, "CustomTexture" + std::to_string(myCustomTextureCounter++)));
     }
 
     AssetHandle<DepthTextureAsset> AssetManager::MakeDepthTexture(const tools::V2ui& aResolution)
@@ -158,7 +166,7 @@ namespace engine
 
         if (myCachedPixelShaders[aPath].count(aFlags) == 0)
         {
-            Asset* shader = myShaderCompiler->GetPixelShader(myBaseFolder + PIXELSHADER_FOLDER, aPath, aFlags);
+            Asset* shader = myShaderCompiler->GetPixelShader(myBaseFolder + SHADER_BASE, PIXELSHADER_FOLDER + aPath, aFlags);
             if (!shader)
             {
                 LOG_SYS_ERROR("Failed to load pixelShader", aPath);
@@ -191,7 +199,7 @@ namespace engine
 
         if (myCachedVertexShaders[aPath].count(aFlags) == 0)
         {
-            Asset* shader = myShaderCompiler->GetVertexShader(myBaseFolder + VERTEXSHADER_FOLDER, aPath, aFlags);
+            Asset* shader = myShaderCompiler->GetVertexShader(myBaseFolder + SHADER_BASE, VERTEXSHADER_FOLDER + aPath, aFlags);
             if (!shader)
             {
                 LOG_SYS_ERROR("Failed to load pixelShader", aPath);
@@ -264,7 +272,7 @@ namespace engine
     //    return GetJSONInternal(myBaseFolder + JSON_FOLDER + aPath);
     //}
     //
-    AssetHandle<JSONAsset> AssetManager::GetJSONRelative(const std::string& aBase, const std::string& aPath)
+    AssetHandle<JsonAsset> AssetManager::GetJSONRelative(const std::string& aBase, const std::string& aPath)
     {
         return GetJSONInternal(tools::PathWithoutFile(aBase) + aPath);
     }
@@ -413,25 +421,14 @@ namespace engine
 		return myCachedTextures[aPath];
 	}
 
-	AssetHandle<JSONAsset> AssetManager::GetJSONInternal(const std::string& aPath)
+	AssetHandle<JsonAsset> AssetManager::GetJSONInternal(const std::string& aPath)
 	{
 		if (myCachedJSON.count(aPath) == 0)
 		{
 			Asset* json = nullptr;
-			tools::JSONObject* obj = new tools::JSONObject();
-			try
-			{
-				obj->Parse(tools::ReadWholeFile(aPath));
-				json = new JSONAsset(obj, aPath);
-			}
-			catch (const std::exception& e)
-			{
-				LOG_ERROR("Failed to load json", aPath, e.what());
-
-				delete obj;
-			}
-
+			json = new JsonAsset(aPath);
 			myCachedJSON[aPath] = json;
+
 			return json;
 		}
 		return myCachedJSON[aPath];

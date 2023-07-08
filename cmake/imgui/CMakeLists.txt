@@ -16,6 +16,8 @@ list(APPEND SOURCE_FILES "backend/imgui_impl_win32.h")
 
 list(APPEND SOURCE_FILES "WindowControl.cpp")
 list(APPEND SOURCE_FILES "WindowControl.h")
+list(APPEND SOURCE_FILES "CustomWidgets.cpp")
+list(APPEND SOURCE_FILES "CustomWidgets.h")
 
 add_library(Imgui STATIC "${SOURCE_FILES}")
 
@@ -26,3 +28,5 @@ configure_file(config.h.in config.h)
 target_compile_options(Imgui PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 target_include_directories(Imgui PUBLIC ${CMAKE_SOURCE_DIR})
 target_include_directories(Imgui PUBLIC ${CMAKE_BINARY_DIR})
+
+target_link_libraries(Imgui Engine fisk_tools)

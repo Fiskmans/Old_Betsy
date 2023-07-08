@@ -1,6 +1,6 @@
 
 #include "tools/ImGuiHelpers.h"
-#include "tools/TimeHelper.h"
+#include "tools/Time.h"
 //#include "FullscreenRenderer.h"
 //#include "Texture.h"
 //#include "TextureFactory.h"
@@ -222,13 +222,13 @@ namespace tools
 		return aString + std::string(aLength - aString.length(), ' ');
 	}
 
-	tools::TimeTree*& HoveredTimeTree()
+	fisk::tools::TimeTree*& HoveredTimeTree()
 	{
-		static tools::TimeTree* val = nullptr;
+		static fisk::tools::TimeTree* val = nullptr;
 		return val;
 	}
 
-	void DrawTimeTree_internal(tools::TimeTree* aTree, int aDepth, std::function<ImVec4(int)> aColorGetter, const char* aFormat, std::function<float(TimeTree*)> aArgumentGetter)
+	void DrawTimeTree_internal(fisk::tools::TimeTree* aTree, int aDepth, std::function<ImVec4(int)> aColorGetter, const char* aFormat, std::function<float(fisk::tools::TimeTree*)> aArgumentGetter)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, aColorGetter(aDepth));
 		bool hovered = false;
@@ -274,7 +274,7 @@ namespace tools
 		}
 	}
 
-	void DrawTimeTree(tools::TimeTree* aTree)
+	void DrawTimeTree(fisk::tools::TimeTree* aTree)
 	{
 
 		ImGui::PushID(aTree->myName);
@@ -299,22 +299,28 @@ namespace tools
 
 
 		const char* format = nullptr;
-		std::function<float(TimeTree*)> valueGetter;
+		std::function<float(fisk::tools::TimeTree*)> valueGetter;
 		switch (mode)
 		{
 		case 0:
 			format = "%s: [%3d] %5.2fms coverage: %s";
-			valueGetter = [](TimeTree* aNode) -> float { return aNode->myTime * 1000.f; };
+			valueGetter = [](fisk::tools::TimeTree* aNode) -> float
+			{
+				return aNode->myTime * 1000.f;
+			};
 			break;
 		case 1:
 			format = "%s: [%3d] %5.1f%% coverage: %s";
-			valueGetter = [](TimeTree* aNode) -> float { return (aNode->myParent ? aNode->myTime / aNode->myParent->myTime : 1.f) * 100.f; };
+			valueGetter = [](fisk::tools::TimeTree* aNode) -> float
+			{
+				return (aNode->myParent ? aNode->myTime / aNode->myParent->myTime : 1.f) * 100.f;
+			};
 			break;
 		case 2:
 			format = "%s: [%3d] %5.1f%% coverage: %s";
-			valueGetter = [](TimeTree* aNode) -> float
+			valueGetter = [](fisk::tools::TimeTree* aNode) -> float
 			{
-				std::function< float(TimeTree*)> GetRootTime = [&GetRootTime](TimeTree* aNode) -> float
+				std::function< float(fisk::tools::TimeTree*)> GetRootTime = [&GetRootTime](fisk::tools::TimeTree* aNode) -> float
 				{
 					if (aNode->myParent)
 					{
@@ -327,7 +333,7 @@ namespace tools
 			break;
 		case 3:
 			format = "%s: [%3d] %5.1f%% coverage: %s";
-			valueGetter = [](TimeTree* aNode) -> float { return (HoveredTimeTree() ? aNode->myTime / HoveredTimeTree()->myTime : 1.f) * 100.f; };
+			valueGetter = [](fisk::tools::TimeTree* aNode) -> float { return (HoveredTimeTree() ? aNode->myTime / HoveredTimeTree()->myTime : 1.f) * 100.f; };
 			break;
 		default:
 			break;

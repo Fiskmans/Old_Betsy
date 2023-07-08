@@ -18,7 +18,7 @@
 namespace engine
 {
 	class AssetManager
-		: public tools::Singleton<AssetManager>
+		: public fisk::tools::Singleton<AssetManager>
 	{
 	public:
 		AssetManager();
@@ -46,7 +46,7 @@ namespace engine
 		//AssetHandle GetPerlinTexture(tools::V2ui aSize, tools::V2f aScale, unsigned int aSeed);
 
 		//AssetHandle GetJSON(const std::string& aPath);
-		AssetHandle<JSONAsset> GetJSONRelative(const std::string& aBase, const std::string& aPath);
+		AssetHandle<JsonAsset> GetJSONRelative(const std::string& aBase, const std::string& aPath);
 
 		//AssetHandle GetFont(const std::string& aPath);
 
@@ -65,7 +65,7 @@ namespace engine
 	private:
 
 		AssetHandle<TextureAsset> GetTextureInternal(const std::string& aPath, bool aFailSilenty);
-		AssetHandle<JSONAsset> GetJSONInternal(const std::string& aPath);
+		AssetHandle<JsonAsset> GetJSONInternal(const std::string& aPath);
 		//AssetHandle GetAnimationInternal(const std::string& aPath);
 
 		size_t myCustomTextureCounter;
@@ -84,7 +84,7 @@ namespace engine
 		std::unordered_map<std::string, AssetHandle<TextureAsset>> myCachedSkyboxes;
 		std::unordered_map<std::string, AssetHandle<TextureAsset>> myCachedTextures;
 		std::unordered_map<std::string, AssetHandle<TextureAsset>> myCachedCubeTextures;
-		std::unordered_map<std::string, AssetHandle<JSONAsset>> myCachedJSON;
+		std::unordered_map<std::string, AssetHandle<JsonAsset>> myCachedJSON;
 		//std::unordered_map<std::string, AssetHandle<FontAsset>> myCachedfonts;
 		//std::unordered_map<std::string, AssetHandle<LevelAsset>> myCachedLevels;
 		//std::unordered_map<std::string, AssetHandle<NavmeshAsset>> myCachedNavMeshes;

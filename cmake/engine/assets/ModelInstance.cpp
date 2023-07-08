@@ -6,9 +6,8 @@
 #include "engine/graphics/RenderManager.h"
 #include "engine/graphics/ShaderBuffers.h"
 
-#include "tools/TimeHelper.h"
-
-#include "logger/Logger.h"
+#include "tools/Logger.h"
+#include "tools/Time.h"
 
 //#include "Model.h"
 //#include "ShaderFlags.h"
@@ -60,7 +59,7 @@ namespace engine
 
 	void ModelInstance::ResetSpawnTime()
 	{
-		mySpawnTime = tools::GetTotalTime();
+		mySpawnTime = fisk::tools::GetTotalTime();
 	}
 
 	tools::M44f ModelInstance::GetModelToWorldTransform()
@@ -262,15 +261,6 @@ namespace engine
 
 	bool ModelInstance::GetIsHighlighted()
 	{
-		for (Model::ModelData* data : myModel.Access().myModel->GetModelData())
-		{
-			if (!data->myTextures[0].IsValid()) { return false; }
-			if (!data->myTextures[1].IsValid()) { return false; }
-			if (!data->myTextures[2].IsValid()) { return false; }
-			if (!data->myTextures[0].Is<TextureAsset>()) { return false; }
-			if (!data->myTextures[1].Is<TextureAsset>()) { return false; }
-			if (!data->myTextures[2].Is<TextureAsset>()) { return false; }
-		}
 		return myIsHighlighted;
 	}
 

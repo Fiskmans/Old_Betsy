@@ -24,20 +24,18 @@ namespace engine::graphics
 
 		bool Init();
 
-
 		FilterResult Filter(const std::vector<ModelInstance*>& aModels);
 
-		void GenerateGBuffer(Camera* aCamera);
+		void GenerateGBuffer(Camera& aCamera);
 
-		void Render(Camera* aCamera);
+		void Render(Camera& aCamera);
 
 	private:
-		void MapEnvLightBuffer(Camera* aCamera);
+		void MapEnvLightBuffer(Camera& aCamera);
 
-		AssetHandle<PixelShaderAsset> myBackFaceShader;
 		ID3D11Buffer* myFrameBuffer = nullptr;
 		ID3D11Buffer* myObjectBuffer = nullptr;
-		ID3D11Buffer* myPixelEnvLightBuffer = nullptr;
+		ID3D11Buffer* myDeferredFrameBuffer = nullptr;
 		ID3D11Buffer* myPixelPointLightBuffer = nullptr;
 		ID3D11Buffer* myPixelSpotLightBuffer = nullptr;
 		ID3D11Buffer* myDecalBuffer = nullptr;

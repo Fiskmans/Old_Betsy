@@ -3,12 +3,12 @@
 
 namespace engine::graph::nodes
 {
-	void RenderCopyNode::Activate()
-	{
-		myOutTexture = myInTexture;
-
-		myIntPin = 5;
-		myFloatPin = 3.f;
-		myRandom = this;
-	}
+	//void RenderCopyNode::Activate()
+	//{
+	//	myOutTexture = myInTexture;
+	//
+	//	myIntPin = 5;
+	//	myFloatPin = 3.f;
+	//	myRandom = this;
+	//}
 }

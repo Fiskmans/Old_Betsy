@@ -1,9 +1,9 @@
-#include "../../FullscreenShaderStructs.hlsli"
+#include "ShaderStructs.hlsli"
 
-PixelOutput pixelShader(VertexToPixel input)
+PixelOutput pixelShader(FullscreenVertexToPixel input)
 {
 	PixelOutput outp;
-	float3 resource = resource1.Sample(defaultSampler, input.myUV.xy).rgb;
+	float3 resource = texture0.Sample(Sampler, input.myUV.xy).rgb;
 
 	float luminance = dot(resource, float3(0.2126f, 0.7152f, 0.0722f));
 	const float cutOff = 0.8f;

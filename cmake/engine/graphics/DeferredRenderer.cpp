@@ -8,26 +8,11 @@
 #include "engine/assets/AssetManager.h"
 #include "engine/assets/Model.h"
 
-#include "tools/TimeHelper.h"
+#include "tools/Time.h"
 #include "tools/Functors.h"
 
 namespace engine::graphics
 {
-	struct DeferredPixelEnvLightBuffer
-	{
-		tools::V3f myCameraPosition;
-		float myLightIntensity;
-
-		tools::V3f myLightColor;
-		float time;
-
-		tools::V3f myLightDirection;
-		float myCloudIntensity;
-
-		tools::M44f myToCamera;
-		tools::M44f myToProjection;
-	};
-
 	struct DeferredPixelPointLightBuffer
 	{
 		tools::M44f myToCamera[6];
@@ -82,18 +67,10 @@ namespace engine::graphics
 
 		if (!RenderManager::CreateGenericShaderBuffer< FrameBuffer>(myFrameBuffer)) { return false; }
 		if (!RenderManager::CreateGenericShaderBuffer< ObjectBuffer>(myObjectBuffer)) { return false; }
-		if (!RenderManager::CreateGenericShaderBuffer< DeferredPixelEnvLightBuffer>(myPixelEnvLightBuffer)) { return false; }
+		if (!RenderManager::CreateGenericShaderBuffer< DeferredPixelEnvLightBuffer>(myDeferredFrameBuffer)) { return false; }
 		if (!RenderManager::CreateGenericShaderBuffer< DeferredPixelPointLightBuffer>(myPixelPointLightBuffer)) { return false; }
 		if (!RenderManager::CreateGenericShaderBuffer< DeferredPixelSpotLightBuffer>(myPixelSpotLightBuffer)) { return false; }
 		if (!RenderManager::CreateGenericShaderBuffer< DeferredDecalBuffer>(myDecalBuffer)) { return false; }
-
-		myBackFaceShader = AssetManager::GetInstance().GetPixelShader("deferred/Deferred_backfacing.hlsl");
-
-		if (!myBackFaceShader.IsValid())
-		{
-			LOG_SYS_CRASH("Failed to load required engine shader");
-			return false;
-		}
 
 		LOG_INFO("Deferred Renderer initialization complete");
 
@@ -121,42 +98,41 @@ namespace engine::graphics
 		return FilterResult();
 	}
 
-	void DeferredRenderer::GenerateGBuffer(Camera* aCamera)
+	void DeferredRenderer::GenerateGBuffer(Camera& aCamera)
 	{
 		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 
 		{
 			FrameBuffer fData;
-			WIPE(fData);
 
-			fData.myWorldToCamera = aCamera->GetTransform().FastInverse();
+			fData.myWorldToCamera = tools::M44f::Identity();// aCamera->GetTransform().FastInverse();
+			fData.myCameraToProjection = tools::M44f::Identity();// aCamera->GetProjection();
 
-			fData.myTotalTime = tools::GetTotalTime();
-			fData.myCameraToProjection = aCamera->GetProjection();
+			fData.myTotalTime = fisk::tools::GetTotalTime();
 
 			if (!RenderManager::OverWriteBuffer(myFrameBuffer, &fData, sizeof(fData)))
 				return;
 		}
 
-		context->VSSetConstantBuffers(graphics::FRAME_BUFFER_INDEX, 1, &myFrameBuffer);
-		context->PSSetConstantBuffers(graphics::FRAME_BUFFER_INDEX, 1, &myFrameBuffer);
+		context->VSSetConstantBuffers(graphics::shader_mappings::BUFFER_FRAME, 1, &myFrameBuffer);
+		context->PSSetConstantBuffers(graphics::shader_mappings::BUFFER_FRAME, 1, &myFrameBuffer);
 
 		context->GSSetShader(nullptr, nullptr, 0);
 
 		{
 			PERFORMANCETAG("standard");
-			for (ModelInstance* modelInstance : aCamera->Cull())
+			for (ModelInstance* modelInstance : aCamera.Cull())
 			{
 				Model* model = modelInstance->GetModelAsset().myModel;
 
 				for (Model::ModelData* modelData : model->GetModelData())
 				{
 					ObjectBuffer oData;
-					WIPE(oData);
-					oData.myModelToWorldSpace = modelInstance->GetModelToWorldTransform().Transposed() * modelData->myOffset;
+
+					oData.myModelToWorldSpace = tools::M44f::Identity();// modelInstance->GetModelToWorldTransform().Transposed(); // *modelData->myOffset;
 					oData.myDiffuseColor = modelData->myDiffuseColor;
 
-					oData.myObjectLifeTime = tools::GetTotalTime() - modelInstance->GetSpawnTime();
+					oData.myObjectLifeTime = fisk::tools::GetTotalTime() - modelInstance->GetSpawnTime();
 					oData.myObjectId = modelInstance->GetId();
 
 					if (!RenderManager::OverWriteBuffer(myObjectBuffer, &oData, sizeof(oData))) { return; }
@@ -167,21 +143,16 @@ namespace engine::graphics
 					context->IASetPrimitiveTopology(modelData->myPrimitiveTopology);
 					context->IASetInputLayout(modelData->myInputLayout);
 
-					context->VSSetConstantBuffers(graphics::OBJECT_BUFFER_INDEX, 1, &myObjectBuffer);
-					context->PSSetConstantBuffers(graphics::OBJECT_BUFFER_INDEX, 1, &myObjectBuffer);
+					context->VSSetConstantBuffers(graphics::shader_mappings::BUFFER_OBJECT, 1, &myObjectBuffer);
+					context->PSSetConstantBuffers(graphics::shader_mappings::BUFFER_OBJECT, 1, &myObjectBuffer);
 
 					context->VSSetShader(modelData->myVertexShader.Access().myShader, nullptr, 0);
 					context->PSSetShader(modelData->myPixelShader.Access().myShader, nullptr, 0);
 
 
-					ID3D11ShaderResourceView* resources[3] = { nullptr };
-
-					if (modelData->myTextures[0].IsValid()) { resources[0] = modelData->myTextures[0].Access().myTexture; }
-					if (modelData->myTextures[1].IsValid()) { resources[1] = modelData->myTextures[1].Access().myTexture; }
-					if (modelData->myTextures[2].IsValid()) { resources[2] = modelData->myTextures[2].Access().myTexture; }
-
-					context->PSSetShaderResources(0, 3, resources);
-					context->VSSetShaderResources(0, 3, resources);
+					RenderManager::SetShaderResource(shader_mappings::TEXTURE_ALBEDO, modelData->myAlbedo);
+					RenderManager::SetShaderResource(shader_mappings::TEXTURE_NORMAL, modelData->myNormal);
+					RenderManager::SetShaderResource(shader_mappings::TEXTURE_MATERIAL, modelData->myMaterial);
 
 					UINT vertexOffset = 0;
 
@@ -283,9 +254,8 @@ namespace engine::graphics
 		return filtered;*/
 	}
 
-	void DeferredRenderer::Render(Camera* aCamera)
+	void DeferredRenderer::Render(Camera& aCamera)
 	{
-
 		//ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
 		{
 			PERFORMANCETAG("Environmentlight");
@@ -308,7 +278,7 @@ namespace engine::graphics
 
 			MapEnvLightBuffer(aCamera);
 			RenderManager::GetInstance().GetRenderStateManager().SetSamplerState(RenderStateManager::SamplerState::Trilinear);
-			RenderManager::GetInstance().GetFullscreenRender().Render(FullscreenRenderer::Shader::PBREnvironmentLight);
+			RenderManager::GetInstance().GetFullscreenRender().Render(FullscreenRenderer::Shader::DeferedToToon);
 		}
 		//{
 		//	PERFORMANCETAG("PointLights");
@@ -444,26 +414,15 @@ namespace engine::graphics
 		//}
 	}
 
-	void DeferredRenderer::MapEnvLightBuffer(Camera* aCamera)
+	void DeferredRenderer::MapEnvLightBuffer(Camera& aCamera)
 	{
 		ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
-		HRESULT result;
-		D3D11_MAPPED_SUBRESOURCE bufferData;
-
-		result = context->Map(myPixelEnvLightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
-
-		if (FAILED(result))
-		{
-			LOG_ERROR("Could not map frame buffer");
-			return;
-		}
-
 		DeferredPixelEnvLightBuffer fData;
 
 		WIPE(fData);
 
-		fData.myCameraPosition = aCamera->GetPosition();
-		EnvironmentLight* envlight = aCamera->GetScene().GetEnvironmentLight();
+		fData.myCameraPosition = aCamera.GetPosition();
+		EnvironmentLight* envlight = aCamera.GetScene().GetEnvironmentLight();
 		if (envlight)
 		{
 			ID3D11ShaderResourceView* texture[1] { nullptr };
@@ -484,16 +443,16 @@ namespace engine::graphics
 			fData.myLightIntensity = envlight->myIntensity;
 		}
 
-		//const Camera* cam = myShadowRenderer->GetEnvirontmentCamera();
-		//fData.myToCamera = cam->GetTransform().FastInverse();
-		//fData.myToProjection = cam->GetProjection();
-		fData.time = tools::GetTotalTime();
-		//fData.myCloudIntensity = myCloudIntensity;
+		const engine::graphics::EnvironmentLight* envLight = aCamera.GetScene().GetEnvironmentLight();
+		const Camera& cam = envLight->myCamera;
+		fData.myToCamera = cam.GetTransform().FastInverse();
+		fData.myToProjection = cam.GetProjection();
+		fData.time = fisk::tools::GetTotalTime();
 
-		memcpy(bufferData.pData, &fData, sizeof(fData));
 
-		context->Unmap(myPixelEnvLightBuffer, 0);
-		context->PSSetConstantBuffers(shader_mappings::CONSTANT_BUFFER_ENV_LIGHT, 1, &myPixelEnvLightBuffer);
+		RenderManager::OverWriteBuffer(myDeferredFrameBuffer, &fData, sizeof(fData));
+
+		context->PSSetConstantBuffers(shader_mappings::BUFFER_DEFFERED_FRAME, 1, &myDeferredFrameBuffer);
 	}
 
 }

@@ -13,7 +13,7 @@
 namespace engine::graphics
 {
 	class TextureFactory
-		: public tools::Singleton<TextureFactory>
+		: public fisk::tools::Singleton<TextureFactory>
 	{
 	public:
 		TextureFactory() = default;

@@ -4,7 +4,7 @@
 #include "common/WindowsIncludeWrapper.h"
 #include "common/Macros.h"
 
-#include "tools/TimeHelper.h"
+#include "tools/Time.h"
 
 namespace old_betsy_imgui
 {

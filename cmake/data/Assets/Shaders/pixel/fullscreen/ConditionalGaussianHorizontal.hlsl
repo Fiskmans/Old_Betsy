@@ -1,10 +1,10 @@
-#include "../../FullscreenShaderStructs.hlsli"
+#include "ShaderStructs.hlsli"
 
-PixelOutput pixelShader(VertexToPixel input)
+PixelOutput pixelShader(FullscreenVertexToPixel input)
 {
 	PixelOutput outp;
 
-	float texelSize = 1.f / (float)(GetTextureSize(resource1).x);
+	float texelSize = 1.f / (float)(GetTextureSize(texture0).x);
 	float3 blurColor = float3(0.f, 0.f, 0.f);
 
 	float start = (((float)(kernelSize2)-1.f) * 0.5f) * -1.f;
@@ -15,12 +15,12 @@ PixelOutput pixelShader(VertexToPixel input)
 	for (unsigned int i = 0; i < kernelSize2; i++)
 	{
 		uv = input.myUV.xy + float2(texelSize * (start + (float)(i)), 0.f);
-		resource = resource1.Sample(defaultSampler, uv).rgb;
+		resource = texture0.Sample(Sampler, uv).rgb;
 		blurColor += resource * GaussianKernel2[i];
 	}
 
-	float3 flatColor = resource1.Sample(defaultSampler, input.myUV.xy).rgb;
-	float condition = resource2.Sample(defaultSampler, input.myUV.xy).r;
+	float3 flatColor = texture0.Sample(Sampler, input.myUV.xy).rgb;
+	float condition = texture1.Sample(Sampler, input.myUV.xy).r;
 
 	outp.myColor.rgb = lerp(flatColor, blurColor, condition);
 	outp.myColor.a = 1.f;

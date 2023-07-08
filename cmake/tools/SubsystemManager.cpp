@@ -1,7 +1,7 @@
 
 #include "tools/SubsystemManager.h"
 
-#include "logger/Logger.h"
+#include "tools/Logger.h"
 
 namespace tools {
 
@@ -13,6 +13,6 @@ namespace tools {
 	void SubsystemManager::LogAllVersions()
 	{
 		for (std::pair<std::string, std::string> systemAndVersion : myRegisteredSubsystems)
-			logger::Log(logger::Type::SystemInfo, "using " + systemAndVersion.first + " version: " + systemAndVersion.second);
+			fisk::tools::Log(fisk::tools::Type::SystemInfo, "using " + systemAndVersion.first + " version: " + systemAndVersion.second);
 	}
 }

@@ -60,7 +60,7 @@ namespace engine
 
 		bool myIsHighlighted = false;
 
-		tools::M44f myTransform;
+		tools::M44f myTransform = tools::M44f::Identity();
 
 		tools::V3f myScale;
 

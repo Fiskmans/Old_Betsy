@@ -21,6 +21,7 @@ namespace engine
 	{
 	public:
 		void Update(float aDeltaTime);
+		void ImGui();
 
 		void AddToScene(ModelInstance* aModel);
 		void AddToScene(PointLight* aLight);

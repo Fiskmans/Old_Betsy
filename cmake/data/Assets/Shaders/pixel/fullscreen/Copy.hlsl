@@ -1,9 +1,9 @@
-#include "../../FullscreenShaderStructs.hlsli"
+#include "ShaderStructs.hlsli"
 
-PixelOutput pixelShader(VertexToPixel input)
+PixelOutput pixelShader(FullscreenVertexToPixel input)
 {
 	PixelOutput outp;
-	outp.myColor.rgb = resource1.Sample(defaultSampler, input.myUV).rgb;
+	outp.myColor.rgb = texture0.Sample(Sampler, input.myUV).rgb;
 	outp.myColor.a = 1;
 	return outp;
 }

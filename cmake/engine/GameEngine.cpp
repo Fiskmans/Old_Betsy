@@ -10,10 +10,11 @@
 #include "engine/graph/NodeRegistration.h"
 #include "engine/graph/Graph.h"
 
-#include "imgui/imgui.h"
+#include "imgui/CustomWidgets.h"
 #include "imgui/WindowControl.h"
-#include "imgui/backend/imgui_impl_win32.h"
 #include "imgui/backend/imgui_impl_dx11.h"
+#include "imgui/backend/imgui_impl_win32.h"
+#include "imgui/imgui.h"
 
 #include "tools/ImGuiHelpers.h"
 #include "tools/Stopwatch.h"
@@ -45,7 +46,7 @@ namespace engine
 		{
 			tools::TimedScope scopeTimer(stopWatch);
 
-			AssetManager::GetInstance().Init("data/assets", "baked");
+			AssetManager::GetInstance().Init("data/assets/", "baked/");
 
 			graphics::GraphicsEngine::GetInstance().Init(SettingsManager::GetInstance().myWindowSize.Get());
 
@@ -59,6 +60,11 @@ namespace engine
 			SettingsManager::GetInstance().LoadOrDefaultImGuiStyle();
 			ImGui_ImplDX11_Init(graphics::GraphicsEngine::GetInstance().GetFrameWork().GetDevice(), graphics::GraphicsEngine::GetInstance().GetFrameWork().GetContext());
 			ImGui_ImplWin32_Init(WindowManager::GetInstance().GetWindowHandle());
+		}
+
+		for (auto& action : myGame->GetActions())
+		{
+			myInput.RegisterAction(action.first, action.second);
 		}
 
 		LOG_SYS_INFO("Game Engine Initialization completed in " + std::to_string(stopWatch.Read()) + " seconds");
@@ -83,17 +89,59 @@ namespace engine
 
 		old_betsy_imgui::WindowControl::DrawWindowControl();
 
-		old_betsy_imgui::WindowControl::Window("Engine", [&]() { EngineWindow(); });
+		old_betsy_imgui::WindowControl::Window("Engine", [&]() { EngineImgui(); });
+		old_betsy_imgui::WindowControl::Window("Devices", [&]() { DevicesImgui(); });
 		old_betsy_imgui::WindowControl::Window("Performance", PerformanceWindow);
+		old_betsy_imgui::WindowControl::Window("Scene", [&](){ SceneImgui(); });
 
 		graph::NodeManager::GetInstance().Imgui();
 		graph::GraphManager::GetInstance().Imgui();
 		AssetManager::GetInstance().ImGui();
+
+		myGame->ImGui();
 	}
 
-	void GameEngine::EngineWindow()
+	void GameEngine::DevicesImgui()
 	{
+		for (const std::shared_ptr<fisk::input::InputDevice>& device : myInput.GetDevices())
+		{
+			if (ImGui::TreeNode(device->GetName().c_str()))
+			{
+				if (ImGui::BeginTable("channels", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_NoHostExtendX))
+				{
+					ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed);
+					ImGui::TableSetupColumn("value", ImGuiTableColumnFlags_WidthFixed);
+					ImGui::TableHeadersRow();
 
+					for (const std::unique_ptr<fisk::input::InputDevice::Channel>& channel : device->GetChannels())
+					{
+						ImGui::TableNextRow();
+						ImGui::TableNextColumn();
+						ImGui::Text(channel->myName.c_str());
+						ImGui::TableNextColumn();
+						old_betsy_imgui::FloatIndicator(channel->myCurrentValue);
+					}
+					ImGui::EndTable();
+				}
+
+				ImGui::TreePop();
+			}
+
+		}
+	}
+
+	void GameEngine::EngineImgui()
+	{
+		static bool demo = false;
+
+		ImGui::Checkbox("Demo Window", &demo);
+		if (demo)
+			ImGui::ShowDemoWindow(&demo);
+	}
+
+	void GameEngine::SceneImgui()
+	{
+		myMainScene.ImGui();
 	}
 
 	void GameEngine::PerformanceWindow()
@@ -104,7 +152,7 @@ namespace engine
 		struct namedThread
 		{
 			std::thread::id myId;
-			tools::TimeTree* myRoot;
+			fisk::tools::TimeTree* myRoot;
 			std::string myName;
 			auto operator <=>(const namedThread& aOther) const { return myId <=> aOther.myId; }
 		};
@@ -112,8 +160,8 @@ namespace engine
 		std::vector<namedThread> sortedThreads;
 
 		{
-			tools::LockedResource<tools::RootCollection> handle = tools::AllRoots();
-			for (std::pair<std::thread::id, tools::TimeTree*> threadTimeRoot : handle.Get())
+			fisk::tools::LockedResource<fisk::tools::RootCollection> handle = fisk::tools::AllRoots();
+			for (std::pair<std::thread::id, fisk::tools::TimeTree*> threadTimeRoot : handle.Get())
 			{
 				namedThread thread;
 				thread.myId = threadTimeRoot.first;
@@ -149,7 +197,7 @@ namespace engine
 		}
 
 		if (!accumulate)
-			tools::FlushTimeTree();
+			fisk::tools::FlushTimeTree();
 	}
 
 	void GameEngine::RegisterEngineNodes()
@@ -181,7 +229,6 @@ namespace engine
 			
 			{
 				PERFORMANCETAG("Render frame");
-				graphics::GraphicsEngine::GetInstance().BeginFrame(tools::V4f(0.14f, 0.14f, 0.14f, 1.f));
 				graphics::GraphicsEngine::GetInstance().RenderFrame();
 			}
 
@@ -215,6 +262,7 @@ namespace engine
 	{
 		PERFORMANCETAG("Engine Update");
 		WindowManager::GetInstance().Update();
+		myInput.Update();
 	}
 	
 }

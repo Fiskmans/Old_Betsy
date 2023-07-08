@@ -3,9 +3,7 @@
 
 #define VERSIONSTRING(project) (STRINGVALUE(project##_VERSION_MAJOR) "." STRINGVALUE(project##_VERSION_MINOR) "." STRINGVALUE(project##_VERSION_PATCH))
 
-#include "launcher/config.h"
 #include "tools/config.h"
 #include "imgui/config.h"
-#include "logger/config.h"
 #include "engine/config.h"
 #include "demo_game1/config.h"

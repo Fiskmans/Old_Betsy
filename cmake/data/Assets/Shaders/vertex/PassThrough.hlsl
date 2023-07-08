@@ -1,4 +1,4 @@
-#include "../ShaderStructs.hlsli"
+#include "ShaderStructs.hlsli"
 
 float4x4 ExtractBoneMatrix(uint aIndex)
 {

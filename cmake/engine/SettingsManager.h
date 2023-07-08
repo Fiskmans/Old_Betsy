@@ -30,7 +30,7 @@ namespace engine
 	};
 
 
-	class SettingsManager : public tools::Singleton<SettingsManager>
+	class SettingsManager : public fisk::tools::Singleton<SettingsManager>
 	{
 	public:
 		Setting<tools::V2ui> myWindowSize = tools::V2ui(1920, 1080);

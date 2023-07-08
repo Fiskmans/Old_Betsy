@@ -1,4 +1,4 @@
-#include "../ParticleShaderStructs.hlsli"
+#include "ParticleShaderStructs.hlsli"
 
 VertexToGeometry vertexShader(VertexInput input)
 {

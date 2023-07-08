@@ -5,6 +5,8 @@
 
 #include <vector>
 
+#define NOMINMAX
+#include <WinSock2.h>
 #include <d3d11.h>
 
 namespace engine::graphics
@@ -17,8 +19,13 @@ namespace engine::graphics
 	{
 	public:
 		Texture() = default;
-		virtual ~Texture() = default;
-		void Release();
+		virtual ~Texture();
+		Texture(const Texture&) = delete;
+		void operator=(const Texture&) = delete;
+		Texture(Texture&&);
+		void operator=(Texture&&);
+
+
 		bool IsValid() { return !!myTexture && !!myRenderTarget && !!myViewport; }
 
 		void ClearTexture(tools::V4f aClearColor = tools::V4f(0.f, 0.f, 0.f, 1.f));
@@ -39,11 +46,18 @@ namespace engine::graphics
 	class DepthTexture
 	{
 	public:
+		DepthTexture() = default;
+		~DepthTexture();
+		DepthTexture(const DepthTexture&) = delete;
+		void operator=(const DepthTexture&) = delete;
+		DepthTexture(DepthTexture&&);
+		void operator=(DepthTexture&&);
+
 		void ClearDepth(float aClearDepth = 1.0f, unsigned int aClearStencil = 0);
-		void Release();
 		bool IsValid() const { return !!myDepth; }
 
 		const ID3D11DepthStencilView* GetDepth() const { return myDepth; }
+		ID3D11ShaderResourceView*const* GetResourceView() const { return &myShaderResource; }
 
 	private:
 		friend TextureFactory;

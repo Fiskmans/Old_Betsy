@@ -10,7 +10,7 @@
 
 namespace tools
 {
-	class SubsystemManager : public Singleton<SubsystemManager>
+	class SubsystemManager : public fisk::tools::Singleton<SubsystemManager>
 	{
 	public:
 		void AddSubsystemVersion(const std::string& aSubSystemName, const std::string& aVersionString);

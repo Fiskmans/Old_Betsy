@@ -13,43 +13,26 @@ namespace engine
 	const tools::V2ui Camera::AdaptToScreen = tools::V2ui(0, 0);
 
 	Camera::Camera(RenderScene& aScene, float aNearPlane, float aFarPlane, tools::V2ui aResolution)
-		: myRenderGraph("Render graph", { &myRenderTexture }, { &mySelf, &myScene, &myResolutionExport })
-		, myTransform(tools::M44f::Identity())
+		: myTransform(tools::M44f::Identity())
 		, myNearPlane(aNearPlane)
 		, myFarPlane(aFarPlane)
 	{
 		if (aResolution == AdaptToScreen)
 		{
-			myResolutionExport.Write(WindowManager::GetInstance().GetSize());
-			myResolutionEvent = WindowManager::GetInstance().ResolutionChanged.Register(std::bind(&Camera::OnResolutionChanged, this, std::placeholders::_1));
+			myResolution = WindowManager::GetInstance().GetSize();
+			myResolutionEvent = WindowManager::GetInstance().ResolutionChanged.Register(std::bind(&Camera::ChangeResolution, this, std::placeholders::_1));
 		}
 		else
 		{
-			myResolutionExport.Write(aResolution);
+			myResolution = aResolution;
 		}
 
-		mySelf = this;
 		myScene = &aScene;
 	}
 
-	Camera::~Camera()
+	void Camera::ChangeResolution(tools::V2ui aResolution)
 	{
-		if (myResolutionEvent != tools::NullEventId)
-		{
-			WindowManager::GetInstance().ResolutionChanged.UnRegister(myResolutionEvent);
-			myResolutionEvent = tools::NullEventId;
-		}
-	}
-
-	void Camera::OnResolutionChanged(tools::V2ui aResolution)
-	{
-		myResolutionExport.Write(WindowManager::GetInstance().GetSize());
-	}
-
-	void Camera::ForceRedraw()
-	{
-		myResolutionExport.GetOutStorage()->MarkRefreshed();
-		mySelf.GetOutStorage()->MarkRefreshed();
+		myResolution = aResolution;
 	}
 
 	void Camera::SetTransform(tools::V4f aPosition, tools::V3f aRotation)
@@ -68,10 +51,10 @@ namespace engine
 	{
 		tools::V4f position = myTransform.Row(3);
 
-		myTransform  = tools::M44f::CreateRotationAroundPointX(aRotation[0], { position[0], position[1], position[2], 1 });
+		myTransform = tools::M44f::CreateRotationAroundPointX(aRotation[0], { position[0], position[1], position[2], 1 });
 		myTransform *= tools::M44f::CreateRotationAroundPointY(aRotation[1], { position[0], position[1], position[2], 1 });
 		myTransform *= tools::M44f::CreateRotationAroundPointZ(aRotation[2], { position[0], position[1], position[2], 1 });
-		
+
 		myTransform.Row(3) = position;
 	}
 
@@ -210,15 +193,14 @@ namespace engine
 
 	std::vector<ModelInstance*> Camera::Cull() const
 	{
-		return myScene.Get()->CullByFrustum(GenerateFrustum());
+		return myScene->CullByFrustum(GenerateFrustum());
 	}
 
 	void Camera::SetResolution(tools::V2ui aResolution)
 	{
-		myResolutionExport.Write(aResolution);
 	}
 
-	PerspectiveCamera::PerspectiveCamera(RenderScene& aScene, float aNearPlane, float aFarPlane, float aFOV, tools::V2ui aResolution)
+	PerspectiveCamera::PerspectiveCamera(RenderScene& aScene, tools::Distance aNearPlane, tools::Distance aFarPlane, tools::Rotation aFOV, tools::V2ui aResolution)
 		: Camera(aScene, aNearPlane, aFarPlane, aResolution)
 	{
 		myProjection = tools::M44f::Identity();
@@ -227,10 +209,10 @@ namespace engine
 		myProjection.Row(3)[3] = 0;
 		myProjection.Row(2)[3] = 1;
 
-		SetFOVRad(aFOV);
+		SetFOV(aFOV);
 	}
 
-	void PerspectiveCamera::SetFOVRad(float aFOV)
+	void PerspectiveCamera::SetFOV(tools::Rotation aFOV)
 	{
 		myXFOV = aFOV / 2.f;
 		if (myXFOV > ourMaxFOV)
@@ -244,8 +226,7 @@ namespace engine
 
 	void PerspectiveCamera::UpdateYFOV()
 	{
-		tools::V2ui resolution = myResolutionExport.Get();
-		myYFOV = myXFOV * (static_cast<float>(resolution[0]) / static_cast<float>(resolution[1]));
+		myYFOV = myXFOV * (static_cast<float>(myResolution[0]) / static_cast<float>(myResolution[1]));
 		if (myYFOV > ourMaxFOV)
 		{
 			myYFOV = ourMaxFOV;
@@ -257,23 +238,23 @@ namespace engine
 	{
 		tools::Frustum<float> frustum;
 
-		frustum.AddPlane(tools::Plane<float>(GetPosition(), tools::V4f(0.f, 0.f, 1.f, 0.f) * tools::M44f::CreateRotationAroundY((PI_F + myXFOV) * 0.5f) * myTransform));
-		frustum.AddPlane(tools::Plane<float>(GetPosition(), tools::V4f(0.f, 0.f, 1.f, 0.f) * tools::M44f::CreateRotationAroundY((PI_F + myXFOV) * -0.5f) * myTransform));
+		frustum.myRight = tools::Plane<float>(GetPosition(), tools::V4f(1.f, 0.f, 0.f, 0.f) * tools::M44f::CreateRotationAroundY(myXFOV * 0.5f) * myTransform);
+		frustum.myLeft = tools::Plane<float>(GetPosition(), tools::V4f(-1.f, 0.f, 0.f, 0.f) * tools::M44f::CreateRotationAroundY(myXFOV * -0.5f) * myTransform);
 
-		frustum.AddPlane(tools::Plane<float>(GetPosition(), tools::V4f(0.f, 0.f, 1.f, 0.f) * tools::M44f::CreateRotationAroundX((PI_F + myYFOV) * 0.5f) * myTransform));
-		frustum.AddPlane(tools::Plane<float>(GetPosition(), tools::V4f(0.f, 0.f, 1.f, 0.f) * tools::M44f::CreateRotationAroundX((PI_F + myYFOV) * -0.5f) * myTransform));
+		frustum.myTop = tools::Plane<float>(GetPosition(), tools::V4f(0.f, 1.f, 0.f, 0.f) * tools::M44f::CreateRotationAroundX(myYFOV * -0.5f) * myTransform);
+		frustum.myBottom = tools::Plane<float>(GetPosition(), tools::V4f(0.f, -1.f, 0.f, 0.f) * tools::M44f::CreateRotationAroundX(myYFOV * 0.5f) * myTransform);
 
 		tools::M33f rotation = myTransform.LowSubMatrix();
 
-		frustum.AddPlane(tools::Plane<float>(tools::V3f(0, 0, myFarPlane) * rotation + GetPosition(), tools::V3f(0.f, 0.f, 1.f) * rotation));
-		frustum.AddPlane(tools::Plane<float>(tools::V3f(0, 0, myNearPlane) * rotation + GetPosition(), tools::V3f(0.f, 0.f, -1.f) * rotation));
+		frustum.myBack = tools::Plane<float>(tools::V3f(0, 0, myFarPlane) * rotation + GetPosition(), tools::V3f(0.f, 0.f, 1.f) * rotation);
+		frustum.myFront = tools::Plane<float>(tools::V3f(0, 0, myNearPlane) * rotation + GetPosition(), tools::V3f(0.f, 0.f, -1.f) * rotation);
 
 		return frustum;
 	}
 
-	void PerspectiveCamera::OnResolutionChanged(tools::V2ui aResolution)
+	void PerspectiveCamera::ChangeResolution(tools::V2ui aResolution)
 	{
-		Camera::OnResolutionChanged(aResolution);
+		Camera::ChangeResolution(aResolution);
 		UpdateYFOV();
 	}
 
@@ -287,23 +268,25 @@ namespace engine
 		myProjection.Row(4)[4] = 1.f;
 	}
 
-	tools::PlaneVolume<float> OrthogonalCamera::GenerateFrustum() const
+	tools::Frustum<float> OrthogonalCamera::GenerateFrustum() const
 	{
 		tools::Frustum<float> frustum;
+
 		tools::V3f forward = GetForward();
 		tools::V3f right = GetRight();
 		tools::V3f up = GetUp();
 		tools::V3f center = GetPosition() + (forward * myOrthoBounds[2] / 2.f);
 
-		frustum.AddPlane(tools::Plane<float>(center - right * myOrthoBounds[0] / 2.0f, -right));
-		frustum.AddPlane(tools::Plane<float>(center + right * myOrthoBounds[0] / 2.0f, right));
+		frustum.myLeft = tools::Plane<float>(center - right * myOrthoBounds[0] / 2.0f, -right);
+		frustum.myRight = tools::Plane<float>(center + right * myOrthoBounds[0] / 2.0f, right);
 
-		frustum.AddPlane(tools::Plane<float>(center - up * myOrthoBounds[1] / 2.0f, -up));
-		frustum.AddPlane(tools::Plane<float>(center + up * myOrthoBounds[1] / 2.0f, up));
+		frustum.myBottom = tools::Plane<float>(center - up * myOrthoBounds[1] / 2.0f, -up);
+		frustum.myTop = tools::Plane<float>(center + up * myOrthoBounds[1] / 2.0f, up);
 
 
-		frustum.AddPlane(tools::Plane<float>(center - forward * myOrthoBounds[2] / 2.0f, -forward));
-		frustum.AddPlane(tools::Plane<float>(center + forward * myOrthoBounds[2] / 2.0f, forward));
+		frustum.myBack = tools::Plane<float>(center - forward * myOrthoBounds[2] / 2.0f, -forward);
+		frustum.myFront = tools::Plane<float>(center + forward * myOrthoBounds[2] / 2.0f, forward);
+
 		return frustum;
 	}
 

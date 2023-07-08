@@ -1,8 +1,8 @@
 #ifndef TOOLS_STOPWATCH_H
 #define TOOLS_STOPWATCH_H
 
-#include "tools/TimeHelper.h"
-#include "logger/Logger.h"
+#include "tools/Time.h"
+#include "tools/Logger.h"
 
 namespace tools
 {
@@ -13,12 +13,12 @@ namespace tools
 
 		inline void Start()
 		{
-			myStartTime = GetTotalTime();
+			myStartTime = fisk::tools::GetTotalTime();
 		}
 
 		inline void Stop()
 		{
-			myTime = GetTotalTime() - myStartTime;
+			myTime = fisk::tools::GetTotalTime() - myStartTime;
 		}
 
 		inline float Read()

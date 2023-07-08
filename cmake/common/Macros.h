@@ -134,7 +134,7 @@
 #define UNIQUENAME CONCAT(UniqueName,__LINE__);
 
 #if TRACKPERFORMANCE
-#define PERFORMANCETAG(name) tools::ScopeDiagnostic CONCAT(PerformanceTag, __LINE__)(name)
+#define PERFORMANCETAG(name) fisk::tools::ScopeDiagnostic CONCAT(PerformanceTag, __LINE__)(name)
 #else
 #define PERFORMANCETAG(name) ((void*)0)
 #endif

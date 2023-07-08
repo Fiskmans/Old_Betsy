@@ -3,91 +3,9 @@
 
 #include "catch2/catch_all.hpp"
 
-#include "tools/JSON.h"
 #include "tools/FloatCompare.h"
 #include "tools/MathVector.h"
 #include "tools/StringManipulation.h"
-
-
-TEST_CASE("Fiskjson", "[parsing]") 
-{
-
-	SECTION("Z")
-	{
-		REQUIRE(tools::JSONObject().Parse("{}"));
-		REQUIRE(tools::JSONObject().Parse("null").IsNull());
-		REQUIRE(!tools::JSONObject().Parse("null"));
-		REQUIRE_THROWS_AS(tools::JSONObject().Parse(""), tools::Invalid_JSON);
-		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{"), tools::Invalid_JSON);
-		REQUIRE_THROWS_AS(tools::JSONObject().Parse("["), tools::Invalid_JSON);
-		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{]"), tools::Invalid_JSON);
-		REQUIRE_THROWS_AS(tools::JSONObject().Parse("[\"x\":1 }"), tools::Invalid_JSON);
-		REQUIRE_THROWS_AS(tools::JSONObject().Parse("[1}"), tools::Invalid_JSON);
-		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{\"x"), tools::Invalid_JSON);
-		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{\"x\""), tools::Invalid_JSON);
-		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{\"x\":"), tools::Invalid_JSON);
-		REQUIRE_THROWS_AS(tools::JSONObject().Parse("{\"x\":1"), tools::Invalid_JSON);
-		REQUIRE(tools::JSONObject().Parse("{ }"));
-		REQUIRE(tools::JSONObject().Parse("{\n}"));
-		REQUIRE(tools::JSONObject().Parse("{\t}"));
-		REQUIRE(tools::JSONObject().Parse("{\r}"));
-		REQUIRE(tools::JSONObject().Parse("{\b}"));
-		REQUIRE(tools::JSONObject().Parse("{\f}"));
-		REQUIRE(tools::JSONObject().Parse("[ ]"));
-		REQUIRE(tools::JSONObject().Parse("[\n]"));
-		REQUIRE(tools::JSONObject().Parse("[\t]"));
-		REQUIRE(tools::JSONObject().Parse("[\r]"));
-		REQUIRE(tools::JSONObject().Parse("[\b]"));
-		REQUIRE(tools::JSONObject().Parse("[\f]"));
-	}
-
-	SECTION("O")
-	{
-		tools::JSONObject root;
-		SECTION("int")
-		{
-			root.Parse("1");
-			REQUIRE(root);
-			REQUIRE(root.Is<int>());
-			REQUIRE(root.Get<int>() == 1);
-			REQUIRE(root.Is<long>());
-			REQUIRE(root.Get<long>() == 1);
-			REQUIRE(root.Is<long long>());
-			REQUIRE(root.Get<long long>() == 1);
-			REQUIRE(root.Is<size_t>());
-			REQUIRE(root.Get<size_t>() == 1);
-
-			root.Parse("{\"x\":2}");
-			REQUIRE(root);
-			REQUIRE(root["x"]);
-			REQUIRE(root["x"].Is<int>());
-			REQUIRE(root["x"].Get<int>() == 2);
-		}
-
-		SECTION("string")
-		{
-			using namespace std::string_view_literals;
-			root.Parse("\"hello\"");
-			REQUIRE(root);
-			REQUIRE(root.Is<std::string>());
-			REQUIRE(root.Get<std::string>() == "hello");
-			REQUIRE(root.Is<const char*>());
-			REQUIRE(root.Get<const char*>() == "hello"sv);
-			REQUIRE(root.Is<std::string>());
-			REQUIRE(root.Get<std::string>() == "hello");
-		}
-
-		SECTION("floating point")
-		{
-			root.Parse("1.0");
-			REQUIRE(root);
-			REQUIRE(root.Is<float>());
-			REQUIRE(root.Get<float>() == tools::FloatCompare(1.0f, 1.e-8f));
-			REQUIRE(root.Is<double>());
-			REQUIRE(root.Get<double>() == tools::FloatCompare(1.0, 1.e-8));
-		}
-	}
-}
 
 TEST_CASE("MathVector", "[Math]")
 {

@@ -6,11 +6,12 @@
 #include "tools/Event.h"
 
 #define NOMINMAX
+#include <WinSock2.h>
 #include <windows.h>
 
 namespace engine
 {
-	class WindowManager : public tools::Singleton<WindowManager>
+	class WindowManager : public fisk::tools::Singleton<WindowManager>
 	{
 	public:
 		WindowManager();
@@ -26,7 +27,7 @@ namespace engine
 
 		tools::V2ui GetSize();
 
-		tools::Event<tools::V2ui> ResolutionChanged;
+		fisk::tools::Event<tools::V2ui> ResolutionChanged;
 
 	private:
 		HWND myWindowHandle;

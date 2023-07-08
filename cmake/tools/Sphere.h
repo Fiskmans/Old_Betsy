@@ -10,24 +10,13 @@ namespace tools
 	{
 	public:
 		Sphere() = default;
-		Sphere(const Sphere<T>& aSphere);
 		Sphere(const tools::MathVector<T, 3>& aCenter, T aRadius);
 
-		bool IsInside(const tools::MathVector<T, 3>& aPosition) const;
+		bool Intersects(const Sphere& aSphere) const;
 
-		T Radius() const;
-		const tools::MathVector<T, 3>& Position() const;
-	public:
 		tools::MathVector<T, 3> myPosition;
 		T myRadius;
 	};
-
-	template<typename T>
-	inline Sphere<T>::Sphere(const Sphere<T>& aSphere) :
-		myRadius(aSphere.myRadius),
-		myPosition(aSphere.myPosition)
-	{
-	}
 
 	template<typename T>
 	inline Sphere<T>::Sphere(const tools::MathVector<T, 3>& aCenter, T aRadius) :
@@ -37,22 +26,12 @@ namespace tools
 	}
 
 	template<typename T>
-	inline T Sphere<T>::Radius() const
+	inline bool Sphere<T>::Intersects(const Sphere& aSphere) const
 	{
-		return myRadius;
-	}
+		const MathVector<T, 3> delta = myPosition - aSphere.myPosition;
+		const T intersectionDistanceSq = tools::Square(myRadius + aSphere.myRadius);
 
-	template<typename T>
-	inline const tools::MathVector<T, 3>& Sphere<T>::Position() const
-	{
-		return myPosition;
-	}
-
-	template<typename T>
-	inline bool Sphere<T>::IsInside(const tools::MathVector<T, 3>& aPosition) const
-	{
-		const T dist = (aPosition.x - myPosition.x) + (aPosition.y - myPosition.y) + (aPosition.z - myPosition.z);
-		return dist * dist <= myRadius * myRadius;
+		return delta.LengthSqr() < intersectionDistanceSq;
 	}
 }
 
