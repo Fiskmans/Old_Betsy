@@ -6,10 +6,6 @@
 
 #include "engine/assets/AssetManager.h"
 
-#include "engine/graph/NodeManager.h"
-#include "engine/graph/NodeRegistration.h"
-#include "engine/graph/Graph.h"
-
 #include "imgui/CustomWidgets.h"
 #include "imgui/WindowControl.h"
 #include "imgui/backend/imgui_impl_dx11.h"
@@ -26,14 +22,6 @@ namespace engine
 {
 	Game::Game()
 	{
-		LOG_SYS_INFO("Registering nodes");
-		tools::Stopwatch stopWatch;
-		{
-			GameEngine::GetInstance().RegisterEngineNodes();
-			RegisterNodes();
-			graph::NodeManager::GetInstance().EndNode();
-		}
-		LOG_SYS_INFO("Nodes registerd in " + std::to_string(stopWatch.Read()) + " seconds");
 	}
 
 	void GameEngine::Init(Game& aGame)
@@ -94,8 +82,6 @@ namespace engine
 		old_betsy_imgui::WindowControl::Window("Performance", PerformanceWindow);
 		old_betsy_imgui::WindowControl::Window("Scene", [&](){ SceneImgui(); });
 
-		graph::NodeManager::GetInstance().Imgui();
-		graph::GraphManager::GetInstance().Imgui();
 		AssetManager::GetInstance().ImGui();
 
 		myGame->ImGui();
@@ -198,17 +184,6 @@ namespace engine
 
 		if (!accumulate)
 			fisk::tools::FlushTimeTree();
-	}
-
-	void GameEngine::RegisterEngineNodes()
-	{
-		LOG_SYS_INFO("Registering Engine nodes");
-		tools::Stopwatch stopWatch;
-		{
-			tools::TimedScope scopeTimer(stopWatch);
-			graph::NodeRegistration::Register();
-		}
-		LOG_SYS_INFO("Engine nodes registerd in " + std::to_string(stopWatch.Read()) + " seconds");
 	}
 
 	void GameEngine::Run()

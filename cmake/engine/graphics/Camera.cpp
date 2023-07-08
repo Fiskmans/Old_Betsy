@@ -5,9 +5,6 @@
 
 #include "common/Macros.h"
 
-#include "engine/graph/NodeManager.h"
-#include "engine/graph/nodes/RenderMergeNode.h"
-
 namespace engine
 {
 	const tools::V2ui Camera::AdaptToScreen = tools::V2ui(0, 0);

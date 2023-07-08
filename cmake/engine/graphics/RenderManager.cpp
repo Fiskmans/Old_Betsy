@@ -25,7 +25,6 @@ namespace engine::graphics
 	}
 
 	RenderManager::RenderManager()
-		//: myStateManager(RenderStateManager())
 	{
 	}
 
@@ -37,42 +36,6 @@ namespace engine::graphics
 		if (!myFullscreenRenderer.Init())
 			return false;
 
-		if (!myDeferredRenderer.Init())
-			return false;
-		
-		//myPerlinView = AssetManager::GetInstance().GetPerlinTexture({ 1024,1024 }, { 2,2 }, 2);
-		//
-		//if (!myForwardRenderer.Init(aFramework, myPerlinView, &myShadowRenderer))
-		//{
-		//	return false;
-		//}
-		//if (!TextureFactory::GetInstance().Init(aFramework))
-		//{
-		//	return false;
-		//}
-		//if (!mySpriteRenderer.Init(aFramework))
-		//{
-		//	return false;
-		//}
-		//if (!myParticleRenderer.Init(aFramework))
-		//{
-		//	return false;
-		//}
-		//if (!myTextRenderer.Init(aFramework))
-		//{
-		//	return false;
-		//}
-		//if (!myHighlightRenderer.Init(aFramework))
-		//{
-		//	return false;
-		//}
-		//if (!myShadowRenderer.Init(aFramework))
-		//{
-		//	return false;
-		//}
-		//
-		//DebugDrawer::GetInstance().Init(aFramework);
-		//DebugDrawer::GetInstance().SetColor(V4F(0.8f, 0.2f, 0.2f, 1.f));
 		if (!CreateTextures(WindowManager::GetInstance().GetSize()))
 		{
 			return false;
@@ -110,29 +73,6 @@ namespace engine::graphics
 	{
 		myDepthTexture.ClearDepth();
 
-
-		{
-			myGBuffer.SetAsActiveTarget(&myDepthTexture);
-			myDeferredRenderer.GenerateGBuffer(aCamera);
-			UnbindResources();
-			UnbindTargets();
-		}
-
-		{
-			myGBuffer.SetAllAsResources();
-			myTextures[static_cast<int>(Channel::IntermediateTexture)].SetAsActiveTarget();
-
-			ID3D11DeviceContext* context = GraphicsEngine::GetInstance().GetFrameWork().GetContext();
-			context->PSSetShaderResources(shader_mappings::TEXTURE_DEPTH, 1, myDepthTexture.GetResourceView());
-
-			myRenderStateManager.SetDepthStencilState(RenderStateManager::DepthStencilState::Default);
-			myRenderStateManager.SetRasterizerState(RenderStateManager::RasterizerState::NoBackfaceCulling);
-			myRenderStateManager.SetSamplerState(RenderStateManager::SamplerState::Point);
-			myRenderStateManager.SetBlendState(RenderStateManager::BlendState::AlphaBlend);
-			myDeferredRenderer.Render(aCamera);
-			UnbindResources();
-			UnbindTargets();
-		}
 
 		myTextures[static_cast<int>(Channel::IntermediateTexture)].SetAsResourceOnSlot(0);
 		myTextures[static_cast<int>(Channel::BackBuffer)].SetAsActiveTarget();

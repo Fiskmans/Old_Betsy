@@ -58,8 +58,6 @@ namespace engine
 
 		static void PerformanceWindow();
 
-		void RegisterEngineNodes();
-
 		void Run();
 		void Update();
 		Game* myGame = nullptr;

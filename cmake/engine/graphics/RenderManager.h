@@ -1,13 +1,13 @@
 #ifndef ENGINE_GRAPHICS_RENDER_MANAGER_H
 #define ENGINE_GRAPHICS_RENDER_MANAGER_H
 
-#include "engine/graphics/WindowManager.h"
-#include "engine/graphics/Texture.h"
-#include "engine/graphics/GBuffer.h"
-#include "engine/graphics/FullscreenRenderer.h"
-#include "engine/graphics/RenderStateManager.h"
 #include "engine/graphics/BoneBuffer.h"
-#include "engine/graphics/DeferredRenderer.h"
+#include "engine/graphics/Camera.h"
+#include "engine/graphics/FullscreenRenderer.h"
+#include "engine/graphics/GBuffer.h"
+#include "engine/graphics/RenderStateManager.h"
+#include "engine/graphics/Texture.h"
+#include "engine/graphics/WindowManager.h"
 
 #include "engine/assets/ModelInstance.h"
 
@@ -19,19 +19,6 @@
 #include <unordered_map>
 
 #include <d3d11.h>
-
-//#include "TextureFactory.h"
-//#include "Texture.h"
-
-//#include "ForwardRenderer.h"
-//#include "FullscreenRenderer.h"
-//#include "SpriteRenderer.h"
-//#include "ParticleRenderer.h"
-//#include "HighlightRenderer.h"
-//#include "DepthRenderer.h"
-
-//#include "GBuffer.h"
-//#include "TextRenderer.h"
 
 namespace engine::graphics
 {
@@ -69,9 +56,6 @@ namespace engine::graphics
 
 		RenderStateManager& GetRenderStateManager() { return myRenderStateManager; }
 
-		FullscreenRenderer& GetFullscreenRender() { return myFullscreenRenderer; }
-		DeferredRenderer& GetDeferredRenderer() { return myDeferredRenderer; }
-
 		template<class BufferType>
 		static bool CreateGenericShaderBuffer(ID3D11Buffer*& aBuffer) { return CreateGenericShaderBuffer(aBuffer, sizeof(BufferType)); }
 		static bool CreateGenericShaderBuffer(ID3D11Buffer*& aBuffer, size_t aSize);
@@ -85,17 +69,6 @@ namespace engine::graphics
 
 		RenderStateManager myRenderStateManager;
 
-		FullscreenRenderer myFullscreenRenderer;
-		DeferredRenderer myDeferredRenderer;
-		//ForwardRenderer myForwardRenderer;
-		//SpriteRenderer mySpriteRenderer;
-		//ParticleRenderer myParticleRenderer;
-		//TextRenderer myTextRenderer;
-		//HighlightRenderer myHighlightRenderer;
-		//DepthRenderer myShadowRenderer;
-		//AssetHandle myPerlinView;
-		//AssetHandle myRandomNormal;
-
 		enum class Channel
 		{
 			BackBuffer,
@@ -107,14 +80,14 @@ namespace engine::graphics
 		DepthTexture myDepthTexture;
 		GBuffer myGBuffer;
 
+		FullscreenRenderer myFullscreenRenderer;
+
 #if ENABLESSAO
 		bool myDoSSAO = false;
 #endif
 		bool myDoAA = true;
 		bool myShouldRenderWireFrame = false;
 
-		void SetupBoneTexture(const std::vector<ModelInstance*>& aModelList);
-		//void RenderSelection(const std::vector<ModelInstance*>& aModelsToHighlight, Camera* aCamera);
 		bool CreateTextures(const tools::V2ui& aSize);
 
 		void FullscreenPass(std::vector<Channel> aSources, Channel aTarget, FullscreenRenderer::Shader aShader);

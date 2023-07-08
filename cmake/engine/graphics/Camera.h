@@ -1,8 +1,6 @@
 #ifndef ENGINE_GRAPHICS_CAMERA_H
 #define ENGINE_GRAPHICS_CAMERA_H
 
-#include "engine/graph/Graph.h"
-
 #include "engine/assets/Asset.h"
 #include "engine/assets/ModelInstance.h"
 
