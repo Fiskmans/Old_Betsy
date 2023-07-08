@@ -3,7 +3,7 @@
 #include "engine/graphics/WindowManager.h"
 #include "engine/graphics/RenderManager.h"
 
-#include "tools/Stopwatch.h"
+#include "engine/utilities/Stopwatch.h"
 
 #include "tools/Logger.h"
 
@@ -17,9 +17,8 @@ namespace engine::graphics
 	bool GraphicsEngine::Init(tools::V2ui aWindowSize)
 	{
 		LOG_SYS_INFO("Initializing Graphics Engine");
-		tools::Stopwatch watch;
+		engine::utilities::StopWatch watch;
 		{
-			tools::TimedScope scopeTimer(watch);
 			if (!WindowManager::GetInstance().OpenWindow(aWindowSize))
 			{
 				LOG_SYS_CRASH("Unable to open window");
@@ -44,7 +43,7 @@ namespace engine::graphics
 				return false;
 			}
 		}
-		LOG_SYS_INFO("Graphics Engine initialized in " + std::to_string(watch.Read()) + " seconds");
+		LOG_SYS_INFO("Graphics Engine initialized in " + std::to_string(watch.Stop().count()) + " seconds");
 
 		return true;
 	}

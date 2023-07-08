@@ -7,13 +7,6 @@
 #include "engine/graphics/ShaderBuffers.h"
 
 #include "tools/Logger.h"
-#include "tools/Time.h"
-
-//#include "Model.h"
-//#include "ShaderFlags.h"
-//#include "Animator.h"
-//#include "TimeHelper.h"
-
 
 namespace engine
 {
@@ -49,7 +42,6 @@ namespace engine
 		myAnimator = nullptr;
 		myShouldRender = true;
 		SetCastsShadows(true);
-		ResetSpawnTime();
 	}
 
 	const ModelAsset& ModelInstance::GetModelAsset() const 
@@ -57,14 +49,8 @@ namespace engine
 		return myModel.Access();
 	}
 
-	void ModelInstance::ResetSpawnTime()
-	{
-		mySpawnTime = fisk::tools::GetTotalTime();
-	}
-
 	tools::M44f ModelInstance::GetModelToWorldTransform()
 	{
-		//tools::M44f mat = myScaleAndRotate;
 		tools::M44f toWorld = myTransform;
 
 		tools::M44f scale;
@@ -143,106 +129,6 @@ namespace engine
 	{
 		return myTransform.Row(3);
 	}
-
-	void ModelInstance::SetupanimationMatrixes()
-	{
-		thread_local graphics::AnimationBuffer bones;
-		//if (myAnimator)
-		//{
-		//	myAnimator->BoneTransform(aMatrixes);
-		//}
-		//else
-		//{
-		//	static bool onetimeWarning = true;
-		//	if (onetimeWarning)
-		//	{
-		//		SYSWARNING("Model instance with bones tried to animate without an attached controller", myModel.Get<ModelAsset>().myFilePath);
-		//		onetimeWarning = false;
-		//	}
-		//}
-		graphics::RenderManager::OverWriteBuffer(ourAnimationBuffer, bones.myTransforms, sizeof(graphics::AnimationBuffer));
-	}
-
-	/*
-	bool ModelInstance::ImGuiNode(std::map<std::string, std::vector<std::string>>& aFiles, Camera* aCamera)
-	{
-		tools::V3f pos = GetPosition();
-		if (ImGui::DragFloat3("Position", &pos.x, 0.1f))
-		{
-			SetPosition({ pos.x,pos.y,pos.z,1 });
-		}
-		float rotation[3] = { 0,0,0 };
-		if (ImGui::DragFloat3("Rotate", rotation, 0.01f, 0.0f, 0.0f, "%.1f"))
-		{
-			Rotate(tools::V3f(rotation[0], rotation[1], rotation[2]));
-		}
-		if (ImGui::DragFloat3("Scale", &myScale.x, 0.003f, 0.0f, 0.0f, "%.5f"))
-		{
-		}
-		ImGui::ColorEdit4("Tint", &myTint.x);
-		{
-
-		}
-		static std::bitset<NUMBEROFANIMATIONBONES> bonesToCross;
-		if (myModel.IsLoaded())
-		{
-			if (myModel.GetAsModel()->myBoneNameLookup.size() > 0)
-			{
-				if (ImGui::Button("Bones"))
-				{
-					ImGui::OpenPopup("boneIndexer");
-				}
-				if (ImGui::BeginPopup("boneIndexer"))
-				{
-					for (auto& i : myModel.GetAsModel()->myBoneNameLookup)
-					{
-						bool state = bonesToCross[i.second];
-						if (ImGui::Checkbox(i.first.c_str(), &state))
-						{
-							bonesToCross[i.second] = state;
-						}
-						if (ImGui::IsItemHovered())
-						{
-							DebugDrawer::GetInstance().DrawCross(GetBonePositions()[i.second], 20);
-						}
-					}
-					ImGui::EndPopup();
-				}
-			}
-		}
-		else
-		{
-			ImGui::TextColored(ImColor(1, 0, 0), "%s", "Model not loaded yet");
-		}
-
-		if (bonesToCross.any())
-		{
-			auto bonepos = GetBonePositions();
-			for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)
-			{
-				if (bonesToCross[i])
-				{
-					DebugDrawer::GetInstance().DrawCross(bonepos[i], 10);
-				}
-			}
-		}
-
-
-
-		if (ImGui::Button("Find"))
-		{
-			aCamera->SetPosition(pos + tools::V3f(0, 0, -3));
-			aCamera->SetRotation(CommonUtilities::Matrix3x3<float>());
-		}
-		ImGui::SameLine();
-
-		if (ImGui::Button("Remove"))
-		{
-			return true;
-		}
-		return false;
-	}
-	*/
 
 	tools::Sphere<float> ModelInstance::GetBoundingSphere(float aRangeModifier)
 	{

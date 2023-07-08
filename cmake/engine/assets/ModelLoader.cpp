@@ -11,7 +11,6 @@
 #include "tools/FileHelpers.h"
 #include "tools/Functors.h"
 #include "tools/Logger.h"
-#include "tools/Time.h"
 
 #include "common/Macros.h"
 
@@ -515,7 +514,6 @@ namespace engine::assets
 
 	void ModelLoader::QueueLoad(Model* aModel, std::string aFilePath)
 	{
-		PERFORMANCETAG("Model loading enqueuement");
 		while (myIsRunning)
 		{
 			for (size_t i = 0; i < myHandoverSlots; i++)
@@ -539,7 +537,6 @@ namespace engine::assets
 
 	Asset* ModelLoader::LoadModel(const std::string& aFilePath)
 	{
-		PERFORMANCETAG("Model loading");
 		Model* model = new Model();
 		PrepareModel(model, aFilePath);
 		return new ModelAsset(model, aFilePath);

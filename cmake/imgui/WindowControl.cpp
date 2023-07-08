@@ -4,8 +4,6 @@
 #include "common/WindowsIncludeWrapper.h"
 #include "common/Macros.h"
 
-#include "tools/Time.h"
-
 namespace old_betsy_imgui
 {
 	std::unordered_map<std::string, bool> WindowControl::myOpenWindows;
@@ -34,19 +32,17 @@ namespace old_betsy_imgui
 			ImGui::EndPopup();
 		}
 	}
+
 	bool WindowControl::Window(const char* aLabel, std::function<void()> aContent, ImGuiWindowFlags flags, std::function<void()> aWindowSettings)
 	{
 		if (myOpenWindows[aLabel])
 		{
-			PERFORMANCETAG("Imgui_window");
 			if (aWindowSettings)
 			{
-				PERFORMANCETAG("Imgui_setup");
 				aWindowSettings();
 			}
 			if (ImGui::Begin(aLabel, &myOpenWindows[aLabel], flags))
 			{
-				PERFORMANCETAG("Imgui_content");
 				aContent();
 			}
 			ImGui::End();

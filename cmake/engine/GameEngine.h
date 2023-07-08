@@ -19,7 +19,6 @@ namespace engine
 		Game();
 		virtual ~Game() = default;
 
-
 		virtual std::string AsciiName() = 0;
 		virtual std::wstring Name() = 0;
 
@@ -55,8 +54,6 @@ namespace engine
 		void DevicesImgui();
 		void EngineImgui();
 		void SceneImgui();
-
-		static void PerformanceWindow();
 
 		void Run();
 		void Update();

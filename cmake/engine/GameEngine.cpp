@@ -1,6 +1,10 @@
 
 #include "engine/GameEngine.h"
 #include "engine/SettingsManager.h"
+#include "engine/Time.h"
+
+#include "engine/utilities/StopWatch.h"
+
 #include "engine/graphics/GraphicEngine.h"
 #include "engine/graphics/WindowManager.h"
 
@@ -13,7 +17,6 @@
 #include "imgui/imgui.h"
 
 #include "tools/ImGuiHelpers.h"
-#include "tools/Stopwatch.h"
 #include "tools/NameThread.h"
 
 #include <algorithm>
@@ -30,10 +33,8 @@ namespace engine
 		
 		myGame = &aGame;
 		
-		tools::Stopwatch stopWatch;
+		engine::utilities::StopWatch stopWatch;
 		{
-			tools::TimedScope scopeTimer(stopWatch);
-
 			AssetManager::GetInstance().Init("data/assets/", "baked/");
 
 			graphics::GraphicsEngine::GetInstance().Init(SettingsManager::GetInstance().myWindowSize.Get());
@@ -55,31 +56,27 @@ namespace engine
 			myInput.RegisterAction(action.first, action.second);
 		}
 
-		LOG_SYS_INFO("Game Engine Initialization completed in " + std::to_string(stopWatch.Read()) + " seconds");
+		LOG_SYS_INFO("Game Engine Initialization completed in " + std::to_string(stopWatch.Stop().count()) + " seconds");
 	}
 
 	void GameEngine::RunGame()
 	{
 		LOG_SYS_INFO("Initializing Game");
-		tools::Stopwatch setupWatch;
+		engine::utilities::StopWatch setupWatch;
 		{
-			tools::TimedScope scopeTimer(setupWatch);
 			myGame->Setup();
 		}
-		LOG_SYS_INFO("Game Initialization completed in " + std::to_string(setupWatch.Read()) + " seconds");
+		LOG_SYS_INFO("Game Initialization completed in " + std::to_string(setupWatch.Stop().count()) + " seconds");
 
 		Run();
 	}
 
 	void GameEngine::Imgui()
 	{
-		PERFORMANCETAG("Engine");
-
 		old_betsy_imgui::WindowControl::DrawWindowControl();
 
 		old_betsy_imgui::WindowControl::Window("Engine", [&]() { EngineImgui(); });
 		old_betsy_imgui::WindowControl::Window("Devices", [&]() { DevicesImgui(); });
-		old_betsy_imgui::WindowControl::Window("Performance", PerformanceWindow);
 		old_betsy_imgui::WindowControl::Window("Scene", [&](){ SceneImgui(); });
 
 		AssetManager::GetInstance().ImGui();
@@ -130,112 +127,33 @@ namespace engine
 		myMainScene.ImGui();
 	}
 
-	void GameEngine::PerformanceWindow()
-	{
-		static bool accumulate = true;
-		ImGui::Checkbox("Accumulate", &accumulate);
-
-		struct namedThread
-		{
-			std::thread::id myId;
-			fisk::tools::TimeTree* myRoot;
-			std::string myName;
-			auto operator <=>(const namedThread& aOther) const { return myId <=> aOther.myId; }
-		};
-		
-		std::vector<namedThread> sortedThreads;
-
-		{
-			fisk::tools::LockedResource<fisk::tools::RootCollection> handle = fisk::tools::AllRoots();
-			for (std::pair<std::thread::id, fisk::tools::TimeTree*> threadTimeRoot : handle.Get())
-			{
-				namedThread thread;
-				thread.myId = threadTimeRoot.first;
-				thread.myRoot = threadTimeRoot.second;
-				thread.myName = tools::GetNameOfThread(threadTimeRoot.first);
-
-				sortedThreads.insert(std::upper_bound(sortedThreads.begin(), sortedThreads.end(), thread), thread);
-			}
-
-			if (sortedThreads.empty())
-			{
-				ImGui::Text("No performance data available");
-				return;
-			}
-
-			static int selected = 0;
-			if (selected >= sortedThreads.size())
-			{
-				selected = sortedThreads.size();
-			}
-
-			if (ImGui::BeginCombo("Thread", sortedThreads[selected].myName.c_str()))
-			{
-				for (size_t i = 0; i < sortedThreads.size(); i++)
-					if (ImGui::Selectable(sortedThreads[selected].myName.c_str()))
-						selected = i;
-
-				ImGui::EndCombo();
-			}
-
-
-			tools::DrawTimeTree(sortedThreads[selected].myRoot);
-		}
-
-		if (!accumulate)
-			fisk::tools::FlushTimeTree();
-	}
-
 	void GameEngine::Run()
 	{
 		while (!myGame->WantsExit())
 		{
-			PERFORMANCETAG("Main Update Loop");
-
 			Update();
-			{
-				PERFORMANCETAG("Game Update");
-				myGame->Update();
-			}
-			{
-				PERFORMANCETAG("Game Prepare Render");
-				myGame->PrepareRender();
-			}
-			
-			{
-				PERFORMANCETAG("Render frame");
-				graphics::GraphicsEngine::GetInstance().RenderFrame();
-			}
 
-			{
-				PERFORMANCETAG("Imgui");
-				ImGui_ImplDX11_NewFrame();
-				ImGui_ImplWin32_NewFrame();
-				ImGui::NewFrame();
+			myGame->Update();
+			myGame->PrepareRender();
 
-				{
-					PERFORMANCETAG("Imgui Content");
-					Imgui();
-				}
+			graphics::GraphicsEngine::GetInstance().RenderFrame();
 
-				{
-					PERFORMANCETAG("Imgui Render");
-					ImGui::Render();
-				}
+			ImGui_ImplDX11_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+			ImGui::NewFrame();
 
-				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-			}
+			Imgui();
+			ImGui::Render();
 
-			{
-				PERFORMANCETAG("End frame");
-				graphics::GraphicsEngine::GetInstance().EndFrame();
-			}
+			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+			graphics::GraphicsEngine::GetInstance().EndFrame();
 		}
 	}
 
 	void GameEngine::Update()
 	{
-		PERFORMANCETAG("Engine Update");
+		Time::GetInstance().Update();
 		WindowManager::GetInstance().Update();
 		myInput.Update();
 	}

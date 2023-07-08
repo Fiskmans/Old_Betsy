@@ -5,6 +5,8 @@
 #include "engine/graphics/RenderScene.h"
 #include "engine/graphics/ShaderMappings.h"
 
+#include "engine/utilities/Stopwatch.h"
+
 #include "engine/GameEngine.h"
 
 #include "imgui/imgui.h"
@@ -13,7 +15,6 @@
 
 #include "tools/ImGuiHelpers.h"
 #include "tools/Functors.h"
-#include "tools/Time.h"
 
 
 namespace engine::graphics
@@ -41,8 +42,12 @@ namespace engine::graphics
 			return false;
 		}
 
-		myStartedAt = fisk::tools::GetTotalTime();
-		myIsReady = true;
+		myResolutionChangedEventHandle = WindowManager::GetInstance().ResolutionChanged.Register(
+			[](tools::V2ui aResolution)
+			{
+				GetInstance().Resize(aResolution);
+			});
+
 		return true;
 	}
 
@@ -52,8 +57,6 @@ namespace engine::graphics
 
 		myTextures[static_cast<int>(Channel::BackBuffer)].ClearTexture(transparent);
 		myTextures[static_cast<int>(Channel::IntermediateTexture)].ClearTexture();
-
-		fisk::tools::GetTotalTime();
 
 		RenderScene& scene = GameEngine::GetInstance().GetMainScene();
 		Camera* camera = scene.GetMainCamera();
@@ -73,6 +76,7 @@ namespace engine::graphics
 	{
 		myDepthTexture.ClearDepth();
 
+		myTextures[static_cast<int>(Channel::IntermediateTexture)].ClearTexture();
 
 		myTextures[static_cast<int>(Channel::IntermediateTexture)].SetAsResourceOnSlot(0);
 		myTextures[static_cast<int>(Channel::BackBuffer)].SetAsActiveTarget();
@@ -103,77 +107,8 @@ namespace engine::graphics
 			context->PSSetShaderResources(tex.mySlot, 1, &tex.myResource);
 	}
 
-
-	//sprites
-		//if (aSpriteList.size() == 0)
-		//{
-		//	return;
-		//}
-		//myTextures[static_cast<int>(Textures::BackBuffer)].SetAsActiveTarget();
-		//myStateManager.SetBlendState(RenderStateManager::BlendState::AlphaBlend);
-		//myStateManager.SetRasterizerState(RenderStateManager::RasterizerState::NoBackfaceCulling);
-		//myStateManager.SetDepthStencilState(RenderStateManager::DepthStencilState::Default);
-		//
-		//mySpriteRenderer.Render(aSpriteList);
-		//
-		//myStateManager.SetBlendState(RenderStateManager::BlendState::Disable);
-		//myStateManager.SetRasterizerState(RenderStateManager::RasterizerState::Default);
-
-	//text
-		//myTextures[static_cast<int>(Textures::BackBuffer)].SetAsActiveTarget();
-		//myStateManager.SetBlendState(RenderStateManager::BlendState::AlphaBlend);
-		//myStateManager.SetRasterizerState(RenderStateManager::RasterizerState::NoBackfaceCulling); //Not sure if needed :o
-		//
-		//myTextRenderer.Render(aTextList);
-		//
-		//myStateManager.SetBlendState(RenderStateManager::BlendState::Disable);
-		//myStateManager.SetRasterizerState(RenderStateManager::RasterizerState::Default);
-
-	/*
-	void RenderManager::SetupBoneTexture(const std::vector<ModelInstance*>& aModelList)
-	{
-		static_assert(sizeof(char) == 1 && CHAR_BIT == 8, "Look over this code, make sure it works with this newfangled bytesize of yours... crazy why are you still looking at this code btw it's been decenia.. move on");
-
-		myBoneOffsetMap.clear();
-
-		unsigned char boneIndexOffset = 0;
-
-		ID3D11DeviceContext* context = myFrameworkPtr->GetContext();
-		assert(context && "Hol' up, wtf");
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-		for (auto& model : aModelList)
-		{
-			if (boneIndexOffset >= MAXNUMBEROFANIMATIONSONSCREEN)
-			{
-				break;
-			}
-			if (model->GetModelAsset().GetAsModel()->ShouldRender() && model->GetModelAsset().GetAsModel()->myAnimations.IsValid())
-			{
-				std::array<M44f, NUMBEROFANIMATIONBONES>& matrixes = myBoneBuffer[boneIndexOffset];
-				for (size_t i = 0; i < NUMBEROFANIMATIONBONES; i++)
-				{
-					matrixes[i] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-				}
-				model->SetupanimationMatrixes(matrixes);
-				myBoneOffsetMap[model] = boneIndexOffset;
-				boneIndexOffset++;
-			}
-		}
-		context->Map(myBoneBufferTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		memcpy(mappedResource.pData, &myBoneBuffer, sizeof(myBoneBuffer));
-		context->Unmap(myBoneBufferTexture, 0);
-	}
-	*/
-
 	void RenderManager::Imgui()
 	{
-		ImGui::Checkbox("Wire frame", &myShouldRenderWireFrame);
-		ImGui::BeginGroup();
-		ImGui::Checkbox("Anti aliasing", &myDoAA);
-		ImGui::Separator();
-		//tools::ZoomableImGuiSnapshot(myTextures[static_cast<int>(Textures::BackBuffer)].GetResourceView(),ImVec2(192*2,108*2));
-		ImGui::Separator();
 
 		ImGui::EndGroup();
 	}
@@ -223,27 +158,6 @@ namespace engine::graphics
 		return false;
 	}
 
-	/*
-	void RenderManager::RenderSelection(const std::vector<ModelInstance*>& aModelsToHighlight, Camera* aCamera)
-	{
-		myStateManager.SetAllStates();
-		myStateManager.SetBlendState(RenderStateManager::BlendState::Disable);
-		//return;
-		myTextures[static_cast<int>(Textures::Selection)].SetAsActiveTarget();
-		myHighlightRenderer.Render(aModelsToHighlight, aCamera, myBoneBuffer, myBoneOffsetMap);
-
-		FullscreenPass({ Textures::Selection }, Textures::SelectionScaleDown1, FullscreenRenderer::Shader::COPY);
-		FullscreenPass({ Textures::SelectionScaleDown1 }, Textures::SelEdgesHalf, FullscreenRenderer::Shader::GAUSSIANVERTICAL);
-		FullscreenPass({ Textures::SelEdgesHalf }, Textures::SelEdges, FullscreenRenderer::Shader::GAUSSIANHORIZONTAL);
-		FullscreenPass({ Textures::SelEdges }, Textures::SelectionScaleDown1, FullscreenRenderer::Shader::COPY);
-		FullscreenPass({ Textures::Selection, Textures::SelectionScaleDown1 }, Textures::Selection2, FullscreenRenderer::Shader::MERGE);
-
-		myStateManager.SetBlendState(RenderStateManager::BlendState::AlphaBlend);
-		FullscreenPass({ Textures::Selection2 }, Textures::BackBuffer, FullscreenRenderer::Shader::DiscardFull);
-		myStateManager.SetBlendState(RenderStateManager::BlendState::Disable);
-	}
-	*/
-
 
 	bool RenderManager::CreateTextures(const tools::V2ui& aSize)
 	{
@@ -271,55 +185,11 @@ namespace engine::graphics
 		myGBuffer = TextureFactory::GetInstance().CreateGBuffer(aSize, "Engine GBuffer");
 		myDepthTexture = TextureFactory::GetInstance().CreateDepth(aSize, "Engine Depth");
 
-
-		//ID3D11Device* device = myFrameworkPtr->GetDevice();
-
-		//const size_t bytesPerPixel = sizeof(tools::V4f);
-		//const size_t width = sizeof(CommonUtilities::Matrix4x4<float>) * NUMBEROFANIMATIONBONES / bytesPerPixel;
-		//const size_t height = MAXNUMBEROFANIMATIONSONSCREEN;
-		//CD3D11_TEXTURE2D_DESC desc;
-		//WIPE(desc);
-		//desc.Width = width;
-		//desc.Height = height;
-		//desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		//desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		//desc.Usage = D3D11_USAGE_DYNAMIC;
-		//desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		//desc.MipLevels = 1;
-		//desc.ArraySize = 1;
-		//desc.SampleDesc.Count = 1;
-		//desc.SampleDesc.Quality = 0;
-		//desc.MiscFlags = 0;
-		//
-		//static_assert(sizeof(BoneTextureCPUBuffer) == (width * height * bytesPerPixel) && "Something got missmatched");
-		//
-		//GraphicsFramework::AddGraphicsMemoryUsage(static_cast<size_t>(sizeof(BoneTextureCPUBuffer) * GraphicsFramework::FormatToSizeLookup[desc.Format]), "Bone Texture", "Engine Texture");
-		//
-		//
-		//HRESULT result = device->CreateTexture2D(&desc, nullptr, &myBoneBufferTexture);
-		//if (FAILED(result))
-		//{
-		//	SYSERROR("Could not create bone buffer texture");
-		//	return false;
-		//}
-		//
-		//
-		//result = device->CreateShaderResourceView(myBoneBufferTexture, nullptr, &myBoneTextureView);
-		//if (FAILED(result))
-		//{
-		//	SYSERROR("Could not create bone shader resource view");
-		//	return false;
-		//}
-
 		return true;
 	}
 
 	void RenderManager::Resize(const tools::V2ui& aSize)
 	{
-		if (!myIsReady)
-		{
-			return;
-		}
 		GraphicsFramework& framework = GraphicsEngine::GetInstance().GetFrameWork();
 		framework.GetContext()->OMSetRenderTargets(0, nullptr, nullptr);
 

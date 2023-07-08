@@ -31,10 +31,7 @@ namespace engine
 		void SetTransform(const tools::M44f& aTransform);
 		void SetScale(tools::V3f aScale);
 		void SetShouldRender(const bool aFlag);
-		//void AttachAnimator(Animator* aAnimator);
-		void ResetSpawnTime();
 		void SetCastsShadows(bool aValue);
-
 
 		bool ShouldRender() const;
 		bool HasAnimations() const;
@@ -42,8 +39,6 @@ namespace engine
 
 		tools::V4f GetPosition();
 		unsigned int GetId() const { return myId; }
-
-		void SetupanimationMatrixes();
 
 		tools::Sphere<float> GetBoundingSphere(float aRangeModifier = 1.f);
 		const float GetSpawnTime();

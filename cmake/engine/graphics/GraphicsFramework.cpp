@@ -1,12 +1,13 @@
 
 #include "engine/graphics/GraphicsFramework.h"
 #include "engine/graphics/WindowManager.h"
+
+#include "engine/utilities/Stopwatch.h"
+
 #include "imgui/WindowControl.h"
 
 #include "tools/MathVector.h"
-#include "tools/Time.h"
 #include "tools/ImGuiHelpers.h"
-#include "tools/Stopwatch.h"
 
 #include "tools/Logger.h"
 
@@ -33,10 +34,8 @@ namespace engine
 	bool GraphicsFramework::Init()
 	{
 		LOG_SYS_INFO("Initializing Graphics framework");
-		tools::Stopwatch watch;
+		engine::utilities::StopWatch watch;
 		{
-			tools::TimedScope scopeTimer(watch);
-
 			DXGI_SWAP_CHAIN_DESC desc;
 			WIPE(desc);
 			desc.BufferCount = 1;
@@ -77,7 +76,7 @@ namespace engine
 			}
 		}
 
-		LOG_SYS_INFO("Graphics framework initialized in " + std::to_string(watch.Read()) + " seconds");
+		LOG_SYS_INFO("Graphics framework initialized in " + std::to_string(watch.Result().count()) + " seconds");
 		return true;
 	}
 
@@ -91,7 +90,6 @@ namespace engine
 	{
 		if (mySwapChain)
 		{
-			PERFORMANCETAG("Present");
 			mySwapChain->Present(0, 0);
 		}
 	}

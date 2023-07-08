@@ -28,10 +28,9 @@ list(APPEND SOURCE_FILES "assets/ModelLoader.cpp"				"assets/ModelLoader.h")
 list(APPEND SOURCE_FILES "assets/ShaderFlags.h")
 list(APPEND SOURCE_FILES "assets/PointLight.h")
 
-list(APPEND SOURCE_FILES "GameEngine.h")
-list(APPEND SOURCE_FILES "GameEngine.cpp")
-list(APPEND SOURCE_FILES "SettingsManager.h")
-list(APPEND SOURCE_FILES "SettingsManager.cpp")
+list(APPEND SOURCE_FILES "GameEngine.cpp" 						"GameEngine.h")
+list(APPEND SOURCE_FILES "SettingsManager.cpp" 					"SettingsManager.h")
+list(APPEND SOURCE_FILES "Time.cpp" 							"Time.h")
 
 file(READ Version.txt VERSION_FILE)
 string(REGEX MATCH "VERSION_MAJOR ([0-9]+).*VERSION_MINOR ([0-9]+).*VERSION_PATCH ([0-9]+)" _ ${VERSION_FILE})

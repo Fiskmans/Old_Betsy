@@ -4,9 +4,9 @@
 #include "engine/graphics/RenderManager.h"
 #include "engine/GameEngine.h"
 
-#include "tools/Logger.h"
+#include "engine/utilities/Stopwatch.h"
 
-#include "tools/Stopwatch.h"
+#include "tools/Logger.h"
 
 #include <cassert>
 
@@ -30,7 +30,7 @@ namespace engine
 		}
 	}
 
-	LRESULT CALLBACK WindowManager::WndProc(_In_ HWND aHWND, _In_ UINT aUMsg, _In_ WPARAM aWParam, _In_ LPARAM aLParam)
+	LRESULT WindowManager::WndProc(_In_ HWND aHWND, _In_ UINT aUMsg, _In_ WPARAM aWParam, _In_ LPARAM aLParam)
 	{
 
 		if (aUMsg == WindowManager::GetInstance().myTaskbarButtonCreatedMessageId)
@@ -42,7 +42,6 @@ namespace engine
 		{
 			GetInstance().mySize = tools::V2ui(LOWORD(aLParam), HIWORD(aLParam));
 			GetInstance().ResolutionChanged.Fire(GetInstance().mySize);
-			graphics::RenderManager::GetInstance().Resize(WindowManager::GetInstance().mySize);
 		}
 
 		LRESULT imguiResult = ImGui_ImplWin32_WndProcHandler(aHWND, aUMsg, aWParam, aLParam);
@@ -59,10 +58,8 @@ namespace engine
 	bool WindowManager::OpenWindow(tools::V2ui aSize)
 	{
 		LOG_SYS_INFO("Opening window");
-		tools::Stopwatch watch;
+		engine::utilities::StopWatch watch;
 		{
-			tools::TimedScope scopeTimer(watch);
-
 			assert(!myWindowHandle);
 
 			tools::V2ui size = aSize;
@@ -127,7 +124,7 @@ namespace engine
 				return false;
 			}
 		}
-		LOG_SYS_INFO("Window opened in " + std::to_string(watch.Read()) + " seconds");
+		LOG_SYS_INFO("Window opened in " + std::to_string(watch.Stop().count()) + " seconds");
 
 		return true;
 	}
@@ -137,7 +134,6 @@ namespace engine
 		MSG windowMessage;
 		WIPE(windowMessage);
 
-		PERFORMANCETAG("Winmessage Parsing");
 		while (PeekMessage(&windowMessage, nullptr, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&windowMessage);

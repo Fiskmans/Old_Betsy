@@ -64,9 +64,9 @@ namespace engine::graphics
 		static bool SetShaderResource(size_t aSlot, AssetHandle<TextureAsset>& aAsset);
 
 	private:
-		float myStartedAt = 0.f;
-		bool myIsReady = false;;
 
+		fisk::tools::EventReg myResolutionChangedEventHandle;
+	
 		RenderStateManager myRenderStateManager;
 
 		enum class Channel
@@ -81,12 +81,6 @@ namespace engine::graphics
 		GBuffer myGBuffer;
 
 		FullscreenRenderer myFullscreenRenderer;
-
-#if ENABLESSAO
-		bool myDoSSAO = false;
-#endif
-		bool myDoAA = true;
-		bool myShouldRenderWireFrame = false;
 
 		bool CreateTextures(const tools::V2ui& aSize);
 
