@@ -53,8 +53,6 @@ namespace engine
 
         if (::GetAsyncKeyState(VK_SHIFT) && ::GetAsyncKeyState(VK_SHIFT))
             myShaderCompiler->ForceRecompile();
-
-        //myErrorTexture = myTextureLoader->LoadTexture(aBaseFolder + TEXTURE_FOLDER + "engine/error.dds");
     }
 
     void AssetManager::Preload()
@@ -82,11 +80,6 @@ namespace engine
             }
             iter++;
         }
-    }
-
-    void AssetManager::FlushChanges()
-    {
-        //myFileWatcher.FlushChanges();
     }
 
 	AssetHandle<TextureAsset> AssetManager::GetTexture(const std::string& aPath, bool aFailSilent)
@@ -143,21 +136,6 @@ namespace engine
 		}
 		return myCachedModels[aPath];
 	}
-    
-    //AssetHandle AssetManager::GetSkybox(const std::string& aPath)
-    //{
-    //    if (myCachedSkyboxes.count(aPath) == 0)
-    //    {
-    //        Asset* model = myModelLoader->LoadSkybox(aPath);
-    //        if (!model)
-    //        {
-    //            SYSERROR("Failed to load skybox", aPath);
-    //        }
-    //        myCachedSkyboxes[aPath] = model;
-    //        return AssetHandle(model);
-    //    }
-    //    return AssetHandle(myCachedSkyboxes[aPath]);
-    //}
 
     AssetHandle<PixelShaderAsset> AssetManager::GetPixelShader(const std::string& aPath, ShaderFlags aFlags)
     {
@@ -172,19 +150,6 @@ namespace engine
                 LOG_SYS_ERROR("Failed to load pixelShader", aPath);
             }
             myCachedPixelShaders[aPath][aFlags] = shader;
-
-            /*
-            Tools::FileWatcher::CallbackFunction callback = std::bind(
-                &ShaderCompiler::ReloadShader,
-                myShaderCompiler,
-                shader,
-                myBaseFolder + PIXELSHADER_FOLDER,
-                aPath,
-                aFlags,
-                std::placeholders::_1);
-
-            shader->myFileHandle = myFileWatcher.RegisterCallback(myBaseFolder + PIXELSHADER_FOLDER + aPath, callback);
-            */
 
             return shader;
         }
@@ -207,132 +172,17 @@ namespace engine
 
             myCachedVertexShaders[aPath][aFlags] = shader;
 
-            /*
-            tools::FileWatcher::CallbackFunction callback = std::bind(
-                &ShaderCompiler::ReloadShader,
-                myShaderCompiler,
-                shader,
-                myBaseFolder + VERTEXSHADER_FOLDER,
-                aPath,
-                aFlags,
-                std::placeholders::_1);
-
-            shader->myFileHandle = myFileWatcher.RegisterCallback(myBaseFolder + VERTEXSHADER_FOLDER + aPath, callback);
-            */
-
             return shader;
         }
 
         return myCachedVertexShaders[aPath][aFlags];
     }
 
-    //AssetHandle AssetManager::GetGeometryShader(const std::string& aPath, ShaderFlags aFlags)
-    //{
-    //    static std::mutex mutex;
-    //    std::lock_guard lock(mutex);
-    //
-    //    if (myCachedGeometryShaders[aPath].count(aFlags) == 0)
-    //    {
-    //        Asset* shader = myShaderCompiler->GetGeometryShader(myBaseFolder + GEOMETRYSHADER_FOLDER, aPath, aFlags);
-    //        if (!shader)
-    //        {
-    //            SYSERROR("Failed to load pixelShader", aPath);
-    //        }
-    //
-    //        myCachedGeometryShaders[aPath][aFlags] = shader;
-    //
-    //#if USEFILEWATHCER
-    //        Tools::FileWatcher::CallbackFunction callback = std::bind(
-    //            &ShaderCompiler::ReloadShader,
-    //            myShaderCompiler,
-    //            shader,
-    //            myBaseFolder + GEOMETRYSHADER_FOLDER,
-    //            aPath,
-    //            aFlags,
-    //            std::placeholders::_1);
-    //
-    //        shader->myFileHandle = myFileWatcher.RegisterCallback(myBaseFolder + GEOMETRYSHADER_FOLDER + aPath, callback);
-    //#endif
-    //        return AssetHandle(shader);
-    //    }
-    //
-    //    return AssetHandle(myCachedGeometryShaders[aPath][aFlags]);
-    //}
-    //
-    //AssetHandle AssetManager::GetPerlinTexture(V2ui aSize, V2f aScale, unsigned int aSeed)
-    //{
-    //    Asset* texture = myTextureLoader->GeneratePerlin(aSize, aScale, aSeed);
-    //    AssetHandle out = AssetHandle(texture);
-    //    myCustomAssets.push_back(texture);
-    //    return out;
-    //}
-    //
-    //AssetHandle AssetManager::GetJSON(const std::string& aPath)
-    //{
-    //    return GetJSONInternal(myBaseFolder + JSON_FOLDER + aPath);
-    //}
-    //
     AssetHandle<JsonAsset> AssetManager::GetJSONRelative(const std::string& aBase, const std::string& aPath)
     {
         return GetJSONInternal(tools::PathWithoutFile(aBase) + aPath);
     }
     
-    //AssetHandle AssetManager::GetFont(const std::string& aPath)
-    //{
-    //    if (myCachedfonts.count(aPath) == 0)
-    //    {
-    //        std::string fullPath = myBaseFolder + FONT_FOLDER + aPath;
-    //        Asset* font = new FontAsset(new DirectX::SpriteFont(myDevice, (std::wstring(fullPath.begin(), fullPath.end())).c_str(), true));
-    //        if (!font)
-    //        {
-    //            SYSERROR("Failed to load font", aPath);
-    //        }
-    //        myCachedfonts[aPath] = font;
-    //        return AssetHandle(font);
-    //    }
-    //    return AssetHandle(myCachedfonts[aPath]);
-    //}
-    //
-    //AssetHandle AssetManager::GetLevel(const std::string& aPath)
-    //{
-    //    if (myCachedLevels.count(aPath) == 0)
-    //    {
-    //        Asset* level = LevelLoader::LoadLevel(myBaseFolder + LEVEL_FOLDER + aPath);
-    //        if (!level)
-    //        {
-    //            SYSERROR("Failed to start loading level", aPath);
-    //        }
-    //        myCachedLevels[aPath] = level;
-    //        return AssetHandle(level);
-    //    }
-    //    return AssetHandle(myCachedLevels[aPath]);
-    //}
-    //
-    //AssetHandle AssetManager::GetNavMesh(const std::string& aPath)
-    //{
-    //    if (myCachedNavMeshes.count(aPath) == 0)
-    //    {
-    //        Asset* navmesh = NavMeshLoader::LoadNavMesh(myBaseFolder + NAVMESH_FOLDER + aPath);
-    //        if (!navmesh)
-    //        {
-    //            SYSERROR("Failed to load navmesh", aPath);
-    //        }
-    //        myCachedNavMeshes[aPath] = navmesh;
-    //        return AssetHandle(navmesh);
-    //    }
-    //    return AssetHandle(myCachedNavMeshes[aPath]);
-    //}
-    //
-    //AssetHandle AssetManager::GetAnimation(const std::string& aPath)
-    //{
-    //    return GetAnimationInternal(myBaseFolder + ANIMATIONS_FOLDER + aPath);
-    //}
-    //
-    //AssetHandle AssetManager::GetAnimationRelative(const std::string& aBase, const std::string& aPath)
-    //{
-    //    return GetAnimationInternal(Tools::PathWithoutFile(aBase) + aPath);
-    //}
-
     void AssetManager::AssumeOwnershipOfCustomAsset(Asset* aCustomAsset)
     {
         myCustomAssets.push_back(aCustomAsset);
@@ -348,38 +198,10 @@ namespace engine
 		if (ImGui::TreeNode("Shaders"))
 		{
 			ImGui::Button("Reload", ImVec2(60, 40));
-			//if (ImGui::BeginDragDropTarget())
-			//{
-			//	const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Select_Pixelshader");
-			//	if (payload)
-			//	{
-			//		std::string path = std::string(reinterpret_cast<const char*>(payload->Data), payload->DataSize);
-            //
-			//		myShaderCompiler->ForceRecompile();
-			//		if (myCachedPixelShaders.count(path) != 0)
-			//		{
-			//			for (auto& i : myCachedPixelShaders[path])
-			//			{
-			//				myFileWatcher.Trigger(i.second->myFileHandle);
-			//			}
-			//		}
-			//		myShaderCompiler->DontForceRecompile();
-			//	}
-            //
-			//	ImGui::EndDragDropTarget();
-			//}
 
 			for (auto& ShaderList : myCachedPixelShaders)
 			{
 				ImGui::Button(ShaderList.first.c_str());
-				//if (ImGui::BeginDragDropSource())
-				//{
-				//	ImGui::SetDragDropPayload("Select_Pixelshader", ShaderList.first.c_str(), ShaderList.first.length(), ImGuiCond_Once);
-                //
-				//	ImGui::Text(ShaderList.first.c_str());
-                //
-				//	ImGui::EndDragDropSource();
-				//}
 			}
 
 			ImGui::TreePop();
@@ -433,15 +255,4 @@ namespace engine
 		}
 		return myCachedJSON[aPath];
 	}
-
-    //AssetHandle AssetManager::GetAnimationInternal(const std::string& aPath)
-    //{
-    //    if (myCachedAnimations.count(aPath) == 0)
-    //    {
-    //        Asset* model = AnimationLoader::BakeAnimation(aPath);
-    //        myCachedAnimations[aPath] = model;
-    //        return AssetHandle(model);
-    //    }
-    //    return AssetHandle(myCachedAnimations[aPath]);
-    //}
 }
