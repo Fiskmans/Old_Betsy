@@ -11,6 +11,8 @@
 
 #include "engine/assets/ModelInstance.h"
 
+#include "engine/ImGuiWindow.h"
+
 #include "tools/Singleton.h"
 #include "tools/MathVector.h"
 
@@ -23,8 +25,9 @@
 namespace engine::graphics
 {
 
-	class RenderManager
-		: public fisk::tools::Singleton<RenderManager>
+	class RenderManager : 
+		public fisk::tools::Singleton<RenderManager>,
+		public engine::ImGuiWindow
 	{
 	public:
 		class TextureMapping
@@ -51,9 +54,6 @@ namespace engine::graphics
 		void MapTextures(AssetHandle<DrawableTextureAsset>& aTarget, const std::vector<TextureMapping>& aTextures, AssetHandle<DepthTextureAsset> aDepth = nullptr);
 		void MapTextures(AssetHandle<GBufferAsset>& aTarget, const std::vector<TextureMapping>& aTextures, AssetHandle<DepthTextureAsset> aDepth = nullptr);
 
-		void Imgui();
-		bool myDoDebugLines = true;
-
 		RenderStateManager& GetRenderStateManager() { return myRenderStateManager; }
 
 		template<class BufferType>
@@ -63,8 +63,13 @@ namespace engine::graphics
 		static bool OverWriteBuffer(ID3D11Buffer* aBuffer, void* aData, size_t aSize);
 		static bool SetShaderResource(size_t aSlot, AssetHandle<TextureAsset>& aAsset);
 
+		void OnImgui() override;
+		inline const char* ImGuiName() override { return "Rendering"; };
+
 	private:
 
+		bool myDoDebugLines = true;
+		tools::V4f myClearColor;
 		fisk::tools::EventReg myResolutionChangedEventHandle;
 	
 		RenderStateManager myRenderStateManager;

@@ -22,8 +22,6 @@ namespace engine::graphics
 
 		inline GraphicsFramework& GetFrameWork() { return *myFrameWork; }
 
-		void Imgui();
-
 	private:
 
 		std::unique_ptr<GraphicsFramework> myFrameWork = nullptr;

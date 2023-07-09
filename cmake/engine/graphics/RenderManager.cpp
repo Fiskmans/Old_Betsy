@@ -53,11 +53,6 @@ namespace engine::graphics
 
 	void RenderManager::Render()
 	{
-		tools::V4f transparent = tools::V4f(0.f, 0.f, 0.f, 0.f);
-
-		myTextures[static_cast<int>(Channel::BackBuffer)].ClearTexture(transparent);
-		myTextures[static_cast<int>(Channel::IntermediateTexture)].ClearTexture();
-
 		RenderScene& scene = GameEngine::GetInstance().GetMainScene();
 		Camera* camera = scene.GetMainCamera();
 
@@ -76,7 +71,9 @@ namespace engine::graphics
 	{
 		myDepthTexture.ClearDepth();
 
-		myTextures[static_cast<int>(Channel::IntermediateTexture)].ClearTexture();
+		myTextures[static_cast<int>(Channel::IntermediateTexture)].ClearTexture(myClearColor);
+
+		//rendering
 
 		myTextures[static_cast<int>(Channel::IntermediateTexture)].SetAsResourceOnSlot(0);
 		myTextures[static_cast<int>(Channel::BackBuffer)].SetAsActiveTarget();
@@ -105,12 +102,6 @@ namespace engine::graphics
 		aTarget.Access().myGBuffer.SetAsActiveTarget(&aDepth.Access().myTexture);
 		for (const TextureMapping& tex : aTextures)
 			context->PSSetShaderResources(tex.mySlot, 1, &tex.myResource);
-	}
-
-	void RenderManager::Imgui()
-	{
-
-		ImGui::EndGroup();
 	}
 
 	bool RenderManager::CreateGenericShaderBuffer(ID3D11Buffer*& aBuffer, size_t aSize)
@@ -230,5 +221,11 @@ namespace engine::graphics
 	void RenderManager::UnbindTargets()
 	{
 		GraphicsEngine::GetInstance().GetFrameWork().GetContext()->OMSetRenderTargets(0, nullptr, nullptr);
+	}
+
+	void RenderManager::OnImgui()
+	{
+		ImGui::Checkbox("Debug lines", &myDoDebugLines);
+		ImGui::ColorPicker4("Clear color", myClearColor.Raw());
 	}
 }

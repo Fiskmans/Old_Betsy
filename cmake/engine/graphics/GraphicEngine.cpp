@@ -57,9 +57,4 @@ namespace engine::graphics
 	{
 		myFrameWork->EndFrame();
 	}
-
-	void GraphicsEngine::Imgui()
-	{
-		RenderManager::GetInstance().Imgui();
-	}
 }
