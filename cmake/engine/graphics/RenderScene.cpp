@@ -94,7 +94,7 @@ namespace engine
 		LOG_SYS_WARNING("Tried to remove invalid point light :c");
 	}
 
-	std::vector<ModelInstance*> RenderScene::CullByFrustum(const tools::Frustum<float>& aFrustum)
+	std::vector<ModelInstance*> RenderScene::Cull(const tools::Frustum<float>& aFrustum)
 	{
 		thread_local std::vector<ModelInstance*> culledModels;
 		culledModels.clear();
@@ -121,7 +121,7 @@ namespace engine
 		return filtered;
 	}
 
-	std::array<PointLight*, NUMBEROFPOINTLIGHTS> RenderScene::CullPointLights(ModelInstance* aModel)
+	std::array<PointLight*, NUMBEROFPOINTLIGHTS> RenderScene::FindAffectingPointLights(ModelInstance* aModel)
 	{
 		std::array<PointLight*, NUMBEROFPOINTLIGHTS> returnArr = { nullptr };
 

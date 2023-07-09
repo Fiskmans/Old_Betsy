@@ -25,23 +25,19 @@ namespace engine
 		void AddToScene(ModelInstance* aModel);
 		void AddToScene(PointLight* aLight);
 
-		void SetMainCamera(Camera* aCamera) { myMainCamera = aCamera; }
-		void SetEnvironmentLight(engine::graphics::EnvironmentLight* aLight) { myEnvironmentLight = aLight; };
-
 		void RemoveFromScene(ModelInstance* aModel);
 		void RemoveFromScene(PointLight* aLight);
 
-		void SetSkybox(ModelInstance* aSkybox) { mySkybox = aSkybox;  }
+		void SetMainCamera(Camera* aCamera) { myMainCamera = aCamera; }
+		void SetEnvironmentLight(engine::graphics::EnvironmentLight* aLight) { myEnvironmentLight = aLight; };
 
-
-		inline ModelInstance* GetSkybox() { return mySkybox; }
 		inline Camera* GetMainCamera() { return myMainCamera; }
 		engine::graphics::EnvironmentLight* GetEnvironmentLight() const { return myEnvironmentLight; }
 
-		std::vector<ModelInstance*> CullByFrustum(const tools::Frustum<float>& aPlaneVolume);
+		std::vector<ModelInstance*> Cull(const tools::Frustum<float>& aPlaneVolume);
 		std::vector<ModelInstance*> Cull(const tools::Sphere<float>& aBoundingSphere);
 
-		std::array<PointLight*, NUMBEROFPOINTLIGHTS> CullPointLights(ModelInstance* aModel);
+		std::array<PointLight*, NUMBEROFPOINTLIGHTS> FindAffectingPointLights(ModelInstance* aModel);
 
 		inline std::vector<ModelInstance*>::iterator begin() { return myModels.begin(); }
 		inline std::vector<ModelInstance*>::iterator end() { return myModels.end(); }

@@ -190,7 +190,7 @@ namespace engine
 
 	std::vector<ModelInstance*> Camera::Cull() const
 	{
-		return myScene->CullByFrustum(GenerateFrustum());
+		return myScene->Cull(GenerateFrustum());
 	}
 
 	void Camera::SetResolution(tools::V2ui aResolution)
