@@ -5,6 +5,8 @@
 #include "engine/graphics/GraphicEngine.h"
 #include "engine/graphics/RenderScene.h"
 
+#include "engine/ImGuiWindow.h"
+
 #include "fisk_input/Input.h"
 
 #include <string>
@@ -37,7 +39,9 @@ namespace engine
 		bool myWantsExit = false;
 	};
 
-	class GameEngine : public fisk::tools::Singleton<GameEngine>
+	class GameEngine : 
+		public fisk::tools::Singleton<GameEngine>,
+		public engine::ImGuiWindow
 	{
 	public:
 		void Init(Game& aGame);
@@ -47,13 +51,11 @@ namespace engine
 		inline Game& GetCurrentGame() { return *myGame; }
 		inline RenderScene& GetMainScene() { return myMainScene; }
 
+		void OnImgui() override;
+		inline const char* ImGuiName() override { return "Game Engine"; };
+
 	private:
 		friend Game;
-
-		void Imgui();
-		void DevicesImgui();
-		void EngineImgui();
-		void SceneImgui();
 
 		void Run();
 		void Update();

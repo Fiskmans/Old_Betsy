@@ -29,6 +29,8 @@ list(APPEND SOURCE_FILES "assets/ShaderFlags.h")
 list(APPEND SOURCE_FILES "assets/PointLight.h")
 
 list(APPEND SOURCE_FILES "GameEngine.cpp" 						"GameEngine.h")
+list(APPEND SOURCE_FILES "ImGuiManager.cpp" 					"ImGuiManager.h")
+list(APPEND SOURCE_FILES "ImGuiWindow.cpp" 						"ImGuiWindow.h")
 list(APPEND SOURCE_FILES "SettingsManager.cpp" 					"SettingsManager.h")
 list(APPEND SOURCE_FILES "Time.cpp" 							"Time.h")
 
