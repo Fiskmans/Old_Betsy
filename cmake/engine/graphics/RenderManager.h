@@ -69,7 +69,10 @@ namespace engine::graphics
 	private:
 
 		bool myDoDebugLines = true;
-		tools::V4f myClearColor;
+		bool myStaticClearColor = false;
+		tools::V4f myClearColor = tools::V4f(1,1,0,1);
+
+
 		fisk::tools::EventReg myResolutionChangedEventHandle;
 	
 		RenderStateManager myRenderStateManager;

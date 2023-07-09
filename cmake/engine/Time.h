@@ -20,13 +20,13 @@ namespace engine
 
 		Time();
 
-		inline time::Seconds Now()
+		static inline time::Seconds Now()
 		{
-			return myNow;
+			return GetInstance().myNow;
 		}
-		inline time::Seconds DeltaTime()
+		static inline time::Seconds DeltaTime()
 		{
-			return myDeltaTime;
+			return GetInstance().myDeltaTime;
 		}
 
 	private:

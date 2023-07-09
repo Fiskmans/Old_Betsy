@@ -53,6 +53,11 @@ namespace engine::graphics
 
 	void RenderManager::Render()
 	{
+		if (!myStaticClearColor)
+		{
+			myClearColor = tools::V4f(0.5f + sin(Time::Now().count()) * 0.5f, 0.5f + cos(Time::Now().count()) * 0.5f, 0.5f - sin(Time::Now().count()) * 0.5f, 1.f);
+		}
+
 		RenderScene& scene = GameEngine::GetInstance().GetMainScene();
 		Camera* camera = scene.GetMainCamera();
 
@@ -226,6 +231,10 @@ namespace engine::graphics
 	void RenderManager::OnImgui()
 	{
 		ImGui::Checkbox("Debug lines", &myDoDebugLines);
-		ImGui::ColorPicker4("Clear color", myClearColor.Raw());
+		ImGui::Checkbox("Static Clear color", &myStaticClearColor);
+		if (myStaticClearColor)
+		{
+			ImGui::ColorEdit4("Clear color", myClearColor.Raw());
+		}
 	}
 }
