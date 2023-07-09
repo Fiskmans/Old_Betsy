@@ -14,7 +14,6 @@ list(APPEND SOURCE_FILES "graphics/ShaderBuffers.h")
 list(APPEND SOURCE_FILES "graphics/ShaderMappings.h")
 list(APPEND SOURCE_FILES "graphics/EnvironmentLight.h")
 list(APPEND SOURCE_FILES "graphics/BoneBuffer.h")
-list(APPEND SOURCE_FILES "graphics/Releasable.h")
 
 list(APPEND SOURCE_FILES "assets/ShaderCompiler.cpp"			"assets/ShaderCompiler.h")
 list(APPEND SOURCE_FILES "assets/ShaderTypes.cpp"				"assets/ShaderTypes.h")

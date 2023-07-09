@@ -78,6 +78,10 @@ namespace engine::graphics
 
 		myTextures[static_cast<int>(Channel::IntermediateTexture)].ClearTexture(myClearColor);
 
+		std::vector<ModelInstance*> visibleModels = aCamera.Cull();
+
+		myForwardRenderer
+
 		//rendering
 
 		myTextures[static_cast<int>(Channel::IntermediateTexture)].SetAsResourceOnSlot(0);
