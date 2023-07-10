@@ -17,6 +17,7 @@ namespace engine::graphics
 		void Render(std::vector<ModelInstance*>& aModels, Camera& aCamera);
 
 	private:
+		ID3D11Buffer* myFrameBuffer;
 		ID3D11Buffer* myObjectBuffer;
 
 		AssetHandle<PixelShaderAsset> myPixelShader;

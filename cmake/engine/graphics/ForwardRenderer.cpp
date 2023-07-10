@@ -13,6 +13,12 @@ namespace engine::graphics
 {
 	bool ForwardRenderer::Init()
 	{
+		if (!RenderManager::GetInstance().CreateGenericShaderBuffer(myFrameBuffer, sizeof(FrameBuffer)))
+		{
+			LOG_SYS_ERROR("Failed to create forward renderers frame buffer");
+			return false;
+		}
+
 		if (!RenderManager::GetInstance().CreateGenericShaderBuffer(myObjectBuffer, sizeof(ObjectBuffer)))
 		{
 			LOG_SYS_ERROR("Failed to create forward renderers object buffer");
@@ -33,16 +39,23 @@ namespace engine::graphics
 			return leftDistance < rightDistance;
 		});
 
+		FrameBuffer fBuffer;
+		fBuffer.myCameraToProjection = aCamera.GetProjection();
+		fBuffer.myWorldToCamera = aCamera.GetTransform().FastInverse();
+		fBuffer.myTotalTime = Time::Now().count();
+
+		RenderManager::GetInstance().OverWriteBuffer(myFrameBuffer, &fBuffer, sizeof(fBuffer));
+
+		context->PSSetConstantBuffers(shader_mappings::BUFFER_FRAME, 1, &myObjectBuffer);
+		context->VSSetConstantBuffers(shader_mappings::BUFFER_FRAME, 1, &myObjectBuffer);
+		
 		for (ModelInstance* modelInstance : aModels)
 		{
 			const engine::Model* rawModel = modelInstance->GetModelAsset().myModel;
 		
 
-
-			
 			for (const engine::Model::ModelData* modelData : rawModel->GetModelData())
 			{
-
 				ObjectBuffer oBuffer;
 				oBuffer.myDiffuseColor = modelData->myDiffuseColor;
 				oBuffer.myModelToWorldSpace = modelInstance->GetModelToWorldTransform().Transposed();
