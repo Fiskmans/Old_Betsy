@@ -7,9 +7,9 @@
 
 namespace engine
 {
-	ImGuiWindow::ImGuiWindow()
+	ImGuiWindow::ImGuiWindow(const std::string& aCategory)
 	{
-		ImGuiManager::GetInstance().AddWindow(this);
+		ImGuiManager::GetInstance().AddWindow(aCategory, this);
 	}
 
 	ImGuiWindow::~ImGuiWindow()

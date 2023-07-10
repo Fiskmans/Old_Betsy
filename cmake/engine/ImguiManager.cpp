@@ -24,32 +24,37 @@ namespace engine
 		
 		if (ImGui::BeginMainMenuBar())
 		{
-			if (ImGui::BeginMenu("Windows", "W"))
+			for (auto& category : myWindows)
 			{
-				ImGui::MenuItem("Windows", nullptr, false, false);
-				ImGui::Separator();
-
-				for (ImGuiWindow* window : myWindows)
+				if (ImGui::BeginMenu(category.first.c_str()))
 				{
-					ImGui::MenuItem(window->ImGuiName(), nullptr, &window->myImGuiOpen);
-				}
+					ImGui::MenuItem(category.first.c_str(), nullptr, false, false);
+					ImGui::Separator();
 
-				ImGui::EndMenu();
+					for (ImGuiWindow* window : category.second)
+					{
+						ImGui::MenuItem(window->ImGuiName(), nullptr, &window->myImGuiOpen);
+					}
+
+					ImGui::EndMenu();
+				}
 			}
 
 			ImGui::EndMainMenuBar();
 		}
-
-		for (ImGuiWindow* window : myWindows)
+		for (auto& category : myWindows)
 		{
-			if (!window->myImGuiOpen)
-				continue;
-
-			if (ImGui::Begin(window->ImGuiName(), &window->myImGuiOpen))
+			for (ImGuiWindow* window : category.second)
 			{
-				window->OnImgui();
+				if (!window->myImGuiOpen)
+					continue;
+
+				if (ImGui::Begin(window->ImGuiName(), &window->myImGuiOpen))
+				{
+					window->OnImgui();
+				}
+				ImGui::End();
 			}
-			ImGui::End();
 		}
 
 		ImGui::Render();
@@ -57,18 +62,22 @@ namespace engine
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	void ImGuiManager::AddWindow(ImGuiWindow* aWindow)
+	void ImGuiManager::AddWindow(const std::string& aCategory, ImGuiWindow* aWindow)
 	{
-		myWindows.push_back(aWindow);
+		myWindows[aCategory].push_back(aWindow);
 	}
 
 	void ImGuiManager::RemoveWindow(ImGuiWindow* aWindow)
 	{
-		decltype(myWindows)::iterator it = std::find(myWindows.begin(), myWindows.end(), aWindow);
-
-		if (it != myWindows.end())
+		for (auto& category : myWindows)
 		{
-			myWindows.erase(it);
+			std::vector<ImGuiWindow*>::iterator it = std::find(category.second.begin(), category.second.end(), aWindow);
+
+			if (it != category.second.end())
+			{
+				category.second.erase(it);
+			}
+
 		}
 	}
 

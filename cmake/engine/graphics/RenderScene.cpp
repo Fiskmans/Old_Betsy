@@ -12,7 +12,14 @@
 
 namespace engine
 {
-	void RenderScene::ImGui()
+	RenderScene::RenderScene(const std::string& aName)
+		: ImGuiWindow("Scenes")
+	{
+		static int sceneIndex = 0;
+		myName = aName + "##" + std::to_string(sceneIndex++);
+	}
+
+	void RenderScene::OnImgui()
 	{
 		std::vector<tools::V3f> pointsOfInterest;
 		

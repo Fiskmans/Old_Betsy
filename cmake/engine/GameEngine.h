@@ -18,7 +18,7 @@ namespace engine
 	class Game
 	{
 	public:
-		Game();
+		Game() = default;
 		virtual ~Game() = default;
 
 		virtual std::string AsciiName() = 0;
@@ -44,6 +44,8 @@ namespace engine
 		public engine::ImGuiWindow
 	{
 	public:
+		GameEngine();
+
 		void Init(Game& aGame);
 
 		void RunGame();

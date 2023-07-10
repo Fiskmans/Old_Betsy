@@ -8,7 +8,7 @@ namespace engine
 	class ImGuiWindow
 	{
 	public:
-		ImGuiWindow();
+		ImGuiWindow(const std::string& aCategory = "Windows");
 		~ImGuiWindow();
 
 		virtual void OnImgui() = 0;

@@ -1,13 +1,15 @@
 #ifndef ENGINE_GRAPHICS_RENDER_SCENE_H
 #define ENGINE_GRAPHICS_RENDER_SCENE_H
 
+#include "common/Macros.h"
+
 #include "engine/graphics/Camera.h"
 #include "engine/graphics/Environmentlight.h"
 
-#include "common/Macros.h"
-
 #include "engine/assets/ModelInstance.h"
 #include "engine/assets/PointLight.h"
+
+#include "engine/ImGuiWindow.h"
 
 #include "tools/PlaneVolume.h"
 #include "tools/Sphere.h"
@@ -16,11 +18,13 @@
 
 namespace engine
 {
-
-	class RenderScene
+	class RenderScene : public engine::ImGuiWindow
 	{
 	public:
-		void ImGui();
+		RenderScene(const std::string& aName);
+
+		void OnImgui() override;
+		inline const char* ImGuiName() override { return myName.c_str(); };
 
 		void AddToScene(ModelInstance* aModel);
 		void AddToScene(PointLight* aLight);
@@ -43,6 +47,8 @@ namespace engine
 		inline std::vector<ModelInstance*>::iterator end() { return myModels.end(); }
 
 	private:
+		std::string myName;
+
 		std::vector<ModelInstance*> myModels;
 		std::vector<PointLight*> myPointLights;
 		Camera* myMainCamera = nullptr;

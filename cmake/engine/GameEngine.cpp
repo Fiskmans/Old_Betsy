@@ -17,7 +17,8 @@
 
 namespace engine
 {
-	Game::Game()
+	GameEngine::GameEngine()
+		: myMainScene("main_scene")
 	{
 	}
 

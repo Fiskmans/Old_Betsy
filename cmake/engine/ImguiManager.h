@@ -6,6 +6,7 @@
 #include "tools/Singleton.h"
 
 #include <vector>
+#include <unordered_map>
 
 namespace engine
 {
@@ -15,12 +16,12 @@ namespace engine
 		void Init();
 		void Update();
 
-		void AddWindow(ImGuiWindow* aWindow);
+		void AddWindow(const std::string& aCategory, ImGuiWindow* aWindow);
 		void RemoveWindow(ImGuiWindow* aWindow);
 
 	private:
 
-		std::vector<ImGuiWindow*> myWindows;
+		std::unordered_map<std::string, std::vector<ImGuiWindow*>> myWindows;
 	};
 }
 
