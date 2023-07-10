@@ -45,7 +45,7 @@ namespace engine::graphics
 
 				ObjectBuffer oBuffer;
 				oBuffer.myDiffuseColor = modelData->myDiffuseColor;
-				oBuffer.myModelToWorldSpace = modelInstance->GetModelToWorldTransform();
+				oBuffer.myModelToWorldSpace = modelInstance->GetModelToWorldTransform().Transposed();
 				oBuffer.myObjectId = modelInstance->GetId();
 				oBuffer.myObjectLifeTime = (Time::Now() - modelInstance->GetSpawnTime()).count();
 

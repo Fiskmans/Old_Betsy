@@ -54,10 +54,10 @@ namespace engine
 	{
 		tools::M44f toWorld = myTransform;
 
-		tools::M44f scale;
-		scale.Row(1)[1] = myScale[0];
-		scale.Row(2)[2] = myScale[1];
-		scale.Row(3)[3] = myScale[2];
+		tools::M44f scale = tools::M44f::Identity();
+		scale.Row(0)[0] = myScale[0];
+		scale.Row(1)[1] = myScale[1];
+		scale.Row(2)[2] = myScale[2];
 
 		toWorld *= scale;
 
