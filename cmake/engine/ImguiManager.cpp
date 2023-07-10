@@ -45,7 +45,7 @@ namespace engine
 			if (!window->myImGuiOpen)
 				continue;
 
-			if (ImGui::Begin(window->ImGuiName()))
+			if (ImGui::Begin(window->ImGuiName(), &window->myImGuiOpen))
 			{
 				window->OnImgui();
 			}
