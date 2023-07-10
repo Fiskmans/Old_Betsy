@@ -30,7 +30,7 @@
 
 #define BAKED_SHADER_FOLDER "shaders/"
 
-#define DEFAULT_PIXEL_SHADER "deferred/Deferred.hlsl"
+#define DEFAULT_PIXEL_SHADER "FlatColor.hlsl"
 
 namespace engine
 {

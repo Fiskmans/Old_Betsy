@@ -1,8 +1,6 @@
 #ifndef ENGINE_GRAPHICS_GRAPHICS_FRAMEWORK_H
 #define ENGINE_GRAPHICS_GRAPHICS_FRAMEWORK_H
 
-#include "engine/graphics/Releasable.h"
-
 #include "tools/Singleton.h"
 
 #include <unordered_map>
@@ -16,7 +14,7 @@
 
 namespace engine
 {
-	class GraphicsFramework : fisk::tools::Singleton<GraphicsFramework>
+	class GraphicsFramework
 	{
 	public:
 		GraphicsFramework();

@@ -60,7 +60,7 @@ namespace engine
 
 		void AddModelPart(ModelData* aPart);
 
-		const std::vector<ModelData*> GetModelData();
+		const std::vector<ModelData*> GetModelData() const;
 
 
 		void MarkLoaded() { myIsLoaded = true; }

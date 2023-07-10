@@ -1,4 +1,4 @@
-#include "../ShaderStructs.hlsli"
+#include "ShaderStructs.hlsli"
 
 
 PixelOutput pixelShader(VertexToPixel input)

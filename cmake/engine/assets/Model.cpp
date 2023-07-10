@@ -16,7 +16,7 @@ namespace engine
 		myModelData.push_back(aPart);
 	}
 
-	const std::vector<Model::ModelData*> Model::GetModelData()
+	const std::vector<Model::ModelData*> Model::GetModelData() const
 	{
 		return myModelData;
 	}

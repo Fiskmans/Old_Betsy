@@ -26,6 +26,8 @@ namespace engine::graphics
 	}
 
 	RenderManager::RenderManager()
+		: myRenderStateManager()
+		, myForwardRenderer()
 	{
 	}
 
@@ -35,6 +37,9 @@ namespace engine::graphics
 			return false;
 		
 		if (!myFullscreenRenderer.Init())
+			return false;
+
+		if (!myForwardRenderer.Init())
 			return false;
 
 		if (!CreateTextures(WindowManager::GetInstance().GetSize()))
@@ -80,9 +85,14 @@ namespace engine::graphics
 
 		std::vector<ModelInstance*> visibleModels = aCamera.Cull();
 
-		myForwardRenderer
+
+		myTextures[static_cast<int>(Channel::IntermediateTexture)].SetAsActiveTarget();
+
+		myForwardRenderer.Render(visibleModels, aCamera);
 
 		//rendering
+
+		UnbindTargets();
 
 		myTextures[static_cast<int>(Channel::IntermediateTexture)].SetAsResourceOnSlot(0);
 		myTextures[static_cast<int>(Channel::BackBuffer)].SetAsActiveTarget();

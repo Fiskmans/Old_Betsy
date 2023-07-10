@@ -3,6 +3,7 @@
 
 #include "engine/graphics/BoneBuffer.h"
 #include "engine/graphics/Camera.h"
+#include "engine/graphics/ForwardRenderer.h"
 #include "engine/graphics/FullscreenRenderer.h"
 #include "engine/graphics/GBuffer.h"
 #include "engine/graphics/RenderStateManager.h"
@@ -72,10 +73,10 @@ namespace engine::graphics
 		bool myStaticClearColor = false;
 		tools::V4f myClearColor = tools::V4f(1,1,0,1);
 
-
 		fisk::tools::EventReg myResolutionChangedEventHandle;
 	
 		RenderStateManager myRenderStateManager;
+		ForwardRenderer myForwardRenderer;
 
 		enum class Channel
 		{

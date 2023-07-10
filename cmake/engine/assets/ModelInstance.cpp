@@ -41,6 +41,7 @@ namespace engine
 		myGraphicBoundsModifier = 1.f;
 		myAnimator = nullptr;
 		myShouldRender = true;
+		mySpawnTime = Time::Now();
 		SetCastsShadows(true);
 	}
 
@@ -135,7 +136,7 @@ namespace engine
 		return tools::Sphere<float>(myTransform.Row(3), myModel.Access().myModel->GetSize() * myGraphicBoundsModifier * aRangeModifier);
 	}
 
-	const float ModelInstance::GetSpawnTime()
+	const time::Seconds ModelInstance::GetSpawnTime()
 	{
 		return mySpawnTime;
 	}

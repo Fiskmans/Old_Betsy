@@ -8,6 +8,8 @@
 
 #include "engine/graphics/BoneBuffer.h"
 
+#include "engine/Time.h"
+
 #include "engine/assets/Asset.h"
 
 #include <unordered_map>
@@ -41,7 +43,7 @@ namespace engine
 		unsigned int GetId() const { return myId; }
 
 		tools::Sphere<float> GetBoundingSphere(float aRangeModifier = 1.f);
-		const float GetSpawnTime();
+		const time::Seconds GetSpawnTime();
 
 		void SetIsHighlighted(bool aState);
 		bool GetIsHighlighted();
@@ -66,7 +68,7 @@ namespace engine
 
 		bool myShouldRender;
 		bool myCastsShadows;
-		float mySpawnTime;
+		time::Seconds mySpawnTime;
 	};
 
 	inline void ModelInstance::SetCastsShadows(bool aValue)
