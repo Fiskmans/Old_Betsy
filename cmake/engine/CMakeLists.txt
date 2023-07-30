@@ -28,6 +28,9 @@ list(APPEND SOURCE_FILES "assets/ModelLoader.cpp"				"assets/ModelLoader.h")
 list(APPEND SOURCE_FILES "assets/ShaderFlags.h")
 list(APPEND SOURCE_FILES "assets/PointLight.h")
 
+list(APPEND SOURCE_FILES "utilities/StopWatch.h")
+list(APPEND SOURCE_FILES "utilities/ImGuiThreeAxisControl.cpp" 	"utilities/ImGuiThreeAxisControl.h")
+
 list(APPEND SOURCE_FILES "GameEngine.cpp" 						"GameEngine.h")
 list(APPEND SOURCE_FILES "ImGuiManager.cpp" 					"ImGuiManager.h")
 list(APPEND SOURCE_FILES "ImGuiWindow.cpp" 						"ImGuiWindow.h")

@@ -2,6 +2,8 @@
 
 #include "engine/assets/PointLight.h"
 
+#include "engine/utilities/ImGuiThreeAxisControl.h"
+
 #include "common/Macros.h"
 
 #include "tools/Intersection.h"
@@ -44,6 +46,7 @@ namespace engine
 				ImGui::Text("%.01f %.01f %.01f %.01f", myMainCamera->GetProjection().Row(3)[0], myMainCamera->GetProjection().Row(3)[1], myMainCamera->GetProjection().Row(3)[2], myMainCamera->GetProjection().Row(3)[3]);
 			ImGui::Unindent();
 
+			tools::V3f rotation = engine::utilities::ImguiThreeAxisControl("mainCameraControl");
 
 
 			ImGui::PopID();

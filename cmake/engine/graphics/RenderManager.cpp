@@ -83,10 +83,16 @@ namespace engine::graphics
 
 		myTextures[static_cast<int>(Channel::IntermediateTexture)].ClearTexture(myClearColor);
 
-		std::vector<ModelInstance*> visibleModels = aCamera.Cull();
+		std::vector<ModelInstance*> visibleModels; // = aCamera.Cull();
 
+		for (ModelInstance* instance : aCamera.GetScene())
+		{
+			visibleModels.push_back(instance);
+		}
 
-		myTextures[static_cast<int>(Channel::IntermediateTexture)].SetAsActiveTarget();
+		myRenderStateManager.SetRasterizerState(RenderStateManager::RasterizerState::Default);
+
+		myTextures[static_cast<int>(Channel::IntermediateTexture)].SetAsActiveTarget(&myDepthTexture);
 
 		myForwardRenderer.Render(visibleModels, aCamera);
 

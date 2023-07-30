@@ -27,8 +27,6 @@ namespace engine
 		virtual void Setup() = 0;
 		virtual void Update() = 0;
 		virtual void PrepareRender() = 0;
-		virtual void RegisterNodes(){}
-		virtual void ImGui() {}
 		virtual std::vector<std::pair<std::reference_wrapper<fisk::input::Action>, std::string>> GetActions() = 0;
 
 		inline void Exit() { myWantsExit = true; }

@@ -40,14 +40,14 @@ namespace engine::graphics
 		});
 
 		FrameBuffer fBuffer;
-		fBuffer.myCameraToProjection = aCamera.GetProjection();
+		fBuffer.myCameraToProjection = tools::M44f::CreateRotationAroundY(aCamera.GetProjection().Row(0)[0]);
 		fBuffer.myWorldToCamera = aCamera.GetTransform().FastInverse();
 		fBuffer.myTotalTime = Time::Now().count();
 
 		RenderManager::GetInstance().OverWriteBuffer(myFrameBuffer, &fBuffer, sizeof(fBuffer));
 
-		context->PSSetConstantBuffers(shader_mappings::BUFFER_FRAME, 1, &myObjectBuffer);
-		context->VSSetConstantBuffers(shader_mappings::BUFFER_FRAME, 1, &myObjectBuffer);
+		context->PSSetConstantBuffers(shader_mappings::BUFFER_FRAME, 1, &myFrameBuffer);
+		context->VSSetConstantBuffers(shader_mappings::BUFFER_FRAME, 1, &myFrameBuffer);
 		
 		for (ModelInstance* modelInstance : aModels)
 		{
@@ -83,7 +83,7 @@ namespace engine::graphics
 				{
 					context->Draw(modelData->myNumberOfVertexes, 0);
 				}
-
+				break;
 			}
 		}
 	}

@@ -259,10 +259,10 @@ namespace engine
 		: Camera(aScene, 0, aSize[2], aResolution)
 	{
 		myProjection = tools::M44f::Identity();
-		myProjection.Row(1)[1] = 2.f / aSize[0];
-		myProjection.Row(2)[2] = 2.f / aSize[1];
-		myProjection.Row(3)[3] = 1.f / aSize[2];
-		myProjection.Row(4)[4] = 1.f;
+		myProjection.Row(0)[0] = 2.f / aSize[0];
+		myProjection.Row(1)[1] = 2.f / aSize[1];
+		myProjection.Row(2)[2] = 1.f / aSize[2];
+		myProjection.Row(3)[3] = 1.f;
 	}
 
 	tools::Frustum<float> OrthogonalCamera::GenerateFrustum() const

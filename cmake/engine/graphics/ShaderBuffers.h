@@ -17,6 +17,10 @@ namespace engine::graphics
 		float myPadding[3] = { -1.f, -1.f, -1.f };
 	};
 
+	static_assert(offsetof(FrameBuffer, myWorldToCamera) == 0);
+	static_assert(offsetof(FrameBuffer, myCameraToProjection) == 64);
+	static_assert(offsetof(FrameBuffer, myTotalTime) == 128);
+
 	struct ObjectBuffer
 	{
 		tools::M44f myModelToWorldSpace;
@@ -27,7 +31,12 @@ namespace engine::graphics
 
 		float myPadding[2] = { -1.f, -1.f};
 	};
-	
+
+	static_assert(offsetof(ObjectBuffer, myModelToWorldSpace) == 0);
+	static_assert(offsetof(ObjectBuffer, myDiffuseColor) == 64);
+	static_assert(offsetof(ObjectBuffer, myObjectLifeTime) == 80);
+	static_assert(offsetof(ObjectBuffer, myObjectId) == 84);
+
 	struct PointLight
 	{
 		tools::V3f myPosition;

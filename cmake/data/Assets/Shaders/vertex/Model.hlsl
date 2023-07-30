@@ -14,23 +14,16 @@ VertexToPixel vertexShader(VertexInput input)
 	input.myPosition = skinnedPosition;
 #endif
 
-	float4x4 packedPosition = {
-		input.myPosition.x,input.myPosition.y,input.myPosition.z,input.myPosition.w,
-		input.myNormal.x,input.myNormal.y,input.myNormal.z,0,
-		input.myTangent.x,input.myTangent.y,input.myTangent.z,0,
-		input.myBiTangent.x,input.myBiTangent.y,input.myBiTangent.z,0
-	};
 
-	float4x4 worldPosition = mul(packedPosition, ObjectBuffer.myModelToWorldSpace);
-	float4x4 cameraPosition = mul(worldPosition, FrameBuffer.myWorldToCamera);
-	float4x4 screenPosition = mul(cameraPosition, FrameBuffer.myCameraToProjection);
+	float4 worldPosition = mul(input.myPosition, ObjectBuffer.myModelToWorldSpace);
+	float4 cameraPosition = mul(worldPosition, FrameBuffer.myWorldToCamera);
+	float4 screenPosition = mul(cameraPosition, FrameBuffer.myCameraToProjection);
 
-
-	returnValue.myPosition = -screenPosition[0];
-	returnValue.myPosition.w = 1.0;
-	returnValue.myNormal = normalize(worldPosition[1]);
-	returnValue.myTangent = worldPosition[2];
-	returnValue.myBiTangent = worldPosition[3];
+	returnValue.myPosition = worldPosition;
+	returnValue.myPosition.w = 1;
+	returnValue.myNormal = float4(1.0, 0.0, 0.0, 0.0);
+	returnValue.myTangent = float4(0.0, 1.0, 0.0, 0.0);
+	returnValue.myBiTangent = float4(0.0, 0.0, 1.0, 0.0);
 
 #if HAS_UV_SETS
 	[unroll] for (uint i = 0; i < UV_SETS_COUNT; i++)
